@@ -83,6 +83,106 @@
             <!-- /.tab-pane -->
             <div class="active tab-pane" id="settings">
               {{#with user}}
+              {{#if userTypes}}
+              <form class="form-horizontal updateVansale_profile">
+                <div class="form-group">
+                  <label for="inputName" class="col-sm-2 control-label">First Name <span
+                      class="asteric_red">*</span></label>
+
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control input" id=" inputName" name="firstName"
+                      value="{{profile.firstName}}" placeholder="First Name" required>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="inputName" class="col-sm-2 control-label">Last Name</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control input" id="inputName" name="lastName"
+                      value="{{profile.lastName}}" placeholder="Last Name">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="inputName" class="col-sm-2 control-label">Username</label>
+                  <div class="col-sm-10">
+                    <div style="padding-top:5px;padding-left: 5px;">{{username}}</div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="inputName" class="col-sm-2 control-label">Email Id</label>
+                  <div class="col-sm-10">
+                    {{#each emails}}
+                    <div style="padding-top:5px;padding-left: 5px;">{{address}}</div>
+                    {{/each}}
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="inputName" class="col-sm-2 control-label">Gender</label>
+                  <div class="col-sm-10">
+                    <div style="padding-top:5px;padding-left: 5px;">{{profile.gender}}</div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="inputName" class="col-sm-2 control-label">Branch</label>
+                  <div class="col-sm-10">
+                    <div style="padding-top:5px;padding-left: 5px;">{{defaultBranchName}}</div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="inputName" class="col-sm-2 control-label">Date Of Birth</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control datepicker date input" data-provide="datepicker"
+                      onkeydown="event.preventDefault()" id="inputName my-datepickerr " data-date-format="dd/mm/yyyy"
+                      name="dateOfBirth" data-date-autoclose="true" data-date-end-date="{{date}}"
+                      value="{{profile.dateOfBirth}}" placeholder="Date Of Birth (required)" required>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="inputName" class="col-sm-2 control-label">Transporter Name<span
+                      class="asteric_red">*</span></label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control input" id=" inputName" name="transporterName"
+                      value="{{transporterName}}" placeholder="Transporter Name" required>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="inputName" class="col-sm-2 control-label">Vehicle Number<span
+                      class="asteric_red">*</span></label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control input" id=" inputName" name="vehicleNumber"
+                      value="{{vehicleNumber}}" placeholder="Vehicle Number" required>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="inputName" class="col-sm-2 control-label">Driver Name<span
+                      class="asteric_red">*</span></label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control input" id=" inputName" name="driverName"
+                      value="{{driverName}}" placeholder="Driver Name" required>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="inputName" class="col-sm-2 control-label">Driver Number<span
+                      class="asteric_red">*</span></label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control input" id=" inputName" name="driverNumber"
+                      value="{{driverNumber}}" placeholder="Driver Number" required>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="inputName" class="col-sm-2 control-label">Lorry Boy<span
+                      class="asteric_red">*</span></label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control input" id=" inputName" name="lorryBoy" value="{{lorryBoy}}"
+                      placeholder="Lorry Boy" required>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-offset-2 col-sm-10">
+                    <button type="submit" disabled class="btn btn-primary buttonDisabled">Update Profile Info</button>
+                  </div>
+                </div>
+              </form>
+              {{else}}
               <form class="form-horizontal update_profile">
                 <div class="form-group">
                   <label for="inputName" class="col-sm-2 control-label">First Name <span
@@ -113,11 +213,17 @@
                     <div style="padding-top:5px;padding-left: 5px;">{{address}}</div>
                     {{/each}}
                   </div>
-                </div> 
+                </div>
                 <div class="form-group">
-                  <label for="inputName" class="col-sm-2 control-label">Roles</label>
+                  <label for="inputName" class="col-sm-2 control-label">Gender</label>
                   <div class="col-sm-10">
-                    <div style="padding-top:5px;padding-left: 5px;">{{roleNameGet roles}} </div>
+                    <div style="padding-top:5px;padding-left: 5px;">{{profile.gender}}</div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="inputName" class="col-sm-2 control-label">Branch</label>
+                  <div class="col-sm-10">
+                    <div style="padding-top:5px;padding-left: 5px;">{{defaultBranchName}}</div>
                   </div>
                 </div>
                 <div class="form-group">
@@ -135,6 +241,7 @@
                   </div>
                 </div>
               </form>
+              {{/if}}
               {{/with}}
             </div>
             <!-- /.tab-pane -->

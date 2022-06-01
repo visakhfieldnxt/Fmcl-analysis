@@ -1,204 +1,93 @@
-<template name="header">
-  <header class="main-header">
-    <!-- Logo -->
-    {{#with href}}
-    <a href="{{href_url}}" target="_blank" class="logo">
-      {{#with logo}}
-      <span class="logo-mini"><img src="{{logo_img}}" class="mainLogo"></span>
-      <span class="logo-lg"><img src="{{logo_img}}" class="mainLogo">&emsp;<b>
-          {{#with appName}} {{app}} {{/with}}</b></span>
-      {{/with}}
-    </a>
-    {{/with}}
-    <!-- Header Navbar: style can be found in header.less -->
-    <nav class="navbar navbar-static-top">
-      <!-- Sidebar toggle button-->
-      <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </a>
+<template name="header"> 
+    <nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
+      id="layout-navbar">
+      <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
+        <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
+          <i class="bx bx-menu bx-sm"></i>
+        </a>
+      </div>
+      <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+        <!-- Search -->
+        <div class="navbar-nav align-items-center">
+          <div class="nav-item d-flex align-items-center">
+            <i class="bx bx-search fs-4 lh-0"></i>
+            <input type="text" class="form-control border-0 shadow-none" placeholder="Search..."
+              aria-label="Search..." />
+          </div>
+        </div>
+        <!-- /Search -->
 
-      <div class="navbar-custom-menu">
+        <ul class="navbar-nav flex-row align-items-center ms-auto">
+          <!-- Place this tag where you want the button to render. -->
+          <li class="nav-item lh-1 me-3">
+            <a class="github-button" href=""
+              data-icon="octicon-star" data-size="large" data-show-count="true"
+              aria-label="Star themeselection/sneat-html-admin-template-free on GitHub">Star</a>
+          </li>
 
-        <ul class="nav navbar-nav">
-          {{#if userCan 'cashSalesView'}}
-          <li class="dropdown notifications-menu " style="font-size: 19px;">
-            <a href="#" class="dropdown-toggle" style="color: #181e25;" data-toggle="dropdown" aria-expanded="true">
-              <i class="fa fa-bell-o" style="color:white;"></i>
-              {{#with notificationCount}}
-              <span class="label label-danger">{{notificationCount}}</span>
-              {{/with}}
+          <!-- User -->
+          <li class="nav-item navbar-dropdown dropdown-user dropdown">
+            <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
+              <div class="avatar avatar-online">
+                <img src="/assets/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle" />
+              </div>
             </a>
-            <ul class="dropdown-menu">
-              {{#with notificationCount}}
-              <li class="header">You have {{notificationCount}} notifications</li>
-              {{/with}}
+            <ul class="dropdown-menu dropdown-menu-end">
               <li>
-                <ul class="menu">
-                  {{#with notificationStockAccept}}
-                  <li>
-                    <a href="/stockAcceptance/list" id="stockRem">
-                      <i class="fa fa-cubes " style="color: #4CAF50;"></i>
-                      {{{this}}}
-                    </a>
-                  </li>
-                  {{/with}}
-                  {{#with notificationOutletAprvd}}
-                  <li>
-                    <a href="/sdOutletList/list" id="outletAprvRem">
-                      <i class="fa fa-building " style="color: #4c8baf;"></i>
-                      {{{this}}}
-                    </a>
-                  </li>
-                  {{/with}}
-                  {{#with notificationOrdrAprvd}}
-                  <li>
-                    <a href="/order/list" id="ordrAprRem">
-                      <i class="fa fa-cart-plus " style="color: #9e4caf;"></i>
-                      {{{this}}}
-                    </a>
-                  </li>
-                  {{/with}}
-                </ul>
+                <a class="dropdown-item" href="#">
+                  <div class="d-flex">
+                    <div class="flex-shrink-0 me-3">
+                      <div class="avatar avatar-online">
+                        <img src="/assets/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle" />
+                      </div>
+                    </div>
+                    <div class="flex-grow-1">
+                      <span class="fw-semibold d-block">{{user.profile.firstName}}&nbsp;{{user.profile.lastName}}</span>
+                      <small class="text-muted">Admin</small>
+                    </div>
+                  </div>
+                </a>
               </li>
-            </ul>
-          </li>
-          {{/if}}
-          {{#if userCan 'outletsApproveView'}}
-          <li class="dropdown notifications-menu " style="font-size: 19px;">
-            <a href="#" class="dropdown-toggle" style="color: #181e25;" data-toggle="dropdown" aria-expanded="true">
-              <i class="fa fa-bell-o" style="color:white;"></i>
-              {{#with notificationCount}}
-              <span class="label label-danger">{{notificationCount}}</span>
-              {{/with}}
-            </a>
-            <ul class="dropdown-menu">
-              {{#with notificationCount}}
-              <li class="header">You have {{notificationCount}} notifications</li>
-              {{/with}}
               <li>
-                <ul class="menu">
-                  {{#with notificationOutletChecker}}
-                  <li>
-                    <a href="/outletApproval/list" id="outletRem">
-                      <i class="fa fa-building " style="color: #4CAF50;"></i>
-                      {{{this}}}
-                    </a>
-                  </li>
-                  {{/with}}
-                  {{#with notificationAcceptChecker}}
-                  <li>
-                    <a href="/stockTransfer/list" id="acceptRem">
-                      <i class="fa fa-cubes " style="color: #4c8baf;"></i>
-                      {{{this}}}
-                    </a>
-                  </li>
-                  {{/with}}
-                  {{#with notificationEditChecker}}
-                  <li>
-                    <a href="/stockTransfer/list" id="editRem">
-                      <i class="fa fa-pencil " style="color: #9e4caf;"></i>
-                      {{{this}}}
-                    </a>
-                  </li>
-                  {{/with}}
-                  {{#with notificationOrderChecker}}
-                  <li>
-                    <a href="/orderApprove/list" id="ordrRem">
-                      <i class="fa fa-cart-plus " style="color: #e9e522;"></i>
-                      {{{this}}}
-                    </a>
-                  </li>
-                  {{/with}}
-                  {{#with notificationStockRtn}}
-                  <li>
-                    <a href="/stockReturnAccept/list" id="stockReturnId">
-                      <i class="fa fa-cart-plus " style="color: #4CAF50;"></i>
-                      {{{this}}}
-                    </a>
-                  </li>
-                  {{/with}}
-                  {{#with notificationCollectionAdd}}
-                  <li>
-                    <a href="/collection/list" id="collectionId">
-                      <i class="fa fa-credit-card" style="color: hsl(180, 93%, 37%);"></i>
-                      {{{this}}}
-                    </a>
-                  </li>
-                  {{/with}}
-                </ul>
+                <div class="dropdown-divider"></div>
+              </li>
+              <li>
+                <a class="dropdown-item" href="#">
+                  <i class="bx bx-user me-2"></i>
+                  <span class="align-middle">My Profile</span>
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="#">
+                  <i class="bx bx-cog me-2"></i>
+                  <span class="align-middle">Settings</span>
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="#">
+                  <span class="d-flex align-items-center align-middle">
+                    <i class="flex-shrink-0 bx bx-credit-card me-2"></i>
+                    <span class="flex-grow-1 align-middle">Billing</span>
+                    <span class="flex-shrink-0 badge badge-center rounded-pill bg-danger w-px-20 h-px-20">4</span>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <div class="dropdown-divider"></div>
+              </li>
+              <li>
+                <a class="dropdown-item" href="/signout">
+                  <i class="bx bx-power-off me-2"></i>
+                  <span class="align-middle">Log Out</span>
+                </a>
               </li>
             </ul>
           </li>
-          {{/if}}
-          {{#if userCan 'sdOutletsView'}}
-
-          <li class="user user-menu notification">
-            <a href="#" class="dropdown-toggle " data-toggle="dropdown">
-              <i class="fa fa-hand-paper-o"></i>
-            </a>
-            <ul class="dropdown-menu">
-              <li class="user-header">
-                <h3 style="color:#fff"><b>Attendance</b></h3>
-                <p>
-                  {{#with user}}
-                  {{profile.firstName}} {{profile.lastName}}<br>
-                  {{else}}
-                  {{/with}}
-                </p>
-                <div class="">
-                  {{#with attCheck}}
-                  {{{attCheck}}}
-                  {{/with}}
-                </div>
-              </li>
-            </ul>
-          </li>
-          {{/if}}
-          <li class="dropdown user user-menu">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              <img src="{{profileImage}}" class="user-image" alt="User Image">
-              {{#with user}}
-              <span class="hidden-xs"> Hi {{profile.firstName}} {{profile.lastName}} !</span>
-              {{else}}
-              <span class="hidden-xs">Hi Guest !</span>
-              {{/with}}
-            </a>
-            <ul class="dropdown-menu">
-              <!-- User image -->
-              <li class="user-header">
-                <img src="{{profileImage}}" class="img-circle" alt="User Image">
-                <p>
-                  {{#with user}}
-                  {{profile.firstName}} {{profile.lastName}}<br>
-                  {{roleNameGet roles}}
-                  {{else}}
-                  {{/with}}
-                </p>
-
-              </li>
-              <li class="user-footer">
-                <div class="pull-left">
-                  <a href="/profile/update" class="btn btn-default btn-flat profile" id="ic-update">Profile</a>
-                </div>
-                <div class="pull-right">
-                  <a class="btn btn-default btn-flat signOutVal">Sign out</a>
-                </div>
-              </li>
-            </ul>
-          </li>
+          <!--/ User -->
         </ul>
       </div>
-    </nav>
-
-    {{#if notification}}
-    <!-- {{> notification}} -->
-
-    {{/if}}
-    {{> warningModal id="notificationWarnigModal" section='Warning' }}
-
-
-  </header>
+    </nav> 
+  {{#if notification}}
+  {{/if}}
+  {{> warningModal id="notificationWarnigModal" section='Warning' }}
 </template>

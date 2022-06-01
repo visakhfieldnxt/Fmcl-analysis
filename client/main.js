@@ -2,10 +2,13 @@
 
 import '/imports/startup/client';
 import '/imports/startup/both';
-import {Config} from '../imports/api/config/config.js'
+import { Config } from '../imports/api/config/config.js'
 
- 
+Meteor.subscribe('config.list');  
+
 setTimeout(function () {
-  const appName = Config.findOne({name: 'headerName'});
-  $('#title').html(appName.value);
+  const appName = Config.findOne({ name: 'headerName' });
+  if (appName) {
+    $('#title').html(appName.value);
+  }
 }, 800);

@@ -1,241 +1,774 @@
 <template name="delivery">
-   {{#if userCan 'deliveryListView'}}
+  {{#if userCan 'deliveryView'}}
   <section class="content-header">
-      <h1>Delivery
-        <small>Listing All deliveries</small>
-      </h1>
-      <ol class="breadcrumb">
-        <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li class="active">delivery</li>
-      </ol>
-    </section>
-    <section class="content">
-      <div class="row">
-        <div style="float: right;">
-          <button class="btn btn-primary btn-flat" id="filterSearch"><i class="fa fa-search"> </i>&nbsp; Search</button>
+    <h1>Delivery - Invoice List
+      <small>Listing All Delivery - Invoice</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
+      <li class="active">Delivery - Invoice</li>
+    </ol>
+  </section>
+  <section class="content">
+    <div class="row">
+      <div style="float: right;">
+        {{#if userCan 'deliveryCreate'}}
+        <button type="button" class="btn btn-primary btn-flat delivery" id="order-create-button">Create new
+          Delivery</button>
+        {{/if}}
+        <button type="button" class="btn btn-primary btn-flat filters" id="filterSearch"><i class="fa fa-search">
+          </i>&nbsp; Search</button>
+      </div>
+    </div>
+    <div class="row" id="filterDisplay" style="display:none">
+      <div class="box box-default box-solid">
+        <div class="box-header with-border bg-aqua">
+          <h3 class="box-title">{{user}} Filter</h3><button type="button" id="removeSearch"
+            style="color: white; background-color: transparent; border-color:transparent" class="pull-right"><i
+              class="fa fa-close"></i></button>
+        </div>
+        <div class="box-body no-padding">
+          <form class="order-filter">
+            <div class="row">
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EMPcode">Customer Name</label><br>
+                <select value='' name="cardName" style="width:100% !important" id="selectCustomerName"
+                  class="selectCustomerName" placeholder="Select Card Name">
+                  <option disabled selected value=''>Select Customer Name</option>
+                  {{# each customersList}}
+                  <option value="{{cardName}}">{{cardName}}</option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EmailId">From Date</label>
+                <input type="text" autocomplete="off" class="form-control datepicker date validation"
+                  data-date-autoclose="true" onkeydown="event.preventDefault()" id="fromDate" data-provide="datepicker"
+                  data-date-format="dd-mm-yyyy" placeholder="From Date " name="fromDate" />
+              </div>
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EmailId">To Date</label>
+                <input type="text" autocomplete="off" class="form-control datepicker date validation"
+                  data-date-autoclose="true" onkeydown="event.preventDefault()" id="toDate" data-provide="datepicker"
+                  data-date-format="dd-mm-yyyy" placeholder="To Date " name="toDate" />
+              </div>
+              <div class="row" style="float: right">
+                <button type="submit" name="filter" class="btn btn-primary">Filter</button>
+                <button type="button" name="reset" class="btn btn-info reset">Reset Filter</button>
+              </div>
+            </div>
+          </form>
         </div>
       </div>
-      <div class="row" id="filterDisplay" style="display:none">
-        <div class="box box-default box-solid">
-          <div class="box-header with-border bg-aqua">
-            <h3 class="box-title"  style="color: black;">Delivery Filter</h3><button type="button" id="removeSearch"
-              style="color: white; background-color: transparent; border-color:transparent" class="pull-right"><i
-                class="fa fa-close"  style="color: black;"></i></button>
-          </div>
-          <div class="box-body no-padding">
-            <form class="deliveryFilter">
-              <div class="row">
-                <div class="col-sm-4" style="padding: 10px 10px 10px 10px;">
-                  <label for="delivery">Delivery Outlet</label>
-                  <select class="deliveryOutletselection" style="width:100%;" name="deliveryOutletselection"
-                    id="deliveryOutletselection">
-                    <option disabled selected value=''>Select Outlet</option>
-                    {{# each outletLis}}
-                    <option value="{{_id}}">{{name}}</option>
-                    {{/each}}
-                  </select>
-                </div>
-                <!-- <div class="col-sm-4" style="padding: 10px 10px 10px 10px;">
-                  <label for="delivery">Delivery Assigned to</label>
-                  <select class="deliveryAssignedSelection" style="width:100%;" name="deliveryAssignedSelection"
-                    id="deliveryAssignedSelection">
-                    <option disabled selected value=''>Select Assigned to</option>
-                    
-                  </select>
-                </div> -->
-                <div class="row" style="float: right">
-                  <button type="submit" name="filter" class="btn btn-primary">Filter</button>
-                  <button type="button" name="reset" class="btn btn-info reset">Reset Filter</button>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="nav-tabs-custom taskHeader" id="taskHeader">
-          
-          <div class="tab-content" style="padding : 0px !important">
-            <div class="box box-default box-solid">
-              <!-- <div class="box-header with-border bg-aqua">
-                <h3 class="box-title">delivery</h3>
-              </div> -->
-              {{#if isReady}}
-              <div class="box-body no-padding table-responsive">
-                <table class="table table-striped generic">
-                  <tbody>
-                    <tr>
-                      <th class="text-center sorted-column" id="name">Outlet</th>
-                      <th class="text-center sorted-column">Assigned to</th>
-                      <th class="text-center sorted-column">Date</th>
-                      <th class="text-center sorted-column">Location</th>
-                      <th class="text-center sorted-column"></th>
-                    </tr>
-                    {{#each deliverylist}}
-                    <tr style="cursor:pointer">
-                      <td class="text-center outletVal_{{outlet}}" width="16.6%">{{outletHelp outlet}} </td>
-                      <td class="text-center AssignedVal_{{assigned_to}}" width="16.6%">{{assignedHelp assigned_to}}</td>
-                      <td class="text-center" width="16.6%">{{dateFunction date}}</td>
-                      <td class="text-center" width="16.6%">{{location}}</td>
-                      <td class="text-center" width="16.6%">
-                       
-                        <a href="javascript:void(0)" class="view" title="Click to view detailsss" id="{{_id}}">
-                          <button class="pd-20 btn btn-default"><i class="fa fa-ellipsis-v"></i></button>
-                        </a>
-                      </td>
-                    </tr>
-                    {{/each}}
-                  </tbody>
-                </table>
-              </div>
-              {{sortIcon}}
-            {{else}}
-            <div class="overlay">
-              <i class="fa fa-refresh fa-spin"></i>
-            </div> 
-            {{/if}}
-             
-            </div>
-            </div>
+    </div>
+    <div class="row">
+      {{#if isReady}}
+      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right" onClick=clickEvent}}
+      {{/if}}
+      <div class="box box-default box-solid">
+        <div class="box-header with-border bg-aqua">
+          <h3 class="box-title"> Delivery - Invoice List</h3>
         </div>
         {{#if isReady}}
-        {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
-        onClick=clickEvent}}
-        {{/if}}
-      </div>
-      {{#if isReady}}
-      <div id="bodySpin">
-      </div>
-      {{else}}
-      <div id="bodySpin" style=" width: 100%;position: 
-            fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
-        {{#with bodyLoader}}
-        <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
-        justify-content: center;background: #f1f1f1;">
-          <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
-        </div>
-        {{/with}}
-      </div>
-      {{/if}}
-  </section>
-  
-{{> successModal id="deliverySuccessModal" section=delivery}}
-{{> errorModal id="deliveryErrorModal" section=delivery}}
-<div class="modal fade in" id="deliveryActiveConfirmation">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">×</span></button>
-        <h4 class="modal-title text-bold" id="deliveryHeaders"></h4>
-        <input id="deliveryRemAndActId" type="hidden" value="">
-      </div>
-      <div class="modal-body">
-        <div id="deliverysBody">
-          <p class="success-color">
-            Are you sure to activate delivery- '<span id="deliveryNameDups" class="text-bold"></span>' ?
-          </p>
-        </div>
-        <input type="hidden" id="confirmedUuids">
-      </div>
-      <div class="modal-footer">
-        <button id="deliveryActivate" class="btn btn-success">Yes please!</button>
-        <button type="button" class="btn btn-default" data-dismiss="modal" id="deliveryClose">Not
-          now</button>
-      </div>
-    </div>
-  </div>
-</div>
-<div class="modal fade in" id="deliveryDelConfirmation">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">×</span></button>
-        <h4 class="modal-title text-bold" id="deliveryHeader"></h4>
-      </div>
-      <div class="modal-body">
-        <div id="deliverysBody">
-          <p class="danger-color">
-            Are you sure to inactivate delivery- '<span id="deliveryNameDup" class="text-bold"></span>' ?
-          </p>
-        </div>
-        <input type="hidden" id="confirmedUuid">
-      </div>
-      <div class="modal-footer">
-        <button id="deliveryRemove" class="btn btn-danger">Yes please!</button>
-        <button type="button" class="btn btn-default" data-dismiss="modal" id="deliveryClose">Not
-          now</button>
-      </div>
-    </div>
-  </div>
-</div>
-<div class="modal fade in" id="deliveryDetailPage">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">×</span></button>
-        <h4 class="modal-title text-bold" id="deliveryH"></h4>
-      </div>
-      <div class="modal-body">
-        <div class="box box-default box-solid">
-         
-          <table style="width:100%;" class="table table-striped">
+        <div class="box-body no-padding table-responsive">
+          <table class="table table-striped generic">
             <tbody>
-              <tr class="table-border">
-                <td width="50%">
-                  <label for="Employee ">Outlet</label>
-                  <div id="deliveryoutlet"></div>
-                </td>
-                <td width="50%">
-                  <label for="firstName">Assigned To </label>
-                  <div id="deliveryassigned_to"></div>
-                </td>
-                
+              <tr>
+                <th class="text-center sorted-column" id="name">Customer Name</th>
+                <th class="text-center sorted-column">Delivery No/Date</th>
+                <th class="text-center sorted-column">Delivery Status</th>
+                <th class="text-center sorted-column">DueDate</th>
+                <th class="text-center sorted-column"></th>
               </tr>
-              <tr class="table-border">
-                <td width="50%">
-                  <label for="Employee ">Date</label>
-                  <div id="deliverydate"></div>
-                </td>
-                <td width="50%">
-                  <label for="Employee ">location</label>
-                  <div id="deliveryLocation"></div>
+              {{#each deliveries}}
+              <tr>
+                <td class="pl-20 text-center" width="20%">{{cardName}}</td>
+                <td class="text-center" width="20%">{{docNum}}/{{date docDate}}</td>
+                <td class="text-center" width="20%"> {{docStts docStatus}}</td>
+                <td class="text-center" width="20%">{{date docDueDate}}</td>
+                <td class="text-center" width="20%">
+                  <!-- <a href="javascript:void(0)"  class="returns " title="Click for Sales Return" id="{{uuid}}">
+                                    <button class="pd-20 btn btn-primary"><i class="fa fa-share"></i></button>
+                                  </a> -->
+                  <!-- <a href="javascript:void(0)" class="gInvoice " title="Generate Invoice" id="{{uuid}}">
+                                <button class="pd-20 btn btn-primary"><i class="fa fa-print"></i></button>
+                              </a> -->
+                  {{#if docNum}}
+                  <a href="javascript:void(0)" class="print" title="Click to print" id="{{_id}}">
+                    <button class="pd-20 btn btn-primary"><i class="fa fa-print"></i></button>
+                  </a>
+                  {{/if}}
+                  {{#if userCan 'dispatchView'}}
+                  <a href="javascript:void(0)" class="genInvoice" title="Generate Invoice" id="{{_id}}">
+                    <button class="pd-20 btn btn-success"><i class="fa fa-external-link"></i></button>
+                  </a>
+                  {{/if}}
+                  <a href="javascript:void(0)" class="view " title="Click to view details" id="{{_id}}">
+                    <button class="pd-20 btn btn-default"><i class="fa fa-ellipsis-v"></i></button>
+                  </a>
                 </td>
               </tr>
-              <tr class="table-border">
-                <td width="50%">
-                  <label for="Employee ">Status</label>
-                  <div id="statusdelivery"></div>
-                </td>
-              
-              </tr>
+              {{/each}}
             </tbody>
           </table>
         </div>
-        {{#if printLoad}}
-        <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
-        absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
-          {{#with printLoaderImage}}
-          <div class="loader-lg" style="width: 100%;height: 100%;display: 
-          flex; align-items: center;justify-content: center;background: #fff;">
-            <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
-          </div>
-          {{/with}}
-        </div>
+        {{sortIcon}}
         {{else}}
-        <div class="loadersSpin">
+        <div class="overlay">
+          <i class="fa fa-refresh fa-spin"></i>
         </div>
         {{/if}}
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default closen" data-dismiss="modal">Close</button>
+      {{#if isReady}}
+      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right" onClick=clickEvent}}
+      {{/if}}
+    </div>
+    {{#if isReady}}
+    <div id="bodySpin">
+    </div>
+    {{else}}
+    <div id="bodySpin" style=" width: 100%;position: 
+          fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+      justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;"></div>
+      {{/with}}
+    </div>
+    {{/if}}
+  </section>
+  <div class="modal fade in" id="invoiceGenerate">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="categoryHeader"></h4>
+        </div>
+        <div class="modal-body">
+          <div id="categoryBody">
+            <p>
+              Are you sure to you want to generate Invoice ?
+            </p>
+          </div>
+          <input type="hidden" id="confirmedUuid">
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="categoryInvoice" class="btn btn-success ">Yes please!</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal" id="closeRole">Not now</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
+  <div class="modal fade in" id="invoiceDetailPage">
+    <div class="modal-dialog">
+      <form class="invoiceUpdates" autocomplete="off">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span></button>
+            <h4 class="modal-title text-bold" id="categoryHss"></h4>
+          </div>
+          <div class="modal-body">
+            <div class="box box-default box-solid">
+              <div class="box-header with-border bg-aqua">
+                <h3 class="box-title">Invoice Details</h3>
+              </div>
+              <table style="width:100%;table-layout: fixed;border-collapse: collapse;"
+                class="table table-responsive table-striped">
+                <tbody>
+                  <tr class="table-border">
+                    <td width="50%">
+                      <label for="Employee ">Customer Name </label>
+                      <div id="detailCardNamess" style="word-wrap:break-word;"></div>
+                    </td>
+                    <td width="50%">
+                      <label for="Employee ">Shipping Address</label>
+                      <div id="detailAddressInvoice" style="word-wrap:break-word;"></div>
+                    </td>
+                  </tr>
+                  <tr class="table-border">
+                    <td width="50%">
+                      <label for="Employee ">Branch </label>
+                      <div id="detailBranchss" style="word-wrap:break-word;"></div>
+                    </td>
+                    <td width="50%">
+                      <label for="firstName">Delivery Date </label>
+                      <div id="detailDocDatess" style="word-wrap:break-word;"></div>
+                    </td>
+                  </tr>
+                  <tr class="table-border">
+                    <td>
+                      <label for="Employee ">Due Date</label>
+                      <div id="detailDocDeliverss" style="word-wrap:break-word;"></div>
+                    </td>
+                    <td>
+                      <label for="firstName">Delivery No</label>
+                      <div id="detailOrderIdss" style="word-wrap:break-word;"></div>
+                    </td>
+                  </tr>
+                  <tr class="table-border">
+                    <td>
+                      <label for="Employee ">Transporter Name</label>
+                      <div id="detailTransporters" style="word-wrap:break-word;"></div>
+                    </td>
+                    <td>
+                      <label for="firstName">Driver Name</label>
+                      <div id="detailDrivers" style="word-wrap:break-word;"></div>
+                    </td>
+                  </tr>
+                  <tr class="table-border">
+                    <td>
+                      <label for="Employee ">Vehicle Number</label>
+                      <div id="detailVehicles" style="word-wrap:break-word;"></div>
+                    </td>
+                  </tr>
 
-{{/if}}
-  <!-- modal section ends-->
+                </tbody>
+              </table>
+              <span style="padding-left: 10px;"><label for="Employee ">Items List</label></span>
+              {{#with items}}
+              <div id="detailUsernamess" class="table-responsive">
+                <div class="row ">
+                  <table style="width:100%;table-layout: fixed" class="table table-striped with-border">
+                    <thead>
+                      <tr>
+                        <th width="30px">Sl no. </th>
+                        <th width="130px">Item Name </th>
+                        <th width="110px">Price(Inc Price) </th>
+                        <th width="110px">Quantity</th>
+                        <th width="110px">UOM</th>
+                        <th width="110px">Tax Amount</th>
+                        <th width="110px">Weight</th>
+                        <th width="110px">Total</th>
+                        <th width="110px">Remark</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {{#each items}}
+                      <tr class="table-border">
+                        <td align="right">{{incremented @index}}</td>
+                        <td style="word-wrap: break-word">{{itemNam}}</td>
+                        <td align="right">{{priceFormat incPrice}}</td>
+                        <td align="right">{{quantityFormat quantity}}</td>
+                        <td>{{ uomCode}}</td>
+                        <td align="right">{{taxFormats quantity taxRate}}</td>
+                        <td align="right">{{weightCal quantity invWeight unitQuantity}}</td>
+                        <td align="right">{{totalIn incPrice quantity}}</td>
+                        <td width="100px" style="word-wrap: break-word">{{itemRemark}}</td>
+                      </tr>
+                      {{/each}}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              {{/with}}
+              <div class="row">
+                <div class="col-sm-5 pull-left">
+                  <span class="pull-left">Weight[kg] :</span>
+                  <span class="pull-right" style="text-align: right; font-weight: bold;" id="detailWeightInvoice">
+                  </span>
+                </div>
+                <div class="col-sm-7 pull-right">
+                  <table>
+                    <tr>
+                      <td class="pull-right">Tax Amount[{{currencyGet}}] : </td>
+                      <td style="text-align: right;font-weight: bold;" id="detailGstInvoice"></td>
+                    </tr>
+                    <tr>
+                      <td class="pull-right">Grand Total[{{currencyGet}}] :</td>
+                      <td style="text-align: right;font-weight: bold; width: 60%;" id="docTTotalssInvoice">
+                      </td>
+                    </tr>
+
+                  </table>
+                </div>
+              </div>
+            </div>
+            {{#if printLoad}}
+            <div class="loadersSpin">
+            </div>
+            {{else}}
+            <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+            absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+              {{#with printLoaderImage}}
+              <div class="loader-lg" style="width: 100%;height: 100%;display: 
+              flex; align-items: center;justify-content: center;background: #fff;">
+                <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;"></div>
+              {{/with}}
+            </div>
+            {{/if}}
+          </div>
+          <div class="modal-footer">
+            <button type="submit" id='deliveryIdss' class="btn btn-primary pull-right">Invoice</button>
+            <button type="button" class="btn btn-default closen pull-left" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="modal fade in" id="creditApproveConfirmations">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="categoryHeaders"></h4>
+        </div>
+        <div class="modal-body">
+          <div id="categoryBodys">
+            <p>
+              Credit limit exceeds. Do you want to continue ?
+            </p>
+          </div>
+          <input type="hidden" id="confirmedUuid">
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="categoryOrders" class="btn btn-success">Yes please!</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal" id="closeRole">Not now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  {{> successModal id="deliverySuccessModal" section='Delivery'}}
+  {{> errorModal id="deliveryErrorModal" section='Delivery'}}
+
+  <div class="modal fade in" id="orderDetailPage">
+    <div class="modal-dialog">
+      <form class="deliveryUpdate" autocomplete="off">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span></button>
+            <h4 class="modal-title text-bold" id="categoryH"></h4>
+          </div>
+          <div class="modal-body">
+            <div class="box box-default box-solid">
+              <div class="box-header with-border bg-aqua">
+                <h3 class="box-title">Delivery Details</h3>
+              </div>
+              <table style="width:100%;table-layout: fixed;border-collapse: collapse;"
+                class="table table-responsive table-striped">
+                <tbody>
+                  <tr class="table-border">
+                    <td width="50%">
+                      <label for="Employee ">Customer Name </label>
+                      <div id="detailCardName" style="word-wrap:break-word;"></div>
+                    </td>
+                    <td width="50%">
+                      <label for="Employee ">Shipping Address</label>
+                      <div id="detailAddress" style="word-wrap:break-word;"></div>
+                    </td>
+                  </tr>
+                  <tr class="table-border">
+                    <td width="50%">
+                      <label for="Employee ">Branch </label>
+                      <div id="detailBranch" style="word-wrap:break-word;"></div>
+                    </td>
+                    <td width="50%">
+                      <label for="firstName">Delivery Date </label>
+                      <div id="detailDocDate" style="word-wrap:break-word;"></div>
+                    </td>
+                  </tr>
+                  <tr class="table-border">
+                    <td>
+                      <label for="Employee ">Due Date</label>
+                      <div id="detailDocDeliver" style="word-wrap:break-word;"></div>
+                    </td>
+                    <td>
+                      <label for="firstName">Delivery No</label>
+                      <div id="detailOrderId" style="word-wrap:break-word;"></div>
+                    </td>
+                  </tr>
+                  <tr class="table-border">
+                    <td>
+                      <label for="Employee ">Transporter Name</label>
+                      <div id="detailTransporter" style="word-wrap:break-word;"></div>
+                    </td>
+                    <td>
+                      <label for="firstName">Driver Name</label>
+                      <div id="detailDriver" style="word-wrap:break-word;"></div>
+                    </td>
+                  </tr>
+                  <tr class="table-border">
+                    <td>
+                      <label for="Employee ">Vehicle Number</label>
+                      <div id="detailVehicle" style="word-wrap:break-word;"></div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <span style="padding-left: 10px;"><label for="Employee ">Items List</label></span>
+              {{#with items}}
+              <div id="detailUsername" class="table-responsive">
+                <div class="row ">
+                  <table style="width:100%;table-layout: fixed" class="table table-striped with-border">
+                    <thead>
+                      <tr>
+                        <th width="30px">Sl no. </th>
+                        <th width="130px">Item Name </th>
+                        <th width="110px">Price(Inc Price) </th>
+                        <th width="110px">Quantity</th>
+                        <th width="110px">UOM</th>
+                        <th width="110px">Tax Amount</th>
+                        <th width="110px">Weight</th>
+                        <th width="110px">Total</th>
+                        <th width="110px">Remark</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {{#each items}}
+                      <tr class="table-border">
+                        <td align="right">{{incremented @index}}</td>
+                        <td style="word-wrap: break-word">{{itemNam}}</td>
+                        <td align="right">{{priceFormat incPrice}}</td>
+                        <td align="right">{{quantityFormat quantity}}</td>
+                        <td>{{ uomCode}}</td>
+                        <td align="right">{{taxFormats quantity taxRate}}</td>
+                        <td align="right">{{weightCal quantity invWeight unitQuantity}}</td>
+                        <td align="right">{{totalIn incPrice quantity}}</td>
+                        <td width="100px" style="word-wrap: break-word">{{itemRemark}}</td>
+                      </tr>
+                      {{/each}}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              {{/with}}
+              <div class="row">
+                <div class="col-sm-5 pull-left">
+                  <span class="pull-left">Weight[kg] :</span>
+                  <span class="pull-right" style="text-align: right; font-weight: bold;" id="detailWeight">
+                  </span>
+                </div>
+                <div class="col-sm-7 pull-right">
+                  <table>
+                    <tr>
+                      <td class="pull-right">Tax Amount[{{currencyGet}}] : </td>
+                      <td style="text-align: right;font-weight: bold;" id="detailGst"></td>
+                    </tr>
+                    <tr>
+                      <td class="pull-right">Grand Total[{{currencyGet}}] :</td>
+                      <td style="text-align: right;font-weight: bold; width: 60%;" id="docTTotal">
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+            {{#if printLoad}}
+            <div class="loadersSpin">
+            </div>
+            {{else}}
+            <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+          absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+              {{#with printLoaderImage}}
+              <div class="loader-lg" style="width: 100%;height: 100%;display: 
+            flex; align-items: center;justify-content: center;background: #fff;">
+                <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;"></div>
+              {{/with}}
+            </div>
+            {{/if}}
+          </div>
+          <div class="modal-footer">
+            <!-- <button type="submit" class="btn btn-primary updateDelivery" >Update</button> -->
+            <button type="button" class="btn btn-default closen" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="modal fade in" id="printDetailPage">
+    <div class="modal-dialog" style="width:21cm;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="">Print Invoice</h4>
+        </div>
+        <div class="modal-body">
+          <div id="printSection">
+            <table style="width:100%; right:0px; height: auto;">
+              <tr>
+                <td style="font-family:'Times New Roman', Times, serif;text-align:center; width:100%">
+                  <p class="pull-left" style="font-size: 75%; font-weight: bold; color:rgb(0, 0, 0) !important">
+                    {{#with ordDetail}}{{#if printType}}{{printType}}{{else}}Original{{/if}}{{/with}}</p>
+                </td>
+              </tr>
+            </table>
+            <table style="width:100%; right:0px; height: auto;font-family:'Tahoma', Times, serif;">
+              <tr>
+                <td style=" text-align:center; width:87%; height:50px;padding-left: 61px;">
+                  <p style="height:15px;font-size: 125%;font-weight:bolder; color:rgb(0, 0, 0) !important">Gourock
+                    Zambia Limited
+                  </p>
+                  <p style="height:8px;font-size: 70%; ">Birkmyre House,E12,Arusha Street,P.O BOX
+                    70467,NDOLA,Copperbelt,Zambia</p>
+                  <p style="height:8px;font-size: 70%;"><b><span id="branchNamePrint">,</span></b>&nbsp;: &nbsp;
+                    <span id="branchPloteNoPrint"></span> ,<span id="branchAddressPrint"></span></p>
+                  <p style="height:8px;font-size: 70%; font-size:10px;"><b>Tel</b>: +260 212 615 402,+260 212 615 658
+                    <b>Fax</b>:
+                    +260 212 615 657 </p>
+                </td>
+                <td style="width:13%">
+                  {{#with logo}} <img class="pull-left" src="{{logo}}" style="height:40%" alt="">{{/with}}
+                </td>
+              </tr>
+            </table>
+            <table style="width:100%; right:0px; height: auto;font-family:'Tahoma', Times, serif;">
+              <tr>
+                <td style="text-align:center; width:55%;padding-right: 20px;">
+                  <p class="pull-right" style="font-size: 100%;font-weight:bolder; color:rgb(0, 0, 0) !important">
+                    DELIVERY NOTE</p>
+                </td>
+                <td style="width:40%">
+                  <p class="pull-right" style="font-size: 85%;  color:rgb(0, 0, 0) !important">
+                    TPIN NO. : 1001695147</p>
+                </td>
+              </tr>
+            </table>
+            <div class="body_2" style="display: inline;display: flex; width:100%; justify-content: flex-end;">
+              <div class="firstTable" style="font-size:70%;width: 59%;border:1px solid black;padding:13px 5px;
+                border-right: 1px solid #111;border-left: 1px solid #111;">
+                {{#with cstmrDetail}}
+                <table border="0" style="width:100%; table-layout:fixed; border-collapse:collapse;">
+                  <tr style="width:100%">
+                    <td style="padding-left:10px; width:15%"><b>M/s</b></td>
+                    <td style="padding-left:10px;width:85%;height:19px;word-wrap: break-word;">:&nbsp;
+                      &nbsp;{{cardName}}</td>
+                  </tr>
+                  <tr style="width:100%">
+                    <td style="padding-left:10px;width:15%"><b>Address </b></td>
+                    <td style="padding-left:10px;width:80%;word-wrap: break-word;"> :&nbsp;&nbsp;
+                      {{#with custAddress}}
+                      {{address}}
+                      {{/with}}
+                    </td>
+                  </tr>
+                  <tr style="width:100%">
+                    <td style="padding-left:10px;width:15%"><b></b></td>
+                    <td style="padding-left:10px;width:80%;word-wrap: break-word;"> &nbsp;&nbsp;&nbsp;
+                      {{#with custAddress}}
+                      {{ street}}
+                      {{/with}}
+                    </td>
+                  </tr>
+                  <tr style="width:100%">
+                    <td style="padding-left:10px;width:15%"><b></b></td>
+                    <td style="padding-left:10px;width:80%;word-wrap: break-word;"> &nbsp;&nbsp;&nbsp;
+                      {{#with custAddress}}
+                      {{convertUpperCase block}}
+                      {{/with}}
+                    </td>
+                  </tr>
+                  <tr style="width:100%">
+                    <td style="padding-left:10px;width:15%"><b> </b></td>
+                    <td style="padding-left:10px;width:80%;word-wrap: break-word;"> &nbsp;&nbsp;&nbsp;
+                      {{#with custAddress}}
+                      {{convertUpperCase city}}
+                      {{/with}}
+                    </td>
+                  </tr>
+                </table>
+                {{/with}}
+              </div>
+              <div class="firstTable" style="width: 0.5%;">
+              </div>
+              <div class="firstTable" style="font-size:70%;width: 46%;border:1px solid black;padding: 0px 0px;
+                border-right: 1px solid #111;border-left: 1px solid #111;">
+                <table border="0" style="width:100%; table-layout:fixed; border-collapse:collapse;">
+                  <tr border="1" style="border-bottom: 1px solid #111; width:100%">
+                    <td style="padding-left:10px; border-right-color: black !important;"><b>Del No.
+                      </b>:{{#with ordDetail}}
+                      {{docNum}} {{/with}}</td>
+                    <td style="padding-left:10px; border-left-color: black !important;">| <b>Date
+                      </b>:{{#with ordDetail}}
+                      {{dateHelper docDate}} {{/with}}
+                    </td>
+                  </tr>
+                  <tr style="width:100%">
+                    <td style="padding-left:10px"><b>Order No. </b></td>
+                    <td style="padding-left:10px;height:19px;word-wrap: break-word;">:
+                      {{#with ordDetail}}
+                      {{orderId}} {{/with}}</td>
+                  </tr>
+                  <tr style="width:100%">
+                    <td style="padding-left:10px"><b>Date </b></td>
+                    <td style="padding-left:10px;word-wrap: break-word;">:&nbsp;
+                      &nbsp;{{#with ordDetail}}{{orderDates orderDate}}{{/with}}</td>
+                  </tr>
+                  <tr style="width:100%">
+                    <td style="padding-left:10px"><b>Cust Ref No </b></td>
+                    <td style="padding-left:10px;word-wrap: break-word;">:&nbsp;
+                      {{#with ordDetail}}{{custRefNo}}{{/with}}</td>
+                  </tr>
+                  <tr style="width:100%">
+                    <td style="padding-left:10px"><b>Ref Date </b></td>
+                    <td style="padding-left:10px;word-wrap: break-word;">:&nbsp;
+                      &nbsp;{{#with ordDetail}}{{orderDates custRefDate}}{{/with}}</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+
+            <div class="body_3" style="width:100%;">
+              <table class="tables" border="1" style="font-size:70%; text-align:right;
+                  width: 100%; border:1px solid black; table-layout:auto; margin-top:-1px">
+                <tr style="text-align:center;">
+                  <td style="word-wrap:break-word; width:5%"><b>Sr No.</b></td>
+                  <td style="word-wrap:break-word; width:51%"><b>Product Description</b></td>
+                  <td style="word-wrap:break-word; width:15%"><b>Packing Size</b></td>
+                  <td style="word-wrap:break-word; width:15%"><b>Unit</b></td>
+                  <td style="word-wrap:break-word; width:15%"><b>Qty</b></td>
+
+                </tr>
+                {{#each ordDetail.itemLines}}
+                <tr>
+                  <td style="text-align:center">{{incremented @index}}</td>
+                  <td style="text-align:left;word-wrap:break-word !important; padding-left: 5px;">{{itemNam}}</td>
+                  <td style="text-align:center;">{{noDecimal  unitQuantity}}x{{uomCode}} </td>
+                  <td style="text-align:center;">{{uomCode}}</td>
+                  <td style="text-align:center;">{{quantityFormat quantity}}</td>
+
+                </tr>
+                {{/each}}
+                <tr height="30px">
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+              </table>
+            </div>
+
+            <div class="body_2"
+              style="display: inline;display: flex; width:100%; justify-content: flex-end; margin-top: 2px;">
+              <!-- <div class="firstTable" style="font-size:60%;width: 48%;border:1px solid black;padding: 5px 0px;
+                border-right: 1px solid #111;border-left: 1px solid #111;"> -->
+              <table border="1" style="width:70%;font-size:70%; table-layout:fixed; border-collapse:collapse;">
+                <tr style="text-align:center;">
+                  <td
+                    style="word-wrap:break-word; width:40%; height:25px !important; text-align: left;padding-left: 5px;">
+                    <b>VEHICLE
+                      NO</b></td>
+                  <td
+                    style="word-wrap:break-word; width:60%; height:25px !important; text-align: left;padding-left: 5px;">
+                    {{#with ordDetail}}
+                    {{vehicleNumber}} {{/with}}</td>
+                </tr>
+                <tr style="text-align:center;">
+                  <td
+                    style="word-wrap:break-word;  width:40%; height:20px !important; text-align: left;padding-left: 5px;">
+                    <b>DRIVER'S
+                      NAME & SIGN</b></td>
+                  <td
+                    style="word-wrap:break-word; width:60%; height:20px !important; text-align: left;padding-left: 5px;">
+                    {{#with ordDetail}}
+                    {{driverName}} {{/with}}</td>
+                </tr>
+                <tr style="text-align:center;">
+                  <td
+                    style="word-wrap:break-word;  width:40%; height:20px !important; text-align: left;padding-left: 5px;">
+                    <b>WAY BILL NO
+                      & CARRIE</b></td>
+                  <td
+                    style="word-wrap:break-word; width:60%; height:20px !important; text-align: left;padding-left: 5px;">
+                  </td>
+                </tr>
+                <tr style="text-align:center;">
+                  <td
+                    style="word-wrap:break-word;  width:40% ;height:25px !important; text-align: left;padding-left: 5px;">
+                    <b>GOODS
+                      ISSUED BY(Sign)</b></td>
+                  <td
+                    style="word-wrap:break-word; width:60%; height:25px !important; text-align: left;padding-left: 5px;">
+                  </td>
+                </tr>
+              </table>
+              <!-- </div> -->
+              <div class="firstTable"
+                style="font-size:70%;width: 30%;border:1px solid black;padding: 5px 15px;border-right: 1px solid #111;border-left: none;">
+                <p style="text-align: left; font-size:70%;">All above goods are received in good order and condition</p>
+                <br>
+                <p style="text-align: center;font-size:70%;margin-top: 15px;">Signature with Company's Rubber Stamp</p>
+              </div>
+            </div>
+            <div class="body_2" style="display: inline;display: flex; width:100%; justify-content: flex-end;">
+              <div class="firstTable" style="font-size:70%;width: 100%;">
+                <table class="tables" border="0" style="width: 100%;table-layout:fixed;border-collapse:collapse;">
+                  <tr>
+                    <td style="text-align:left; border-right:none" width="30%">
+                      <!-- Printed by : {{printedBy}} -->
+                    </td>
+                    <td style="text-align:center; border-right:none" width="30%">
+                      <b style="margin-left: 70px;">Page No. 1 of 1</b>
+                    </td>
+                    <td style="text-align:right" width="40%">
+                      {{printTime}}
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+
+            <div class="body_2" style="display: inline;display: flex; width:100%; justify-content: flex-end;height:5px">
+              <div class="firstTable" style="font-size:70%;width: 100%; margin-top: -20px;">
+                <hr style="border-style:solid;border-width: 1px !important">
+              </div>
+            </div>
+
+            <div class="body_2" style="display: inline;display: flex; width:100%; justify-content: flex-end;">
+              <div class="firstTable" style="font-size:70%;width: 100%;">
+                <table class="tables" border="0" style="width: 100%;table-layout:fixed;border-collapse:collapse;">
+                  <tr>
+                    <td style="text-align:left;font-size:11px;" width="33.3%">
+                      <b>Telephone</b>&nbsp;&nbsp; :&nbsp;+260 212 615 402<br>
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                      +260 212 615 658<br>
+                    </td>
+                    <td style="text-align:center;font-size:11px;" width="33.3%">
+                      <b>Fax No :</b>
+                      +260 212 615 657<br>
+                      <b>www.gourockzambia.com</b><br><br>
+                      <span class="salesOrder"
+                        style=" font-style: italic;
+                                      font-weight: bold;font-family:'Times New Roman', Times, serif;font-size: 14px;text-align:center">
+                        Quality that's Forever</span>
+                    </td>
+                    <td style="text-align:right;font-size:11px;padding-right: 10px;" width="33.3%">
+                      <b>Email &nbsp;&nbsp;:&nbsp;&nbsp;</b>info@gourockzambia.com
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+          {{#if printLoad}}
+          <div class="loadersSpin">
+          </div>
+          {{else}}
+          <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+          absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+            {{#with printLoaderImage}}
+            <div class="loader-lg" style="width: 100%;height: 100%;display: 
+            flex; align-items: center;justify-content: center;background: #fff;">
+              <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;"></div>
+            {{/with}}
+          </div>
+          {{/if}}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default pull-left closen" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary printThis">Print</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- {{/with}} -->
+  <!-- {{else}}
+      {{> accessDenied}} -->
+  {{/if}}
+
 </template>

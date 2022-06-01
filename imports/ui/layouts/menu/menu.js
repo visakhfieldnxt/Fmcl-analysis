@@ -4,7 +4,6 @@
 import { Config } from '../../../api/config/config';
 import { Meteor } from 'meteor/meteor';
 
-
 Template.menu.onCreated(function () {
 
   let self = this;
@@ -23,13 +22,13 @@ Template.menu.onCreated(function () {
 });
 
 Template.registerHelper('printLoaderImage', () => {
-  // let config = Config.findOne({ name: 'printLoader' });
-   return { printLoaderImg: printLoader_Image };
+  let config = Config.findOne({ name: 'printLoader' });
+  if (config) return { printLoaderImg: config.value };
 });
 
 Template.registerHelper('connectionLoad', () => {
-  // let config = Config.findOne({ name: 'connectionLoader' });
- return { connectionLoaderImg: connectionLoader_Image };
+  let config = Config.findOne({ name: 'connectionLoader' });
+  if (config) return { connectionLoaderImg: config.value };
 });
 
 Template.registerHelper('userName', () => {
@@ -37,23 +36,28 @@ Template.registerHelper('userName', () => {
   if (config) return { user: config.value };
 });
 
-// Template.registerHelper('vanSaleUserName', () => {
-//   let config = Config.findOne({ name: 'vanSaleUserName' });
-//   if (config) return { vanSaleUser: config.value };
-// });
+Template.registerHelper('vanSaleUserName', () => {
+  let config = Config.findOne({ name: 'vanSaleUserName' });
+  if (config) return { vanSaleUser: config.value };
+});
 
-// Template.registerHelper('itemName', () => {
-//   let config = Config.findOne({ name: 'itemName' });
-//   if (config) return { item: config.value };
-// });
+Template.registerHelper('itemName', () => {
+  let config = Config.findOne({ name: 'itemName' });
+  if (config) return { item: config.value };
+});
 
 Template.registerHelper('appName', () => {
   let config = Config.findOne({ name: 'appName' });
   if (config) return { app: config.value };
 });
 Template.registerHelper('bodyLoader', () => {
-  // let config = Config.findOne({ name: 'bodyLoader' });
-   return { bodyLoader_img: bodyLoader_Image };
+  let config = Config.findOne({ name: 'bodyLoader' });
+  if (config) return { bodyLoader_img: config.value };
+});
+
+Template.registerHelper('href', () => {
+  let config = Config.findOne({ name: 'url' });
+  if (config) return { href_url: config.value };
 });
 
 Template.registerHelper('href', () => {
@@ -71,10 +75,10 @@ Template.registerHelper('roleName', () => {
   if (config) return { role: config.value };
 });
 
-// Template.registerHelper('designationName', () => {
-//   let config = Config.findOne({ name: 'designationName' });
-//   if (config) return { designation: config.value };
-// });
+Template.registerHelper('designationName', () => {
+  let config = Config.findOne({ name: 'designationName' });
+  if (config) return { designation: config.value };
+});
 
 Template.registerHelper('pendingOrderList', () => {
   let res = Session.get("accountantCheckValue");

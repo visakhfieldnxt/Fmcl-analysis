@@ -12,8 +12,8 @@
   <section class="content">
     <div class="row">
       <div>
-        <button class="btn btn-primary btn-flat pull-right" id="config-create-button">New Config</button>
-        <!-- <button type="button" class="btn btn-primary btn-flat" id="customerSync">Customer Sync</button>
+        <button class="btn btn-primary btn-flat" id="config-create-button">New Config</button>
+        <button type="button" class="btn btn-primary btn-flat" id="customerSync">Customer Sync</button>
         <button type="button" class="btn btn-primary btn-flat itemSync">Item Sync</button>
         <button type="button" class="btn btn-primary btn-flat branchSync">Branch Sync</button>
         <button type="button" class="btn btn-primary btn-flat countrySync">Country Sync</button>
@@ -37,11 +37,11 @@
         <button type="button" class="btn btn-primary btn-flat customerBrancSync">Customer Branch Sync</button>
         <button type="button" class="btn btn-primary btn-flat binQuantitySync">Bin Quantity Sync</button>
         <button type="button" class="btn btn-primary btn-flat binSync">Bin Sync</button>
-        <button type="button" class="btn btn-primary btn-flat BatchSync">Batch Sync</button> -->
+        <button type="button" class="btn btn-primary btn-flat BatchSync">Batch Sync</button>
 
         <!-- <button type="button" class="btn btn-primary btn-flat warehouseStockDelete"  >Delete Warehouse Stock</button> -->
 
-        <!-- <div class="row">
+        <div class="row">
           <div class="col-md-3 col-sx-12 col-sm-12">
             <form class="warehouseStockDelete">
               <label for="EMPcode">Delete Warehouse Stock</label>
@@ -53,10 +53,10 @@
               <button type="button" class="btn btn-default closen" data-dismiss="modal">Clear</button>
             </form>
           </div>
-        </div> -->
+        </div>
 
 
-        <!-- <div class="row">
+        <div class="row">
           <div class="col-md-3 col-sx-12 col-sm-12">
             <form class="warehouseStockDateWise">
               <label for="EMPcode">Date Wise Warehouse Stock</label>
@@ -68,10 +68,10 @@
               <button type="button" class="btn btn-default closen" data-dismiss="modal">Clear</button>
             </form>
           </div>
-        </div> -->
+        </div>
 
 
-        <!-- <div class="row">
+        <div class="row">
           <div class="col-md-3 col-sx-12 col-sm-12">
             <form class="itemPriceDateWise">
               <label for="EMPcode">Date Wise Item Get Price</label>
@@ -84,70 +84,10 @@
             </form>
           </div>
         </div>
-      </div> -->
-        <div class="row">
-          <div class="col-md-4 col-sx-12 col-sm-12">
-            <h4>Forcefully Logout</h4>
-            <div class="row">
-              <form class="submitForceFullyLogOut">
-                <table style="width:100%;" class="table table-striped">
-                  <tr>
-                    <div class="form-group has-feedback">
-                      <label for="customer">Select User <span class="asteric_red">*</span></label>
-                      <select class=" selectVanUsers" style="width:100%;" name="selectVanUsers" id="selectVanUsers"
-                        required>
-                        <option value="">Select User</option>
-                        <option value="allUsers">All - Users</option>
-                        {{# each vanUserArray}}
-                        <option value="{{_id}}">{{profile.firstName}} {{profile.lastName}}</option>
-                        {{/each}}
-                      </select>
-                    </div>
-                  </tr>
-                </table>
-                <button type="submit" class="btn btn-primary btn-flat ">Submit</button>
-                &nbsp;
-                <button type="button" class="btn btn-default resetSyn" data-dismiss="modal">Clear</button>
-              </form>
-            </div>
-          </div>
-          <div class="col-md-4 col-sx-12 col-sm-12">
-            <h4>Cancel Stock Return</h4>
-            <div class="row">
-              <form class="cancelStockReturn">
-                <table style="width:100%;" class="table table-striped">
-                  <tr>
-                    <div class="form-group has-feedback">
-                      <label for="customer">Select Stock Return Id <span class="asteric_red">*</span></label>
-                      <select class="selectReturnId" style="width:100%;" name="selectReturnId" id="selectReturnId"
-                        required>
-                        <option value="">Select Stock Return Id</option> 
-                        {{# each stockReturnIdList}}
-                        <option value="{{_id}}">{{temporaryId}}</option>
-                        {{/each}}
-                      </select>
-                    </div>
-                  </tr>
-                </table>
-                <button type="submit" class="btn btn-primary btn-flat ">Submit</button>
-                &nbsp;
-                <button type="button" class="btn btn-default resetRtn" data-dismiss="modal">Clear</button>
-              </form>
-            </div>
-          </div>
-          <div class="col-md-4 col-sx-12 col-sm-12">
-            <h4>Clear Negative Stock</h4>
-            <div class="row">
-              <form class="clearNegativeStock">
-                <button type="submit" class="btn btn-primary btn-flat ">Submit</button>
-              </form>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
 
-    <div class="row">
+    <div class="row" >
       <div class="box box-default box-solid" style="width:400">
         <div class="box-header with-border bg-aqua">
           <h3 class="box-title">System Configuration</h3>
@@ -183,8 +123,7 @@
         {{/if}}
       </div>
       {{#if isReady}}
-      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
-      onClick=clickEvent}}
+      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right" onClick=clickEvent}}
       {{/if}}
     </div>
   </section>

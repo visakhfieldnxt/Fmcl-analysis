@@ -1,5 +1,5 @@
 /**
- * @author Nithin
+ * @author Visakh
  */
 
 branchCollectionName = 'branch';

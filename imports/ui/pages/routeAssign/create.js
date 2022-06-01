@@ -2,6 +2,7 @@
  * @author Nithin
  */
 
+import { Random } from 'meteor/random';
 import { Meteor } from 'meteor/meteor';
 let routeCodeCheck = false;
 Template.routeAssign_create.onCreated(function () {
@@ -17,29 +18,29 @@ Template.routeAssign_create.onCreated(function () {
   this.vansaleUsersData = new ReactiveVar();
   this.branchArrayList = new ReactiveVar();
   this.endDateSetUp = new ReactiveVar();
-  this.sdList = new ReactiveVar();
   $("#selectItems").val('').trigger('change');
   $("#selectCustomer").val('').trigger('change');
   $("#selectCustomerAddress").val('').trigger('change');
 });
 Template.routeAssign_create.onRendered(function () {
   routeCodeCheck = false;
-
-  let subDistributorValue = Session.get("subDistributorValue");
-  if (subDistributorValue === true) {
-    $('.selectSdIds').prop('disabled', true);
-  }
-  else {
-    $('.selectSdIds').prop('disabled', false);
-  }
-
+  $('.loaderValues').css('display', 'none');
+  /**
+ * TODO:Complete Js doc
+ * Getting user branch list
+ */
+  // Meteor.call('routeGroup.activelist', (err, res) => {
+  //   if (!err) {
+  //     this.routeGroupList.set(res);
+  //   }
+  // });
   /**
 * TODO:Complete Js doc
 * Getting user branch list
 */
-  Meteor.call('user.sdUserFullList', (err, res) => {
+  Meteor.call('branch.branchList', (err, res) => {
     if (!err) {
-      this.sdList.set(res);
+      this.branchArrayList.set(res);
     }
   });
 
@@ -65,19 +66,11 @@ Template.routeAssign_create.onRendered(function () {
     dropdownParent: $(".selectCustomers").parent(),
   });
 
-  $('.selectRouteDate').select2({
-    placeholder: "Select Date",
+  $('.selectBranch').select2({
+    placeholder: "Select Branch",
     tokenSeparators: [','],
     allowClear: true,
-    dropdownParent: $(".selectRouteDate").parent(),
-  });
-
-
-  $('.selectSdIds').select2({
-    placeholder: "Select Sub Distributor",
-    tokenSeparators: [','],
-    allowClear: true,
-    dropdownParent: $(".selectSdIds").parent(),
+    dropdownParent: $(".selectBranch").parent(),
   });
 
   $('.selectPrevRoute').select2({
@@ -111,26 +104,46 @@ Template.routeAssign_create.helpers({
   // * get vansale user name
   // */
 
+  //   custNameHelp: (cardCode) => {
+  //     let custData = Template.instance().customerNameArray.get();
+  //     if (custData) {
+  //       let res = custData.find(x => x.cardCode === cardCode);
+  //       if (res) {
+  //         return res.cardName;
+  //       }
+  //     }
+  //   },
+  async custNameHelp(cardCode) {
+    let promiseVal = new Promise((resolve, reject) => {
+      Meteor.call("customer.idCardName", cardCode, (error, result) => {
+        if (!error) {
+          resolve(result);
+        } else {
+          reject(error);
+        }
+      });
+    });
+    promiseVal.then((result) => {
+      $('.customersVal_' + cardCode).html(result);
+      $('.loaderValues').css('display', 'none');
+    }
+    );
+    promiseVal.catch((error) => {
+      $('.customersVal_' + cardCode).html('');
+      $('.loaderValues').css('display', 'none');
+    }
+    );
+  },
   endDateGet: () => {
     return Template.instance().endDateSetUp.get();
   },
 
+
   /**
-   * get sdList 
+   * get branch list
    */
-  sdUsersGet: () => {
-    let subDistributorValue = Session.get("subDistributorValue");
-    if (subDistributorValue === true) {
-      if (Meteor.user()) {
-        Meteor.setTimeout(function () {
-          $('#selectSdIds').val(Meteor.userId()).trigger('change');
-        }, 100);
-      }
-      else {
-        $('#selectSdIds').val('').trigger('change');
-      }
-    }
-    return Template.instance().sdList.get();
+  branchLists: () => {
+    return Template.instance().branchArrayList.get();
   },
   /**
   * 
@@ -145,6 +158,7 @@ Template.routeAssign_create.helpers({
   routeListGet: () => {
     return Template.instance().routeGroupList.get();
   },
+
   /**
   * TODO:Complete Js doc
   * Showing todays date
@@ -171,6 +185,7 @@ Template.routeAssign_create.helpers({
 
 });
 let customerArray = [];
+let routeAssignVal = false;
 Template.routeAssign_create.events({
 
 
@@ -187,15 +202,17 @@ Template.routeAssign_create.events({
     $('#selectRouteName').find(':selected').each(function () {
       routeCode = $(this).val();
     });
-  $("#selectRouteDate").val('').trigger('change');
-
     if (routeCode !== '') {
+       $('.loaderValues').css('display', 'block');
       template.modalLoader.set(true);
+      template.vansaleUsersData.set('');
       customerArray = [];
       template.customervalueList.set('');
-      Meteor.call('routeGroup.assignedEmployeeList', routeCode, (err, res) => {
+      let vansaleRoles = Session.get("vansaleRoles");
+      Meteor.call('routeGroup.assignedEmployeeList', routeCode,vansaleRoles, (err, res) => {
         if (!err) {
           customerArray = [];
+          template.vansaleUsersData.set(res.userRes);
           template.modalLoader.set(false);
           if (res.routeCustList !== undefined && res.routeCustList.length > 0) {
             for (let x = 0; x < res.routeCustList.length; x++) {
@@ -204,41 +221,21 @@ Template.routeAssign_create.events({
             template.customervalueList.set(customerArray);
           }
           else {
+            $('.loaderValues').css('display', 'none');
           }
         }
         else {
+          template.vansaleUsersData.set('');
           template.modalLoader.set(false);
           template.customervalueList.set('');
           customerArray = [];
+          $('.loaderValues').css('display', 'none');
         }
       });
     }
 
   },
-  'change #selectRouteDate': (event, template) => {
-    event.preventDefault();
-    let date = '';
-    let routeCode = '';
-    $('#selectRouteName').find(':selected').each(function () {
-      routeCode = $(this).val();
-    });
-    $('#selectRouteDate').find(':selected').each(function () {
-      date = $(this).val();
-    });
-    if (date !== '' && routeCode!=='') {
-      Meteor.call('routeAssign.checkDateAssigned', routeCode,date, (err, res) => {
-        if (!err) {
-         if (res == true) {
-           $('.assignBtn').prop('disabled', true);
-          toastr['error'](`Route already assigned on this Day .Please select another Day`);
-         }else{
-          $('.assignBtn').prop('disabled', false);
-         }
-        }
-      });
-    }
 
-  },
 
   /**
     * TODO:Complete Js doc
@@ -260,7 +257,7 @@ Template.routeAssign_create.events({
   'click .closeRouteAssign': (event, template) => {
     $('#selectRouteName').val('').trigger('change');
     $('#selectAssignEmpoyee').val('').trigger('change');
-    $('#selectSdIds').val('').trigger('change');
+    $('#selectBranch').val('').trigger('change');
     $('.routeDate').val('');
     $('.routeDateEnd').val('');
     $('#descriptionVal').val('');
@@ -270,18 +267,30 @@ Template.routeAssign_create.events({
     $('form :input').val("");
     template.endDateSetUp.set('');
     $('.loaderValues').css('display', 'none');
-    let subDistributorValue = Session.get("subDistributorValue");
-    if (subDistributorValue === true) {
-      if (Meteor.user()) {
-        $('#selectSdIds').val(Meteor.userId()).trigger('change');
-      }
-    }
-    else {
-      $('#selectSdIds').val('').trigger('change');
-    }
-    $('#selectRouteDate').val('').trigger('change');
   },
 
+  'keyup #routeCodevalue': (event, template) => {
+    event.preventDefault();
+    let routeCode = $('#routeCodevalue').val();
+    routeCodeCheck = false;
+    if (routeCode !== '') {
+      Meteor.call('route.routeCodeCheck', routeCode, (err, res) => {
+        if (!err) {
+          if (res === true) {
+            routeCodeCheck = true;
+            $("#routeCodeSpan").html('<style>#routeCodeSpans{color:#fc5f5f;}</style><span id="routeCodeSpans"> Route Code already exists</span>');
+          }
+          else {
+            routeCodeCheck = false;
+            $("#routeCodeSpan").html('<style>#routeCodeSpans{color:#fc5f5f;}</style><span id="routeCodeSpans"></span>');
+          }
+        }
+      });
+    }
+    else {
+      routeCodeCheck = false;
+    }
+  },
 
   /**
     * TODO:Complete Js doc
@@ -298,51 +307,54 @@ Template.routeAssign_create.events({
     $('#selectAssignEmpoyee').find(':selected').each(function () {
       empId = $(this).val();
     });
-    let routeDate = '';
-    $('#selectRouteDate').find(':selected').each(function () {
-      routeDate = $(this).val();
-    });
-    let loginUserVerticals = Session.get("loginUserVerticals");
-    $("#submit").prop('disabled', true);
-    Meteor.setTimeout(function () {
-      $("#submit").prop('disabled', false);
-    }, 5000);
-    Meteor.call("routeAssign.checkData", routeGroupId, empId, routeDate, (err, res) => {
-      if (!err) {
-        if (res.approvalCheck === true) {
-          toastr['error'](`Route already assigned to ${res.assignedByName} !`);
-        }
-        else {
-          assignRouteValues(event.target, routeGroupId, empId, routeDate,loginUserVerticals);
-          dataClear();
-          $('#routeAssign-create').modal('hide');
-        }
-      }
-    });
-    function dataClear() {
-      $("#submit").attr("disabled", false);
-      $('#selectRouteName').val('').trigger('change');
-      $('#selectRouteDate').val('').trigger('change');
-      $('#selectAssignEmpoyee').val('').trigger('change');
-      $('#selectSdIds').val('').trigger('change');
-      $('.routeDate').val('');
-      $('.routeDateEnd').val('');
-      $('#descriptionVal').val('');
-      customerArray = [];
-      template.customervalueList.set('');
-      template.endDateSetUp.set('');
-      $('form :input').val("");
-      let subDistributorValue = Session.get("subDistributorValue");
-      if (subDistributorValue === true) {
-        if (Meteor.user()) {
-          $('#selectSdIds').val(Meteor.userId()).trigger('change');
-        }
+    let fromDate = $('.routeDate').val();
+    let endDate = $('.routeDateEnd').val();
+    let fromDateIso = new Date(moment(fromDate, 'DD-MM-YYYY').format('YYYY-MM-DD'));
+    let endDateIso = new Date(moment(endDate, 'DD-MM-YYYY').format('YYYY-MM-DD'));
+    if (endDateIso < fromDateIso) {
+      toastr['error'](`End Date Must Be Greater Than Start Date !`);
+    }
+    else {
+      if (customerArray.length === 0) {
+        toastr["error"](customerValidationAssignMessage);
       }
       else {
-        $('#selectSdIds').val('').trigger('change');
+        if (routeAssignVal === true) {
+          toastr['error'](`Route already assigned !`);
+        }
+        else {
+          $("#submit").prop('disabled', true);
+          Meteor.setTimeout(function () {
+            $("#submit").prop('disabled', false);
+          }, 5000);
+          Meteor.call("routeAssign.checkData", routeGroupId, empId, fromDate, (err, res) => {
+            if (!err) {
+              if (res.approvalCheck === true) {
+                toastr['error'](`Route already assigned to ${res.assignedByName} !`);
+              }
+              else {
+                assignRouteValues(event.target, routeGroupId, empId);
+                dataClear();
+                $('#routeAssign-create').modal('hide');
+              }
+            }
+          });
+          function dataClear() {
+            $("#submit").attr("disabled", false);
+            $('#selectRouteName').val('').trigger('change');
+            $('#selectAssignEmpoyee').val('').trigger('change');
+            $('#selectBranch').val('').trigger('change');
+            $('.routeDate').val('');
+            $('.routeDateEnd').val('');
+            $('#descriptionVal').val('');
+            customerArray = [];
+            template.customervalueList.set('');
+            template.endDateSetUp.set('');
+            $('form :input').val("");
+          }
+        }
       }
     }
-    // }
   },
 
   /**
@@ -381,10 +393,10 @@ Template.routeAssign_create.events({
     }
   },
 
-  'change #selectSdIds': (event, template) => {
+  'change #selectBranch': (event, template) => {
     event.preventDefault();
     let branch = '';
-    $('#selectSdIds').find(':selected').each(function () {
+    $('#selectBranch').find(':selected').each(function () {
       branch = $(this).val();
     });
     template.routeGroupList.set('');
@@ -409,52 +421,6 @@ Template.routeAssign_create.events({
     $('.routeDateEnd').val('');
     $('#descriptionVal').val('');
   },
-  /**
-   * 
-   * @param {*} event 
-   * @param {*} template 
-   */
-  'change #selectSdIds': (event, template) => {
-    event.preventDefault();
-    let sdId = '';
-    $('#selectSdIds').find(':selected').each(function () {
-      sdId = ($(this).val());
-    });
-    $('#verticalSpan').html('');
-    $('#branchSpan').html('');
-    $('#locationSpan').html('');
-    template.routeGroupList.set('');
-    template.vansaleUsersData.set();
-    if (sdId !== '' && sdId !== undefined) {
-      template.modalLoader.set(true);
-      Meteor.call('routeGroup.vsrUserList', sdId, (err, res) => {
-        if (!err) {
-          $('#verticalSpan').html(`Verticals : <b> ${res.verticalName}</b>`);
-          $('#branchSpan').html(`Branch : <b> ${res.branchName}</b>`);
-          $('#locationSpan').html(`Location : <b>${res.locationName}</b>`);
-          $('#verticalSpan').css("padding", "4px 14px");
-          $('#branchSpan').css("padding", "4px 14px");
-          $('#locationSpan').css("padding", "4px 14px");
-          template.routeGroupList.set(res.routeRes);
-          template.vansaleUsersData.set(res.sdUsersList);
-          template.modalLoader.set(false);
-        }
-        else {
-          $('#verticalSpan').html('');
-          $('#branchSpan').html('');
-          $('#locationSpan').html('');
-          template.modalLoader.set(false);
-          template.vansaleUsersData.set();
-        }
-      });
-    }
-    customerArray = [];
-    template.customervalueList.set('');
-    $('#selectRouteName').val('').trigger('change');
-    $('#selectAssignEmpoyee').val('').trigger('change');
-    $('.routeDate').val('');
-    $('.routeDateEnd').val('');
-    $('#descriptionVal').val('');
-  },
+
 
 });

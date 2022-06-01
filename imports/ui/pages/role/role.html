@@ -16,11 +16,8 @@
 
     <div class="row">
       <div style="float: right;">
-        <button title="Export Transaction List" id="exportButtons2" class="btn btn-success btn-flat">Export Transaction
-          Details</button>
-        <button title="Export Role Based User List" id="exportButtons" class="btn btn-primary btn-flat">Export</button>
         {{#if userCan 'roleCreate'}}
-        <button class="btn btn-primary btn-flat" id="ic-create-button">Create {{role}}</button>
+        <button class="btn btn-primary btn-flat" id="ic-create-button">Create new {{role}}</button>
         {{/if}}
         <button class="btn btn-primary btn-flat" id="filterSearch"><i class="fa fa-search"> </i>&nbsp; Search</button>
       </div>
@@ -28,27 +25,28 @@
     <div class="row" id="filterDisplay" style="display:none">
       <div class="box box-default box-solid">
         <div class="box-header with-border bg-aqua">
-          <h3 class="box-title" style="color: black;">{{role}} Filter</h3><button type="button" id="removeSearch"
+          <h3 class="box-title">{{role}} Filter</h3><button type="button" id="removeSearch"
             style="color: white; background-color: transparent; border-color:transparent" class="pull-right"><i
-              class="fa fa-close" style="color: black;"></i></button>
+              class="fa fa-close"></i></button>
         </div>
         <div class="box-body no-padding">
           <form class="roleFilter">
             <div class="row">
-              <div class="col-md-3 col-sx-12 col-sm-12">
-                <label for="Firstname">Name</label>
-                <input type="text" class="form-control validation" placeholder="Name" id="name" name="name">
+              <div class="col-md-2 col-xs-12 col-sm-12">Name</div>
+              <div class="col-md-3 col-xs-12 col-sm-12">
+                <input type="text" placeholder="Name" id="name" name="name">
               </div>
-              <div class="col-md-3 col-sx-12 col-sm-12">
-                <label for="Firstname">Description</label>
-                <input type="text" class="form-control validation" placeholder="Description" id="description"
-                  name="description">
+              <div class="col-md-2 col-xs-12 col-sm-12">Description</div>
+              <div class="col-md-3 col-xs-12 col-sm-12">
+                <input type="text" placeholder="Description" id="description" name="description">
               </div>
-              <div class="row" style="float: right">
-                <button type="submit" name="filter" class="btn btn-primary">Filter</button>
-                <button type="button" name="reset" class="btn btn-info reset">Reset Filter</button>
-              </div>
+
             </div>
+            <div class="row" style="float: right">
+              <button type="submit" name="filter" class="btn btn-primary">Filter</button>
+              <button type="button" name="reset" class="btn btn-info reset">Reset Filter</button>
+            </div>
+
           </form>
         </div>
       </div>
@@ -60,9 +58,9 @@
       onClick=clickEvent}}
       {{/if}}
       <div class="box box-default box-solid">
-        <!-- <div class="box-header with-border bg-aqua">
+        <div class="box-header with-border bg-aqua">
           <h3 class="box-title">{{role}}</h3>
-        </div> -->
+        </div>
         {{#if isReady}}
         <div class="box-body no-padding table-responsive">
           <table class="table table-striped generic ">
@@ -84,7 +82,7 @@
               </tr>
               {{#each roles}}
               <tr>
-                <td class="pl-20 text-center sorted-column" width="20%">
+                <td class="pl-20" width="20%">
                   <div class="editable-input">{{#if userCan 'roleUpdate'}}
                     {{> editableText options=optionsHelper field="name"}}
                     {{else}}
@@ -93,7 +91,7 @@
                   </div>
                 </td>
 
-                <td class="pl-20 hidden-xs hidden-sm text-center sorted-column" width="40%">
+                <td class="pl-20 hidden-xs hidden-sm" width="40%">
                   <div class="editable-textarea">
                     {{#if userCan 'roleUpdate'}}
                     {{> editableText options=optionsHelperWithTextArea field="description"}}
@@ -103,7 +101,7 @@
                   </div>
                 </td>
 
-                <td class="text-center totalUsers_{{_id}}" width="10%">{{totalUsers _id}}</td>
+                <td class="text-center" width="10%">{{totalUsers _id}}</td>
 
                 {{#if userCan 'roleUpdate'}}
                 <td class="text-center" width="10%">
@@ -167,15 +165,7 @@
       {{/with}}
     </div>
     {{/if}}
-    <div id="bodySpinLoaders" style=" width: 100%;position: 
-    fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
-      {{#with bodyLoader}}
-      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
-justify-content: center;background: #f1f1f1;">
-        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
-      </div>
-      {{/with}}
-    </div>
+
   </section>
 
   <div class="ic-create-modal">
@@ -231,21 +221,11 @@ justify-content: center;background: #f1f1f1;">
                       <select class="homeURLUpdate" style="width:100%;" name="homeURLUpdate" id="homeURLUpdate"
                         required>
                         <option disabled selected='selected'>Select Home Page</option>
-                        <option value="/sdOutletList/list">Outlet List</option>
                         <option value="/sales/dashboard">Sales Dashboard</option>
                         <option value="/admin/dashboard">Admin Dashboard</option>
-                        <option value="/superAdmin/dashboard">Super Admin Dashboard</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div class="row" style="padding-top: 5px; padding-bottom: 5px;">
-                    <div class="col-md-4 col-sm-12 col-xs-12">Roles Under <span class="asteric_red">*</span></div>
-                    <div class="col-md-8 col-sm-12 col-xs-12">
-                      <select class="rolesUnderEdit" style="width:100%;" name="rolesUnderEdit" id="rolesUnderEdit"
-                        required>
-                        <option disabled selected='selected' value="">Select Value</option>
-                        <option value="MD">Super Admin</option>
-                        <option value="SD">Sub Distributor</option>
+                        <option value="/cxo/dashboard">CXO Dashboard</option>
+                        <option value="/deliveryDispatch/list">Delivery</option>
+                        <option value="/arInvoicePayment/list">Ar Invoice + Payment</option>
                       </select>
                     </div>
                   </div>
@@ -264,87 +244,10 @@ justify-content: center;background: #f1f1f1;">
                             <td class="bg-darkblue">Update </td>
                             <td class="bg-darkblue">Delete </td>
                           </tr>
-
-
-
-                          <tr>
-                            <td>Super Admin </td>
-                            <td><input type="checkbox" id="superAdminchecks"> </td>
-                            <td><input type="checkbox" id="superAdmincheckView" class="superAdminSelect"
-                                name="superAdmin_view">
-                            </td>
-                            <td><input type="checkbox" id="superAdmincheckCreate" disabled="disabled"></td>
-                            <td><input type="checkbox" id="superAdmincheckUpdate" disabled="disabled"> </td>
-                            <td><input type="checkbox" id="superAdmincheckDelete" disabled="disabled"> </td>
-                          </tr>
-                          <tr>
-                            <td>Business Head </td>
-                            <td><input type="checkbox" id="businessHeadchecks"> </td>
-                            <td><input type="checkbox" id="businessHeadcheckView" class="businessHeadSelect"
-                                name="businessHead_view">
-                            </td>
-                            <td><input type="checkbox" id="businessHeadcheckCreate" disabled="disabled"></td>
-                            <td><input type="checkbox" id="businessHeadcheckUpdate" disabled="disabled"> </td>
-                            <td><input type="checkbox" id="businessHeadcheckDelete" disabled="disabled"> </td>
-                          </tr>
-                          <tr>
-                            <td>Business Development Manager </td>
-                            <td><input type="checkbox" id="bdmchecks"> </td>
-                            <td><input type="checkbox" id="bdmcheckView" class="bdmSelect" name="bdm_view">
-                            </td>
-                            <td><input type="checkbox" id="bdmcheckCreate" disabled="disabled"></td>
-                            <td><input type="checkbox" id="bdmcheckUpdate" disabled="disabled"> </td>
-                            <td><input type="checkbox" id="bdmcheckDelete" disabled="disabled"> </td>
-                          </tr>
-                          <tr>
-                            <td>Coordinator (MIC) </td>
-                            <td><input type="checkbox" id="coordinatorchecks"> </td>
-                            <td><input type="checkbox" id="coordinatorcheckView" class="coordinatorSelect"
-                                name="coordinator_view">
-                            </td>
-                            <td><input type="checkbox" id="coordinatorcheckCreate" disabled="disabled"></td>
-                            <td><input type="checkbox" id="coordinatorcheckUpdate" disabled="disabled"> </td>
-                            <td><input type="checkbox" id="coordinatorcheckDelete" disabled="disabled"> </td>
-                          </tr>
-                          <tr>
-                            <td>Sub Distributor </td>
-                            <td><input type="checkbox" id="sdchecks"> </td>
-                            <td><input type="checkbox" id="sdcheckView" class="sdSelect" name="sd_view">
-                            </td>
-                            <td><input type="checkbox" id="sdcheckCreate" disabled="disabled"></td>
-                            <td><input type="checkbox" id="sdcheckUpdate" disabled="disabled"> </td>
-                            <td><input type="checkbox" id="sdcheckDelete" disabled="disabled"> </td>
-                          </tr>
-                          <tr>
-                            <td>Vansale Rep (VSR)</td>
-                            <td><input type="checkbox" id="vsrchecks"> </td>
-                            <td><input type="checkbox" id="vsrcheckView" class="vsrSelect" name="vsr_view">
-                            </td>
-                            <td><input type="checkbox" id="vsrcheckCreate" disabled="disabled"></td>
-                            <td><input type="checkbox" id="vsrcheckUpdate" disabled="disabled"> </td>
-                            <td><input type="checkbox" id="vsrcheckDelete" disabled="disabled"> </td>
-                          </tr>
-                          <tr>
-                            <td>Open Market Rep(OMR)</td>
-                            <td><input type="checkbox" id="omrchecks"> </td>
-                            <td><input type="checkbox" id="omrcheckView" class="omrSelect" name="omr_view">
-                            </td>
-                            <td><input type="checkbox" id="omrcheckCreate" disabled="disabled"></td>
-                            <td><input type="checkbox" id="omrcheckUpdate" disabled="disabled"> </td>
-                            <td><input type="checkbox" id="omrcheckDelete" disabled="disabled"> </td>
-                          </tr>
-                          <tr>
-                            <td>Wholesale Exe(WS Ex)</td>
-                            <td><input type="checkbox" id="wsechecks"> </td>
-                            <td><input type="checkbox" id="wsecheckView" class="wseSelect" name="wse_view">
-                            </td>
-                            <td><input type="checkbox" id="wsecheckCreate" disabled="disabled"></td>
-                            <td><input type="checkbox" id="wsecheckUpdate" disabled="disabled"> </td>
-                            <td><input type="checkbox" id="wsecheckDelete" disabled="disabled"> </td>
-                          </tr>
                           <tr>
                             <td>History </td>
                             <td><input type="checkbox" id="historychecks"> </td>
+
                             <td><input type="checkbox" id="historycheckView" class="historySelect" name="history_view">
                             </td>
                             <td><input type="checkbox" id="historycheckCreate" disabled="disabled"></td>
@@ -361,6 +264,16 @@ justify-content: center;background: #f1f1f1;">
                             <td><input type="checkbox" id="reportcheckDelete" disabled="disabled"> </td>
                           </tr>
                           <tr>
+                            <td>Own Reports </td>
+                            <td><input type="checkbox" id="reportOwnchecks"> </td>
+                            <td><input type="checkbox" id="reportOwncheckView" class="reportOwnSelect"
+                                name="reportOwn_view">
+                            </td>
+                            <td><input type="checkbox" id="reportOwncheckCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="reportOwncheckUpdate" disabled="disabled"> </td>
+                            <td><input type="checkbox" id="reportOwncheckDelete" disabled="disabled"> </td>
+                          </tr>
+                          <tr>
                             <td>User </td>
                             <td><input type="checkbox" id="userschecks"> </td>
 
@@ -372,7 +285,7 @@ justify-content: center;background: #f1f1f1;">
                             </td>
                           </tr>
                           <tr>
-                            <td>SD Users</td>
+                            <td>Van-Sale User</td>
                             <td><input type="checkbox" id="vanSaleUserschecks"> </td>
                             <td><input type="checkbox" id="vanSaleUserscheckView" class="vanSaleUsersSelect"
                                 name="vanSaleUsers_view"> </td>
@@ -393,6 +306,45 @@ justify-content: center;background: #f1f1f1;">
                             <td><input type="checkbox" id="rolecheckCreate" class="roleSelect" name="role_create"></td>
                             <td><input type="checkbox" id="rolecheckUpdate" class="roleSelect" name="role_update"> </td>
                             <td><input type="checkbox" id="rolecheckDelete" class="roleSelect" name="role_delete"> </td>
+                          </tr>
+                          <tr>
+                            <td>Designation </td>
+                            <td><input type="checkbox" id="designationchecks"> </td>
+                            <td><input type="checkbox" id="designationcheckView" class="designationSelect"
+                                name="designation_view"> </td>
+                            <td><input type="checkbox" id="designationcheckCreate" class="designationSelect"
+                                name="designation_create"></td>
+                            <td><input type="checkbox" id="designationcheckUpdate" class="designationSelect"
+                                name="designation_update"> </td>
+                            <td><input type="checkbox" id="designationcheckDelete" class="designationSelect"
+                                name="designation_delete"> </td>
+                          </tr>
+                          <tr>
+                            <td>Branch Transfer </td>
+                            <td><input type="checkbox" id="branchTransferchecks"> </td>
+                            <td><input type="checkbox" id="branchTransfercheckView" class="branchTransferSelect"
+                                name="branchTransfer_view"> </td>
+                            <td><input type="checkbox" id="branchTransfercheckCreate" class="branchTransferSelect"
+                                name="branchTransfer_create"></td>
+                            <td><input type="checkbox" id="branchTransfercheckUpdate" disabled="disabled"> </td>
+                            <td><input type="checkbox" id="branchTransfercheckDelete" disabled="disabled"> </td>
+                          </tr>
+                          <tr>
+                            <td>Branch Transfer Issue</td>
+                            <td><input type="checkbox" id="branchTransferApprovechecks"> </td>
+                            <td><input type="checkbox" id="branchTransfercheckApproveView"
+                                class="branchTransferApproveSelect" name="branchTransferApprove_view"> </td>
+                            <td><input type="checkbox" id="branchTransfercheckApproveCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="branchTransfercheckApproveUpdate" disabled="disabled"> </td>
+                            <td><input type="checkbox" id="branchTransfercheckApproveDelete" disabled="disabled"> </td>
+                          </tr>
+                          <tr>
+                            <td>Lead </td>
+                            <td><input type="checkbox" id="leadchecks"> </td>
+                            <td><input type="checkbox" id="leadcheckView" class="leadSelect" name="lead_view"> </td>
+                            <td><input type="checkbox" id="leadcheckCreate" class="leadSelect" name="lead_create"></td>
+                            <td><input type="checkbox" id="leadcheckUpdate" class="leadSelect" name="lead_update"> </td>
+                            <td><input type="checkbox" id="leadcheckDelete" class="leadSelect" name="lead_delete"> </td>
                           </tr>
                           <tr>
                             <td>Admin Dashboard </td>
@@ -433,7 +385,16 @@ justify-content: center;background: #f1f1f1;">
                                 disabled="disabled"> </td>
                           </tr>
                           <tr>
-                            <td> Order</td>
+                            <td>POS Print</td>
+                            <td><input type="checkbox" id="poschecks"> </td>
+                            <td><input type="checkbox" id="posView" class="posSelect" name="pos_view"> </td>
+                            <td><input type="checkbox" id="poscheckin" name="pos_create" disabled="disabled"> </td>
+                            <td><input type="checkbox" id="poschecki" name="pos_update" disabled="disabled"> </td>
+                            <td><input type="checkbox" id="sdashboardcheckings" name="pos_delete" disabled="disabled">
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>Sales Order,Sales Order Report & History (Login User) </td>
                             <td><input type="checkbox" id="orderchecks"> </td>
                             <td><input type="checkbox" id="ordercheckView" class="orderSelect" name="order_view"> </td>
                             <td><input type="checkbox" id="ordercheckCreate" class="orderSelect" name="order_create">
@@ -443,52 +404,409 @@ justify-content: center;background: #f1f1f1;">
                             </td>
                           </tr>
                           <tr>
-                            <td>Sub Distributor User Approval </td>
-                            <td><input type="checkbox" id="sdUserApprovechecks"> </td>
-                            <td><input type="checkbox" id="sdUserApprovecheckView" class="sdUserApproveSelect"
-                                name="sdUserApprove_view">
+                            <td>Sales Order,Sales Order Report & History (Senior Employee) </td>
+                            <td><input type="checkbox" id="orderSeniorchecks"> </td>
+                            <td><input type="checkbox" id="orderSeniorcheckView" class="orderSeniorSelect"
+                                name="orderSenior_view"> </td>
+                            <td><input type="checkbox" id="orderSeniorcheckCreate" class="orderSeniorSelect"
+                                name="orderSenior_create">
                             </td>
-                            <td><input type="checkbox" id="sdUserApprovecheckCreate" disabled="disabled"></td>
-                            <td><input type="checkbox" id="sdUserApprovecheckUpdate" disabled="disabled"> </td>
-                            <td><input type="checkbox" id="sdUserApprovecheckDelete" disabled="disabled"> </td>
+                            <td><input type="checkbox" id="orderSeniorchecki" name="orderSenior_update"
+                                disabled="disabled"> </td>
+                            <td><input type="checkbox" id="orderSeniorcheckings" name="orderSenior_delete"
+                                disabled="disabled">
+                            </td>
                           </tr>
                           <tr>
-                            <td>Stock Transfer (SD Manager) </td>
-                            <td><input type="checkbox" id="stockTransferchecks"> </td>
-                            <td><input type="checkbox" id="stockTransfercheckView" class="stockTransferSelect"
-                                name="stockTransfer_view">
-                            </td>
-                            <td><input type="checkbox" id="stockTransfercheckCreate" disabled="disabled"></td>
-                            <td><input type="checkbox" id="stockTransfercheckUpdate" disabled="disabled"> </td>
-                            <td><input type="checkbox" id="stockTransfercheckDelete" disabled="disabled"> </td>
+                            <td>Sales Return, Sales Return Report & History (Login User) </td>
+                            <td><input type="checkbox" id="salesReturnchecks"> </td>
+                            <td><input type="checkbox" id="salesReturncheckView" class="salesReturnSelect"
+                                name="salesReturn_view"> </td>
+                            <td><input type="checkbox" id="salesReturncheckCreate" class="salesReturnSelect"
+                                name="salesReturn_create"> </td>
+                            <td><input type="checkbox" id="salesReturnchecki" name="salesReturn_update"
+                                disabled="disabled"> </td>
+                            <td><input type="checkbox" id="salesReturncheckings" name="salesReturn_delete"
+                                disabled="disabled"> </td>
                           </tr>
-                          <tr>
-                            <td>Master Data</td>
-                            <td><input type="checkbox" id="masterDatachecks"> </td>
 
-                            <td><input type="checkbox" id="masterDatacheckView" class="masterDataSelect"
-                                name="masterData_view"> </td>
-                            <td><input type="checkbox" id="masterDatacheckCreate" class="masterDataSelect"
-                                name="masterData_create"></td>
-                            <td><input type="checkbox" id="masterDatacheckUpdate" class="masterDataSelect"
-                                name="masterData_update">
+                          <tr>
+                            <td>Stock Transfer Request (Login User) </td>
+                            <td><input type="checkbox" id="stockTransferRequestchecks"> </td>
+                            <td><input type="checkbox" id="stockTransferRequestcheckView"
+                                class="stockTransferRequestSelect" name="stockTransferRequest_view"> </td>
+                            <td><input type="checkbox" id="stockTransferRequestcheckCreate"
+                                class="stockTransferRequestSelect" name="stockTransferRequest_create"> </td>
+                            <td><input type="checkbox" id="stockTransferRequestchecki"
+                                name="stockTransferRequest_update" disabled="disabled"> </td>
+                            <td><input type="checkbox" id="stockTransferRequestcheckings"
+                                name="stockTransferRequest_delete" disabled="disabled"> </td>
+                          </tr>
+
+                          <tr>
+                            <td>Order Delivery & Order Delivery Report Page (Login User) </td>
+                            <td><input type="checkbox" id="deliverycheck1"> </td>
+                            <td><input type="checkbox" id="deliverycheckView" class="deliverySelections1"
+                                name="delivery_view"> </td>
+                            <td><input type="checkbox" id="deliverycheckin" name="delivery_create" disabled="disabled">
                             </td>
-                            <td><input type="checkbox" id="masterDatacheckDelete" class="masterDataSelect"
-                                name="masterData_delete">
+                            <td><input type="checkbox" id="deliverycheckUpdate" class="deliverySelections1"
+                                name="delivery_update"> </td>
+                            <td><input type="checkbox" id="deliverycheckings" name="delivery_delete"
+                                disabled="disabled"> </td>
+
+                          </tr>
+
+                          <tr>
+                            <td>Order Dispatch List (Out for delivery,List Of dispatch,Dispatch Delivered) </td>
+                            <td><input type="checkbox" id="dispatchcheck1"> </td>
+                            <td><input type="checkbox" id="dispatchcheckView" class="dispatchSelections1"
+                                name="dispatch_view"> </td>
+                            <td><input type="checkbox" id="dispatchcheckin" name="dispatch_create" disabled="disabled">
                             </td>
+                            <td><input type="checkbox" id="dispatchcheckUpdate" class="dispatchSelections1"
+                                name="dispatch_update"> </td>
+                            <td><input type="checkbox" id="dispatchcheckings" name="dispatch_delete"
+                                disabled="disabled"> </td>
+
+                          </tr>
+
+                          <tr>
+                            <td>Dispatch Rejected</td>
+                            <td><input type="checkbox" id="dispatchRejectchecks"> </td>
+                            <td><input type="checkbox" id="dispatchRejectView" class="dispatchRejectSelect"
+                                name="dispatchReject_view"> </td>
+                            <td><input type="checkbox" id="dispatchRejectcheckin" name="dispatchReject_create"
+                                disabled="disabled"> </td>
+                            <td><input type="checkbox" id="dispatchRejectUpdate" disabled="disabled"> </td>
+                            <td><input type="checkbox" id="dispatchRejectcheckings" name="dispatchReject_delete"
+                                disabled="disabled"> </td>
                           </tr>
                           <tr>
-                            <td>Outlets Approval </td>
-                            <td><input type="checkbox" id="outletsApprovechecks"> </td>
-                            <td><input type="checkbox" id="outletsApprovecheckView" class="outletsApproveSelect"
-                                name="outletsApprove_view">
-                            </td>
-                            <td><input type="checkbox" id="outletsApprovecheckCreate" disabled="disabled"></td>
-                            <td><input type="checkbox" id="outletsApprovecheckUpdate" disabled="disabled"> </td>
-                            <td><input type="checkbox" id="outletsApprovecheckDelete" disabled="disabled"> </td>
+                            <td>Collection Due Today</td>
+                            <td><input type="checkbox" id="collectionDueTodaychecks"> </td>
+                            <td><input type="checkbox" id="collectionDueTodayView" class="collectionDueTodaySelect"
+                                name="collectionDueToday_view"></td>
+                            <td><input type="checkbox" id="collectionDueTodayCreate" class="collectionDueTodaySelect"
+                                name="collectionDueToday_create"> </td>
+                            <td><input type="checkbox" id="collectionDueTodaychecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="collectionDueTodaycheckings" disabled="disabled"> </td>
                           </tr>
                           <tr>
-                            <td>Route </td>
+                            <td>Credit Invoice</td>
+                            <td><input type="checkbox" id="creditInvoicechecks"> </td>
+                            <td><input type="checkbox" id="creditInvoiceView" class="creditInvoiceSelect"
+                                name="creditInvoice_view"></td>
+                            <td><input type="checkbox" id="creditInvoiceCreate" class="creditInvoiceSelect"
+                                name="creditInvoice_create"> </td>
+                            <td><input type="checkbox" id="creditInvoicechecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="creditInvoicecheckings" disabled="disabled"> </td>
+                          </tr>
+                          <tr>
+                            <td>Credit Note</td>
+                            <td><input type="checkbox" id="creditNotechecks"> </td>
+                            <td><input type="checkbox" id="creditNoteView" class="creditNoteSelect"
+                                name="creditNote_view"></td>
+                            <td><input type="checkbox" id="creditNoteCreate" class="creditNoteSelect"
+                                name="creditNote_create"> </td>
+                            <td><input type="checkbox" id="creditNotechecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="creditNotecheckings" disabled="disabled"> </td>
+                          </tr>
+                          <tr>
+                            <td>AR Invoice + Payment</td>
+                            <td><input type="checkbox" id="arInvoicePaymentchecks"> </td>
+                            <td><input type="checkbox" id="arInvoicePaymentView" class="arInvoicePaymentSelect"
+                                name="arInvoicePayment_view"></td>
+                            <td><input type="checkbox" id="arInvoicePaymentCreate" class="arInvoicePaymentSelect"
+                                name="arInvoicePayment_create"> </td>
+                            <td><input type="checkbox" id="arInvoicePaymentchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="arInvoicePaymentcheckings" disabled="disabled"> </td>
+                          </tr>
+                          <tr>
+                            <td>AR Invoice + Payment Senior</td>
+                            <td><input type="checkbox" id="arInvoiceSeniorPaymentchecks"> </td>
+                            <td><input type="checkbox" id="arInvoiceSeniorPaymentView"
+                                class="arInvoiceSeniorPaymentSelect" name="arInvoiceSeniorPayment_view"></td>
+                            <td><input type="checkbox" id="arInvoiceSeniorPaymentCreate"
+                                class="arInvoiceSeniorPaymentSelect" name="arInvoiceSeniorPayment_create"> </td>
+                            <td><input type="checkbox" id="arInvoiceSeniorPaymentchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="arInvoiceSeniorPaymentcheckings" disabled="disabled"> </td>
+                          </tr>
+                          <tr>
+                            <td>Sales Quotation</td>
+                            <td><input type="checkbox" id="salesQuotationchecks"> </td>
+                            <td><input type="checkbox" id="salesQuotationView" class="salesQuotationSelect"
+                                name="salesQuotation_view"></td>
+                            <td><input type="checkbox" id="salesQuotationCreate" class="salesQuotationSelect"
+                                name="salesQuotation_create"> </td>
+                            <td><input type="checkbox" id="salesQuotationchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="salesQuotationcheckings" disabled="disabled"> </td>
+                          </tr>
+                          <tr>
+                            <td>Sales Quotation Senior</td>
+                            <td><input type="checkbox" id="salesQuotationSeniorchecks"> </td>
+                            <td><input type="checkbox" id="salesQuotationSeniorView" class="salesQuotationSeniorSelect"
+                                name="salesQuotationSenior_view"></td>
+                            <td><input type="checkbox" id="salesQuotationSeniorCreate"
+                                class="salesQuotationSeniorSelect" name="salesQuotationSenior_create"> </td>
+                            <td><input type="checkbox" id="salesQuotationSeniorchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="salesQuotationSeniorcheckings" disabled="disabled"> </td>
+                          </tr>
+                          <tr>
+                            <td>Invoice</td>
+                            <td><input type="checkbox" id="invoicechecks"> </td>
+                            <td><input type="checkbox" id="invoiceView" class="invoiceSelect" name="invoice_view"></td>
+                            <td><input type="checkbox" id="invoiceCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="invoicechecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="invoicecheckings" disabled="disabled"> </td>
+                          </tr>
+                          <tr>
+                            <td>Delivery Boy</td>
+                            <td><input type="checkbox" id="deliveryBoychecks"> </td>
+                            <td><input type="checkbox" id="deliveryBoyView" class="deliveryBoySelect"
+                                name="deliveryBoy_view"></td>
+                            <td><input type="checkbox" id="deliveryBoyCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="deliveryBoychecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="deliveryBoycheckings" disabled="disabled"> </td>
+                          </tr>
+                          <tr>
+                            <td>Order Approve</td>
+                            <td><input type="checkbox" id="orderApprovechecks"> </td>
+                            <td><input type="checkbox" id="orderApproveView" class="orderApproveSelect"
+                                name="orderApprove_view"></td>
+                            <td><input type="checkbox" id="orderApproveCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="orderApprovechecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="orderApprovecheckings" disabled="disabled"> </td>
+                          </tr>
+                          <tr>
+                            <td>Sales Quotation Approve</td>
+                            <td><input type="checkbox" id="quotationApprovechecks"> </td>
+                            <td><input type="checkbox" id="quotationApproveView" class="quotationApproveSelect"
+                                name="quotationApprove_view"></td>
+                            <td><input type="checkbox" id="quotationApproveCreate" disabled="disabled"> </td>
+                            <td><input type="checkbox" id="quotationApprovechecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="quotationApprovecheckings" disabled="disabled"> </td>
+                          </tr>
+                          <tr>
+                            <td>Sales Return Approve</td>
+                            <td><input type="checkbox" id="salesReturnApprovechecks"> </td>
+                            <td><input type="checkbox" id="salesReturnApproveView" class="salesReturnApproveSelect"
+                                name="salesReturnApprove_view"></td>
+                            <td><input type="checkbox" id="salesReturnApproveCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="salesReturnApprovechecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="salesReturnApprovecheckings" disabled="disabled"> </td>
+                          </tr>
+                          <tr>
+                            <td>Stock Transfer Approve</td>
+                            <td><input type="checkbox" id="stockTransferApprovechecks"> </td>
+                            <td><input type="checkbox" id="stockTransferApproveView" class="stockTransferApproveSelect"
+                                name="stockTransferApprove_view"></td>
+                            <td><input type="checkbox" id="stockTransferApproveCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="stockTransferApprovechecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="stockTransferApprovecheckings" disabled="disabled"> </td>
+                          </tr>
+                          <tr>
+                            <td>Credit Note Approve</td>
+                            <td><input type="checkbox" id="creditNoteApprovechecks"> </td>
+                            <td><input type="checkbox" id="creditNoteApproveView" class="creditNoteApproveSelect"
+                                name="creditNoteApprove_view"></td>
+                            <td><input type="checkbox" id="creditNoteApproveCreate" disabled="disabled"> </td>
+                            <td><input type="checkbox" id="creditNoteApprovechecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="creditNoteApprovecheckings" disabled="disabled"> </td>
+                          </tr>
+                          <tr>
+                            <td>Credit Invoice Approve</td>
+                            <td><input type="checkbox" id="creditInvoiceApprovechecks"> </td>
+                            <td><input type="checkbox" id="creditInvoiceApproveView" class="creditInvoiceApproveSelect"
+                                name="creditInvoiceApprove_view"></td>
+                            <td><input type="checkbox" id="creditInvoiceApproveCreate" disabled="disabled"> </td>
+                            <td><input type="checkbox" id="creditInvoiceApprovechecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="creditInvoiceApprovecheckings" disabled="disabled"> </td>
+                          </tr>
+                          <tr>
+                            <td>Pick List</td>
+                            <td><input type="checkbox" id="pickListchecks"> </td>
+                            <td><input type="checkbox" id="pickListView" class="pickListSelect" name="pickList_view">
+                            </td>
+                            <td><input type="checkbox" id="pickListCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="pickListchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="pickListcheckings" disabled="disabled"> </td>
+                          </tr>
+                          <tr>
+                            <td>Order Report </td>
+                            <td><input type="checkbox" id="orderReportchecks"> </td>
+                            <td><input type="checkbox" id="orderReportView" class="orderReportSelect"
+                                name="orderReport_view">
+                            </td>
+                            <td><input type="checkbox" id="orderReportCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="orderReportchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="orderReportcheckings" disabled="disabled"> </td>
+                          </tr>
+                          <tr>
+                            <td>Sales Quotation Report </td>
+                            <td><input type="checkbox" id="salesQuotationReportchecks"> </td>
+                            <td><input type="checkbox" id="salesQuotationReportView" class="salesQuotationReportSelect"
+                                name="salesQuotationReport_view">
+                            </td>
+                            <td><input type="checkbox" id="salesQuotationReportCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="salesQuotationReportchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="salesQuotationReportcheckings" disabled="disabled"> </td>
+                          </tr>
+                          <tr>
+                            <td>AR Invoice Report </td>
+                            <td><input type="checkbox" id="arInvoiceReportchecks"> </td>
+                            <td><input type="checkbox" id="arInvoiceReportView" class="arInvoiceReportSelect"
+                                name="arInvoiceReport_view">
+                            </td>
+                            <td><input type="checkbox" id="arInvoiceReportCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="arInvoiceReportchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="arInvoiceReportcheckings" disabled="disabled"> </td>
+                          </tr>
+                          <tr>
+                            <td>Credit Invoice Report </td>
+                            <td><input type="checkbox" id="creditInvoiceReportchecks"> </td>
+                            <td><input type="checkbox" id="creditInvoiceReportView" class="creditInvoiceReportSelect"
+                                name="creditInvoiceReport_view">
+                            </td>
+                            <td><input type="checkbox" id="creditInvoiceReportCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="creditInvoiceReportchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="creditInvoiceReportcheckings" disabled="disabled"> </td>
+                          </tr>
+                          <tr>
+                            <td>Sales Return Report </td>
+                            <td><input type="checkbox" id="salesReturnReportchecks"> </td>
+                            <td><input type="checkbox" id="salesReturnReportView" class="salesReturnReportSelect"
+                                name="salesReturnReport_view">
+                            </td>
+                            <td><input type="checkbox" id="salesReturnReportCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="salesReturnReportchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="salesReturnReportcheckings" disabled="disabled"> </td>
+                          </tr>
+                          <tr>
+                            <td>Credit Note Report </td>
+                            <td><input type="checkbox" id="creditNoteReportchecks"> </td>
+                            <td><input type="checkbox" id="creditNoteReportView" class="creditNoteReportSelect"
+                                name="creditNoteReport_view">
+                            </td>
+                            <td><input type="checkbox" id="creditNoteReportCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="creditNoteReportchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="creditNoteReportcheckings" disabled="disabled"> </td>
+                          </tr>
+                          <tr>
+                            <td>Branch Transfer Report</td>
+                            <td><input type="checkbox" id="branchTransferReportchecks"> </td>
+                            <td><input type="checkbox" id="branchTransferReportView" class="branchTransferReportSelect"
+                                name="branchTransferReport_view">
+                            </td>
+                            <td><input type="checkbox" id="branchTransferReportCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="branchTransferReportchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="branchTransferReportcheckings" disabled="disabled"> </td>
+                          </tr>
+                          <tr>
+                            <td>Collection Report</td>
+                            <td><input type="checkbox" id="collectionReportchecks"> </td>
+                            <td><input type="checkbox" id="collectionReportView" class="collectionReportSelect"
+                                name="collectionReport_view">
+                            </td>
+                            <td><input type="checkbox" id="collectionReportCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="collectionReportchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="collectionReportcheckings" disabled="disabled"> </td>
+                          </tr>
+                          <tr>
+                            <td>Stock Transfer Report</td>
+                            <td><input type="checkbox" id="stockTransferReportchecks"> </td>
+                            <td><input type="checkbox" id="stockTransferReportView" class="stockTransferReportSelect"
+                                name="stockTransferReport_view">
+                            </td>
+                            <td><input type="checkbox" id="stockTransferReportCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="stockTransferReportchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="stockTransferReportcheckings" disabled="disabled"> </td>
+                          </tr>
+
+                          <tr>
+                            <td>Invoice Report</td>
+                            <td><input type="checkbox" id="invoiceReportchecks"> </td>
+                            <td><input type="checkbox" id="invoiceReportView" class="invoiceReportSelect"
+                                name="invoiceReport_view">
+                            </td>
+                            <td><input type="checkbox" id="invoiceReportCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="invoiceReportchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="invoiceReportcheckings" disabled="disabled"> </td>
+                          </tr>
+
+                          <tr>
+                            <td>Delivery Report</td>
+                            <td><input type="checkbox" id="deliveryReportchecks"> </td>
+                            <td><input type="checkbox" id="deliveryReportView" class="deliveryReportSelect"
+                                name="deliveryReport_view">
+                            </td>
+                            <td><input type="checkbox" id="deliveryReportCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="deliveryReportchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="deliveryReportcheckings" disabled="disabled"> </td>
+                          </tr>
+
+                          <tr>
+                            <td>Purchase Invoice Print</td>
+                            <td><input type="checkbox" id="purchasePrintchecks"> </td>
+                            <td><input type="checkbox" id="purchasePrintView" class="purchasePrintSelect"
+                                name="purchasePrint_view">
+                            </td>
+                            <td><input type="checkbox" id="purchasePrintCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="purchasePrintchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="purchasePrintcheckings" disabled="disabled"> </td>
+                          </tr>
+
+                          <tr>
+                            <td>Accountant</td>
+                            <td><input type="checkbox" id="accountantchecks"> </td>
+                            <td><input type="checkbox" id="accountantView" class="accountantSelect"
+                                name="accountant_view">
+                            </td>
+                            <td><input type="checkbox" id="accountantCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="accountantchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="accountantcheckings" disabled="disabled"> </td>
+                          </tr>
+
+                          <tr>
+                            <td>Activities</td>
+                            <td><input type="checkbox" id="activitychecks"> </td>
+                            <td><input type="checkbox" id="activitycheckView" class="activitySelect"
+                                name="activity_view"> </td>
+                            <td><input type="checkbox" id="activitycheckCreate" class="activitySelect"
+                                name="activity_create"></td>
+                            <td><input type="checkbox" id="activitycheckUpdate" disabled="disabled"> </td>
+                            <td><input type="checkbox" id="activitycheckDelete" disabled="disabled"> </td>
+                          </tr>
+                          <tr>
+                            <td>Activities Listing (Senior Employee)</td>
+                            <td><input type="checkbox" id="activitySeniorchecks"> </td>
+                            <td><input type="checkbox" id="activitySeniorView" class="activitySeniorSelect"
+                                name="activitySenior_view">
+                            </td>
+                            <td><input type="checkbox" id="activitySeniorCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="activitySeniorchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="activitySeniorcheckings" disabled="disabled"> </td>
+                          </tr>
+                          <tr>
+                            <td>Business Partner Administration</td>
+                            <td><input type="checkbox" id="bpAdminchecks"> </td>
+                            <td><input type="checkbox" id="bpAdminView" class="bpAdminSelect" name="bpAdmin_view">
+                            </td>
+                            <td><input type="checkbox" id="bpAdminCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="bpAdminchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="bpAdmincheckings" disabled="disabled"> </td>
+                          </tr>
+                          <tr>
+                            <td>POS Summary </td>
+                            <td><input type="checkbox" id="posReportchecks"> </td>
+                            <td><input type="checkbox" id="posReportView" class="posReportSelect" name="posReport_view">
+                            </td>
+                            <td><input type="checkbox" id="posReportCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="posReportchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="posReportcheckings" disabled="disabled"> </td>
+                          </tr>
+                          <tr>
+                            <td>Route</td>
                             <td><input type="checkbox" id="routechecks"> </td>
                             <td><input type="checkbox" id="routecheckView" class="routeSelect" name="route_view"> </td>
                             <td><input type="checkbox" id="routecheckCreate" class="routeSelect" name="route_create">
@@ -499,474 +817,244 @@ justify-content: center;background: #f1f1f1;">
                             </td>
                           </tr>
                           <tr>
-                            <td>Route Assign</td>
-                            <td><input type="checkbox" id="routeAssignchecks"> </td>
-                            <td><input type="checkbox" id="routeAssigncheckView" class="routeAssignSelect"
-                                name="routeAssign_view">
+                            <td>Location Tracker</td>
+                            <td><input type="checkbox" id="locationchecks"> </td>
+                            <td><input type="checkbox" id="locationView" class="locationSelect" name="location_view">
                             </td>
-                            <td><input type="checkbox" id="routeAssigncheckCreate" disabled="disabled"></td>
-                            <td><input type="checkbox" id="routeAssigncheckUpdate" disabled="disabled"> </td>
-                            <td><input type="checkbox" id="routeAssigncheckDelete" disabled="disabled"> </td>
+                            <td><input type="checkbox" id="locationCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="locationchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="locationcheckings" disabled="disabled"> </td>
+                          </tr>
+                          <tr>
+                            <td>Pending AR Invoice + Payments </td>
+                            <td><input type="checkbox" id="pendingArInvoicechecks"> </td>
+                            <td><input type="checkbox" id="pendingArInvoiceView" class="pendingArInvoiceSelect"
+                                name="pendingArInvoice_view">
+                            </td>
+                            <td><input type="checkbox" id="pendingArInvoiceCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="pendingArInvoicechecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="pendingArInvoicecheckings" disabled="disabled"> </td>
+                          </tr>
+                          <tr>
+                            <td>Pending POS Invoices </td>
+                            <td><input type="checkbox" id="pendingPosInvoicechecks"> </td>
+                            <td><input type="checkbox" id="pendingPosInvoiceView" class="pendingPosInvoiceSelect"
+                                name="pendingPosInvoice_view">
+                            </td>
+                            <td><input type="checkbox" id="pendingPosInvoiceCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="pendingPosInvoicechecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="pendingPosInvoicecheckings" disabled="disabled"> </td>
                           </tr>
                           <tr>
                             <td>Attendance</td>
                             <td><input type="checkbox" id="attendancechecks"> </td>
-                            <td><input type="checkbox" id="attendancecheckView" class="attendanceSelect"
+                            <td><input type="checkbox" id="attendanceView" class="attendanceSelect"
                                 name="attendance_view">
                             </td>
-                            <td><input type="checkbox" id="attendancecheckCreate" disabled="disabled"></td>
-                            <td><input type="checkbox" id="attendancecheckUpdate" disabled="disabled"> </td>
-                            <td><input type="checkbox" id="attendancecheckDelete" disabled="disabled"> </td>
+                            <td><input type="checkbox" id="attendanceCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="attendancechecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="attendancecheckings" disabled="disabled"> </td>
                           </tr>
                           <tr>
-                            <td>Stock List</td>
-                            <td><input type="checkbox" id="stockListchecks"> </td>
-                            <td><input type="checkbox" id="stockListcheckView" class="stockListSelect"
-                                name="stockList_view">
+                            <td>Route Approve</td>
+                            <td><input type="checkbox" id="routeApprovechecks"> </td>
+                            <td><input type="checkbox" id="routeApproveView" class="routeApproveSelect"
+                                name="routeApprove_view">
                             </td>
-                            <td><input type="checkbox" id="stockListcheckCreate" disabled="disabled"></td>
-                            <td><input type="checkbox" id="stockListcheckUpdate" disabled="disabled"> </td>
-                            <td><input type="checkbox" id="stockListcheckDelete" disabled="disabled"> </td>
+                            <td><input type="checkbox" id="routeApproveCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="routeApprovechecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="routeApprovecheckings" disabled="disabled"> </td>
                           </tr>
                           <tr>
-                            <td>Verticals (Master Data)</td>
-                            <td><input type="checkbox" id="verticalschecks"> </td>
-                            <td><input type="checkbox" id="verticalscheckView" class="verticalsSelect"
-                                name="verticals_view"> </td>
-                            <td><input type="checkbox" id="verticalscheckCreate" class="verticalsSelect"
-                                name="verticals_create">
+                            <td>Sales Summary Report</td>
+                            <td><input type="checkbox" id="salesSummaryReportchecks"> </td>
+                            <td><input type="checkbox" id="salesSummaryReportView" class="salesSummaryReportSelect"
+                                name="salesSummaryReport_view">
                             </td>
-                            <td><input type="checkbox" id="verticalscheckUpdate" class="verticalsSelect"
-                                name="verticals_update">
-                            </td>
-                            <td><input type="checkbox" id="verticalscheckDelete" class="verticalsSelect"
-                                name="verticals_delete">
-                            </td>
+                            <td><input type="checkbox" id="salesSummaryReportCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="salesSummaryReportchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="salesSummaryReportcheckings" disabled="disabled"> </td>
                           </tr>
                           <tr>
-                            <td>Outlets (Master Data)</td>
-                            <td><input type="checkbox" id="outletschecks"> </td>
-                            <td><input type="checkbox" id="outletscheckView" class="outletsSelect" name="outlets_view">
+                            <td>Stock Summary Report</td>
+                            <td><input type="checkbox" id="stockSummaryReportchecks"> </td>
+                            <td><input type="checkbox" id="stockSummaryReportView" class="stockSummaryReportSelect"
+                                name="stockSummaryReport_view">
                             </td>
-                            <td><input type="checkbox" id="outletscheckCreate" class="outletsSelect"
-                                name="outlets_create">
-                            </td>
-                            <td><input type="checkbox" id="outletscheckUpdate" class="outletsSelect"
-                                name="outlets_update">
-                            </td>
-                            <td><input type="checkbox" id="outletscheckDelete" class="outletsSelect"
-                                name="outlets_delete">
-                            </td>
+                            <td><input type="checkbox" id="stockSummaryReportCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="stockSummaryReportchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="stockSummaryReportcheckings" disabled="disabled"> </td>
                           </tr>
                           <tr>
-                            <td>Sub Distributor (Master Data)</td>
-                            <td><input type="checkbox" id="sdMasterchecks"> </td>
-                            <td><input type="checkbox" id="sdMastercheckView" class="sdMasterSelect"
-                                name="sdMaster_view">
+                            <td>Skipped Customer Report</td>
+                            <td><input type="checkbox" id="skippedCustomerReportchecks"> </td>
+                            <td><input type="checkbox" id="skippedCustomerReportView"
+                                class="skippedCustomerReportSelect" name="skippedCustomerReport_view">
                             </td>
-                            <td><input type="checkbox" id="sdMastercheckCreate" class="sdMasterSelect"
-                                name="sdMaster_create">
-                            </td>
-                            <td><input type="checkbox" id="sdMastercheckUpdate" class="sdMasterSelect"
-                                name="sdMaster_update">
-                            </td>
-                            <td><input type="checkbox" id="sdMastercheckDelete" class="sdMasterSelect"
-                                name="sdMaster_delete">
-                            </td>
-                          </tr>
-                          <!-- code 22062021 -->
-                          <tr>
-                            <td>Branch </td>
-                            <td><input type="checkbox" id="branchchecks"> </td>
-                            <td><input type="checkbox" id="branchcheckView" class="branchelect" name="branch_view">
-                            </td>
-                            <td><input type="checkbox" id="branchcheckCreate" class="branchelect" name="branch_create">
-                            </td>
-                            <td><input type="checkbox" id="branchcheckUpdate" class="branchelect" name="branch_update">
-                            </td>
-                            <td><input type="checkbox" id="branchcheckDelete" class="branchelect" name="branch_delete">
-                            </td>
+                            <td><input type="checkbox" id="skippedCustomerReportCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="skippedCustomerReportchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="skippedCustomerReportcheckings" disabled="disabled"> </td>
                           </tr>
                           <tr>
-                            <td>Location </td>
-                            <td><input type="checkbox" id="locationchecks"> </td>
-
-                            <td><input type="checkbox" id="locationcheckView" class="locationelect"
-                                name="location_view"> </td>
-                            <td><input type="checkbox" id="locationcheckCreate" class="locationelect"
-                                name="location_create"></td>
-                            <td><input type="checkbox" id="locationcheckUpdate" class="locationelect"
-                                name="location_update">
+                            <td>Customer With No Sale Report</td>
+                            <td><input type="checkbox" id="noSalesReportchecks"> </td>
+                            <td><input type="checkbox" id="noSalesReportView" class="noSalesReportSelect"
+                                name="noSalesReport_view">
                             </td>
-                            <td><input type="checkbox" id="locationcheckDelete" class="locationelect"
-                                name="location_delete">
-                            </td>
+                            <td><input type="checkbox" id="noSalesReportCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="noSalesReportchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="noSalesReportcheckings" disabled="disabled"> </td>
                           </tr>
                           <tr>
-                            <td>Price Type </td>
-                            <td><input type="checkbox" id="priceTypechecks"> </td>
-
-                            <td><input type="checkbox" id="priceTypecheckView" class="priceTypeelect"
-                                name="priceType_view"> </td>
-                            <td><input type="checkbox" id="priceTypecheckCreate" class="priceTypeelect"
-                                name="priceType_create"></td>
-                            <td><input type="checkbox" id="priceTypecheckUpdate" class="priceTypeelect"
-                                name="priceType_update">
+                            <td>Target No Of Outlet By Salesman Report</td>
+                            <td><input type="checkbox" id="targetOutletReportchecks"> </td>
+                            <td><input type="checkbox" id="targetOutletReportView" class="targetOutletReportSelect"
+                                name="targetOutletReport_view">
                             </td>
-                            <td><input type="checkbox" id="priceTypecheckDelete" class="priceTypeelect"
-                                name="priceType_delete">
-                            </td>
+                            <td><input type="checkbox" id="targetOutletReportCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="targetOutletReportchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="targetOutletReportcheckings" disabled="disabled"> </td>
                           </tr>
                           <tr>
-                            <td>Product </td>
-                            <td><input type="checkbox" id="productchecks"> </td>
-
-                            <td><input type="checkbox" id="productcheckView" class="productelect" name="product_view">
+                            <td>Call Rate Report</td>
+                            <td><input type="checkbox" id="callRateReportchecks"> </td>
+                            <td><input type="checkbox" id="callRateReportView" class="callRateReportSelect"
+                                name="callRateReport_view">
                             </td>
-                            <td><input type="checkbox" id="productcheckCreate" class="productelect"
-                                name="product_create"></td>
-                            <td><input type="checkbox" id="productcheckUpdate" class="productelect"
-                                name="product_update">
-                            </td>
-                            <td><input type="checkbox" id="productcheckDelete" class="productelect"
-                                name="product_delete">
-                            </td>
+                            <td><input type="checkbox" id="callRateReportCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="callRateReportchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="callRateReportcheckings" disabled="disabled"> </td>
                           </tr>
                           <tr>
-                            <td>Unit </td>
-                            <td><input type="checkbox" id="unitchecks"> </td>
-
-                            <td><input type="checkbox" id="unitcheckView" class="unitelect" name="unit_view"> </td>
-                            <td><input type="checkbox" id="unitcheckCreate" class="unitelect" name="unit_create"></td>
-                            <td><input type="checkbox" id="unitcheckUpdate" class="unitelect" name="unit_update">
+                            <td>Strike Rate Report</td>
+                            <td><input type="checkbox" id="strikeRateReportchecks"> </td>
+                            <td><input type="checkbox" id="strikeRateReportView" class="strikeRateReportSelect"
+                                name="strikeRateReport_view">
                             </td>
-                            <td><input type="checkbox" id="unitcheckDelete" class="unitelect" name="unit_delete">
-                            </td>
+                            <td><input type="checkbox" id="strikeRateReportCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="strikeRateReportchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="strikeRateReportcheckings" disabled="disabled"> </td>
                           </tr>
                           <tr>
-                            <td>Price </td>
-                            <td><input type="checkbox" id="pricechecks"> </td>
-
-                            <td><input type="checkbox" id="pricecheckView" class="priceelect" name="price_view"> </td>
-                            <td><input type="checkbox" id="pricecheckCreate" class="priceelect" name="price_create">
+                            <td>Price Edit/Update</td>
+                            <td><input type="checkbox" id="priceUpdatechecks"> </td>
+                            <td><input type="checkbox" id="priceUpdateView" class="priceUpdateSelect"
+                                name="priceUpdate_view">
                             </td>
-                            <td><input type="checkbox" id="pricecheckUpdate" class="priceelect" name="price_update">
-                            </td>
-                            <td><input type="checkbox" id="pricecheckDelete" class="priceelect" name="price_delete">
-                            </td>
+                            <td><input type="checkbox" id="priceUpdateCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="priceUpdatechecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="priceUpdatecheckings" disabled="disabled"> </td>
                           </tr>
                           <tr>
-                            <td>Tax </td>
-                            <td><input type="checkbox" id="taxchecks"> </td>
-
-                            <td><input type="checkbox" id="taxcheckView" class="taxelect" name="tax_view"> </td>
-                            <td><input type="checkbox" id="taxcheckCreate" class="taxelect" name="tax_create"></td>
-                            <td><input type="checkbox" id="taxcheckUpdate" class="taxelect" name="tax_update">
+                            <td>Vansale Report</td>
+                            <td><input type="checkbox" id="vansaleReportchecks"> </td>
+                            <td><input type="checkbox" id="vansaleReportView" class="vansaleReportSelect"
+                                name="vansaleReport_view">
                             </td>
-                            <td><input type="checkbox" id="taxcheckDelete" class="taxelect" name="tax_delete">
-                            </td>
+                            <td><input type="checkbox" id="vansaleReportCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="vansaleReportchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="vansaleReportcheckings" disabled="disabled"> </td>
                           </tr>
                           <tr>
-                            <td>Administration </td>
-                            <td><input type="checkbox" id="administrationchecks"> </td>
-
-                            <td><input type="checkbox" id="administrationcheckView" class="administrationselect"
-                                name="administration_view"> </td>
-                            <td><input type="checkbox" id="administrationcheckCreate" disabled="disabled"></td>
-                            <td><input type="checkbox" id="administrationcheckUpdate" disabled="disabled">
+                            <td>CXO Dashboard</td>
+                            <td><input type="checkbox" id="cxoDashboardchecks"> </td>
+                            <td><input type="checkbox" id="cxoDashboardView" class="cxoDashboardSelect"
+                                name="cxoDashboard_view">
                             </td>
-                            <td><input type="checkbox" id="administrationcheckDelete" disabled="disabled">
-                            </td>
+                            <td><input type="checkbox" id="cxoDashboardCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="cxoDashboardchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="cxoDashboardcheckings" disabled="disabled"> </td>
                           </tr>
                           <tr>
-                            <td>SD Price List </td>
-                            <td><input type="checkbox" id="SdPriceListchecks"> </td>
-
-                            <td><input type="checkbox" id="SdPriceListcheckView" class="SdPriceListselect"
-                                name="SdPriceList_view"> </td>
-                            <td><input type="checkbox" id="SdPriceListcheckCreate" disabled="disabled"></td>
-                            <td><input type="checkbox" id="SdPriceListcheckUpdate" disabled="disabled">
+                            <td>Item Wise Sales Report</td>
+                            <td><input type="checkbox" id="itemWiseReportchecks"> </td>
+                            <td><input type="checkbox" id="itemWiseReportView" class="itemWiseReportSelect"
+                                name="itemWiseReport_view">
                             </td>
-                            <td><input type="checkbox" id="SdPriceListcheckDelete" disabled="disabled">
-                            </td>
-                          </tr>
-                          <!-- code 22062021 -->
-                          <tr>
-                            <td>Delivery</td>
-                            <td><input type="checkbox" id="deliveryListchecks"></td>
-
-                            <td><input type="checkbox" id="deliveryListcheckView" class="deliveryListselect"
-                                name="deliveryList_view"> </td>
-                            <td><input type="checkbox" id="deliveryListcheckCreate" disabled="disabled"></td>
-                            <td><input type="checkbox" id="deliveryListcheckUpdate" class="deliveryListselect"
-                                name="deliveryList_update">
-                            </td>
-                            <td><input type="checkbox" id="deliveryListcheckDelete" disabled="disabled">
-                            </td>
+                            <td><input type="checkbox" id="itemWiseReportCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="itemWiseReportchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="itemWiseReportcheckings" disabled="disabled"> </td>
                           </tr>
                           <tr>
-                            <td>Collection </td>
-                            <td><input type="checkbox" id="collectionListchecks"> </td>
-                            <td><input type="checkbox" id="collectionListcheckView" class="collectionListselect"
-                                name="collectionList_view"> </td>
-                            <td><input type="checkbox" id="collectionListcheckCreate" disabled="disabled"></td>
-                            <td><input type="checkbox" id="collectionListcheckUpdate" class="collectionListselect"
-                                name="collectionList_update">
+                            <td>Route Wise Report</td>
+                            <td><input type="checkbox" id="routeWiseReportchecks"> </td>
+                            <td><input type="checkbox" id="routeWiseReportView" class="routeWiseReportSelect"
+                                name="routeWiseReport_view">
                             </td>
-                            <td><input type="checkbox" id="collectionListcheckDelete" disabled="disabled">
-                            </td>
+                            <td><input type="checkbox" id="routeWiseReportCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="routeWiseReportchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="routeWiseReportcheckings" disabled="disabled"> </td>
                           </tr>
                           <tr>
-                            <td>Order Approval </td>
-                            <td><input type="checkbox" id="orderApListchecks"> </td>
-                            <td><input type="checkbox" id="orderApListcheckView" class="orderApListselect"
-                                name="orderApList_view"> </td>
-                            <td><input type="checkbox" id="orderApListcheckCreate" disabled="disabled"></td>
-                            <td><input type="checkbox" id="orderApListcheckUpdate" disabled="disabled">
+                            <td>Numerical Distribution Report</td>
+                            <td><input type="checkbox" id="numericalDistributonReportchecks"> </td>
+                            <td><input type="checkbox" id="numericalDistributonReportView" class="numericalDistributonReportSelect"
+                                name="numericalDistributonReport_view">
                             </td>
-                            <td><input type="checkbox" id="orderApListcheckDelete" disabled="disabled">
-                            </td>
+                            <td><input type="checkbox" id="numericalDistributonReportCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="numericalDistributonReportchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="numericalDistributonReportcheckings" disabled="disabled"> </td>
                           </tr>
                           <tr>
-                            <td>Stock Acceptance</td>
-                            <td><input type="checkbox" id="stockAcceptchecks"> </td>
-                            <td><input type="checkbox" id="stockAcceptcheckView" class="stockAcceptSelect"
-                                name="stockAccept_view">
+                            <td>WareHouse Stock Report</td>
+                            <td><input type="checkbox" id="whsStockReportchecks"> </td>
+                            <td><input type="checkbox" id="whsStockReportView" class="whsStockReportSelect"
+                                name="whsStockReport_view">
                             </td>
-                            <td><input type="checkbox" id="stockAcceptcheckCreate" disabled="disabled"></td>
-                            <td><input type="checkbox" id="stockAcceptcheckUpdate" disabled="disabled"> </td>
-                            <td><input type="checkbox" id="stockAcceptcheckDelete" disabled="disabled"> </td>
+                            <td><input type="checkbox" id="whsStockReportCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="whsStockReportchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="whsStockReportcheckings" disabled="disabled"> </td>
                           </tr>
                           <tr>
-                            <td>Outlets (SD User)</td>
-                            <td><input type="checkbox" id="sdOutletschecks"> </td>
-                            <td><input type="checkbox" id="sdOutletscheckView" class="sdOutletsSelect"
-                                name="sdOutlets_view">
+                            <td>Weightage Distribution Report</td>
+                            <td><input type="checkbox" id="weightageDistributionReportchecks"> </td>
+                            <td><input type="checkbox" id="weightageDistributionReportView" class="weightageDistributionReportSelect"
+                                name="weightageDistributionReport_view">
                             </td>
-                            <td><input type="checkbox" id="sdOutletscheckCreate" class="sdOutletsSelect"
-                                name="sdOutlets_create">
-                            </td>
-                            <td><input type="checkbox" id="sdOutletscheckUpdate" class="sdOutletsSelect"
-                                name="sdOutlets_update">
-                            </td>
-                            <td><input type="checkbox" id="sdOutletscheckDelete" class="sdOutletsSelect"
-                                name="sdOutlets_delete">
-                            </td>
+                            <td><input type="checkbox" id="weightageDistributionReportCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="weightageDistributionReportchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="weightageDistributionReportcheckings" disabled="disabled"> </td>
                           </tr>
                           <tr>
-                            <td>Cash Sales</td>
-                            <td><input type="checkbox" id="cashSaleschecks"> </td>
-                            <td><input type="checkbox" id="cashSalescheckView" class="cashSalesSelect"
-                                name="cashSales_view">
+                            <td>Coverage Distribution Report</td>
+                            <td><input type="checkbox" id="coverageDistributionReportchecks"> </td>
+                            <td><input type="checkbox" id="coverageDistributionReportView" class="coverageDistributionReportSelect"
+                                name="coverageDistributionReport_view">
                             </td>
-                            <td><input type="checkbox" id="cashSalescheckCreate" class="cashSalesSelect"
-                                name="cashSales_create">
-                            </td>
-                            <td><input type="checkbox" id="cashSalescheckUpdate" class="cashSalesSelect"
-                                name="cashSales_update">
-                            </td>
-                            <td><input type="checkbox" id="cashSalescheckDelete" class="cashSalesSelect"
-                                name="cashSales_delete">
-                            </td>
+                            <td><input type="checkbox" id="coverageDistributionReportCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="coverageDistributionReportchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="coverageDistributionReportcheckings" disabled="disabled"> </td>
                           </tr>
                           <tr>
-                            <td>Cash Sales Report</td>
-                            <td><input type="checkbox" id="cashSalesRepEditcheck"> </td>
-                            <td><input type="checkbox" id="cashSalesRepEditchecking" class="cashSalesRepEditSelections"
-                                name="cashSalesReport_view">
+                            <td>Price Type Edit</td>
+                            <td><input type="checkbox" id="priceTypeEditchecks"> </td>
+                            <td><input type="checkbox" id="priceTypeEditView" class="priceTypeEditSelect"
+                                name="priceTypeEdit_view">
                             </td>
-                            <td><input type="checkbox" id="cashSalesRepEditcheckin" disabled="">
-                            </td>
-                            <td><input type="checkbox" id="cashSalesRepEditchecki" disabled="">
-                            </td>
-                            <td><input type="checkbox" id="cashSalesRepEditcheckings" disabled="">
-                            </td>
+                            <td><input type="checkbox" id="priceTypeEditCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="priceTypeEditchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="priceTypeEditcheckings" disabled="disabled"> </td>
                           </tr>
                           <tr>
-                            <td>Order Report </td>
-                            <td><input type="checkbox" id="orderReportchecks"> </td>
-                            <td><input type="checkbox" id="orderReportcheckView" class="orderReportselect"
-                                name="orderReport_view"> </td>
-                            <td><input type="checkbox" id="orderReportcheckCreate" disabled="disabled"></td>
-                            <td><input type="checkbox" id="orderReportcheckUpdate" disabled="disabled">
+                            <td>Expense List</td>
+                            <td><input type="checkbox" id="expenseListchecks"> </td>
+                            <td><input type="checkbox" id="expenseListView" class="expenseListSelect"
+                                name="expenseList_view">
                             </td>
-                            <td><input type="checkbox" id="orderReportcheckDelete" disabled="disabled">
-                            </td>
+                            <td><input type="checkbox" id="expenseListCreate" disabled="disabled"></td>
+                            <td><input type="checkbox" id="expenseListchecki" disabled="disabled"></td>
+                            <td><input type="checkbox" id="expenseListcheckings" disabled="disabled"> </td>
                           </tr>
                           <tr>
-                            <td>Stock Report</td>
-                            <td><input type="checkbox" id="stockReportchecks"> </td>
-                            <td><input type="checkbox" id="stockReportcheckView" class="stockReportSelect"
-                                name="stockReport_view">
+                            <td>Master Data</td>
+                            <td><input type="checkbox" id="masterDatachecks"> </td>
+                            <td><input type="checkbox" id="masterDatacheckView" class="masterDataSelect" name="masterData_view"> </td>
+                            <td><input type="checkbox" id="masterDatacheckCreate" class="masterDataSelect" name="masterData_create">
                             </td>
-                            <td><input type="checkbox" id="stockReportcheckCreate" disabled="disabled"></td>
-                            <td><input type="checkbox" id="stockReportcheckUpdate" disabled="disabled"> </td>
-                            <td><input type="checkbox" id="stockReportcheckDelete" disabled="disabled"> </td>
-                          </tr>
-                          <tr>
-                            <td>Credit Sales</td>
-                            <td><input type="checkbox" id="creditSalechecks"> </td>
-                            <td><input type="checkbox" id="creditSalecheckView" class="creditSaleSelect"
-                                name="creditSale_view">
+                            <td><input type="checkbox" id="masterDatacheckUpdate" class="masterDataSelect" name="masterData_update">
                             </td>
-                            <td><input type="checkbox" id="creditSalecheckCreate" class="creditSaleSelect"
-                                name="creditSale_create">
+                            <td><input type="checkbox" id="masterDatacheckDelete" class="masterDataSelect" name="masterData_delete">
                             </td>
-                            <td><input type="checkbox" id="creditSalecheckUpdate" class="creditSaleSelect"
-                                name="creditSale_update">
-                            </td>
-                            <td><input type="checkbox" id="creditSalecheckDelete" class="creditSaleSelect"
-                                name="creditSale_delete">
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>Stock Return</td>
-                            <td><input type="checkbox" id="stockReturnchecks"> </td>
-                            <td><input type="checkbox" id="stockReturncheckView" class="stockReturnSelect"
-                                name="stockReturn_view">
-                            </td>
-                            <td><input type="checkbox" id="stockReturncheckCreate" disabled="disabled"></td>
-                            <td><input type="checkbox" id="stockReturncheckUpdate" disabled="disabled"> </td>
-                            <td><input type="checkbox" id="stockReturncheckDelete" disabled="disabled"> </td>
-                          </tr>
-                          <tr>
-                            <td>Credit Sale Report </td>
-                            <td><input type="checkbox" id="creditSaleReportchecks"> </td>
-                            <td><input type="checkbox" id="creditSaleReportcheckView" class="creditSaleReportselect"
-                                name="creditSaleReport_view"> </td>
-                            <td><input type="checkbox" id="creditSaleReportcheckCreate" disabled="disabled"></td>
-                            <td><input type="checkbox" id="creditSaleReportcheckUpdate" disabled="disabled">
-                            </td>
-                            <td><input type="checkbox" id="creditSaleReportcheckDelete" disabled="disabled">
-                            </td>
-                          </tr>
-
-                          <tr>
-                            <td>Stock Summary (Sub Distributor)</td>
-                            <td><input type="checkbox" id="stockSummarychecks"> </td>
-                            <td><input type="checkbox" id="stockSummarycheckView" class="stockSummarySelect"
-                                name="stockSummary_view">
-                            </td>
-                            <td><input type="checkbox" id="stockSummarycheckCreate" disabled="disabled"></td>
-                            <td><input type="checkbox" id="stockSummarycheckUpdate" disabled="disabled"> </td>
-                            <td><input type="checkbox" id="stockSummarycheckDelete" disabled="disabled"> </td>
-                          </tr>
-                          <tr>
-                            <td>Brand (Master Data)</td>
-                            <td><input type="checkbox" id="brandchecks"> </td>
-                            <td><input type="checkbox" id="brandcheckView" class="brandSelect" name="brand_view">
-                            </td>
-                            <td><input type="checkbox" id="brandcheckCreate" class="brandSelect" name="brand_create">
-                            </td>
-                            <td><input type="checkbox" id="brandcheckUpdate" class="brandSelect" name="brand_update">
-                            </td>
-                            <td><input type="checkbox" id="brandcheckDelete" class="brandSelect" name="brand_delete">
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>Category (Master Data)</td>
-                            <td><input type="checkbox" id="categorychecks"> </td>
-                            <td><input type="checkbox" id="categorycheckView" class="categorySelect"
-                                name="category_view">
-                            </td>
-                            <td><input type="checkbox" id="categorycheckCreate" class="categorySelect"
-                                name="category_create">
-                            </td>
-                            <td><input type="checkbox" id="categorycheckUpdate" class="categorySelect"
-                                name="category_update">
-                            </td>
-                            <td><input type="checkbox" id="categorycheckDelete" class="categorySelect"
-                                name="category_delete">
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>SD User Stock History</td>
-                            <td><input type="checkbox" id="sdUserStockHistory1check"> </td>
-                            <td><input type="checkbox" id="sdUserStockHistory1checking"
-                                class="sdUserStockHistory1Selections" name="sdUserStockHistory_view">
-                            </td>
-                            <td><input type="checkbox" disabled>
-                            </td>
-                            <td><input type="checkbox" disabled>
-                            </td>
-                            <td><input type="checkbox" disabled>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>SD User Stock Summary</td>
-                            <td><input type="checkbox" id="sdUserStockSummary1check"> </td>
-                            <td><input type="checkbox" id="sdUserStockSummary1checking"
-                                class="sdUserStockSummary1Selections" name="sdUserStockSummary_view">
-                            </td>
-                            <td><input type="checkbox" disabled>
-                            </td>
-                            <td><input type="checkbox" disabled>
-                            </td>
-                            <td><input type="checkbox" disabled>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>Vertical wise Sale Report</td>
-                            <td><input type="checkbox" id="verticalSaleReport1check"> </td>
-                            <td><input type="checkbox" id="verticalSaleReport1checking"
-                                class="verticalSaleReport1Selections" name="verticalSaleReport_view">
-                            </td>
-                            <td><input type="checkbox" disabled>
-                            </td>
-                            <td><input type="checkbox" disabled>
-                            </td>
-                            <td><input type="checkbox" disabled>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>SD Reports</td>
-                            <td><input type="checkbox" id="sdReports1check"> </td>
-                            <td><input type="checkbox" id="sdReports1checking" class="sdReports1Selections"
-                                name="sdReports_view">
-                            </td>
-                            <td><input type="checkbox" disabled>
-                            </td>
-                            <td><input type="checkbox" disabled>
-                            </td>
-                            <td><input type="checkbox" disabled>
-                            </td>
-                          </tr>
-                          <tr>
-
-                            <td>BDM Reports</td>
-                            <td><input type="checkbox" id="bdmReports1check"> </td>
-                            <td><input type="checkbox" id="bdmReports1checking" class="bdmReports1Selections"
-                                name="bdmReports_view">
-                            </td>
-                            <td><input type="checkbox" disabled>
-                            </td>
-                            <td><input type="checkbox" disabled>
-                            </td>
-                            <td><input type="checkbox" disabled>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td> BH Reports</td>
-                            <td><input type="checkbox" id="bhReports1check"> </td>
-                            <td><input type="checkbox" id="bhReports1checking" class="bhReports1Selections"
-                                name="bhReports_view">
-                            </td>
-                            <td><input type="checkbox" disabled>
-                            </td>
-                            <td><input type="checkbox" disabled>
-                            </td>
-                            <td><input type="checkbox" disabled>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>Outlet Tracker</td>
-                            <td><input type="checkbox" id="outletTrackerchecks"> </td>
-                            <td><input type="checkbox" id="outletTrackercheckView" class="outletTrackerSelect"
-                                name="outletTracker_view">
-                            </td>
-                            <td><input type="checkbox" id="outletTrackercheckCreate" disabled="disabled"></td>
-                            <td><input type="checkbox" id="outletTrackercheckUpdate" disabled="disabled"> </td>
-                            <td><input type="checkbox" id="outletTrackercheckDelete" disabled="disabled"> </td>
                           </tr>
                         </tbody>
                       </table>
@@ -1048,137 +1136,6 @@ justify-content: center;background: #f1f1f1;">
       </div>
     </div>
   </div>
-
-  <table class="table table-striped generic" id="exportTodayOrder" style="display:none">
-    <tbody>
-      <tr>
-        <th class="sorted-column" style="width:500px; font-size: 20px;">User Details
-        </th>
-      </tr>
-      <tr>
-        <th class="sorted-column" style="width:500px; font-size: 20px;">
-        </th>
-      </tr>
-      <tr>
-        <th class="sorted-column" style="width:500px; font-size: 20px;">Total No Of Active Users :
-          <span id="activeUserId"></span>
-        </th>
-      </tr>
-      <tr>
-        <th class="sorted-column" style="width:500px; font-size: 20px;">Total No Of InActive Users :
-          <span id="inActiveUserId"></span>
-        </th>
-      </tr>
-      <tr>
-        <th class="sorted-column" style="width:500px; font-size: 20px;">
-        </th>
-      </tr>
-      <tr>
-        <th class="text-center sorted-column" style="width:500px">Sl.No</th>
-        <th class="text-center sorted-column" style="width:200px">Role Name</th>
-        <th class="text-center sorted-column" style="width:500px">Total No Of Active Users</th>
-        <th class="text-center sorted-column" style="width:500px">Total No Of InActive Users</th>
-        <th class="text-center sorted-column" style="width:500px"></th>
-        <th class="text-center sorted-column" style="width:500px">User Details</th>
-      </tr>
-      {{#each orderByDateExport}}
-      <tr id="{{_id}}">
-        <td class="text-center sorted-column" style="width:500px">{{incremented @index}}</td>
-        <td class="text-center sorted-column" style="width:200px">{{roleNameVal}}</td>
-        <td class="text-center sorted-column" style="width:200px"> {{totalUsersActiveVal}}</td>
-        <td class="text-center sorted-column" style="width:200px"> {{totalUsersInActiveVal}}</td>
-        <td class="text-center sorted-column" style="width:500px"></td>
-        <td class="text-center sorted-column" style="width:500px">
-          {{#if userDetails}}
-          <table style="width:100%" class="table table-striped with-border">
-            <thead>
-              <tr>
-                <th>Sl No. </th>
-                <th> Emp Code </th>
-                <th> Name</th>
-                <th>User Name</th>
-                <th>Email</th>
-                <th>Vertical</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {{#each userDetails}}
-              <tr class="table-border">
-                <td class="text-center">{{incremented @index}}</td>
-                <td>{{empCode}}</td>
-                <td style="word-wrap: break-word !important">{{firstName}} {{lastName}}</td>
-                <td>{{userNameVal}}</td>
-                <td>{{email}}</td>
-                <td>{{verticalNameArray}}</td>
-                <td>{{status}}</td>
-              </tr>
-              {{/each}}
-            </tbody>
-          </table>
-          {{
-          /if
-          }}
-        </td>
-      </tr>
-      {{/each}}
-    </tbody>
-  </table>
-
-
-
-  <table class="table table-striped generic" id="exportTodayOrder1" style="display:none">
-    <tbody>
-
-      <tr>
-        <th class="text-center sorted-column" style="width:500px">Sl.No</th>
-        <th class="text-center sorted-column" style="width:200px">Sub Distributor Name</th>
-        <th class="text-center sorted-column" style="width:500px">Total No Of Orders</th>
-        <th class="text-center sorted-column" style="width:500px">Total No Of Cash Sales</th>
-        <th class="text-center sorted-column" style="width:500px">Total No Of Credit Sales</th>
-        <th class="text-center sorted-column" style="width:500px"></th>
-        <th class="text-center sorted-column" style="width:500px">User Details</th>
-      </tr>
-      {{#each userTransExport}}
-      <tr id="{{_id}}">
-        <td class="text-center sorted-column" style="width:500px">{{incremented @index}}</td>
-        <td class="text-center sorted-column" style="width:200px">{{subDistributorName}}</td>
-        <td class="text-center sorted-column" style="width:200px"> {{orderCount}}</td>
-        <td class="text-center sorted-column" style="width:200px"> {{cashSales}}</td>
-        <td class="text-center sorted-column" style="width:200px"> {{creditSales}}</td>
-        <td class="text-center sorted-column" style="width:500px"></td>
-        <td class="text-center sorted-column" style="width:500px">
-          {{#if userArrays}}
-          <table style="width:100%" class="table table-striped with-border">
-            <thead>
-              <tr>
-                <th>Sl No. </th>
-                <th>User Name</th>
-                <th>Total No Of Orders</th>
-                <th>Total No Of Cash Sales</th>
-                <th>Total No Of Credit Sales</th>
-              </tr>
-            </thead>
-            <tbody>
-              {{#each userArrays}}
-              <tr class="table-border">
-                <td class="text-center">{{incremented @index}}</td>
-                <td style="word-wrap: break-word !important">{{sdUserName}}</td>
-                <td>{{orderCount1}}</td>
-                <td>{{cashSales1}}</td>
-                <td>{{creditSale1}}</td>
-              </tr>
-              {{/each}}
-            </tbody>
-          </table>
-          {{
-          /if
-          }}
-        </td>
-      </tr>
-      {{/each}}
-    </tbody>
-  </table>
 
   {{/with}}
 

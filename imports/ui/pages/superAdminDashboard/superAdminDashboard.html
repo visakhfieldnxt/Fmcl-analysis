@@ -14,83 +14,65 @@
       <div class="box box-solid ">
         <div class="box-header">
           <i class="fa fa-dashboard"></i>
-          <h3 class="box-title">Vertical Wise Sales</h3>
-          <div class="box-tools ">
-            <a href="/verticalWiseSalesReport/list"><button type="button" title="More" class="btn btn-primary btn-flat"><i
-              class="fa fa-plus"> </i></button></a>
+          <h3 class="box-title">Customer Transactions (in {{currencyGet}})</h3>
+          <!-- <div class="box-tools pull-right">
+            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+            </button>
+            <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+          </div> -->
+          <div class="box-tools col-lg-2">
+            <button type="button" title="Search" class="btn btn-info btn-flat pull-right filterTransaction"><i
+                class="fa fa-filter"> </i></button>
           </div>
         </div>
-        <div class="box-body"> 
-          <div class="row" >
-              <div class="chart-responsive" id="outletDataDisplay">
-                <div class="chart" id="doughnut-chart" width="800" height="200" >
-                  {{#with verticalData}}{{verticalData}}{{/with}}
-                </div>
-              </div>
-              <div class="overlay" id="refreshvert" >
-                <i class="fa fa-refresh fa-spin"></i>
-              </div>
+        <div class="box-body">
+          <!-- <div class="row">
+            <div class="pull-left col-lg-4">
+              <label for="EmailId">Select Date</label>
+              <input type="text" autocomplete="off" class="form-control datepicker date validation"
+                data-date-autoclose="true" onkeydown="event.preventDefault()" id="fromDate" data-provide="datepicker"
+                data-date-format="dd-mm-yyyy" value="{{dateVal}}" placeholder="Select Date " name="fromDate" />
             </div>
-              
+          </div> -->
+          <div class="row">
+            <div class="chart-responsive">
+              <canvas id="doughnut-chart" width="800" height="372"></canvas>
+            </div>
           </div>
-          
+        </div>
       </div>
     </section>
     <section class="col-lg-6 connectedSortable">
       <div class="box box-solid ">
         <div class="box-header">
-          <i class="fa fa-shopping-cart"></i>
-          <h3 class="box-title">Outlets</h3>
-          <div class="box-tools pull-right">
-            <!-- <button type="button" title="Search" class="btn btn-info btn-flat filterTransaction"><i
-                class="fa fa-filter"> </i></button> -->
-            &nbsp;
-            <a href="/ouletWiseReport/list"><button type="button" title="More" class="btn btn-primary btn-flat"><i
-                class="fa fa-plus"></i></button> </a>
-          </div>
-        </div>
-        <div class="box-body">
-          {{#with outletWise}}{{outletWise}}{{/with}}
-      
-          <div class="row">
-            <div class="chart-responsive">
-              <canvas id="polarAreaChart" width="800" height="400"></canvas>
-            </div>
-            <div class="overlay" id="refreshvoutlet" >
-              <i class="fa fa-refresh fa-spin"></i>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-    <section class="col-lg-12 connectedSortable">
-      <div class="box box-solid ">
-        <div class="box-header">
           <i class="fa fa-cart-arrow-down"></i>
-          <h3 class="box-title">Sub Distributor Wise Sales</h3>
-         
-          <div class="box-tools ">
-            <a href="/subDWiseSalesRep/list"> <button type="button" title="More" class="btn btn-primary btn-flat"><i
-              class="fa fa-plus"> </i></button></a>
+          <h3 class="box-title">Top Selling Products</h3>
+          <!-- <div class="box-tools pull-right">
+            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+            </button>
+            <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+          </div> -->
+          <div class="box-tools col-lg-2">
+            <button type="button" title="Search" class="btn btn-info btn-flat pull-right filterProducts"><i
+                class="fa fa-filter"> </i></button>
           </div>
         </div>
         <div class="box-body">
-          
           <div class="row">
-            {{#with sdWiseSales}}{{sdWiseSales}}{{/with}}
-
-            <div class="chart-responsive">
-              <canvas id="bar-chart-grouped" width="800" height="200"></canvas>
-            </div>
-
-            <div class="overlay" id="refreshvsd" >
-              <i class="fa fa-refresh fa-spin"></i>
-            </div>
-          </div>
-        </div>
-        <!-- <div class="box-body">
-          <div class="row">
-        
+            <!-- <div class="pull-left col-lg-8">
+              <div class="col-lg-4">
+                <label for="EmailId">From Date</label>
+                <input type="text" autocomplete="off" class="form-control datepicker date validation"
+                  data-date-autoclose="true" onkeydown="event.preventDefault()" id="fromDate" data-provide="datepicker"
+                  data-date-format="dd-mm-yyyy" value="{{dateVal}}" placeholder="Select Date " name="fromDate" />
+              </div>
+              <div class="col-lg-4">
+                <label for="EmailId">To Date</label>
+                <input type="text" autocomplete="off" class="form-control datepicker date validation"
+                  data-date-autoclose="true" onkeydown="event.preventDefault()" id="fromDate" data-provide="datepicker"
+                  data-date-format="dd-mm-yyyy" value="{{dateVal}}" placeholder="Select Date " name="fromDate" />
+              </div>
+            </div> -->
           </div>
           <div class="row chart-responsive">
             <table class="table generic ">
@@ -108,7 +90,7 @@
                     -100 GM
                   </td>
                   <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
-                    <span class="badge bg-success " style="font-size: 10px;"> ZMW </span>&nbsp;
+                    <span class="badge bg-success " style="font-size: 10px;"> {{currencyGet}} </span>&nbsp;
                     12.258
                   </td>
                   <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
@@ -122,7 +104,7 @@
                     1KG
                   </td>
                   <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;"> <span
-                      class="badge bg-success " style="font-size: 10px;"> ZMW </span>&nbsp;
+                      class="badge bg-success " style="font-size: 10px;"> {{currencyGet}} </span>&nbsp;
                     12.258</td>
                   <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
                     <span class="badge bg-warning " > <span style="color: black;">Supa Oil</span></span>
@@ -134,7 +116,7 @@
                     BROWN
                     BALE - 500GM</td>
                   <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;"> <span
-                      class="badge bg-success " style="font-size: 10px;"> ZMW </span>&nbsp;
+                      class="badge bg-success " style="font-size: 10px;"> {{currencyGet}} </span>&nbsp;
                     18.258</td>
                   <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
                     <span class="badge bg-warning "> <span style="color: black;">Supa Oil</span></span>
@@ -147,7 +129,7 @@
                     2KG
                   </td>
                   <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;"> <span
-                      class="badge bg-success " style="font-size: 10px;"> ZMW </span>&nbsp;
+                      class="badge bg-success " style="font-size: 10px;"> {{currencyGet}} </span>&nbsp;
                     17.238</td>
                   <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
                     <span class="badge bg-warning "><span style="color: black;">Supa Oil</span> </span>
@@ -160,7 +142,7 @@
                     WRAPPED
                     - 500GM</td>
                   <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;"> <span
-                      class="badge bg-success " style="font-size: 10px;"> ZMW </span>&nbsp;
+                      class="badge bg-success " style="font-size: 10px;"> {{currencyGet}} </span>&nbsp;
                     12.858</td>
                   <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
                     <span class="badge bg-primary "> North Safety</span>
@@ -170,7 +152,7 @@
               </tbody>
             </table>
           </div>
-        </div> -->
+        </div>
       </div>
     </section>
 
@@ -178,30 +160,1146 @@
       <div class="box box-solid ">
         <div class="box-header">
           <i class="fa fa-shopping-cart"></i>
-          <h3 class="box-title">Region Wise Sales</h3>
+          <h3 class="box-title">Manufacturers</h3>
           <div class="box-tools pull-right">
-          
-            <a href="/regionWiseSalesReport/list"><button type="button" title="More" class="btn btn-primary btn-flat"><i
-              class="fa fa-plus"> </i></button></a>
+            <button type="button" title="Search" class="btn btn-info btn-flat filterTransaction"><i
+                class="fa fa-filter"> </i></button>
+            &nbsp;
+            <button type="button" title="More" class="btn btn-primary btn-flat" id="manufacturersMoreButton"><i
+                class="fa fa-plus"> </i></button>
           </div>
         </div>
         <div class="box-body">
-          {{#with regionSales}}{{regionSales}}{{/with}}
-      
+          <!-- <div class="row">
+            <div class="pull-left col-lg-2">
+              <label for="EmailId">Select Date</label>
+              <input type="text" autocomplete="off" class="form-control datepicker date validation"
+                data-date-autoclose="true" onkeydown="event.preventDefault()" id="fromDate" data-provide="datepicker"
+                data-date-format="dd-mm-yyyy" value="{{dateVal}}" placeholder="Select Date " name="fromDate" />
+            </div> 
+          </div> -->
           <div class="row">
             <div class="chart-responsive">
               <canvas id="line-chart" width="800" height="200"></canvas>
-            </div>
-            <div class="overlay" id="refreshvregion" >
-              <i class="fa fa-refresh fa-spin"></i>
             </div>
           </div>
         </div>
       </div>
     </section>
- 
 
+    <section class="col-lg-12 connectedSortable">
+      <div class="box box-solid ">
+        <div class="box-header">
+          <i class="fa fa-shopping-bag"></i>
+          <h3 class="box-title">Stocks</h3>
+          <div class="box-tools pull-right">
+            <button type="button" title="Search" class="btn btn-info btn-flat filterTransaction"><i
+                class="fa fa-filter"> </i></button>
+            &nbsp;
+            <button type="button" title="More" class="btn btn-primary btn-flat " id="stockMoreButton"><i
+                class="fa fa-plus"> </i></button>
+
+          </div>
+        </div>
+        <div class="box-body">
+          <!-- <div class="row">
+            <div class="pull-left col-lg-2">
+              <label for="EmailId">Select Date</label>
+              <input type="text" autocomplete="off" class="form-control datepicker date validation"
+                data-date-autoclose="true" onkeydown="event.preventDefault()" id="fromDate" data-provide="datepicker"
+                data-date-format="dd-mm-yyyy" value="{{dateVal}}" placeholder="Select Date " name="fromDate" />
+            </div> 
+          </div> -->
+          <div class="row">
+            <div class="chart-responsive">
+              <canvas id="bar-chart-grouped" width="800" height="200"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 
 
+  <div class="modal fade in" id="salesOrderModal">
+    <div class="modal-dialog" style="width: 60%;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="orderHs"> Sales Order Details</h4>
+        </div>
+        <div class="modal-body">
+          <div class="box box-default box-solid">
+            <!-- <div class="box-header with-border bg-aqua">
+              <h3 class="box-title">Sales Order Details</h3>
+            </div> -->
+            <table class="table generic">
+              <tbody>
+                <tr>
+                  <th class="sorted-column" style="border: none !important;padding:13px 8px 13px 10px;">Customer Name
+                  </th>
+                  <th class="sorted-column" style="border: none !important;padding:13px 8px 13px 10px;">Total Amount
+                  </th>
+                  <th class="sorted-column" style="border: none !important;padding:13px 8px 13px 10px;">No Of
+                    Transactions</th>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    GM TRADING SERVICE
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    {{currencyGet}}&nbsp; 120.258</td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">7</td>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    REVIN ZAMBIA LIMITED
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    {{currencyGet}}&nbsp; 320.158</td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">15</td>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    CENTRAL BAKERY
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    {{currencyGet}}&nbsp; 180.258</td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">10</td>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    COASTAL IMPORT & EXPORT
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    {{currencyGet}}&nbsp; 170.238</td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">5</td>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    METALCAST INDUSTRIES </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    {{currencyGet}}&nbsp;120.858</td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">1</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default closen" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade in" id="salesOrderModal">
+    <div class="modal-dialog" style="width: 60%;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="orderHs"> Sales Order Details</h4>
+        </div>
+        <div class="modal-body">
+          <div class="box box-default box-solid">
+            <!-- <div class="box-header with-border bg-aqua">
+              <h3 class="box-title">Sales Order Details</h3>
+            </div> -->
+            <table class="table generic">
+              <tbody>
+                <tr>
+                  <th class="sorted-column" style="border: none !important;padding:13px 8px 13px 10px;">Customer Name
+                  </th>
+                  <th class="sorted-column" style="border: none !important;padding:13px 8px 13px 10px;">Total Amount
+                  </th>
+                  <th class="sorted-column" style="border: none !important;padding:13px 8px 13px 10px;">No Of
+                    Transactions</th>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    GM TRADING SERVICE
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    {{currencyGet}}&nbsp; 120.258</td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">1</td>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    REVIN ZAMBIA LIMITED
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    {{currencyGet}}&nbsp; 320.158</td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">1</td>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    CENTRAL BAKERY
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    {{currencyGet}}&nbsp; 180.258</td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">1</td>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    COASTAL IMPORT & EXPORT
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    {{currencyGet}}&nbsp; 170.238</td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">1</td>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    METALCAST INDUSTRIES </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    {{currencyGet}}&nbsp;120.858</td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">1</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default closen" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade in" id="salesQuotationModal">
+    <div class="modal-dialog" style="width: 60%;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="orderHs"> Sales Quotation Details</h4>
+        </div>
+        <div class="modal-body">
+          <div class="box box-default box-solid">
+            <!-- <div class="box-header with-border bg-aqua">
+              <h3 class="box-title">Sales Order Details</h3>
+            </div> -->
+            <table class="table generic">
+              <tbody>
+                <tr>
+                  <th class="sorted-column" style="border: none !important;padding:13px 8px 13px 10px;">Customer Name
+                  </th>
+                  <th class="sorted-column" style="border: none !important;padding:13px 8px 13px 10px;">Total Amount
+                  </th>
+                  <th class="sorted-column" style="border: none !important;padding:13px 8px 13px 10px;">No Of
+                    Transactions</th>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    GM TRADING SERVICE
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    {{currencyGet}}&nbsp; 120.258</td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">3</td>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    REVIN ZAMBIA LIMITED
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    {{currencyGet}}&nbsp; 320.158</td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">2</td>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    CENTRAL BAKERY
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    {{currencyGet}}&nbsp; 180.258</td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">1</td>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    COASTAL IMPORT & EXPORT
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    {{currencyGet}}&nbsp; 170.238</td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">1</td>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    METALCAST INDUSTRIES </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    {{currencyGet}}&nbsp;120.858</td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">3</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default closen" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade in" id="crInvoiceModal">
+    <div class="modal-dialog" style="width: 60%;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="orderHs"> Credit Invoice Details</h4>
+        </div>
+        <div class="modal-body">
+          <div class="box box-default box-solid">
+            <!-- <div class="box-header with-border bg-aqua">
+              <h3 class="box-title">Sales Order Details</h3>
+            </div> -->
+            <table class="table generic">
+              <tbody>
+                <tr>
+                  <th class="sorted-column" style="border: none !important;padding:13px 8px 13px 10px;">Customer Name
+                  </th>
+                  <th class="sorted-column" style="border: none !important;padding:13px 8px 13px 10px;">Total Amount
+                  </th>
+                  <th class="sorted-column" style="border: none !important;padding:13px 8px 13px 10px;">No Of
+                    Transactions</th>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    GM TRADING SERVICE
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    {{currencyGet}}&nbsp; 120.258</td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">3</td>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    REVIN ZAMBIA LIMITED
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    {{currencyGet}}&nbsp; 320.158</td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">2</td>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    CENTRAL BAKERY
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    {{currencyGet}}&nbsp; 180.258</td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">3</td>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    COASTAL IMPORT & EXPORT
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    {{currencyGet}}&nbsp; 170.238</td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">1</td>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    METALCAST INDUSTRIES </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    {{currencyGet}}&nbsp;120.858</td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">1</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default closen" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade in" id="arInvoiceModal">
+    <div class="modal-dialog" style="width: 60%;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="orderHs"> AR Invoice Details</h4>
+        </div>
+        <div class="modal-body">
+          <div class="box box-default box-solid">
+            <!-- <div class="box-header with-border bg-aqua">
+              <h3 class="box-title">Sales Order Details</h3>
+            </div> -->
+            <table class="table generic">
+              <tbody>
+                <tr>
+                  <th class="sorted-column" style="border: none !important;padding:13px 8px 13px 10px;">Customer Name
+                  </th>
+                  <th class="sorted-column" style="border: none !important;padding:13px 8px 13px 10px;">Total Amount
+                  </th>
+                  <th class="sorted-column" style="border: none !important;padding:13px 8px 13px 10px;">No Of
+                    Transactions</th>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    GM TRADING SERVICE
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    {{currencyGet}}&nbsp; 120.258</td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">1</td>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    REVIN ZAMBIA LIMITED
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    {{currencyGet}}&nbsp; 320.158</td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">1</td>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    CENTRAL BAKERY
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    {{currencyGet}}&nbsp; 180.258</td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">1</td>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    COASTAL IMPORT & EXPORT
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    {{currencyGet}}&nbsp; 170.238</td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">1</td>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    METALCAST INDUSTRIES</td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    {{currencyGet}}&nbsp;120.858</td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">3</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default closen" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal fade in" id="stockModalView">
+    <div class="modal-dialog" style="width: 60%;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="orderHs"> Stock Summary Details</h4>
+        </div>
+        <div class="modal-body">
+          <div class="box box-default box-solid">
+            <!-- <div class="box-header with-border bg-aqua">
+              <h3 class="box-title">Sales Order Details</h3>
+            </div> -->
+            <table class="table generic">
+              <tbody>
+                <tr>
+                  <th class="sorted-column" style="border: none !important;padding:13px 8px 13px 10px;">Customer
+                  </th>
+                  <th class="sorted-column" style="border: none !important;padding:13px 8px 13px 10px;">Opening Stock
+                  </th> 
+                  <th class="sorted-column" style="border: none !important;padding:13px 8px 13px 10px;">Sold Stock
+                  </th>
+                  <th class="sorted-column" style="border: none !important;padding:13px 8px 13px 10px;">Closing Stock
+                  </th>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>GM TRADING SERVICE</b>
+                    <div class="row">
+                      <p>1. CANDLE MACHINE 5th SET</p>
+                      <p>2. GILLETTE2 1CT BAG</p>
+                      <p>3. CUP SELECTING MACHINE</p>
+                    </div>
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>500</b>
+                    <div style="padding-top: 10px;">
+                      <p>200</p>
+                      <p>100</p>
+                      <p>200</p>
+                    </div>
+                  </td> 
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b> 150</b>
+                    <div style="padding-top: 10px;">
+                      <p>80</p>
+                      <p>20</p>
+                      <p>50</p>
+                    </div>
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>350</b>
+                    <div style="padding-top: 10px;">
+                      <p>120</p>
+                      <p>80</p>
+                      <p>150</p>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b> REVIN ZAMBIA LIMITED</b>
+                    <div class="row">
+                      <p>1. TWINE 9 KG - SISAL</p>
+                      <p>2. SKIN GLOW - 200GM</p>
+                      <p>3. Genset 22 KVA - Cummins</p>
+                      <p>4. PHIKA OIL - 2.5LTRS</p>
+                      <p>5. SUNBIX (4 PCS.)</p>
+                    </div>
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>600</b>
+                    <div style="padding-top: 10px;">
+                      <p>50</p>
+                      <p>50</p>
+                      <p>100</p>
+                      <p>200</p>
+                      <p>200</p>
+                    </div>
+                  </td> 
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;"><b>200</b>
+                    <div style="padding-top: 10px;">
+                      <p>20</p>
+                      <p>30</p>
+                      <p>50</p>
+                      <p>50</p>
+                      <p>50</p>
+                    </div>
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;"><b>400</b>
+                    <div style="padding-top: 10px;">
+                      <p>30</p>
+                      <p>20</p>
+                      <p>50</p>
+                      <p>150</p>
+                      <p>150</p>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b> CENTRAL BAKERY</b>
+                    <div class="row">
+                      <p>1. SUGAR D'LITE - 1KG</p>
+                      <p>2. JUICY FRUITY 400ML</p>
+                    </div>
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>700</b>
+                    <div style="padding-top: 10px;">
+                      <p>400</p>
+                      <p>300</p>
+                    </div>
+                  </td> 
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>300</b>
+                    <div style="padding-top: 10px;">
+                      <p>150</p>
+                      <p>150</p>
+                    </div>
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>400</b>
+                    <div style="padding-top: 10px;">
+                      <p>250</p>
+                      <p>150</p>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>COASTAL IMPORT & EXPORT</b>
+                    <div class="row">
+                      <p>1. MINI SHOE BRUSH BLACK - G14</p>
+                      <p>2. HARNESS FULL BODY</p>
+                      <p>3. REPAIR TAPES</p>
+                      <p>4. LENS SHADE12 (108 X 51MM)</p>
+                      <p>5. RICE ALLSOME - 10 KG</p>
+                    </div>
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>800</b>
+                    <div style="padding-top: 10px;">
+                      <p>100</p>
+                      <p>200</p>
+                      <p>200</p>
+                      <p>100</p>
+                      <p>200</p>
+                    </div>
+                  </td> 
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>300</b>
+                    <div style="padding-top: 10px;">
+                      <p>50</p>
+                      <p>50</p>
+                      <p>100</p>
+                      <p>0</p>
+                      <p>100</p>
+                    </div>
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>500</b>
+                    <div style="padding-top: 10px;">
+                      <p>50</p>
+                      <p>150</p>
+                      <p>100</p>
+                      <p>100</p>
+                      <p>100</p>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b> METALCAST INDUSTRIES </b>
+                    <div class="row">
+                      <p>1. ALWAYS ULTRA EXTRA LONG 7'S</p>
+                    </div>
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>1000</b>
+                    <div style="padding-top: 10px;">
+                      <p>1000</p>
+                    </div>
+                  </td> 
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;"> <b>600</b>
+                    <div style="padding-top: 10px;">
+                      <p>600</p>
+                    </div>
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>400</b>
+                    <div style="padding-top: 10px;">
+                      <p>400</p>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default closen" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal fade in" id="manufacturersDetailView">
+    <div class="modal-dialog" style="width: 60%;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="orderHs"> Manufacturers Summary Details</h4>
+        </div>
+        <div class="modal-body">
+          <div class="box box-default box-solid">
+            <!-- <div class="box-header with-border bg-aqua">
+              <h3 class="box-title">Sales Order Details</h3>
+            </div> -->
+            <table class="table generic">
+              <tbody>
+                <tr>
+                  <th class="sorted-column" style="border: none !important;padding:13px 8px 13px 10px;">Manufacturer
+                  </th>
+                  <th class="sorted-column" style="border: none !important;padding:13px 8px 13px 10px;">Date
+                  </th>
+                  <th class="sorted-column" style="border: none !important;padding:13px 8px 13px 10px;">Sold Stock
+                  </th>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>Supa Oil</b>
+                    <div class="row">
+                      <b>1.GM TRADING SERVICE STATION</b>
+                      <div class="row">
+                        <p>1. D'LITE OIL 12 X 2 LTR</p>
+                        <p>2. SUNFOIL OIL PET - 2 LTR (ZM)</p>
+                        <p>3. SUGAR D'LITE - 2KG</p>
+                      </div>
+                      <b>2. REVIN ZAMBIA LIMITED</b>
+                      <div class="row">
+                        <p>1. RICE D'LITE WHITE - 500GM</p>
+                        <p>2. SUNFOIL OIL PET - 2 LTR</p>
+                        <p>3. SUGAR D'LITE - 1KG</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>{{date1Value}}</b>
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>86</b>
+                    <div style="padding-top: 10px;">
+                      <b>50</b>
+                    </div>
+                    <div style="padding-top: 10px;">
+                      <p>10</p>
+                      <p>20</p>
+                      <p>20</p>
+                    </div>
+                    <div style="padding-top: 10px;">
+                      <b>36</b>
+                    </div>
+                    <div style="padding-top: 10px;">
+                      <p>18</p>
+                      <p>6</p>
+                      <p>12</p>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>North Safety</b>
+                    <div class="row">
+                      <b>1.GM TRADING SERVICE STATION</b>
+                      <div class="row">
+                        <p>1. DISPOSABLE MASK FPP2</p>
+                        <p>2. HELMETS (ROUND) W/BRACKET</p>
+                        <p>3. TECHNIPRO BOOTS/ NDLOVU</p>
+                      </div>
+                      <b>2. REVIN ZAMBIA LIMITED</b>
+                      <div class="row">
+                        <p>1. HARD HAT (HI VIKBLUE)</p>
+                        <p>2. SMOKED SPECTACLES</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>{{date1Value}}</b>
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>282</b>
+                    <div style="padding-top: 10px;">
+                      <b>182</b>
+                    </div>
+                    <div style="padding-top: 10px;">
+                      <p>60</p>
+                      <p>40</p>
+                      <p>82</p>
+                    </div>
+                    <div style="padding-top: 10px;">
+                      <b>100</b>
+                    </div>
+                    <div style="padding-top: 10px;">
+                      <p>60</p>
+                      <p>40</p>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>Supa Oil</b>
+                    <div class="row">
+                      <b>1.GM TRADING SERVICE STATION</b>
+                      <div class="row">
+                        <p>1. D'LITE OIL 12 X 2 LTR</p>
+                        <p>2. SUNFOIL OIL PET - 2 LTR (ZM)</p>
+                        <p>3. SUGAR D'LITE - 2KG</p>
+                      </div>
+                      <b>2. REVIN ZAMBIA LIMITED</b>
+                      <div class="row">
+                        <p>1. RICE D'LITE WHITE - 500GM</p>
+                        <p>2. SUNFOIL OIL PET - 2 LTR</p>
+                        <p>3. SUGAR D'LITE - 1KG</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>{{date2Value}}</b>
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>114</b>
+                    <div style="padding-top: 10px;">
+                      <b>50</b>
+                    </div>
+                    <div style="padding-top: 10px;">
+                      <p>10</p>
+                      <p>20</p>
+                      <p>20</p>
+                    </div>
+                    <div style="padding-top: 10px;">
+                      <b>64</b>
+                    </div>
+                    <div style="padding-top: 10px;">
+                      <p>18</p>
+                      <p>18</p>
+                      <p>18</p>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>North Safety</b>
+                    <div class="row">
+                      <b>1.GM TRADING SERVICE STATION</b>
+                      <div class="row">
+                        <p>1. DISPOSABLE MASK FPP2</p>
+                        <p>2. HELMETS (ROUND) W/BRACKET</p>
+                        <p>3. TECHNIPRO BOOTS/ NDLOVU</p>
+                      </div>
+                      <b>2. REVIN ZAMBIA LIMITED</b>
+                      <div class="row">
+                        <p>1. HARD HAT (HI VIKBLUE)</p>
+                        <p>2. SMOKED SPECTACLES</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>{{date2Value}}</b>
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>350</b>
+                    <div style="padding-top: 10px;">
+                      <b>150</b>
+                    </div>
+                    <div style="padding-top: 10px;">
+                      <p>25</p>
+                      <p>75</p>
+                      <p>50</p>
+                    </div>
+                    <div style="padding-top: 10px;">
+                      <b>200</b>
+                    </div>
+                    <div style="padding-top: 10px;">
+                      <p>150</p>
+                      <p>50</p>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>Supa Oil</b>
+                    <div class="row">
+                      <b>1.GM TRADING SERVICE STATION</b>
+                      <div class="row">
+                        <p>1. D'LITE OIL 12 X 2 LTR</p>
+                        <p>2. SUNFOIL OIL PET - 2 LTR (ZM)</p>
+                        <p>3. SUGAR D'LITE - 2KG</p>
+                      </div>
+                      <b>2. REVIN ZAMBIA LIMITED</b>
+                      <div class="row">
+                        <p>1. RICE D'LITE WHITE - 500GM</p>
+                        <p>2. SUNFOIL OIL PET - 2 LTR</p>
+                        <p>3. SUGAR D'LITE - 1KG</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>{{date3Value}}</b>
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>106</b>
+                    <div style="padding-top: 10px;">
+                      <b>50</b>
+                    </div>
+                    <div style="padding-top: 10px;">
+                      <p>10</p>
+                      <p>20</p>
+                      <p>20</p>
+                    </div>
+                    <div style="padding-top: 10px;">
+                      <b>56</b>
+                    </div>
+                    <div style="padding-top: 10px;">
+                      <p>20</p>
+                      <p>26</p>
+                      <p>10</p>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>North Safety</b>
+                    <div class="row">
+                      <b>1.GM TRADING SERVICE STATION</b>
+                      <div class="row">
+                        <p>1. DISPOSABLE MASK FPP2</p>
+                        <p>2. HELMETS (ROUND) W/BRACKET</p>
+                        <p>3. TECHNIPRO BOOTS/ NDLOVU</p>
+                      </div>
+                      <b>2. REVIN ZAMBIA LIMITED</b>
+                      <div class="row">
+                        <p>1. HARD HAT (HI VIKBLUE)</p>
+                        <p>2. SMOKED SPECTACLES</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>{{date3Value}}</b>
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>411</b>
+                    <div style="padding-top: 10px;">
+                      <b>300</b>
+                    </div>
+                    <div style="padding-top: 10px;">
+                      <p>100</p>
+                      <p>150</p>
+                      <p>50</p>
+                    </div>
+                    <div style="padding-top: 10px;">
+                      <b>111</b>
+                    </div>
+                    <div style="padding-top: 10px;">
+                      <p>50</p>
+                      <p>61</p>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>Supa Oil</b>
+                    <div class="row">
+                      <b>1.GM TRADING SERVICE STATION</b>
+                      <div class="row">
+                        <p>1. D'LITE OIL 12 X 2 LTR</p>
+                        <p>2. SUNFOIL OIL PET - 2 LTR (ZM)</p>
+                        <p>3. SUGAR D'LITE - 2KG</p>
+                      </div>
+                      <b>2. REVIN ZAMBIA LIMITED</b>
+                      <div class="row">
+                        <p>1. RICE D'LITE WHITE - 500GM</p>
+                        <p>2. SUNFOIL OIL PET - 2 LTR</p>
+                        <p>3. SUGAR D'LITE - 1KG</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>{{date4Value}}</b>
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>106</b>
+                    <div style="padding-top: 10px;">
+                      <b>50</b>
+                    </div>
+                    <div style="padding-top: 10px;">
+                      <p>10</p>
+                      <p>20</p>
+                      <p>20</p>
+                    </div>
+                    <div style="padding-top: 10px;">
+                      <b>56</b>
+                    </div>
+                    <div style="padding-top: 10px;">
+                      <p>20</p>
+                      <p>26</p>
+                      <p>10</p>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>North Safety</b>
+                    <div class="row">
+                      <b>1.GM TRADING SERVICE STATION</b>
+                      <div class="row">
+                        <p>1. DISPOSABLE MASK FPP2</p>
+                        <p>2. HELMETS (ROUND) W/BRACKET</p>
+                        <p>3. TECHNIPRO BOOTS/ NDLOVU</p>
+                      </div>
+                      <b>2. REVIN ZAMBIA LIMITED</b>
+                      <div class="row">
+                        <p>1. HARD HAT (HI VIKBLUE)</p>
+                        <p>2. SMOKED SPECTACLES</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>{{date4Value}}</b>
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>502</b>
+                    <div style="padding-top: 10px;">
+                      <b>300</b>
+                    </div>
+                    <div style="padding-top: 10px;">
+                      <p>100</p>
+                      <p>150</p>
+                      <p>50</p>
+                    </div>
+                    <div style="padding-top: 10px;">
+                      <b>202</b>
+                    </div>
+                    <div style="padding-top: 10px;">
+                      <p>100</p>
+                      <p>102</p>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>Supa Oil</b>
+                    <div class="row">
+                      <b>1.GM TRADING SERVICE STATION</b>
+                      <div class="row">
+                        <p>1. D'LITE OIL 12 X 2 LTR</p>
+                        <p>2. SUNFOIL OIL PET - 2 LTR (ZM)</p>
+                        <p>3. SUGAR D'LITE - 2KG</p>
+                      </div>
+                      <b>2. REVIN ZAMBIA LIMITED</b>
+                      <div class="row">
+                        <p>1. RICE D'LITE WHITE - 500GM</p>
+                        <p>2. SUNFOIL OIL PET - 2 LTR</p>
+                        <p>3. SUGAR D'LITE - 1KG</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>{{date5Value}}</b>
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>107</b>
+                    <div style="padding-top: 10px;">
+                      <b>50</b>
+                    </div>
+                    <div style="padding-top: 10px;">
+                      <p>10</p>
+                      <p>20</p>
+                      <p>20</p>
+                    </div>
+                    <div style="padding-top: 10px;">
+                      <b>57</b>
+                    </div>
+                    <div style="padding-top: 10px;">
+                      <p>20</p>
+                      <p>26</p>
+                      <p>11</p>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>North Safety</b>
+                    <div class="row">
+                      <b>1.GM TRADING SERVICE STATION</b>
+                      <div class="row">
+                        <p>1. DISPOSABLE MASK FPP2</p>
+                        <p>2. HELMETS (ROUND) W/BRACKET</p>
+                        <p>3. TECHNIPRO BOOTS/ NDLOVU</p>
+                      </div>
+                      <b>2. REVIN ZAMBIA LIMITED</b>
+                      <div class="row">
+                        <p>1. HARD HAT (HI VIKBLUE)</p>
+                        <p>2. SMOKED SPECTACLES</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>{{date5Value}}</b>
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <b>635</b>
+                    <div style="padding-top: 10px;">
+                      <b>300</b>
+                    </div>
+                    <div style="padding-top: 10px;">
+                      <p>100</p>
+                      <p>150</p>
+                      <p>50</p>
+                    </div>
+                    <div style="padding-top: 10px;">
+                      <b>335</b>
+                    </div>
+                    <div style="padding-top: 10px;">
+                      <p>300</p>
+                      <p>35</p>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default closen" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal fade in" id="filterTransactionModal">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close reset" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold"> Filter Search</h4>
+        </div>
+        <div class="modal-body">
+          <table style="width:100%;" class="table table-striped table-responsive">
+            <tr>
+              <div class="form-group has-feedback">
+                <div class="col-sm-12" style="padding: 10px 10px 10px 10px;">
+                  <label for="EmailId">Select Date</label>
+                  <input type="text" autocomplete="off" class="form-control datepicker date validation"
+                    data-date-autoclose="true" onkeydown="event.preventDefault()" id="fromDate"
+                    data-provide="datepicker" data-date-format="dd-mm-yyyy" placeholder="From Date " name="fromDate" />
+                </div>
+              </div>
+            </tr>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button id="deliveryFilterSearch" type="button" class="btn btn-info pull-right"
+            data-dismiss="modal">Search</button>
+          <button type="button" class="btn btn-default pull-left reset" data-dismiss="modal"
+            id="removeClose">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade in" id="filterTransactionModalTwo">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close reset" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold"> Filter Search</h4>
+        </div>
+        <div class="modal-body">
+          <table style="width:100%;" class="table table-striped table-responsive">
+            <tr>
+              <div class="form-group has-feedback">
+                <div class="col-sm-12" style="padding: 10px 10px 10px 10px;">
+                  <label for="EmailId">From Date</label>
+                  <input type="text" autocomplete="off" class="form-control datepicker date validation"
+                    data-date-autoclose="true" onkeydown="event.preventDefault()" id="fromDates"
+                    data-provide="datepicker" data-date-format="dd-mm-yyyy" placeholder="From Date " name="fromDate" />
+                </div>
+              </div>
+            </tr>
+            <tr>
+              <div class="form-group has-feedback">
+                <div class="col-sm-12" style="padding: 10px 10px 10px 10px;">
+                  <label for="EmailId">To Date</label>
+                  <input type="text" autocomplete="off" class="form-control datepicker date validation"
+                    data-date-autoclose="true" onkeydown="event.preventDefault()" id="toDates" data-provide="datepicker"
+                    data-date-format="dd-mm-yyyy" placeholder="To Date " name="fromDate" />
+                </div>
+              </div>
+            </tr>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-info pull-right" data-dismiss="modal">Search</button>
+          <button type="button" class="btn btn-default pull-left reset" data-dismiss="modal"
+            id="removeCloses">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>

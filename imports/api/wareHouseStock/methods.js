@@ -1,625 +1,439 @@
 /**
- * @author Nithin
+ * @author Visakh
  */
-import { WareHouseStock } from './wareHouseStock';
-import { Product } from '../products/products';
-import { Unit } from '../unit/unit';
-import { Stock } from '../stock/stock';
-import { allUsers } from '../user/user';
-import { Verticals } from '../verticals/verticals';
-import { SdPriceType } from '../sdPriceType/sdPriceType';
-import { Price } from '../price/price';
+
+import { WareHouseStock } from "./wareHouseStock";
+import { Config } from "../config/config";
+import { WareHouse } from '../wareHouse/wareHouse';
+import { Branch } from '../branch/branch';
+import { Item } from '../item/item';
+// import {wareHouseStockDataGet_Url} from '../../startup/client/sapUrls';
+
 Meteor.methods({
-    /**
- * 
- * @param {*} vertical 
- * @param {*} user 
- * @returns get product list based on price type for cash sales
- */
-    'wareHouseStock.cashSales': (vertical, user) => {
-        let sdDetails = allUsers.findOne({ _id: user });
-        if (sdDetails) {
-            let productArray = [];
-            let productList = WareHouseStock.find({
-                employeeId: user, vertical: vertical,
-                subDistributor: sdDetails.subDistributor
-            }).fetch();
-            if (productList.length > 0) {
-                for (let i = 0; i < productList.length; i++) {
-                    let productName = '';
-                    let productCode = '';
-                    let basicUnitsName = '';
-                    let productRes = Product.findOne({ _id: productList[i].product });
-                    if (productRes) {
-                        productName = productRes.productName;
-                        productCode = productRes.productCode;
-                        if (productRes.basicUnit !== undefined) {
-                            let unitRes = Unit.findOne({ _id: productRes.basicUnit });
-                            if (unitRes) {
-                                basicUnitsName = unitRes.unitName;
-                            }
-                        }
-                    }
-                    let productObj =
-                    {
-                        _id: Random.id(),
-                        product: productList[i].product,
-                        productName: productName,
-                        productCode: productCode,
-                        basicUnitsName: basicUnitsName,
-                        quantity: productList[i].stock,
-                    }
-                    productArray.push(productObj);
-                }
-            }
-            return productArray;
-        }
-    },
-    /**
-     * 
-     * @param {*} user 
-     * @returns get data for sales return
-     */
-    'wareHouseStock.userWiseList': (user, vertical) => {
-        let productList = WareHouseStock.find({ employeeId: user, vertical: vertical }).fetch();
-        let productArray = [];
-        if (productList.length > 0) {
-            for (let i = 0; i < productList.length; i++) {
-                let productName = '';
-                let productCode = '';
-                let basicUnitsName = '';
-                let basicUnit = '';
-                let baseQty = '';
-                let productRes = Product.findOne({ _id: productList[i].product });
-                if (productRes) {
-                    productName = productRes.productName;
-                    productCode = productRes.productCode;
-                    if (productRes.basicUnit !== undefined) {
-                        let unitRes = Unit.findOne({ product: productList[i].product, unitName: "CTN" });
-                        if (unitRes) {
-                            basicUnit = unitRes._id;
-                            basicUnitsName = "CTN";
-                            baseQty = unitRes.baseQuantity;
-                        }
-                    }
-                }
-                let stockVal = Number(productList[i].stock);
-                if (stockVal > 0) {
-                    let qtyValue = '0.00';
-                    if (baseQty !== '' && baseQty !== undefined) {
-                        let resVal = Number(productList[i].stock) / Number(baseQty);
-                        qtyValue = Math.trunc(resVal);
-                    }
-                    let productObj =
-                    {
-                        _id: Random.id(),
-                        product: productList[i].product,
-                        productName: productName,
-                        productCode: productCode,
-                        basicUnitsName: basicUnitsName,
-                        basicUnit: basicUnit,
-                        quantity: qtyValue.toString(),
-                        baseQty: baseQty,
-                    }
-                    productArray.push(productObj);
-                }
-            }
-        }
-        return productArray;
-    },
-    /**
-     * 
-     * @param {*} user 
-     * @returns get result for summary report
-     */
-    'wareHouseStock.stockSummary': (user, vertical, product) => {
-        let stockRes = '';
-
-        if (user && vertical === '' && product === '') {
-            stockRes = WareHouseStock.find({
-                employeeId: user,
-            },
-                { fields: { vertical: 1, product: 1, stock: 1 } }).fetch();
-        } else if (user === '' && vertical && product === '') {
-            stockRes = WareHouseStock.find({
-                vertical: vertical,
-            },
-                { fields: { vertical: 1, product: 1, stock: 1 } }).fetch();
-        } else if (user === '' && vertical === '' && product) {
-            stockRes = WareHouseStock.find({
-                product: product
-            },
-                { fields: { vertical: 1, product: 1, stock: 1 } }).fetch();
-        } else if (user && vertical && product === '') {
-            stockRes = WareHouseStock.find({
-                employeeId: user,
-                vertical: vertical
-            },
-                { fields: { vertical: 1, product: 1, stock: 1 } }).fetch();
-        } else if (user && vertical === '' && product) {
-            stockRes = WareHouseStock.find({
-                employeeId: user,
-                product: product
-            },
-                { fields: { vertical: 1, product: 1, stock: 1 } }).fetch();
-        } else if (user === '' && vertical && product) {
-            stockRes = WareHouseStock.find({
-                vertical: vertical,
-                product: product
-            },
-                { fields: { vertical: 1, product: 1, stock: 1 } }).fetch();
-        } else if (user && vertical && product) {
-            stockRes = WareHouseStock.find({
-                employeeId: user,
-                vertical: vertical,
-                product: product
-            },
-                { fields: { vertical: 1, product: 1, stock: 1 } }).fetch();
-        } else {
-            stockRes = WareHouseStock.find({
-            },
-                { fields: { vertical: 1, product: 1, stock: 1 } }).fetch();
-        }
-        let stockArray = [];
-        if (stockRes.length > 0) {
-            for (let i = 0; i < stockRes.length; i++) {
-                let productNames = '';
-                let unitName = '';
-                let userName = ''
-                let verticalName = '';
-                let userRes = allUsers.findOne({ _id: user });
-                if (userRes) {
-                    userName = `${userRes.profile.firstName}${userRes.profile.lastName}`;
-                }
-                let verticalRes = Verticals.findOne({ _id: stockRes[i].vertical });
-                if (verticalRes) {
-                    verticalName = verticalRes.verticalName;
-                }
-                let productRes = Product.findOne({ _id: stockRes[i].product });
-                if (productRes) {
-                    productNames = productRes.productName;
-                    if (productRes.basicUnit) {
-                        let unitRes = Unit.findOne({ _id: productRes.basicUnit });
-                        if (unitRes) {
-                            unitName = unitRes.unitName;
-                        }
-                    }
-                }
-                let stockObj =
-                {
-                    productName: productNames,
-                    unitName: unitName,
-                    empName: userName,
-                    stock: stockRes[i].stock,
-                    verticalName: verticalName
-                };
-                stockArray.push(stockObj);
-            }
-        }
-        return stockArray;
-    },
-
-    /**
-* 
-* @param {*} vertical 
-* @param {*} user 
-* @returns get product list based on price type for cash sales
+  /**
+  * TODO:Complete JS doc
+  * Fetching Warehouse Stock List 
 */
-    'wareHouseStock.productList': (vertical, user, brand, category, principal) => {
-        let sdDetails = allUsers.findOne({ _id: user });
-        if (sdDetails) {
-            let productArray = [];
-            let productList = WareHouseStock.find({
-                employeeId: user, vertical: vertical,
-                subDistributor: sdDetails.subDistributor
-            }).fetch();
-            if (productList.length > 0) {
-                for (let i = 0; i < productList.length; i++) {
-                    let productName = '';
-                    let productCode = '';
-                    let basicUnitsName = '';
-                    let productRes = Product.findOne({
-                        _id: productList[i].product,
-                        brand: brand, category: category,
-                        principal: principal
-                    });
-                    if (productRes !== undefined) {
-                        productName = productRes.productName;
-                        productCode = productRes.productCode;
-                        if (productRes.basicUnit !== undefined) {
-                            let unitRes = Unit.findOne({ _id: productRes.basicUnit });
-                            if (unitRes) {
-                                basicUnitsName = unitRes.unitName;
-                            }
-                        }
-                        let productObj =
-                        {
-                            _id: Random.id(),
-                            product: productList[i].product,
-                            productName: productName,
-                            productCode: productCode,
-                            basicUnitsName: basicUnitsName,
-                            quantity: productList[i].stock,
-                        };
-                        productArray.push(productObj);
-                    }
+  'wareHouseStock.itemCodeWhsCode': (itemCode, whsCode) => {
+    return WareHouseStock.findOne({
+      itemCode: itemCode, whsCode: whsCode
+    });
+  },
 
-                }
-            }
-            return productArray;
-        }
-    },
-    'wareHouseStock.userWiseListId': (id) => {
-        let productList = WareHouseStock.findOne({ _id: id });
-        let empName = '';
-        let subDistributorName = '';
-        let verticalName = '';
-        let productName = '';
-        if (productList) {
-            if (productList.employeeId) { //employee name
-                let emp = Meteor.users.findOne({ _id: productList.employeeId });
-                if (emp) {
-                    empName = `${emp.profile.firstName} ${emp.profile.lastName}`;
-                }
-            }
-            if (productList.subDistributor) {//sd name
-                let sddata = Meteor.users.findOne({ _id: productList.subDistributor });
-                if (sddata) {
-                    subDistributorName = `${sddata.profile.firstName} ${sddata.profile.lastName}`;
-                }
-            }
-            if (productList.vertical) {
-                let vertical1 = Verticals.findOne({ _id: productList.vertical });
-                if (vertical1) {
-                    verticalName = vertical1.verticalName;
-                }
-            }
-            if (productList.product) {
-                let prodData = Product.findOne({ _id: productList.product }, { fields: { productName: 1 } });
-                if (prodData) {
-                    productName = prodData.productName;
-                }
-            }
+  'wareHouseStock.wareHouseList': (itemCode) => {
+    return WareHouseStock.find({
+      itemCode: itemCode, bPLId: Meteor.user().defaultBranch
+    }).fetch();
+  },
+
+  'wareHouseStock.wareHouseListBranch': (branch, selecteditem) => {
+    return WareHouseStock.find({
+      bPLId: branch, itemCode: selecteditem
+    }).fetch();
+
+  },
+  'wareHouseStock.itemStockList': (wareHouse, itemCode, bPLId) => {
+    let wareHouseData = WareHouseStock.findOne({ whsCode: wareHouse, itemCode: itemCode, bPLId: bPLId, onHand: { $ne: '' } });
+    // let mostRecentDate = new Date(Math.max.apply(null, wareHouseData.map(e => {
+    //   return new Date(e.createdAt);
+    // })));
+    // let mostRecentObject = wareHouseData.filter(e => {
+    //   let d = new Date(e.createdAt);
+    //   return d.getTime() == mostRecentDate.getTime();
+    // })[0];
+    // console.log("mostRecentObject...", mostRecentObject);
+
+    // return mostRecentObject;
+    return wareHouseData;
+  },
+  // 'wareHouseStock.wareHousePurchase':(itemCode,bPLId)=>{
+  //   let b=WareHouseStock.findOne({itemCode: itemCode,bPLId:bPLId,onHand:{$ne:''}});
+  //   console.log("b",b);
+  //   return b;
+
+
+  // },
+  'wareHouseStock.wareHouseListForSenior': (itemCode, brch) => {
+    return WareHouseStock.find({
+      itemCode: itemCode, bPLId: brch
+    }).fetch();
+  },
+
+  'wareHouseStock.deleteStock': (whsDate) => {
+    let today = moment(whsDate).format("YYYY-MM-DD 00:00:00.0");
+    toDay = new Date(today);
+    nextDay = new Date(toDay);
+    nextDay.setDate(nextDay.getDate() + 1);
+
+    // console.log("Date 1", toDay);
+    // console.log("Date 2", nextDay);
+    return WareHouseStock.remove({ createdAt: { $gte: toDay, $lt: nextDay } });
+  },
+  'wareHouseStock.dataSync': () => {
+    let base_url = Config.findOne({
+      name: 'base_url'
+    }).value;
+    let dbId = Config.findOne({
+      name: 'dbId'
+    }).value;
+    let url = base_url + wareHouseStockDataGet_Url;
+    let dataArray = {
+      dbId: dbId
+    };
+    let options = {
+      data: dataArray,
+      headers: {
+        'content-type': 'application/json'
+      }
+    };
+    HTTP.call("POST", url, options, (err, result) => {
+      if (err) {
+        return err;
+      } else {
+        let res = result.data.data;
+        // console.log("message", res);
+        for (let i = 0; i < res.length; i++) {
+          let bFind = WareHouseStock.find({
+            itemCode: res[i].ItemCode,
+            whsCode: res[i].WhsCode,
+            bPLId: res[i].BPLId
+          }, { sort: { createdAt: -1 } }).fetch();
+          if (bFind.length === 0) {
+
+            WareHouseStock.insert({
+              bPLId: res[i].BPLId,
+              itemCode: res[i].ItemCode,
+              whsCode: res[i].WhsCode,
+              onHand: res[i].OnHand,
+              avgPrice: res[i].AvgPrice,
+              createdAt: new Date(),
+              uuid: Random.id()
+            });
+          }
+          else {
+            WareHouseStock.update(bFind[0]._id, {
+              $set: {
+                bPLId: res[i].BPLId,
+                itemCode: res[i].ItemCode,
+                whsCode: res[i].WhsCode,
+                onHand: res[i].OnHand,
+                avgPrice: res[i].AvgPrice,
+                updatedAt: new Date()
+              }
+            });
+          }
+          console.log("-*/66*/-", i);
 
         }
-        return { productList: productList, empName: empName, subDistributorName: subDistributorName, verticalName: verticalName, productName: productName };
-    },
+      }
+    });
+  },
 
-    /**
- * 
- * @param {*} id 
- * get stock value
- */
-    'wareHouseStock.idPriceValGet': (id) => {
-        let stockRes = WareHouseStock.findOne({ _id: id });
-        let totalValAmt = "0.00";
-        if (stockRes) {
-            let productRes = Product.findOne({ _id: stockRes.product });
-            if (productRes) {
-                // get ctn unit id
-                let unitVal = Unit.findOne({ product: stockRes.product, _id: productRes.basicUnit });
-                // get sd price type based on vertical
-                let sdPriceTypeVal = SdPriceType.findOne({
-                    subDistributor: stockRes.subDistributor,
-                    vertical: stockRes.vertical, active: "Y"
-                });
-                // get price details
-                console.log("sdPriceTypeVal", sdPriceTypeVal);
-                console.log("unitVal", unitVal);
-                if (sdPriceTypeVal && unitVal) {
-                    let stockVal = "0.00";
-                    if (unitVal.baseQuantity !== undefined && unitVal.baseQuantity !== '') {
-                        let stockCalc = Number(stockRes.stock) / Number(unitVal.baseQuantity);
-                        let roundVal = Math.trunc(stockCalc);
-                        stockVal = roundVal.toString();
-                    }
-                    let priceVal = Price.findOne({
-                        priceType: sdPriceTypeVal.priceType,
-                        product: stockRes.product, unit: unitVal._id
-                    });
-                    console.log("priceVal", priceVal);
-                    if (priceVal) {
-                        let priceAmt = Number(priceVal.priceWs * stockVal).toFixed(2);
-                        totalValAmt = priceAmt.toString();
-                    }
-                }
-            }
-        }
-        return totalValAmt;
-    },
-    'wareHouseStock.sdStockList': (vertical, sd, fromDate, toDate) => {
-        let stockRes = WareHouseStock.find({ subDistributor: sd, vertical: { $in: vertical } }).fetch();
-        // ,createdAt: { $gte: fromDate, $lt: toDate }
-        let stock = 0;
-        for (let i = 0; i < stockRes.length; i++) {
-            stock = stock + Number(stockRes[i].stock);
-        }
-        return stock;
-    },
-    'wareHouseStock.wareHousestockvalue': (vertical, sd, fromDate, toDate) => {
-        let stockRes = WareHouseStock.find({ subDistributor: sd, vertical: { $in: vertical } }).fetch();
-        // ,createdAt: { $gte: fromDate, $lt: toDate}
-        let stock = 0; let amount = 0;
-        for (let i = 0; i < stockRes.length; i++) {
-            let productRes = Product.findOne({ _id: stockRes[i].product }, {
-                fields: {
-                    basicUnit: 1
-                }
-            });
-            if (productRes) {
-                let productPrice = Price.findOne({
-                    product: stockRes[i].product,
-                    unit: productRes.basicUnit
-                });
-                if (productPrice) {
-                    amount = (Number(amount) + Number(stockRes[i].stock) * Number(productPrice.priceVsr)).toFixed(2);
-                }
-            }
-        }
-        return amount;
-    },
-    'wareHouseStock.sdStockWarehouseList': (vertical, sd, fromDate, toDate) => { //1fun
-        toDate.setDate(toDate.getDate() + 1)
-        let stockRes = Stock.find({ subDistributor: sd, vertical: { $in: vertical } }).fetch();
-        // , createdAt: { $gte: fromDate, $lt: toDate}
-        let stock = 0;
-        for (let i = 0; i < stockRes.length; i++) {
-            stock = stock + Number(stockRes[i].stock);
-        }
-        return stock;
-    },
-    'wareHouseStock.sdStockWarehouseValueSD': (vertical, sd, fromDate, toDate) => {
-        let stockRes = Stock.find({ subDistributor: sd, vertical: { $in: vertical } }).fetch();
-        // ,createdAt: { $gte: fromDate, $lt: toDate}
-        let stock, amount = 0;
-        for (let i = 0; i < stockRes.length; i++) {
-            let productRes = Product.findOne({ _id: stockRes[i].product }, {
-                fields: {
-                    basicUnit: 1
-                }
-            });
-            if (productRes) {
-                let productPrice = Price.findOne({
-                    product: stockRes[i].product
-                    , unit: productRes.basicUnit
-                });
-                if (productPrice) {
-                    amount = (Number(amount) + Number(stockRes[i].stock) * Number(productPrice.priceVsr)).toFixed(2);
-                }
-            }
-        }
-        return amount;
-    },
-    'wareHouseStock.totalqty': (vertical, sd, fromDate, toDate) => {
-        let stockRes = WareHouseStock.find({ subDistributor: sd, vertical: { $in: vertical } }).fetch();
-        // ,createdAt: { $gte: fromDate, $lt: toDate}
-        let stock = 0;
-        for (let i = 0; i < stockRes.length; i++) {
-            stock = stock + Number(stockRes[i].stock);
-        }
-        let stock1 = 0;
-        let stockRes1 = Stock.find({ subDistributor: sd, vertical: vertical[0] }).fetch();
-        for (let i = 0; i < stockRes1.length; i++) {
-            stock1 = stock1 + Number(stockRes1[i].stock);
-        }
-        return Number(Number(stock) + Number(stock1));
-    },
-    'wareHouseStock.totalvalue': (vertical, sd, fromDate, toDate) => {
-        let stockRes = WareHouseStock.find({ subDistributor: sd, vertical: { $in: vertical } }).fetch();
-        // ,createdAt: { $gte: fromDate, $lt: toDate}
-        let stock = 0; let amount = 0;
-        for (let i = 0; i < stockRes.length; i++) {
-            let productRes = Product.findOne({
-                _id: stockRes[i].product
-            }, {
-                fields: {
-                    basicUnit: 1
-                }
-            });
-            if (productRes) {
-                let productPrice = Price.findOne({
-                    product: stockRes[i].product,
-                    unit: productRes.basicUnit
-                });
-                if (productPrice) {
-                    amount = (Number(amount) + Number(stockRes[i].stock) * Number(productPrice.priceVsr)).toFixed(2);
-                }
-            }
-        }
-        let amount1 = 0;
-        let stockRes1 = Stock.find({ subDistributor: sd, vertical: { $in: vertical } }).fetch();
-        for (let i = 0; i < stockRes1.length; i++) {
-            let productRes = Product.findOne({
-                _id: stockRes1[i].product
-            }, {
-                fields: {
-                    basicUnit: 1
-                }
-            });
-            if (productRes) {
-                let productPrice1 = Price.findOne({
-                    product: stockRes1[i].product,
-                    unit: productRes.basicUnit
-                });
-                if (productPrice1) {
-                    amount1 = (Number(amount1) + Number(stockRes1[i].stock) * Number(productPrice1.priceVsr)).toFixed(2);
-                }
-            }
-        }
-        return Number(Number(amount) + Number(amount1));
-    },
-    'wareHouseStock.sdStockqtyTotal': (vertical, fromDate, toDate) => { //sdStockWarehouseList
-        let sdListArray = [];
-        let sdList = allUsers.find({ vertical: { $in: vertical }, userType: 'SD', active: "Y" }, { fields: { profile: 1 } }).fetch();
-        for (let i = 0; i < sdList.length; i++) {
-            sdListArray.push(sdList[i]._id);
-        }
-        let stockRes = Stock.find({ subDistributor: { $in: sdListArray }, vertical: { $in: vertical } }).fetch();
-        // ,createdAt: { $gte: fromDate, $lt: toDate}
-        let stock = 0;
-        for (let i = 0; i < stockRes.length; i++) {
-            stock = stock + Number(stockRes[i].stock);
-        }
+  'wareHouseStock.dateWiseDataSync': (dateVal) => {
+    let base_url = Config.findOne({
+      name: 'base_url'
+    }).value;
+    let dbId = Config.findOne({
+      name: 'dbId'
+    }).value;
+    let url = base_url + wareHouseStockUpdatePost_Url;
+    let date = moment(dateVal).format("YYYY.MM.DD");
+    let todayDate = moment(new Date()).format("YYYY.MM.DD");
+    let fullDate = date + " 00:00:00.000";
+    let dataArray = {
+      dated: fullDate,
+      dbId: dbId
+    };
+    let options = {
+      data: dataArray,
+      headers: {
+        'content-type': 'application/json'
+      }
+    };
+    // console.log("fullDate", fullDate);
+    // console.log("dataArray", dataArray);
+    HTTP.call("POST", url, options, (err, result) => {
+      if (err) {
+        return err;
+      } else {
+        let res = result.data.data;
+        // console.log("message", res);
+        for (let i = 0; i < res.length; i++) {
+          let bFind = WareHouseStock.find({
+            itemCode: res[i].ItemCode,
+            whsCode: res[i].WhsCode,
+            bPLId: res[i].BPLId
+          }, { sort: { createdAt: -1 } }).fetch();
+          if (bFind.length === 0) {
 
-        return stock;
-    },
-    'wareHouseStock.sdStockValueCalTotal': (vertical, fromDate, toDate) => { //sdStockWarehouseValueSD
-        let sdListArray = [];
-        let sdList = allUsers.find({ vertical: { $in: vertical }, userType: 'SD', active: "Y" }, { fields: { profile: 1 } }).fetch();
-        for (let i = 0; i < sdList.length; i++) {
-            sdListArray.push(sdList[i]._id);
-        }
-        let stockRes = Stock.find({ subDistributor: { $in: sdListArray }, vertical: { $in: vertical } }).fetch();
-        // ,createdAt: { $gte: fromDate, $lt: toDate}
-        let stock, amount = 0;
-        for (let i = 0; i < stockRes.length; i++) {
-            let productRes = Product.findOne({ _id: stockRes[i].product }, {
-                fields: {
-                    basicUnit: 1
-                }
+            WareHouseStock.insert({
+              bPLId: res[i].BPLId,
+              itemCode: res[i].ItemCode,
+              whsCode: res[i].WhsCode,
+              onHand: res[i].OnHand,
+              avgPrice: res[i].AvgPrice,
+              insertdateValue: todayDate,
+              createdAt: new Date(),
+              uuid: Random.id()
             });
-            if (productRes) {
-                let productPrice = Price.findOne({
-                    product: stockRes[i].product,
-                    unit: productRes.basicUnit
-                });
-                if (productPrice) {
-                    amount = (Number(amount) + Number(stockRes[i].stock) * Number(productPrice.priceVsr)).toFixed(2);
-                }
-            }
-        }
-        return amount;
-    },
-    'wareHouseStock.vanQuantityTotal': (vertical, fromDate, toDate) => { //sdStockList
-        let sdListArray = [];
-        let sdList = allUsers.find({ vertical: { $in: vertical }, userType: 'SD', active: "Y" }, { fields: { profile: 1 } }).fetch();
-        for (let i = 0; i < sdList.length; i++) {
-            sdListArray.push(sdList[i]._id);
-        }
-        let stockRes = WareHouseStock.find({ subDistributor: { $in: sdListArray }, vertical: { $in: vertical } }).fetch();
-        // ,createdAt: { $gte: fromDate, $lt: toDate}
-        let stock = 0;
-        for (let i = 0; i < stockRes.length; i++) {
-            stock = stock + Number(stockRes[i].stock);
-        }
-        return stock;
-    },
-    'wareHouseStock.vanstockvalueTotal': (vertical, fromDate, toDate) => {// wareHousestockvalue
-        let sdListArray = [];
-        let sdList = allUsers.find({ vertical: { $in: vertical }, userType: 'SD', active: "Y" }, { fields: { profile: 1 } }).fetch();
-        for (let i = 0; i < sdList.length; i++) {
-            sdListArray.push(sdList[i]._id);
-        }
-        let stockRes = WareHouseStock.find({ subDistributor: { $in: sdListArray }, vertical: { $in: vertical } }).fetch();
-        // ,createdAt: { $gte: fromDate, $lt: toDate}
-        let stock = 0; let amount = 0;
-        for (let i = 0; i < stockRes.length; i++) {
-            let productRes = Product.findOne({
-                _id: stockRes[i].product
-            }, {
-                fields: {
-                    basicUnit: 1
-                }
+          }
+          else {
+            WareHouseStock.update(bFind[0]._id, {
+              $set: {
+                bPLId: res[i].BPLId,
+                itemCode: res[i].ItemCode,
+                whsCode: res[i].WhsCode,
+                onHand: res[i].OnHand,
+                avgPrice: res[i].AvgPrice,
+                updatedateValue: todayDate,
+                updatedAt: new Date()
+              }
             });
-            if (productRes) {
-                let productPrice = Price.findOne({
-                    product: stockRes[i].product,
-                    unit: productRes.basicUnit
-                });
-                if (productPrice) {
-                    amount = (Number(amount) + Number(stockRes[i].stock) * Number(productPrice.priceVsr)).toFixed(2);
-                }
+          }
+          console.log("-*/66*/ Total Count-", i);
+
+        }
+      }
+    });
+  },
+
+
+  'wareHouseStock.filter': (branch, warehouse, item) => {
+    let resultArray = [];
+    let stockResArray = [];
+    if (branch && warehouse && item === '') {
+      resultArray = WareHouseStock.find({
+        whsCode: warehouse, bPLId: branch
+      }, { sort: { onHand: -1 } }, {
+        fields: {
+          itemCode: 1, bPLId: 1, whsCode: 1, onHand: 1,
+          avgPrice: 1, createdAt: 1, updatedAt: 1, _id: 1
+        }
+      }).fetch();
+      if (resultArray.length > 0) {
+        for (let i = 0; i < resultArray.length; i++) {
+          if (Number(resultArray[i].onHand) > 0) {
+            let itemNames = '';
+            let warehouseNames = '';
+            let branchNames = '';
+            let itemRes = Item.findOne({ itemCode: resultArray[i].itemCode }, { fields: { itemNam: 1 } });
+            if (itemRes) {
+              itemNames = itemRes.itemNam;
             }
-        }
-        return amount;
-    },
-    'wareHouseStock.totalqtyTotal': (vertical, fromDate, toDate) => { //totalqty
-        let sdListArray = [];
-        let sdList = allUsers.find({ vertical: { $in: vertical }, userType: 'SD', active: "Y" }, { fields: { profile: 1 } }).fetch();
-        for (let i = 0; i < sdList.length; i++) {
-            sdListArray.push(sdList[i]._id);
-        }
-        let stockRes = WareHouseStock.find({ subDistributor: { $in: sdListArray }, vertical: { $in: vertical } }).fetch();
-        // ,createdAt: { $gte: fromDate, $lt: toDate}
-        let stock = 0;
-        for (let i = 0; i < stockRes.length; i++) {
-            stock = stock + Number(stockRes[i].stock);
-        }
-        let stock1 = 0;
-        let stockRes1 = Stock.find({ subDistributor: { $in: sdListArray }, vertical: vertical[0] }).fetch();
-        // ,createdAt: { $gte: fromDate, $lt: toDate}
-        for (let i = 0; i < stockRes1.length; i++) {
-            stock1 = stock1 + Number(stockRes1[i].stock);
-        }
-        return Number(Number(stock) + Number(stock1));
-    },
-    'wareHouseStock.totalvalueTotal': (vertical, fromDate, toDate) => { //totalvalue
-        let sdListArray = [];
-        let sdList = allUsers.find({ vertical: { $in: vertical }, userType: 'SD', active: "Y" }, { fields: { profile: 1 } }).fetch();
-        for (let i = 0; i < sdList.length; i++) {
-            sdListArray.push(sdList[i]._id);
-        }
-        let stockRes = WareHouseStock.find({ subDistributor: { $in: sdListArray }, vertical: { $in: vertical } }).fetch();
-        // ,createdAt: { $gte: fromDate, $lt: toDate}
-        let stock = 0; let amount = 0;
-        for (let i = 0; i < stockRes.length; i++) {
-            let productRes = Product.findOne({ _id: stockRes[i].product },
-                {
-                    fields: {
-                        basicUnit: 1
-                    }
-                });
-            if (productRes) {
-                let productPrice = Price.findOne({
-                    product: stockRes[i].product,
-                    unit: productRes.basicUnit
-                });
-                if (productPrice) {
-                    amount = (Number(amount) + Number(stockRes[i].stock) * Number(productPrice.priceVsr)).toFixed(2);
-                }
+            let branchRes = Branch.findOne({ bPLId: resultArray[i].bPLId }, { fields: { bPLName: 1 } });
+            if (branchRes) {
+              branchNames = branchRes.bPLName;
             }
-        }
-        let amount1 = 0;
-        let stockRes1 = Stock.find({ subDistributor: { $in: sdListArray }, vertical: { $in: vertical } }).fetch();
-        // ,createdAt: { $gte: fromDate, $lt: toDate}
-        for (let i = 0; i < stockRes1.length; i++) {
-            let productRes = Product.findOne({ _id: stockRes1[i].product },
-                {
-                    fields: {
-                        basicUnit: 1
-                    }
-                });
-            if (productRes) {
-                let productPrice1 = Price.findOne({
-                    product: stockRes1[i].product,
-                    unit: productRes.basicUnit
-                });
-                if (productPrice1) {
-                    amount1 = (Number(amount1) + Number(stockRes1[i].stock) * Number(productPrice1.priceVsr)).toFixed(2);
-                }
+            let warehouseRes = WareHouse.findOne({ whsCode: resultArray[i].whsCode }, { fields: { whsName: 1 } });
+            if (warehouseRes) {
+              warehouseNames = warehouseRes.whsName;
             }
+            let resObj = {
+              _id: resultArray[i]._id,
+              itemCodeVal: resultArray[i].itemCode,
+              itemNameVal: itemNames,
+              whsCode: resultArray[i].whsCode,
+              whsName: branchNames,
+              bPLId: resultArray[i].bPLId,
+              bPLName: warehouseNames,
+              onHand: resultArray[i].onHand,
+              avgPrice: resultArray[i].avgPrice,
+              createdAt: resultArray[i].createdAt,
+              updatedAt: resultArray[i].updatedAt
+            };
+            stockResArray.push(resObj);
+          }
         }
-        return Number(Number(amount) + Number(amount1));
-    },
-    /**
-     * clear negative stock
-     */
-    'warehouseStock.clearStock': () => {
-        let stockRes = WareHouseStock.find({}, { fields: { stock: 1 } }).fetch();
-        if (stockRes.length > 0) {
-            for (let i = 0; i < stockRes.length; i++) {
-                if (Number(stockRes[i].stock) < 0) {
-                    WareHouseStock.update({
-                        _id: stockRes[i]._id,
-                    }, {
-                        $set:
-                        {
-                            stock: '0.00',
-                            stockCleared: new Date()
-                        }
-                    });
-                }
-            }
-        }
+      }
     }
+    else if (branch && warehouse && item) {
+      resultArray = WareHouseStock.find({
+        whsCode: warehouse, bPLId: branch, itemCode: item
+      }, { sort: { onHand: -1 } }, {
+        fields: {
+          itemCode: 1, bPLId: 1, whsCode: 1, onHand: 1,
+          avgPrice: 1, createdAt: 1, updatedAt: 1, _id: 1
+        }
+      }).fetch();
+      if (resultArray.length > 0) {
+        for (let i = 0; i < resultArray.length; i++) {
+          let itemNames = '';
+          let warehouseNames = '';
+          let branchNames = '';
+          let itemRes = Item.findOne({ itemCode: resultArray[i].itemCode }, { fields: { itemNam: 1 } });
+          if (itemRes) {
+            itemNames = itemRes.itemNam;
+          }
+          let branchRes = Branch.findOne({ bPLId: resultArray[i].bPLId }, { fields: { bPLName: 1 } });
+          if (branchRes) {
+            branchNames = branchRes.bPLName;
+          }
+          let warehouseRes = WareHouse.findOne({ whsCode: resultArray[i].whsCode }, { fields: { whsName: 1 } });
+          if (warehouseRes) {
+            warehouseNames = warehouseRes.whsName;
+          }
+          let resObj = {
+            _id: resultArray[i]._id,
+            itemCodeVal: resultArray[i].itemCode,
+            itemNameVal: itemNames,
+            whsCode: resultArray[i].whsCode,
+            whsName: branchNames,
+            bPLId: resultArray[i].bPLId,
+            bPLName: warehouseNames,
+            onHand: resultArray[i].onHand,
+            avgPrice: resultArray[i].avgPrice,
+            createdAt: resultArray[i].createdAt,
+            updatedAt: resultArray[i].updatedAt
+          };
+          stockResArray.push(resObj);
+        }
+      }
+    }
+    return stockResArray;
+  },
+
+  'wareHouseStock.remove': (_id) => {
+    return WareHouseStock.remove({ _id: _id });
+  },
+  /**
+* TODO: Complete JS doc
+* 
+*/
+  'wareHouseStock.create': (itemCode, branch, wareHouse, onHand, averagePrice) => {
+    return WareHouseStock.insert({
+      itemCode: itemCode,
+      whsCode: wareHouse,
+      bPLId: branch,
+      onHand: onHand,
+      avgPrice: averagePrice,
+      disabled: "N",
+      createdBy: Meteor.userId(),
+      createdByWeb: true,
+      uuid: Random.id(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+  },
+  /**
+  * TODO: Complete JS doc
+  * 
+  */
+  'wareHouseStock.update': (id, itemCode, branch, wareHouse, onHand, averagePrice) => {
+    return WareHouseStock.update({ _id: id }, {
+      $set:
+      {
+        itemCode: itemCode,
+        whsCode: wareHouse,
+        bPLId: branch,
+        onHand: onHand,
+        avgPrice: averagePrice,
+        updatedBy: Meteor.userId(),
+        updatedAt: new Date(),
+      }
+    });
+  },
+  'wareHouseStock.inactive': (id) => {
+    let updatedByName = '';
+    let user = Meteor.users.findOne({ _id: Meteor.userId() });
+    if (user !== undefined) {
+      updatedByName = user.profile.firstName;
+    }
+    return WareHouseStock.update({ _id: id }, {
+      $set:
+      {
+        disabled: "Y",
+        updatedBy: Meteor.userId(),
+        updatedName: updatedByName,
+        updatedAt: new Date(),
+      }
+    });
+  },
+  'wareHouseStock.active': (id) => {
+    return WareHouseStock.update({ _id: id }, {
+      $set:
+      {
+        disabled: "N",
+        updatedBy: Meteor.userId(),
+        updatedAt: new Date(),
+      }
+    });
+  },
+  'wareHouseStock.wareHouseStock_id': (id) => {
+    return WareHouseStock.findOne({ _id: id });
+  },
+  'wareHouseStock.bPLId': (bPLId) => {
+    if (bPLId !== undefined && bPLId !== '') {
+      return WareHouseStock.find({ bPLId: bPLId, disabled: { $ne: 'Y' } }, { fields: { whsName: 1, whsCode: 1 } });
+    }
+  },
+  /**
+    * TODO: Complete JS doc
+    * 
+    */
+  'wareHouseStock.createUpload': (wareHouseStockArray) => {
+    if (wareHouseStockArray !== undefined && wareHouseStockArray !== []) {
+      for (let a = 0; a < wareHouseStockArray.length; a++) {
+        let wareHouseStockDetails = WareHouseStock.find({
+          itemCode: wareHouseStockArray[a].itemCode,
+          whsCode: wareHouseStockArray[a].whsCode,
+          bPLId: wareHouseStockArray[a].bPLId,
+        }).fetch();
+        if (wareHouseStockDetails.length === 0) {
+          WareHouseStock.insert({
+            itemCode: wareHouseStockArray[a].itemCode,
+            whsCode: wareHouseStockArray[a].whsCode,
+            bPLId: wareHouseStockArray[a].bPLId,
+            onHand: wareHouseStockArray[a].onHand,
+            avgPrice: wareHouseStockArray[a].avgPrice,
+            uuid: Random.id(),
+            createdAt: new Date(),
+          });
+        }
+        else {
+          WareHouseStock.update({
+            itemCode: wareHouseStockArray[a].itemCode,
+            whsCode: wareHouseStockArray[a].whsCode,
+            bPLId: wareHouseStockArray[a].bPLId,
+          }, {
+            $set: {
+              itemCode: wareHouseStockArray[a].itemCode,
+              whsCode: wareHouseStockArray[a].whsCode,
+              bPLId: wareHouseStockArray[a].bPLId,
+              onHand: wareHouseStockArray[a].onHand,
+              avgPrice: wareHouseStockArray[a].avgPrice,
+              updatedAt: new Date(),
+            }
+          });
+        }
+        console.log("///Stock///", a);
+      }
+    }
+  },
+
+  'wareHouseStock.wareHouseStockDetailsGet': (id) => {
+    let whsRes = WareHouseStock.findOne({ _id: id });
+
+    let itemName = '';
+    let itemResult = Item.findOne({ itemCode: whsRes.itemCode });
+    if (itemResult) {
+      itemName = itemResult.itemNam;
+    }
+
+    let whsName = '';
+    let whsResult = WareHouse.findOne({ whsCode: whsRes.whsCode });
+    if (whsResult) {
+      whsName = whsResult.whsName;
+    }
+
+
+    let branchName = '';
+    let branchRes = Branch.findOne({ bPLId: whsRes.bPLId });
+    if (branchRes) {
+      branchName = branchRes.bPLName;
+    }
+
+    return { whsRes: whsRes, itemName: itemName, whsName: whsName, branchName: branchName }
+
+  },
 });

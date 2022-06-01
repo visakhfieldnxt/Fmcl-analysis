@@ -14,7 +14,7 @@ Template.routeGroup_create.onCreated(function () {
   this.wareHouseArray = new ReactiveVar();
   this.customervalueList = new ReactiveVar();
   this.modalLoader = new ReactiveVar();
-  this.sdList = new ReactiveVar();
+  this.branchArrayList = new ReactiveVar();
   this.customerNameArray = new ReactiveVar();
   $("#selectItems").val('').trigger('change');
   $("#selectCustomer").val('').trigger('change');
@@ -24,26 +24,13 @@ Template.routeGroup_create.onRendered(function () {
   routeCodeCheck = false;
   /**
  * TODO:Complete Js doc
- * Getting sd user list
+ * Getting user branch list
  */
-  let subDistributorValue = Session.get("subDistributorValue");
-  if (subDistributorValue === true) {
-    if (Meteor.user()) {
-      Meteor.call('user.sdUsersingleList', Meteor.userId(), (err, res) => {
-        if (!err) {
-          this.sdList.set(res);
-        }
-      });
+  Meteor.call('branch.branchList', (err, res) => {
+    if (!err) {
+      this.branchArrayList.set(res);
     }
-  }
-  else {
-    let loginUserVerticals = Session.get("loginUserVerticals");
-    Meteor.call('user.sdListGet', loginUserVerticals, (err, res) => {
-      if (!err) {
-        this.sdList.set(res);
-      }
-    });
-  }
+  });
 
   /**
    * TODO:Complete Js doc
@@ -61,15 +48,15 @@ Template.routeGroup_create.onRendered(function () {
     dropdownParent: $(".selectPriority").parent(),
   });
 
-  $('.selectSdIds').select2({
-    placeholder: "Select Sub Distributor",
+  $('.selectBranch').select2({
+    placeholder: "Select Branch",
     tokenSeparators: [','],
     allowClear: true,
-    dropdownParent: $(".selectSdIds").parent(),
+    dropdownParent: $(".selectBranch").parent(),
   });
 
   $('.selectCustomers').select2({
-    placeholder: "Select Outlet",
+    placeholder: "Select Customer",
     tokenSeparators: [','],
     allowClear: true,
     dropdownParent: $(".selectCustomers").parent(),
@@ -87,6 +74,8 @@ Template.routeGroup_create.onRendered(function () {
 
 
 Template.routeGroup_create.helpers({
+
+
   /**
  * TODO Complete Js doc
  * For Loader Showing
@@ -117,10 +106,10 @@ Template.routeGroup_create.helpers({
 
 
   /**
-   * get sdList 
+   * get branch list
    */
-  sdUsersGet: () => {
-    return Template.instance().sdList.get();
+  branchLists: () => {
+    return Template.instance().branchArrayList.get();
   },
   /**
   * TODO:Complete Js doc
@@ -229,7 +218,38 @@ Template.routeGroup_create.events({
     }
   },
 
-
+  /**
+   * 
+   * @param {*} event 
+   * @param {*} template 
+   * set customers based on branch change
+   */
+  'change .selectBranch': (event, template) => {
+    event.preventDefault();
+    let branch = '';
+    template.modalLoader.set(false);
+    $('#selectBranch').find(':selected').each(function () {
+      branch = $(this).val();
+    });
+    if (branch !== '' && branch !== 'Select Branch') {
+      template.modalLoader.set(true);
+      Meteor.call('customer.routeDataGet', branch, (err, res) => {
+        if (!err) {
+          template.customerArrayList.set(res.customerBranch);
+          template.modalLoader.set(false);
+        }
+        else {
+          template.modalLoader.set(false);
+        }
+      });
+    }
+    template.customerArrayList.set('');
+    customerArray = [];
+    template.customervalueList.set('');
+    $("#selectCustomers").val('').trigger('change');
+    $('#selectPriority').val('').trigger('change');
+    $('#selectPrevRoute').val('').trigger('change');
+  },
 
   /**
     * TODO:Complete Js doc
@@ -251,7 +271,7 @@ Template.routeGroup_create.events({
   'click .closeRoute': (event, template) => {
     $("#selectCustomers").val('').trigger('change');
     $('#selectPriority').val('').trigger('change');
-    $('#selectSdIds').val('').trigger('change');
+    $('#selectBranch').val('').trigger('change');
     $('#routeNameValue').val('');
     $('#descriptionVal').val('');
     $('#routeDate').val('');
@@ -259,7 +279,6 @@ Template.routeGroup_create.events({
     customerArray = [];
     template.customervalueList.set('');
     $('form :input').val("");
-
   },
 
   'keyup #routeNameValue': (event, template) => {
@@ -291,11 +310,14 @@ Template.routeGroup_create.events({
     */
   'submit .route-add': (event, template) => {
     event.preventDefault();
-    let subDistributor = '';
-    $('#selectSdIds').find(':selected').each(function () {
-      subDistributor = $(this).val();
+    let branch = '';
+    $('#selectBranch').find(':selected').each(function () {
+      branch = $(this).val();
     });
-    let loginUserVerticals = Session.get("loginUserVerticals");
+    // if (customerArray.length === 0) {
+    //   toastr["error"](customerValidationMessage);
+    // }
+    // else {
     if (routeCodeCheck === true) {
       toastr["error"](routeCodeExistmsg);
     }
@@ -305,7 +327,7 @@ Template.routeGroup_create.events({
         $("#submit").prop('disabled', false);
       }, 10000);
 
-      createrRouteGroup(event.target, subDistributor,loginUserVerticals);
+      createrRouteGroup(event.target, customerArray, branch);
       dataClear();
       $('#routeGroup-create').modal('hide');
     }
@@ -315,47 +337,43 @@ Template.routeGroup_create.events({
       $('#routeNameValue').val('');
       $('#descriptionVal').val('');
       $("#submit").attr("disabled", false);
-      $('#selectSdIds').val('').trigger('change');
+      $('#selectBranch').val('').trigger('change');
       $('#routeDate').val('');
       customerArray = [];
       template.customervalueList.set('');
       $('form :input').val("");
     }
+    // }
   },
   /**
-  * 
-  * @param {*} event 
-  * @param {*} template 
-  */
-  'change #selectSdIds': (event, template) => {
+   *  
+   */
+  'change .selectPrevRoute': (event, template) => {
     event.preventDefault();
-    let sdId = '';
-    $('#selectSdIds').find(':selected').each(function () {
-      sdId = ($(this).val());
+    let routeCode = '';
+    $('#selectPrevRoute').find(':selected').each(function () {
+      routeCode = $(this).val();
     });
-    $('#verticalSpan').html('');
-    $('#branchSpan').html('');
-    $('#locationSpan').html('');
-    template.modalLoader.set(false);
-    if (sdId !== '' && sdId !== undefined) {
+    if (routeCode !== '' && routeCode !== 'Select Route') {
+      customerArray = [];
+      template.customervalueList.set('');
       template.modalLoader.set(true);
-      Meteor.call('user.sdDataGets', sdId, (err, res) => {
+      Meteor.call('route.customerDataGet', routeCode, (err, res) => {
         if (!err) {
-          $('#verticalSpan').html(`Verticals : <b> ${res.verticalName}</b>`);
-          $('#branchSpan').html(`Branch : <b> ${res.branchName}</b>`);
-          $('#locationSpan').html(`Location : <b>${res.locationName}</b>`);
-          $('#verticalSpan').css("padding", "4px 14px");
-          $('#branchSpan').css("padding", "4px 14px");
-          $('#locationSpan').css("padding", "4px 14px");
+          for (let n = 0; n < res.customerArray.length; n++) {
+            customerArray.push(res.customerArray[n]);
+          }
+          template.customervalueList.set(customerArray);
           template.modalLoader.set(false);
         }
         else {
-          $('#verticalSpan').html('');
-          $('#branchSpan').html('');
-          $('#locationSpan').html('');
+          customerArray = [];
+          template.customervalueList.set('');
           template.modalLoader.set(false);
         }
-      });
+
+      }
+      )
     }
   },
 });

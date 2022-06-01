@@ -9,69 +9,74 @@ Template.unit_create.onCreated(function () {
   self.autorun(() => {
 
   });
-  this.productListGet = new ReactiveVar();
+  this.itemFullList = new ReactiveVar();
 });
 
 Template.unit_create.onRendered(function () {
-  $('#selectProduct').val('').trigger('change');
   /**
-   * get branch list 
-   * */
-  let loginUserVerticals = Session.get("loginUserVerticals");
-  Meteor.call('product.userWiseList', loginUserVerticals, (err, res) => {
+       * TODO:Complete Js doc
+       * Getting user itemGetPrice list
+       */
+  Meteor.call('item.itemListGet', (err, res) => {
     if (!err) {
-      this.productListGet.set(res);
+      this.itemFullList.set(res);
     }
   });
+
   /**
-  * TODO: Complete JS doc
-  */
-  $('.selectProduct').select2({
-    placeholder: "Select Product",
+* TODO: Complete JS doc
+*/
+  $('#itemSelections').select2({
+    placeholder: "Select Item ",
     tokenSeparators: [','],
     allowClear: true,
-    dropdownParent: $(".selectProduct").parent(),
+    dropdownParent: $("#itemSelections").parent(),
   });
+
 });
 Template.unit_create.helpers({
   /**
-   * get unit list
+   * TODO: Complete JS doc
    */
-  getProductList: () => {
-    return Template.instance().productListGet.get();
+  date: function () {
+    return new Date();
   },
-
+  /**
+* TODO:COmplete Js doc
+* Getting specific customers base on itemGetPrice
+*/
+  itemsList: function () {
+    return Template.instance().itemFullList.get();
+  },
 });
 Template.unit_create.events({
   /**
     * TODO: Complete JS doc
    */
-  'click .closeunit': (event, template) => {
+  'click .closeunit': () => {
     $('#unitAdd').each(function () {
       this.reset();
     });
-    $('#selectProduct').val('').trigger('change');
   },
-
   /**
    * TODO: Complete JS doc
    * @param event
    */
-  'submit .unitAdd': (event, template) => {
+  'submit .unitAdd': (event) => {
     event.preventDefault();
-    let product = '';
-    $('#selectProduct').find(':selected').each(function () {
-      product = $(this).val();
+    let ugpCode = '';
+    $('.itemSelections').find(':selected').each(function () {
+      ugpCode = $(this).val();
     });
-    let loginUserVerticals = Session.get("loginUserVerticals");
-    createOrUpdateunit(event.target, product, loginUserVerticals);
-    $('#ic-create-unit').modal('hide');
+
+    createOrUpdateunit(event.target, ugpCode);
     dataClear();
+    $('#ic-create-unit').modal('hide');
     function dataClear() {
       $('#unitAdd').each(function () {
         this.reset();
       });
-      $('#selectProduct').val('').trigger('change');
+      $('.itemSelections').val(null).trigger('change');
     }
   }
 });

@@ -21,7 +21,7 @@ Template.routeGroup.onCreated(function () {
   this.customerDataArray = new ReactiveVar();
   this.routeCodeList = new ReactiveVar();
   this.vansaleUsersData = new ReactiveVar();
-  this.sdUserEdits = new ReactiveVar();
+  this.branchEdits = new ReactiveVar();
   this.branchArrayList = new ReactiveVar();
   this.routeUpdatedData = new ReactiveVar();
   this.customerNameArray = new ReactiveVar();
@@ -30,39 +30,15 @@ Template.routeGroup.onCreated(function () {
   this.fileName = new ReactiveVar();
   this.custAddressGet = new ReactiveVar();
   this.addressmaster = new ReactiveVar();
-  this.sdList = new ReactiveVar();
-  let subDistributorValue = Session.get("subDistributorValue");
-  let loginUserVerticals = Session.get("loginUserVerticals");
-  if (subDistributorValue === true) {
-    this.pagination = new Meteor.Pagination(RouteGroup, {
-      filters: {
-        active: "Y",
-        subDistributor: Meteor.userId()
-      },
-      sort: {
-        createdAt: -1
-      },
-      fields: {
-        routeName: 1,
-        routeCode: 1,
-        subDistributor: 1,
-        active: 1
-      },
-      perPage: 20
-    });
-  }
-  else {
-    this.pagination = new Meteor.Pagination(RouteGroup, {
-      filters: {
-        active: "Y",
-        // vertical: { $in: loginUserVerticals }
-      },
-      sort: {
-        createdAt: -1
-      },
-      perPage: 20
-    });
-  }
+  this.pagination = new Meteor.Pagination(RouteGroup, {
+    filters: {
+      active: "Y"
+    },
+    sort: {
+      createdAt: -1
+    },
+    perPage: 20
+  });
 
 });
 
@@ -91,27 +67,17 @@ Template.routeGroup.onRendered(function () {
 * TODO:Complete Js doc
 * Getting user branch list
 */
-  let loginUserVerticals = Session.get("loginUserVerticals");
-  Meteor.call('user.sdListGet', loginUserVerticals, (err, res) => {
+  Meteor.call('branch.branchList', (err, res) => {
     if (!err) {
-      this.sdList.set(res);
+      this.branchArrayList.set(res);
     }
   });
-  let subDistributorValue = Session.get("subDistributorValue");
-  if (subDistributorValue === true) {
-    Meteor.call('routeGroup.sdWiselist', Meteor.userId(), (err, res) => {
-      if (!err) {
-        this.routeCodeList.set(res);
-      }
-    });
-  }
-  else {
-    Meteor.call('routeGroup.list', (err, res) => {
-      if (!err) {
-        this.routeCodeList.set(res);
-      }
-    });
-  }
+
+  Meteor.call('routeGroup.list', (err, res) => {
+    if (!err) {
+      this.routeCodeList.set(res);
+    }
+  });
 
   Meteor.call('customerAddress.list', (err, res) => {
     if (!err) {
@@ -125,6 +91,16 @@ Template.routeGroup.onRendered(function () {
 * Getting vansale user list
 */
 
+  /**
+   * get routeCode list for filter
+   */
+  Meteor.setInterval(() => {
+    Meteor.call('routeGroup.list', (err, res) => {
+      if (!err) {
+        this.routeCodeList.set(res);
+      }
+    });
+  }, 600000);
 
   /**
    * TODO:Complete Js doc
@@ -151,11 +127,11 @@ Template.routeGroup.onRendered(function () {
     dropdownParent: $("#routeNameVal").parent(),
   });
 
-  $('.selectSdIdsEdit').select2({
-    placeholder: "Select Sub Distributor",
+  $('.selectBranchEdits').select2({
+    placeholder: "Select Branch",
     tokenSeparators: [','],
     allowClear: true,
-    dropdownParent: $(".selectSdIdsEdit").parent(),
+    dropdownParent: $(".selectBranchEdits").parent(),
   });
 
   $('.selectPriorityEdit').select2({
@@ -166,12 +142,17 @@ Template.routeGroup.onRendered(function () {
   });
 
   $('.selectCustomersEdit').select2({
-    placeholder: "Select Outlet",
+    placeholder: "Select Customer",
     tokenSeparators: [','],
     allowClear: true,
     dropdownParent: $(".selectCustomersEdit").parent(),
   });
-
+  $('.selectCustomersAddressEdit').select2({
+    placeholder: "Select Customer Address",
+    tokenSeparators: [','],
+    allowClear: true,
+    dropdownParent: $(".selectCustomersAddressEdit").parent(),
+  });
 });
 Template.routeGroup.helpers({
   /**
@@ -197,21 +178,7 @@ Template.routeGroup.helpers({
       return false;
     }
   },
-  /**
-    * get sdList 
-    */
-  sdUsersGetEdit: () => {
-    let sdVal = Template.instance().sdUserEdits.get();
-    console.log("sdVal");
-    if (sdVal) {
-      Meteor.setTimeout(function () {
-        if (sdVal) {
-          $('#selectSdIdsEdit').val(sdVal).trigger('change');
-        }
-      }, 100);
-    }
-    return Template.instance().sdList.get();
-  },
+
   routeDataList: () => {
     return Template.instance().routeUpdatedData.get();
 
@@ -226,7 +193,20 @@ Template.routeGroup.helpers({
   customerArrayList: function () {
     return Template.instance().customerArray.get();
   },
-
+  /**
+   * get branch list
+   */
+  branchListEdits: () => {
+    let branchVal = Template.instance().branchEdits.get();
+    if (branchVal) {
+      Meteor.setTimeout(function () {
+        if (branchVal) {
+          $('#selectBranchEdits').val(branchVal).trigger('change');
+        }
+      }, 200);
+    }
+    return Template.instance().branchArrayList.get();
+  },
   /**
    * address list
    */
@@ -256,12 +236,12 @@ Template.routeGroup.helpers({
   },
 
   /**
-* get vansale user name
-*/
+ * get vansale user name
+ */
 
-  getUserName: (user) => {
+  branchNameHelp: (branch) => {
     let promiseVal = new Promise((resolve, reject) => {
-      Meteor.call("user.idName", user, (error, result) => {
+      Meteor.call("branch.idBranchName", branch, (error, result) => {
         if (!error) {
           resolve(result);
         } else {
@@ -270,40 +250,16 @@ Template.routeGroup.helpers({
       });
     });
     promiseVal.then((result) => {
-      $('.userIdVal_' + user).html(result);
+      $('.branchIdVal_' + branch).html(result);
       $('#bodySpinLoaders').css('display', 'none');
     }
     ).catch((error) => {
-      $('.userIdVal_' + user).html('');
+      $('.branchIdVal_' + branch).html('');
       $('#bodySpinLoaders').css('display', 'none');
     }
     );
   },
 
-  /**
-* get vansale user name
-*/
-
-  getOutletName: (outlet) => {
-    let promiseVal = new Promise((resolve, reject) => {
-      Meteor.call("outlet.idName", outlet, (error, result) => {
-        if (!error) {
-          resolve(result);
-        } else {
-          reject(error);
-        }
-      });
-    });
-    promiseVal.then((result) => {
-      $('.outletIdVal_' + outlet).html(result);
-      $('.loadersSpinVals').css('display', 'none');
-    }
-    ).catch((error) => {
-      $('.outletIdVal_' + outlet).html('');
-      $('.loadersSpinVals').css('display', 'none');
-    }
-    );
-  },
   /**
    * * TODO:Complete Js doc
  * For listing customer filters
@@ -487,61 +443,30 @@ Template.routeGroup.events({
     event.preventDefault();
     let routeCode = event.target.routeCodeVal.value;
     let routeName = event.target.routeNameVal.value;
-    let loginUserVerticals = Session.get("loginUserVerticals");
-    let subDistributorValue = Session.get("subDistributorValue");
-    if (subDistributorValue === true) {
-      if (routeCode && routeName === '') {
-        Template.instance().pagination.settings.set('filters',
-          {
-            routeCode: routeCode, subDistributor: Meteor.userId()
-          }
-        );
-        $('.taskHeaderList').css('display', 'none');
-      }
-      else if (routeName && routeCode === '') {
-        Template.instance().pagination.settings.set('filters', {
-          routeName: routeName, subDistributor: Meteor.userId()
-        });
-        $('.taskHeaderList').css('display', 'none');
-      }
-      else if (routeName && routeCode) {
-        Template.instance().pagination.settings.set('filters', {
+    if (routeCode && routeName === '') {
+      Template.instance().pagination.settings.set('filters',
+        {
           routeCode: routeCode,
-          routeName: routeName, subDistributor: Meteor.userId()
-        });
-        $('.taskHeaderList').css('display', 'none');
-      }
-      else {
-        Template.instance().pagination.settings.set('filters', {});
-        $('.taskHeaderList').css('display', 'inline');
-      }
+        }
+      );
+      $('.taskHeaderList').css('display', 'none');
+    }
+    else if (routeName && routeCode === '') {
+      Template.instance().pagination.settings.set('filters', {
+        routeName: routeName,
+      });
+      $('.taskHeaderList').css('display', 'none');
+    }
+    else if (routeName && routeCode) {
+      Template.instance().pagination.settings.set('filters', {
+        routeCode: routeCode,
+        routeName: routeName,
+      });
+      $('.taskHeaderList').css('display', 'none');
     }
     else {
-      if (routeCode && routeName === '') {
-        Template.instance().pagination.settings.set('filters',
-          {
-            routeCode: routeCode, vertical: { $in: loginUserVerticals }
-          }
-        );
-        $('.taskHeaderList').css('display', 'none');
-      }
-      else if (routeName && routeCode === '') {
-        Template.instance().pagination.settings.set('filters', {
-          routeName: routeName, vertical: { $in: loginUserVerticals }
-        });
-        $('.taskHeaderList').css('display', 'none');
-      }
-      else if (routeName && routeCode) {
-        Template.instance().pagination.settings.set('filters', {
-          routeCode: routeCode,
-          routeName: routeName, vertical: { $in: loginUserVerticals }
-        });
-        $('.taskHeaderList').css('display', 'none');
-      }
-      else {
-        Template.instance().pagination.settings.set('filters', {});
-        $('.taskHeaderList').css('display', 'inline');
-      }
+      Template.instance().pagination.settings.set('filters', {});
+      $('.taskHeaderList').css('display', 'inline');
     }
   },
 
@@ -550,18 +475,9 @@ Template.routeGroup.events({
    * for reset filter
    */
   'click .reset': (event, target) => {
-    let subDistributorValue = Session.get("subDistributorValue");
-    let loginUserVerticals = Session.get("loginUserVerticals");
-    if (subDistributorValue === true) {
-      Template.instance().pagination.settings.set('filters', {
-        active: "Y", subDistributor: Meteor.userId()
-      });
-    }
-    else {
-      Template.instance().pagination.settings.set('filters', {
-        active: "Y", vertical: { $in: loginUserVerticals }
-      });
-    }
+    Template.instance().pagination.settings.set('filters', {
+      active: "Y"
+    });
     $('#routeCodeVal').val('').trigger('change');
     $('#routeNameVal').val('').trigger('change');
     $('form :input').val("");
@@ -579,12 +495,28 @@ Template.routeGroup.events({
     $("#routeGroup-create").modal();
   },
 
-  'click .viewMap': (event, template) => {
+  'change .selectBranchEdits': (event, template) => {
     event.preventDefault();
-    let id = event.currentTarget.attributes.id.value;
-    console.log("id", id);
-    FlowRouter.go('routeWiseMap', { _id: id });
+    let branch = '';
+    template.modalLoader.set(false);
+    $('#selectBranchEdits').find(':selected').each(function () {
+      branch = $(this).val();
+    });
+    if (branch !== '' && branch !== 'Select Branch') {
+      template.modalLoader.set(true);
+      Meteor.call('customer.branchList', branch, (err, res) => {
+        if (!err) {
+          template.customerDataArray.set(res);
+          template.modalLoader.set(false);
+        }
+        else {
+          template.customerDataArray.set('');
+          template.modalLoader.set(false);
+        }
+      });
+    }
   },
+
   /**
  * TODO: Compelete JS doc
  * to view route assign modal
@@ -621,45 +553,35 @@ Template.routeGroup.events({
 
   'click .routeEdit': (event, template) => {
     itemCheck = false;
+    $("#routeEditPage").modal();
     customerArray = [];
     let ids = event.currentTarget.id;
-    let superAdminValue = Session.get("superAdminValue");
     Session.set("routeIds", ids);
     $("#routeNameEdit").val('');
     $("#routeDescripEdit").val('');
     let routeNameEdit = ("#routeNameEdit");
     let routeDescripEdit = ("#routeDescripEdit");
-    template.sdUserEdits.set('');
+    template.branchEdits.set('');
     template.modalLoader.set(false);
-    template.customerDataArray.set('');
     if (ids) {
-      $('.loadersSpinVals').css('display', 'block');
       template.modalLoader.set(true);
-      $("#routeEditPage").modal();
       let header = $('#orderHsEdit');
       $(header).html('Edit Route');
-      Meteor.call('routeGroup.idGetAdmin', ids, superAdminValue, (err, res) => {
+      Meteor.call('routeGroup.idGet', ids, (err, res) => {
         if (!err) {
           $(routeNameEdit).val(res.groupRes.routeName);
           $(routeDescripEdit).val(res.groupRes.description);
-          if (res.customerList.length !== undefined && res.customerList.length > 0) {
-            for (let n = 0; n < res.customerList.length; n++) {
-              customerArray.push(res.customerList[n]);
-            }
-          }
-          else {
-            $('.loadersSpinVals').css('display', 'none');
+          for (let n = 0; n < res.customerList.length; n++) {
+            customerArray.push(res.customerList[n]);
           }
           template.customerArray.set(customerArray);
-          template.customerDataArray.set(res.outletFullList);
           template.modalLoader.set(false);
-          if (res.groupRes.subDistributor !== undefined) {
-            template.sdUserEdits.set(res.groupRes.subDistributor);
+          if (res.groupRes.branchCode !== undefined) {
+            template.branchEdits.set(res.groupRes.branchCode);
           }
         }
         else {
           template.modalLoader.set(false);
-          template.customerDataArray.set();
         }
       });
     }
@@ -693,22 +615,16 @@ Template.routeGroup.events({
     let routeCode = $('#detailrouteCode');
     let description = $('#detailDescription');
     let routeName = $('#detailrouteName');
-    let detailSdUser = $('#detailSdUser');
-    $('.loadersSpinVals').css('display', 'block');
+    let detailBranch = $('#detailBranch');
     Meteor.call('routeGroup.idGet', id, (err, res) => {
       if (!err) {
         $(header).html('Details of Route');
         $(routeCode).html(res.groupRes.routeCode);
         $(description).html(res.groupRes.description);
         $(routeName).html(res.groupRes.routeName);
-        $(detailSdUser).html(res.sdUserName);
+        $(detailBranch).html(res.branchName);
         template.modalLoader.set(false);
-        if (res.customerList !== undefined && res.customerList.length > 0) {
-          template.itemsDetailsList.set(res.customerList);
-        }
-        else {
-          $('.loadersSpinVals').css('display', 'none');
-        }
+        template.itemsDetailsList.set(res.customerList);
       }
       else {
         template.modalLoader.set(false);
@@ -725,63 +641,86 @@ Template.routeGroup.events({
     itemCheckValidation = false;
     let customer = '';
     let priority = '';
+    let address = '';
     $('#selectCustomersEdit').find(':selected').each(function () {
       customer = $(this).val();
     });
-    if (customer === '' || customer === 'Select Outlet') {
+    if (customer === '' || customer === 'Select customer') {
       $(window).scrollTop(0);
       setTimeout(function () {
-        $("#customerArrayspanEdit").html('<style>#customerArrayspansEdit{color:#fc5f5f;}</style><span id="customerArrayspansEdit">Please select outlet</span>').fadeIn('fast');
+        $("#customerArrayspanEdit").html('<style>#customerArrayspansEdit{color:#fc5f5f;}</style><span id="customerArrayspansEdit">Please select customer</span>').fadeIn('fast');
       }, 0);
       setTimeout(function () {
         $('#customerArrayspanEdit').fadeOut('slow');
       }, 3000);
     }
     else {
-      $('#selectPriorityEdit').find(':selected').each(function () {
-        priority = $(this).val();
+      $('#selectCustomersAddressEdit').find(':selected').each(function () {
+        address = $(this).val();
       });
-      if (priority === '' || priority === 'Select Priority') {
+      if (address === '' || address === 'Select Customer Address') {
         $(window).scrollTop(0);
         setTimeout(function () {
-          $("#priorityArrayspanEdit").html('<style>#priorityArrayspansEdit{color:#fc5f5f;}</style><span id="priorityArrayspansEdit">Please select priority</span>').fadeIn('fast');
+          $("#customerAddressArrayspanEdit").html('<style>#customerAddressArrayspansEdit{color:#fc5f5f;}</style><span id="customerAddressArrayspansEdit">Please select customer address</span>').fadeIn('fast');
         }, 0);
         setTimeout(function () {
-          $('#priorityArrayspanEdit').fadeOut('slow');
+          $('#customerAddressArrayspanEdit').fadeOut('slow');
         }, 3000);
       }
       else {
-        $(".addCustomerEdit").prop('disabled', true);
-        Meteor.setTimeout(function () {
-          $(".addCustomerEdit").prop('disabled', false);
-        }, 3000);
-        if (customerArray.length > 0) {
-          for (let i = 0; i < customerArray.length; i++) {
-            if (customer === customerArray[i].customer) {
-              itemCheckValidation = true;
-              toastr['error']('Outlet Already exists!');
-              break;
-            }
-            else {
-              itemCheckValidation = false;
+        $('#selectPriorityEdit').find(':selected').each(function () {
+          priority = $(this).val();
+        });
+        if (priority === '' || priority === 'Select Priority') {
+          $(window).scrollTop(0);
+          setTimeout(function () {
+            $("#priorityArrayspanEdit").html('<style>#priorityArrayspansEdit{color:#fc5f5f;}</style><span id="priorityArrayspansEdit">Please select priority</span>').fadeIn('fast');
+          }, 0);
+          setTimeout(function () {
+            $('#priorityArrayspanEdit').fadeOut('slow');
+          }, 3000);
+        }
+        else {
+
+          $(".addCustomerEdit").prop('disabled', true);
+          Meteor.setTimeout(function () {
+            $(".addCustomerEdit").prop('disabled', false);
+          }, 3000);
+          if (customerArray.length > 0) {
+            for (let i = 0; i < customerArray.length; i++) {
+              if (customer === customerArray[i].customer) {
+                itemCheckValidation = true;
+                toastr['error'](customerAlreadyExist);
+                break;
+              }
+              else {
+                itemCheckValidation = false;
+              }
             }
           }
-        }
-        let randomId = Random.id();
-        let itemObject = {
-          randomId: randomId,
-          customer: customer,
-          priority: priority,
-        };
-        if (itemCheckValidation === false) {
-          customerArray.push(itemObject);
-          template.customerArray.set(customerArray);
-          itemCheck = true;
-          itemDataClear();
-        }
-        function itemDataClear() {
-          $("#selectCustomersEdit").val('').trigger('change');
-          $('#selectPriorityEdit').val('').trigger('change');
+          //Meteor call to take particular unit detail 
+          Meteor.call('customer.custNameGet', customer, (custErr, custRes) => {
+            if (!custErr && custRes !== undefined) {
+              let randomId = Random.id();
+              let itemObject = {
+                randomId: randomId,
+                customer: customer,
+                priority: priority,
+                address: address,
+              };
+              if (itemCheckValidation === false) {
+                customerArray.push(itemObject);
+                template.customerArray.set(customerArray);
+                itemCheck = true;
+                itemDataClear();
+              }
+            }
+          });
+          function itemDataClear() {
+            $("#selectCustomersEdit").val('').trigger('change');
+            $('#selectPriorityEdit').val('').trigger('change');
+            $("#selectCustomersAddressEdit").val('').trigger('change');
+          }
         }
       }
     }
@@ -793,35 +732,35 @@ Template.routeGroup.events({
  */
   'submit .routeEditPage': (event, template) => {
     event.preventDefault();
-    // if (customerArray.length === 0) {
-    //   toastr["error"](customerValidationMessage);
-    // }
-    // else {
-    let routeId = Session.get("routeIds");
-    $("#submit").attr("disabled", true);
-    let loginUserVerticals = Session.get("loginUserVerticals");
-    if (itemCheck === true) {
-      // console.log("weight1", weight);
-      editOrUpdateRouteGroup(event.target, routeId, customerArray, loginUserVerticals);
-      dataClear();
-      $('#routeEditPage').modal('hide');
+    if (customerArray.length === 0) {
+      toastr["error"](customerValidationMessage);
     }
     else {
-      Meteor.call('routeGroup.idGet', routeId, (err, res) => {
-        editOrUpdateRouteGroup(event.target, routeId, res.customerList, loginUserVerticals);
+      let routeId = Session.get("routeIds");
+      $("#submit").attr("disabled", true);
+      if (itemCheck === true) {
+        // console.log("weight1", weight);
+        editOrUpdateRouteGroup(event.target, routeId, customerArray);
         dataClear();
         $('#routeEditPage').modal('hide');
-      });
-      // }
+      }
+      else {
+        Meteor.call('routeGroup.idGet', routeId, (err, res) => {
+          editOrUpdateRouteGroup(event.target, routeId, res.customerList);
+          dataClear();
+          $('#routeEditPage').modal('hide');
+        });
+      }
     }
     function dataClear() {
       $("#selectCustomersEdit").val('').trigger('change');
       $('#selectPriorityEdit').val('').trigger('change');
-      $('#selectsdUserEdits').val('').trigger('change');
+      $('#selectBranchEdits').val('').trigger('change');
       $('#routeNameEdit').val('');
       $('#descriptionValEdit').val('');
       $("#submit").attr("disabled", false);
       $('#routeDescripEdit').val('');
+      $("#selectCustomersAddressEdit").val('').trigger('change');
       customerArray = [];
       template.customerArray.set('');
       $('form :input').val("");
@@ -834,23 +773,8 @@ Template.routeGroup.events({
    * TODO: Complete JS doc
    * for show filter display
    */
-  'click #filterSearch': (event, template) => {
+  'click #filterSearch': () => {
     document.getElementById('filterDisplay').style.display = "block";
-    let subDistributorValue = Session.get("subDistributorValue");
-    if (subDistributorValue === true) {
-      Meteor.call('routeGroup.sdWiselist', Meteor.userId(), (err, res) => {
-        if (!err) {
-          template.routeCodeList.set(res);
-        }
-      });
-    }
-    else {
-      Meteor.call('routeGroup.list', (err, res) => {
-        if (!err) {
-          template.routeCodeList.set(res);
-        }
-      });
-    }
   },
   /**
    * TODO: Complete JS doc
@@ -885,7 +809,7 @@ Template.routeGroup.events({
     Session.set("routeIds", '');
     $("#selectCustomersEdit").val('').trigger('change');
     $('#selectPriorityEdit').val('').trigger('change');
-    $('#selectsdUserEdits').val('').trigger('change');
+    $('#selectBranchEdits').val('').trigger('change');
     $('#routeNameEdit').val('');
     $('#routeDescripEdit').val('');
     $('#routeDateEdit').val('');
@@ -983,22 +907,9 @@ Template.routeGroup.events({
   'click .activeFilter': (event, template) => {
     event.preventDefault();
     $('#bodySpinLoaders').css('display', 'block');
-    Meteor.setTimeout(function () {
-      $('#bodySpinLoaders').css('display', 'none');
-    }, 3000);
-    let loginUserVerticals = Session.get("loginUserVerticals");
-    let subDistributorValue = Session.get("subDistributorValue");
-    if (subDistributorValue === true) {
-      Template.instance().pagination.settings.set('filters', {
-        active: "Y", subDistributor: Meteor.userId()
-      });
-    }
-    else {
-      Template.instance().pagination.settings.set('filters', {
-        active: "Y",
-        // vertical: { $in: loginUserVerticals }
-      });
-    }
+    Template.instance().pagination.settings.set('filters', {
+      active: "Y"
+    });
   },
   /**
   * TODO: Complete JS doc
@@ -1007,24 +918,221 @@ Template.routeGroup.events({
   'click .inactiveFilter': (event, template) => {
     event.preventDefault();
     $('#bodySpinLoaders').css('display', 'block');
-    Meteor.setTimeout(function () {
-      $('#bodySpinLoaders').css('display', 'none');
-    }, 3000);
-    let loginUserVerticals = Session.get("loginUserVerticals");
-    let subDistributorValue = Session.get("subDistributorValue");
-    if (subDistributorValue === true) {
-      Template.instance().pagination.settings.set('filters', {
-        active: "N", subDistributor: Meteor.userId()
-      });
-    }
-    else {
-      Template.instance().pagination.settings.set('filters', {
-        active: "N",
-        // vertical: { $in: loginUserVerticals }
-      });
-    }
+    Template.instance().pagination.settings.set('filters', {
+      active: "N"
+    });
+  },
+  /**
+   * upload customer
+   */
+
+  'click .uploadExcel': (event, template) => {
+    event.preventDefault();
+    $('#customerUploadModal').modal();
+    event.preventDefault();
+    $("#uploadCustomer").each(function () {
+      this.reset();
+    });
+    template.fileName.set('');
+    fileName = '';
+    let _id = event.currentTarget.attributes.id.value;
+    $('#routeIdGets').val(_id);
+    let routeName = $('#routeName_' + _id).val();
+    let header = $('#customerUploadHeader');
+    $(header).html(`Confirm Upload (${routeName})`);
   },
 
+  'submit #uploadCustomer': (event, template) => {
+    event.preventDefault();
+    //Reference the FileUpload element.
+    let fileUpload = document.getElementById("uploadCustomerFile");
+    let id = $('#routeIdGets').val();
+    let customerMasterArray = [];
+    let myFile = $('.uploadCustomerFile').prop('files')[0];
+    let fileType = myFile["type"];
+    let customerAddressMaster = Template.instance().addressmaster.get();
+    console.log("fileType", fileType);
+    Meteor.call('customer.routeBranchList', id, (err, res) => {
+      if (!err && res.length > 0) {
+        for (let k = 0; k < res.length; k++) {
+          customerMasterArray.push(res[k]);
+        }
+        customerGet(customerMasterArray);
+      }
+    });
+    function customerGet(customerMasterArray) {
+      if (myFile.type === 'application/vnd.ms-excel' || myFile.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+
+        //Validate whether File is valid Excel file.
+        // let regex = /^([a-zA-Z0-9\s_\\.\-:])+(.xls|.xlsx)$/;
+        // if (regex.test(fileUpload.value.toLowerCase())) {
+        if (fileUpload !== null && fileUpload !== '' && fileUpload !== undefined) {
+          if (typeof (FileReader) != "undefined") {
+            let reader = new FileReader();
+            //For Browsers other than IE.
+            if (reader.readAsBinaryString) {
+              reader.onload = function (e) {
+                processExcel(e.target.result);
+              };
+              reader.readAsBinaryString(fileUpload.files[0]);
+            } else {
+              //For IE Browser.
+              reader.onload = function (e) {
+                let data = "";
+                let bytes = new Uint8Array(e.target.result);
+                for (let i = 0; i < bytes.byteLength; i++) {
+                  data += String.fromCharCode(bytes[i]);
+                }
+                processExcel(data);
+              };
+              reader.readAsArrayBuffer(fileUpload.files[0]);
+            }
+          }
+          else {
+            $(window).scrollTop(0);
+            setTimeout(function () {
+              $("#fileArrayspan").html('<style>#fileArrayspan {color :#fc5f5f }</style><span id="fileArrayspan">This browser does not support HTML5.</span>').fadeIn('fast');
+            }, 0);
+            setTimeout(function () {
+              $('#fileArrayspan').fadeOut('slow');
+            }, 3000);
+          }
+        }
+        else {
+          $(window).scrollTop(0);
+          setTimeout(function () {
+            $("#fileArrayspan").html('<style>#fileArrayspan {color :#fc5f5f }</style><span id="fileArrayspan">A file needed</span>').fadeIn('fast');
+          }, 0);
+          setTimeout(function () {
+            $('#fileArrayspan').fadeOut('slow');
+          }, 3000);
+        }
+      }
+      else {
+        $('#routeErrorModal').find('.modal-body').text('Invalid File Format!');
+        $('#routeErrorModal').modal();
+        $('#customerUploadModal').modal('hide');
+        $("#uploadCustomer")[0].reset();
+        template.fileName.set('');
+        fileName = '';
+      }
+
+      function processExcel(data) {
+        //Read the Excel File data.
+        let customersArrayData = [];
+        let workbook = XLSX.read(data, {
+          type: 'binary'
+        });
+        //Fetch the name of First Sheet.
+        let firstSheet = workbook.SheetNames[0];
+        //Read all rows from First Sheet into an JSON array.
+        let excelRows = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[firstSheet]);
+        if (excelRows !== undefined && excelRows.length > 0) {
+          //Add the data rows from Excel file.
+          for (let i = 0; i < excelRows.length; i++) {
+            let customer = excelRows[i].CustomerName;
+            let address = excelRows[i].Address;
+            let priority = excelRows[i].Priority;
+            if (customer !== undefined && customer !== '' &&
+              priority !== undefined && priority !== '' &&
+              address !== undefined && address !== '') {
+              let customerCodeGet = ''
+              let custRes = customerMasterArray.find(x => x.cardName === customer);
+              if (custRes) {
+                customerCodeGet = custRes.cardCode;
+              }
+              let addressVal = ''
+              let custResAddress = customerAddressMaster.find(x => x.address === address);
+              if (custResAddress) {
+                addressVal = custResAddress._id;
+              }
+              if (customerCodeGet !== undefined && customerCodeGet !== '' && addressVal !== undefined && addressVal !== '') {
+                customersArrayData.push({
+                  customer: customerCodeGet, priority: priority.toString(), address: addressVal,
+                });
+              }
+            }
+          }
+        }
+        else {
+          $('#routeErrorModal').find('.modal-body').text('Invalid File Format!');
+          $('#routeErrorModal').modal();
+          $('#customerUploadModal').modal('hide');
+          $("#uploadCustomer")[0].reset();
+          template.fileName.set('');
+          fileName = '';
+        }
+        if (customersArrayData.length !== 0 && customersArrayData !== undefined) {
+          $('#customerUploadModal').modal('hide');
+          return Meteor.call('routeGroup.customerUpload', id, customersArrayData, (error, result) => {
+            if (error) {
+              $('#routeErrorModal').find('.modal-body').text(error.reason);
+              $('#routeErrorModal').modal();
+              $('#customerUploadModal').modal('hide');
+              $("#uploadCustomer")[0].reset();
+              template.fileName.set('');
+              fileName = '';
+            }
+            else {
+              $('#customerUploadModal').modal('hide');
+              $("#uploadCustomer")[0].reset();
+              $('#routeSuccessModal').find('.modal-body').text(` Customer has been updated successfully (${customersArrayData.length} Nos)`);
+              $('#routeSuccessModal').modal();
+              template.fileName.set('');
+              fileName = '';
+            }
+          });
+        }
+        else {
+          $('#routeErrorModal').find('.modal-body').text('Invalid File Format!');
+          $('#routeErrorModal').modal();
+          $('#customerUploadModal').modal('hide');
+          $("#uploadCustomer")[0].reset();
+          template.fileName.set('');
+          fileName = '';
+        }
+      };
+    }
+  },
+  /**
+  * TODO: Complete JS doc
+  */
+  'click #customerFileClose': (event, template) => {
+    $("#uploadCustomer").each(function () {
+      this.reset();
+    });
+    template.fileName.set('');
+    fileName = '';
+  },
+
+  /**
+   * TODO: Complete JS doc
+   */
+  'click #downloadbranch': (event, template) => {
+    event.preventDefault();
+    let data = [{
+      cardCode: '', priority: '', address: '',
+    }];
+    dataCSV = data.map(element => ({
+      'CustomerName': '',
+      'Address': '',
+      'Priority': '',
+    }))
+    let excel = Papa.unparse(dataCSV);
+    let blob = new Blob([excel], { type: "text/xls;charset=utf-8" });
+    saveAs(blob, "CustomerFormat.xls");
+  },
+  'change .uploadCustomerFile': function (event, template) {
+    let func = this;
+    let file = event.currentTarget.files[0];
+    let reader = new FileReader();
+    reader.onload = function () {
+      fileName = file.name,
+        fileContent = reader.result,
+        template.fileName.set(file.name);
+    };
+    reader.readAsDataURL(file);
+  },
   'change #selectCustomersEdit': (event, templete) => {
     event.preventDefault();
     let customer = '';
@@ -1046,40 +1154,5 @@ Template.routeGroup.events({
       })
     }
   },
-  /**
-  * 
-  * @param {*} event 
-  * @param {*} template 
-  */
-  'change #selectSdIdsEdit': (event, template) => {
-    event.preventDefault();
-    let sdId = '';
-    $('#selectSdIdsEdit').find(':selected').each(function () {
-      sdId = ($(this).val());
-    });
-    $('#verticalSpanEdit').html('');
-    $('#branchSpanEdit').html('');
-    $('#locationSpanEdit').html('');
-    template.modalLoader.set(false);
-    if (sdId !== '' && sdId !== undefined) {
-      template.modalLoader.set(true);
-      Meteor.call('user.sdDataGets', sdId, (err, res) => {
-        if (!err) {
-          $('#verticalSpanEdit').html(`Verticals : <b> ${res.verticalName}</b>`);
-          $('#branchSpanEdit').html(`Branch : <b> ${res.branchName}</b>`);
-          $('#locationSpanEdit').html(`Location : <b>${res.locationName}</b>`);
-          $('#verticalSpanEdit').css("padding", "4px 14px");
-          $('#branchSpanEdit').css("padding", "4px 14px");
-          $('#locationSpanEdit').css("padding", "4px 14px");
-          template.modalLoader.set(false);
-        }
-        else {
-          $('#verticalSpanEdit').html('');
-          $('#branchSpanEdit').html('');
-          $('#locationSpanEdit').html('');
-          template.modalLoader.set(false);
-        }
-      });
-    }
-  },
+
 });

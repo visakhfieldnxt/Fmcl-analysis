@@ -40,7 +40,7 @@
           <span class="info-box-icon bg-green"><i class="fa fa-newspaper-o"></i></span>
 
           <div class="info-box-content Orders">
-            <span class="info-box-text"> Current Month Orders</span>
+            <span class="info-box-text"> Todays Order</span>
             <span class="info-box-number" style="font-size: 28px;"> {{#with todaysOrder}}{{todaysOrder}}{{/with}}
               Orders</span>
           </div>
@@ -51,20 +51,20 @@
           <span class="info-box-icon bg-blue"><i class="fa fa-book"></i></span>
 
           <div class="info-box-content Orders">
-            <span class="info-box-text"> Current Month Cash Sales</span>
+            <span class="info-box-text"> Todays Quotation</span>
             <span class="info-box-number" style="font-size: 28px;">
-              {{#with todaysQuotations}}{{todaysQuotations}}{{/with}} Sales</span>
+              {{#with todaysQuotations}}{{todaysQuotations}}{{/with}} Quotations</span>
           </div>
         </div>
       </div>
       <!-- 
   <div class="box box-solid ">            
     <div class="info-box">
-      <span class="info-box-icon bg-green">ZMW</span>
+      <span class="info-box-icon bg-green">{{currencyGet}}</span>
 
       <div class="info-box-content outstanding">
         <span class="info-box-text">Total Outstanding</span>
-        <span class="info-box-number" style="font-size: 34px;"> ZMW {{#with totalOutstanding}}{{totalOutstanding}}{{/with}}</span>
+        <span class="info-box-number" style="font-size: 34px;"> {{currencyGet}} {{#with totalOutstanding}}{{totalOutstanding}}{{/with}}</span>
       </div>
   </div>
 </div> -->
@@ -73,100 +73,38 @@
           <span class="info-box-icon bg-green"><i class="fa fa-legal"></i></span>
 
           <div class="info-box-content Orders">
-            <span class="info-box-text">Current Month Credit Sales </span>
-            <span class="info-box-text"></span>
-            <span class="info-box-number" style="font-size: 28px;"> {{#with creditSales}}{{creditSales}}{{/with}} Sales
-              </span>
+            <span class="info-box-text">Order approved </span>
+            <span class="info-box-text">today</span>
+            <span class="info-box-number" style="font-size: 28px;"> {{#with approvedOrders}}{{approvedOrders}}{{/with}}
+              Orders</span>
           </div>
         </div>
       </div>
       <div class="box box-solid ">
         <div class="info-box">
-          <span class="info-box-icon bg-blue"><i class="fa fa-money"></i></span>
+          <span class="info-box-icon bg-blue"><i class="fa fa-legal"></i></span>
 
           <div class="info-box-content Orders">
-            <span class="info-box-text">Current Month Outstanding </span>
-            <span class="info-box-text"></span>
+            <span class="info-box-text">Quotation approved </span>
+            <span class="info-box-text">today</span>
             <span class="info-box-number" style="font-size: 28px;">
-              {{#with martketOutstanding}}{{martketOutstanding}}{{/with}} GHS</span>
+              {{#with approvedQuotations}}{{approvedQuotations}}{{/with}} Quotations</span>
           </div>
         </div>
       </div>
 
       <div class="box box-solid ">
         <div class="info-box">
-          <span class="info-box-icon bg-green"><i class="fa fa-check"></i></span>
+          <span class="info-box-icon bg-red"><i class="fa fa-suitcase"></i></span>
 
-          <div class="info-box-content orderRejectC">
-            <span class="info-box-text">Order Approved </span>
-            <span class="info-box-text"></span>
-            <span class="info-box-number" style="font-size: 28px;">
-              {{#with orderApproved}}{{orderApproved}}{{/with}}
-              Orders</span>
+          <div class="info-box-content dueOutstanding">
+            <span class="info-box-text">Collection Due Today</span>
+            <span class="info-box-number" style="font-size: 28px;"> {{currencyGet}}
+              {{#with collectionTodays}}{{collectionTodays}}{{/with}}</span>
           </div>
-        </div>
-      </div>
-      <div class="box box-solid ">
-        <div class="info-box">
-          <span class="info-box-icon bg-blue"><i class="fa fa-exclamation-circle"></i></span>
+          <!-- /.info-box-content -->
 
-          <div class="info-box-content orderRejectC">
-            <span class="info-box-text">Orders onHold  Current Month</span>
-            <span class="info-box-text"></span>
-            <span class="info-box-number" style="font-size: 28px;"> {{#with onHoldQuotation}}{{onHoldQuotation}}{{/with}}
-              Orders</span>
-          </div>
-        </div>
-      </div>
-    </section>
-    <section class="col-lg-6 connectedSortable">
-      <div class="box box-solid ">
-        <div class="box-header">
-          <i class="fa fa-dashboard"></i>
-          <h3 class="box-title">Outlet On Current Month</h3>
-          <div class="box-tools ">
-            <a href="/outletApproved/list"><button type="button" title="More" class="btn btn-primary btn-flat"><i
-              class="fa fa-plus"> </i></button></a>
-          </div>
-        </div>
-        <div class="box-body"> 
-          <div class="row" >
-              <div class="chart-responsive" id="outletDataDisplay">
-                <div class="chart" id="doughnut-chart" width="800" height="200" >
-                  {{#with verticalData}}{{verticalData}}{{/with}}
-                </div>
-              </div>
-              <div class="overlay" id="refreshvert" >
-                <i class="fa fa-refresh fa-spin"></i>
-              </div>
-            </div>
-              
-          </div>
-          
-      </div>
-      <div class="box box-solid ">
-        <div class="info-box">
-          <span class="info-box-icon bg-green"><i class="fa fa-close"></i></span>
-
-          <div class="info-box-content orderRejectC">
-            <span class="info-box-text">Order Rejected Current Month </span>
-            <span class="info-box-text"></span>
-            <span class="info-box-number" style="font-size: 28px;"> {{#with rejectedOrder}}{{rejectedOrder}}{{/with}}
-              Orders</span>
-          </div>
-        </div>
-      </div>
-      <div class="box box-solid ">
-        <div class="info-box">
-          <span class="info-box-icon bg-blue"><i class="fa fa-check"></i></span>
-
-          <div class="info-box-content orderRejectC">
-            <span class="info-box-text">Credit Sales Approved Current Month </span>
-            <span class="info-box-text"></span>
-            <span class="info-box-number" style="font-size: 28px;">
-              {{#with rejectedQuotation}}{{rejectedQuotation}}{{/with}}
-              Sales</span>
-          </div>
+          <!-- /.info-box -->
         </div>
       </div>
     </section>
@@ -186,11 +124,71 @@
           </div>
       </div> -->
 
-      
+      <div class="box box-solid ">
+        <div class="info-box">
+          <span class="info-box-icon bg-green"><i class="fa fa-exclamation-circle"></i></span>
 
-    
+          <div class="info-box-content orderRejectC">
+            <span class="info-box-text">Order onHold </span>
+            <span class="info-box-text">today</span>
+            <span class="info-box-number" style="font-size: 28px;">
+              {{#with onHoldOrder}}{{onHoldOrder}}{{/with}}
+              Orders</span>
+          </div>
+        </div>
+      </div>
+      <div class="box box-solid ">
+        <div class="info-box">
+          <span class="info-box-icon bg-blue"><i class="fa fa-exclamation-circle"></i></span>
+
+          <div class="info-box-content orderRejectC">
+            <span class="info-box-text">Quotation onHold </span>
+            <span class="info-box-text">today</span>
+            <span class="info-box-number" style="font-size: 28px;"> {{#with onHoldQuotation}}{{onHoldQuotation}}{{/with}}
+              Quotations</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="box box-solid ">
+        <div class="info-box">
+          <span class="info-box-icon bg-green"><i class="fa fa-close"></i></span>
+
+          <div class="info-box-content orderRejectC">
+            <span class="info-box-text">Order rejected </span>
+            <span class="info-box-text">today</span>
+            <span class="info-box-number" style="font-size: 28px;"> {{#with rejectedOrder}}{{rejectedOrder}}{{/with}}
+              Orders</span>
+          </div>
+        </div>
+      </div>
+      <div class="box box-solid ">
+        <div class="info-box">
+          <span class="info-box-icon bg-blue"><i class="fa fa-close"></i></span>
+
+          <div class="info-box-content orderRejectC">
+            <span class="info-box-text">Quotation rejected </span>
+            <span class="info-box-text">today</span>
+            <span class="info-box-number" style="font-size: 28px;">
+              {{#with rejectedQuotation}}{{rejectedQuotation}}{{/with}}
+              Quotations</span>
+          </div>
+        </div>
+      </div>
+      <!-- <div class="box box-solid ">
+        <div class="info-box">
+          <span class="info-box-icon bg-yellow"><i class="fa fa-truck"></i></span>
+
+          <div class="info-box-content orderNotDelivered">
+            <span class="info-box-text">Orders not delivered</span>
+            <span class="info-box-text">yesterday & today</span>
+            <span class="info-box-number" style="font-size: 28px;">{{#with notDelivered}}{{notDelivered}}
+              Orders{{/with}}</span>
+          </div>
+        </div>
+      </div> -->
     </section>
-    
+
   </div>
   <!-- /.row (main row) -->
 

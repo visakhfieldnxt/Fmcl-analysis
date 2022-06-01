@@ -1,335 +1,39 @@
 /**
- * @author Nithin
+ * @author Visakh
  */
+
 import { Meteor } from 'meteor/meteor';
 import { StockTransfer } from "../../../api/stockTransfer/stockTransfer";
-import XLSX from 'xlsx';
 
 Template.stockTransferReport.onCreated(function () {
-
   const self = this;
   self.autorun(() => {
-
   });
-  this.stockNameArray = new ReactiveVar();
-  this.modalLoader = new ReactiveVar();
-  this.fileName = new ReactiveVar();
-  this.productListGet = new ReactiveVar();
+  this.itemNameArray = new ReactiveVar();
+  this.customerNameArray = new ReactiveVar();
   this.itemsDetailsList = new ReactiveVar();
-  this.verticalList = new ReactiveVar();
-  this.stockIdList = new ReactiveVar();
-  this.employeeList = new ReactiveVar();
-  this.stockTransferExports = new ReactiveVar();
-  let date = new Date();
-  let fromiDate = new Date(moment(new Date(date.getFullYear(), date.getMonth(), 1)).format('YYYY-MM-DD 00:00:00.0'));
-  let toiDate = new Date(moment(new Date()).format('YYYY-MM-DD 00:00:00.0'));
-  toiDate.setDate(toiDate.getDate() + 1);
+  this.returnId = new ReactiveVar();
+  this.todayExport = new ReactiveVar();
+  this.modalLoader = new ReactiveVar();
+  let managerBranch = Session.get("managerBranch");
+  let today = moment(new Date()).format("YYYY-MM-DD 00:00:00.0");
+  toDay = new Date(today);
+  nextDay = new Date(toDay);
+  nextDay.setDate(nextDay.getDate() + 1);
   this.pagination = new Meteor.Pagination(StockTransfer, {
-    filters: {
-      subDistributor: Meteor.userId(),
-      createdAt: { $gte: fromiDate, $lt: toiDate }
-    },
     sort: { createdAt: -1 },
-    fields: {
-      temporaryId: 1,
-      transferDate: 1,
-      sdUser: 1,
-      status: 1,
-      createdAt: 1
+    filters: {
+      branch: { $in: managerBranch },
+      createdAt: {
+        $gte: toDay,
+        $lt: nextDay
+      }
     },
-    perPage: 20
+    perPage: 25
   });
+
 });
-
-Template.stockTransferReport.onRendered(function () {
-  $('#bodySpinLoaders').css('display', 'block');
-  /**
- * TODO: Complete JS doc
- */
-  $('.selectVerticalId').select2({
-    placeholder: "Select Vertical",
-    tokenSeparators: [','],
-    allowClear: true,
-    dropdownParent: $(".selectVerticalId").parent(),
-  });
-  /**
- * TODO: Complete JS doc
- */
-  $('.employeeId').select2({
-    placeholder: "Select Employee",
-    tokenSeparators: [','],
-    allowClear: true,
-    dropdownParent: $(".employeeId").parent(),
-  });
-
-  /**
-* TODO: Complete JS doc
-*/
-  $('.employeeIdExport').select2({
-    placeholder: "Select Employee",
-    tokenSeparators: [','],
-    allowClear: true,
-    dropdownParent: $(".employeeIdExport").parent(),
-  });
-
-
-  /**
-   * TODO: Complete JS doc
-   */
-  $('.stocktransferIdval').select2({
-    placeholder: "Select Stock Transfer Id",
-    tokenSeparators: [','],
-    allowClear: true,
-    dropdownParent: $(".stocktransferIdval").parent(),
-  });
-  /**
- * active and inactive list based on nav bar
- */
-  $('.taskHeaderList').css('display', 'inline');
-  var header = document.getElementById("taskHeader");
-  if (header) {
-    var btns = header.getElementsByClassName("paginationFilterValue");
-    for (var i = 0; i < btns.length; i++) {
-      btns[i].addEventListener("click", function () {
-        var current = document.getElementsByClassName("activeHeaders");
-        current[0].className = current[0].className.replace(" activeHeaders", "");
-        this.className += " activeHeaders";
-      });
-    }
-  }
-  /**
-    * TODO: Complete JS doc
-    * for filter
-    */
-  /**
-   * get product list
-   */
-  Meteor.call('product.activeList', (err, res) => {
-    if (!err) {
-      this.productListGet.set(res);
-    }
-  });
-  if (Meteor.user()) {
-    Meteor.call('vertical.userList', Meteor.userId(), (err, res) => {
-      if (!err) {
-        this.verticalList.set(res);
-      }
-    });
-    Meteor.call('stockTransfer.idList', Meteor.userId(), (err, res) => {
-      if (!err) {
-        this.stockIdList.set(res);
-      }
-    });
-
-  }
-
-  Meteor.call('user.sdUserListSd', Meteor.userId(), (err, res) => {
-    if (!err) {
-      this.employeeList.set(res);
-    }
-  });
-});
-
 Template.stockTransferReport.helpers({
-  /**
-               * TODO: Complete JS doc
-               * @returns {any | *}
-               */
-  labelName: function () {
-    let name = Template.instance().fileName.get();
-    if (name !== undefined) {
-      return name;
-    }
-    else {
-      return false;
-    }
-  },
-  /**
-* get vertical list */
-  getVertical: () => {
-    return Template.instance().verticalList.get();
-  },/**
-   * 
-   * @returns product list
-   */
-  getProductList: () => {
-    return Template.instance().productListGet.get();
-  },
-  /**
-   * get stock transfer id
-   */
-  stocktransferIdList: () => {
-    return Template.instance().stockIdList.get();
-  },
-  employeeListSd: () => {
-    return Template.instance().employeeList.get();
-  },
-  /**
-   * TODO: Complete JS doc
-   * @returns {{collection, acceptEmpty, substitute, eventType}}
-   */
-  optionsHelper: () => {
-    return globalOptionsHelper('stocks');
-  },
-  productListGets: () => {
-    return Template.instance().itemsDetailsList.get();
-  },
-
-  stockDataExport: () => {
-    return Template.instance().stockTransferExports.get();
-  },
-  /**
-  * TODO:Complete JS doc
-  * 
-  */
-  printLoad: () => {
-    let res = Template.instance().modalLoader.get();
-    if (res === true) {
-      return true;
-    }
-    else {
-      return false;
-    }
-  },
-  /**
-* get product name
-* @param {} product 
-*/
-  getProductNames: (product) => {
-    let promiseVal = new Promise((resolve, reject) => {
-      Meteor.call("product.idName", product, (error, result) => {
-        if (!error) {
-          resolve(result);
-        } else {
-          reject(error);
-        }
-      });
-    });
-    promiseVal.then((result) => {
-      $('.productIdVals_' + product).html(result);
-      $('#bodySpinLoaders').css('display', 'none');
-    }
-    ).catch((error) => {
-      $('.productIdVals_' + product).html('');
-      $('#bodySpinLoaders').css('display', 'none');
-    }
-    );
-  },
-  /**
-* get product name
-* @param {} id 
-*/
-  getProductCount: (id) => {
-    let promiseVal = new Promise((resolve, reject) => {
-      Meteor.call("stockTransferIssued.idCount", id, (error, result) => {
-        if (!error) {
-          resolve(result);
-        } else {
-          reject(error);
-        }
-      });
-    });
-    promiseVal.then((result) => {
-      $('.prouctCounts_' + id).html(result);
-      $('#bodySpinLoaders').css('display', 'none');
-    }
-    ).catch((error) => {
-      $('.prouctCounts_' + id).html('');
-      $('#bodySpinLoaders').css('display', 'none');
-    }
-    );
-  },
-  /**
-* get vansale user name
-*/
-
-  getUserName: (user) => {
-    let promiseVal = new Promise((resolve, reject) => {
-      Meteor.call("user.idName", user, (error, result) => {
-        if (!error) {
-          resolve(result);
-        } else {
-          reject(error);
-        }
-      });
-    });
-    promiseVal.then((result) => {
-      $('.userIdVal_' + user).html(result);
-    }
-    ).catch((error) => {
-      $('.userIdVal_' + user).html('');
-    }
-    );
-  },
-  /**
-* get unit name
-* @param {} unit 
-*/
-  getUnitNames: (unit) => {
-    let promiseVal = new Promise((resolve, reject) => {
-      Meteor.call("unit.idName", unit, (error, result) => {
-        if (!error) {
-          resolve(result);
-        } else {
-          reject(error);
-        }
-      });
-    });
-    promiseVal.then((result) => {
-      $('.unitNameVals_' + unit).html(result);
-      $('#bodySpinLoaders').css('display', 'none');
-    }
-    ).catch((error) => {
-      $('.unitNameVals_' + unit).html('');
-      $('#bodySpinLoaders').css('display', 'none');
-    }
-    );
-  },
-  /**
-  * get branch name
-  * @param {} vertical 
-  */
-  getVerticalName: (vertical) => {
-    let promiseVal = new Promise((resolve, reject) => {
-      Meteor.call("verticals.idName", vertical, (error, result) => {
-        if (!error) {
-          resolve(result);
-        } else {
-          reject(error);
-        }
-      });
-    });
-    promiseVal.then((result) => {
-      $('.verticalIdVal_' + vertical).html(result);
-    }
-    ).catch((error) => {
-      $('.verticalIdVal_' + vertical).html('');
-    }
-    );
-  },
-  /**
-   * get status values
-   * @param {*} status 
-   */
-  getActiveStatus: (status) => {
-    if (status === 'Y') {
-      return 'Active';
-    }
-    else {
-      return 'Inactive';
-    }
-  },
-  /**
-   * TODO: Complete JS doc
-   * @returns {{collection: *, acceptEmpty: boolean, substitute: string, eventType: string}}
-   */
-  optionsHelperWithTextArea: () => {
-    let config = globalOptionsHelper('stocks');
-    config.textarea = true;
-
-    return config;
-  },
-
   /**
    * TODO: Complete JS doc
    * @returns {any | *}
@@ -338,14 +42,11 @@ Template.stockTransferReport.helpers({
     return Template.instance().pagination.ready();
   },
   /**
-     * TODO: Complete JS doc
-     * @returns {Function}
-     */
-  handlePagination: function () {
-    return function (e, templateInstance, clickedPage) {
-      e.preventDefault();
-      console.log('Changing page from ', templateInstance.data.pagination.currentPage(), ' to ', clickedPage);
-    };
+  * TODO:Complete JS doc
+  * @param docDate
+  */
+  timeSeperate: (docDate) => {
+    return moment(docDate).format('hh:mm:ss A');
   },
   /**
    * TODO: Complete JS doc
@@ -355,515 +56,202 @@ Template.stockTransferReport.helpers({
     return Template.instance().pagination;
   },
   /**
+* 
+* @param {*} index 
+* @returns get row index
+*/
+  indexCountGet: (index) => {
+    let res = Template.instance().pagination;
+    if (res) {
+      let pageValue = res.settings.keys.page;
+      if (pageValue !== undefined && pageValue > 1) {
+        return (25 * (pageValue - 1)) + index + 1;
+      }
+      else {
+        return index + 1;
+      }
+    }
+  },
+  /**
+* TODO:Complete Js doc
+* for getting total weight
+*/
+  weightCal: (quantity, weight, unitQuantity) => {
+    let result = (parseInt(quantity) * Number(weight) * parseInt(unitQuantity)).toFixed(2);
+    return result.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+  },
+  /**
    * TODO: Complete JS doc
    * @returns {*}
    */
-  stockList: function () {
-    let result = Template.instance().pagination.getPage();
-    if (result.length === 0) {
-      $('#bodySpinLoaders').css('display', 'none');
+  stockTransfer: function () {
+    let exportValue = Template.instance().pagination.getPage();
+    let uniqueSlNo = 0;
+    for (let i = 0; i < exportValue.length; i++) {
+      uniqueSlNo = parseInt(uniqueSlNo + 1);
+      for (let j = 0; j < exportValue[i].itemLines.length; j++) {
+        exportValue[i].itemLines[j].stockId = exportValue[i].stockId,
+          exportValue[i].itemLines[j].docDate = exportValue[i].docDate,
+          exportValue[i].itemLines[j].createdAt = exportValue[i].createdAt,
+          exportValue[i].itemLines[j].branchName = exportValue[i].branchName,
+          exportValue[i].itemLines[j].salesmanName = exportValue[i].salesmanName,
+          exportValue[i].itemLines[j].wareHouseFromName = exportValue[i].wareHouseFromName,
+          exportValue[i].itemLines[j].wareHouseToName = exportValue[i].wareHouseToName,
+          exportValue[i].itemLines[j].totalItem = exportValue[i].totalItem,
+          exportValue[i].itemLines[j].totalQty = exportValue[i].totalQty,
+          exportValue[i].itemLines[j].dueDueDate = exportValue[i].dueDueDate,
+          exportValue[i].itemLines[j].stockStatus = exportValue[i].stockStatus,
+          exportValue[i].itemLines[j].approvedByName = exportValue[i].approvedByName,
+          exportValue[i].itemLines[j].rejectedByName = exportValue[i].rejectedByName,
+          exportValue[i].itemLines[j].onHoldByName = exportValue[i].onHoldByName,
+          exportValue[i].itemLines[j].rejectedDate = exportValue[i].rejectedDate,
+          exportValue[i].itemLines[j].onHoldDate = exportValue[i].onHoldDate,
+          exportValue[i].itemLines[j].tempId = exportValue[i].tempId,
+          exportValue[i].itemLines[j].uniqueSlNo = uniqueSlNo
+      }
     }
+    Template.instance().todayExport.set(exportValue);
     return Template.instance().pagination.getPage();
   },
-  /**
-   * TODO: Complete JS doc
-   * @returns {rolelist}
-   */
-  stockLists: function () {
-    return Template.instance().stockNameArray.get();
+  orderTodayExport: function () {
+    return Template.instance().todayExport.get();
   },
   /**
-     * TODO: Complete JS doc
-     * @returns {*}
-     */
-  activeHelper: function (active) {
-    let activeCheck = active;
-    if (activeCheck === "Y") {
+   * TODO: Complete JS doc
+   * @returns {Function}
+   */
+  handlePagination: function () {
+    return function (e, templateInstance, clickedPage) {
+      e.preventDefault();
+      console.log('Changing page from ', templateInstance.data.pagination.currentPage(), ' to ', clickedPage);
+    };
+  },
+  /**
+   * TODO: Complete JS doc
+   */
+  sortIcon: () => {
+    genericSortIcons();
+  },
+  printLoad: () => {
+    return Template.instance().modalLoader.get();
+  },
+  /**
+   * TODO:Complete JS doc
+   * @param docDate
+   */
+  date: (docDate) => {
+    return moment(docDate).format('DD-MM-YYYY');
+  },
+  dateFormat: (docDate) => {
+    return moment(docDate).format('DD-MM-YYYY');
+  },
+  /**
+   * TODO:Complete JS doc
+   * for getting item details
+   */
+  items: () => {
+    // let itemsList = Session.get("itemsDetailsList");
+    let itemsList = Template.instance().itemsDetailsList.get();
+    return itemsList;
+  },
+  /**
+ * TODO:Complete JS doc
+ * @param quantity  
+ * formatting quantity
+ */
+  quantityFormat: (quantity) => {
+    let res = Number(quantity).toFixed(3);
+    return res.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+  },
+  status: function (stockStatus) {
+    if (stockStatus === 'Cancelled') {
       return true;
     }
     else {
-      return false
+      return false;
     }
   },
-  /**
-   * TODO: Complete JS doc
-   * @returns {*}
-   */
-  inactiveHelper: function (active) {
-    let activeCheck = active;
-    if (activeCheck === "N") {
-      return true;
-    }
-    else {
-      return false
-    }
-  },
-  /**
-   * TODO: Complete JS doc
-   */
-  date: function () {
-    return new Date();
-  },
-
-
-
 });
+
 Template.registerHelper('incremented', function (index) {
   index++;
   return index;
 });
-Template.stockTransferReport.events({
 
+Template.stockTransferReport.events({
   /**
    * TODO: Complete JS doc
    * @param event
    */
-  'submit .stockFilter': (event) => {
+  'submit .salesReturn-filter': (event) => {
     event.preventDefault();
-    let uniqueId = event.target.stocktransferIdval.value;
-    let employeeId = event.target.employeeId.value;
+    let managerBranch = Session.get("managerBranch");
     let first = $("#fromDate").val();
     let second = $("#toDate").val();
-    let fromDate = new Date(moment(first, 'DD-MM-YYYY').format('YYYY-MM-DD'));
-    let toDates = new Date(moment(second, 'DD-MM-YYYY').format('YYYY-MM-DD'));
-    toDates.setDate(toDates.getDate() + 1)
-    if (uniqueId && employeeId === '' && isNaN(fromDate) && isNaN(toDates)) {
+    let dateOne = moment(first, 'DD-MM-YYYY').format('YYYY-MM-DD');
+    let dateTwo = moment(second, 'DD-MM-YYYY').format('YYYY-MM-DD');
+    let fromDate = new Date(dateOne);
+    let toDate = new Date(dateTwo);
+    if (fromDate && isNaN(toDate)) {
+      fromDate.setDate(fromDate.getDate() + 1);
       Template.instance().pagination.settings.set('filters', {
-        subDistributor: Meteor.userId(), temporaryId: uniqueId
-      });
-      $('.taskHeaderList').css('display', 'none');
-    } else if (uniqueId === '' && employeeId && isNaN(fromDate) && isNaN(toDates)) {
-      Template.instance().pagination.settings.set('filters', {
-        subDistributor: Meteor.userId(), sdUser: employeeId,
-      });
-      $('.taskHeaderList').css('display', 'none');
-    } else if (uniqueId === '' && employeeId === '' && fromDate && isNaN(toDates)) {
-      Template.instance().pagination.settings.set('filters', {
-        subDistributor: Meteor.userId(), transferDateIso: { $gte: fromDate },
-      });
-      $('.taskHeaderList').css('display', 'none');
-    } else if (uniqueId === '' && employeeId === '' && isNaN(fromDate) && toDates) {
-      Template.instance().pagination.settings.set('filters', {
-        subDistributor: Meteor.userId(), transferDateIso: { $lt: toDates }
-      });
-      $('.taskHeaderList').css('display', 'none');
-    } else if (uniqueId && employeeId && isNaN(fromDate) && isNaN(toDates)) {
-      Template.instance().pagination.settings.set('filters', {
-        subDistributor: Meteor.userId(), sdUser: employeeId, temporaryId: uniqueId
-      });
-      $('.taskHeaderList').css('display', 'none');
-    } else if (uniqueId && employeeId === '' && fromDate && isNaN(toDates)) {
-      Template.instance().pagination.settings.set('filters', {
-        subDistributor: Meteor.userId(), sdUser: employeeId,
-        transferDateIso: { $gte: fromDate, $lt: toDates }, temporaryId: uniqueId
-      });
-      $('.taskHeaderList').css('display', 'none');
-    } else if (uniqueId && employeeId === '' && isNaN(fromDate) && toDates) {
-      Template.instance().pagination.settings.set('filters', {
-        subDistributor: Meteor.userId(),
-        transferDateIso: { $lt: toDates }, temporaryId: uniqueId
-      });
-      $('.taskHeaderList').css('display', 'none');
-    } else if (uniqueId === '' && employeeId && fromDate && isNaN(toDates)) {
-      Template.instance().pagination.settings.set('filters', {
-        subDistributor: Meteor.userId(), sdUser: employeeId,
-        transferDateIso: { $gte: fromDate }
-      });
-    } else if (uniqueId === '' && employeeId && isNaN(fromDate) && toDates) {
-      Template.instance().pagination.settings.set('filters', {
-        subDistributor: Meteor.userId(), sdUser: employeeId,
-        transferDateIso: { $lt: toDates }
-      });
-    } else if (uniqueId === '' && employeeId === '' && fromDate && toDates) {
-      Template.instance().pagination.settings.set('filters', {
-        subDistributor: Meteor.userId(), transferDateIso: { $gte: fromDate, $lt: toDates }
-      });
-    } else if (uniqueId && employeeId && fromDate && isNaN(toDates)) {
-      Template.instance().pagination.settings.set('filters', {
-        subDistributor: Meteor.userId(), sdUser: employeeId,
-        transferDateIso: { $gte: fromDate }, temporaryId: uniqueId
-      });
-    } else if (uniqueId && employeeId && isNaN(fromDate) && toDates) {
-      Template.instance().pagination.settings.set('filters', {
-        subDistributor: Meteor.userId(), sdUser: employeeId,
-        transferDateIso: { $lt: toDates }, temporaryId: uniqueId
-      });
-    } else if (uniqueId === '' && employeeId && fromDate && toDates) {
-      Template.instance().pagination.settings.set('filters', {
-        subDistributor: Meteor.userId(), sdUser: employeeId,
-        transferDateIso: { $gte: fromDate, $lt: toDates }
-      });
-    } else if (uniqueId && employeeId === '' && fromDate && toDates) {
-      Template.instance().pagination.settings.set('filters', {
-        subDistributor: Meteor.userId(),
-        transferDateIso: { $gte: fromDate, $lt: toDates }, temporaryId: uniqueId
-      });
-    } else if (uniqueId && employeeId && isNaN(fromDate) && toDates) {
-      Template.instance().pagination.settings.set('filters', {
-        subDistributor: Meteor.userId(), sdUser: employeeId,
-        transferDateIso: { $lt: toDates }, temporaryId: uniqueId
-      });
-    } else if (uniqueId && employeeId && fromDate && toDates) {
-      Template.instance().pagination.settings.set('filters', {
-        subDistributor: Meteor.userId(), sdUser: employeeId,
-        transferDateIso: { $gte: fromDate, $lt: toDates }, temporaryId: uniqueId
-      });
-      $('.taskHeaderList').css('display', 'none');
-    } else {
-      Template.instance().pagination.settings.set('filters', {
-        subDistributor: Meteor.userId()
+        createdAt: {
+          $lte: fromDate,
+        }, branch: { $in: managerBranch }
       });
     }
-
-  },
-  /**
-   * TODO: Complete JS doc
-   */
-  'click .reset': () => {
-    let date = new Date();
-    let fromiDate = new Date(moment(new Date(date.getFullYear(), date.getMonth(), 1)).format('YYYY-MM-DD 00:00:00.0'));
-    let toiDate = new Date(moment(new Date()).format('YYYY-MM-DD 00:00:00.0'));
-    toiDate.setDate(toiDate.getDate() + 1);
-    Template.instance().pagination.settings.set('filters', {
-      subDistributor: Meteor.userId(),
-      createdAt: { $gte: fromiDate, $lt: toiDate }
-    });
-    $('form :input').val("");
-    $("#selectVerticalId").val('').trigger('change');
-    $("#employeeId").val('').trigger('change');
-    $('.taskHeaderList').css('display', 'inline');
-    $("#stocktransferIdval").val('').trigger('change');
-  },
-
-
-
-
-  /**
-   * TODO: Complete JS doc
-   */
-  'click .closen': (event, template) => {
-    $(".updatestock").each(function () {
-      this.reset();
-    });
-    template.modalLoader.set(false);
-  },
-  /**
-   * TODO:Complete JS doc
-   * @param event
-   */
-  'click .view': (event, template) => {
-    event.preventDefault();
-    let id = event.currentTarget.id;
-    template.modalLoader.set(true);
-    let detailTransferId = $('#detailTransferId');
-    let detailvertical = $('#detailvertical');
-    let detailDate = $('#detailDate');
-    let detailEmp = $('#detailEmp');
-    let detailStatus = $('#detailStatus');
-    $('#stockH').html("Stock Transfer Details");
-    template.itemsDetailsList.set('');
-    $('#stockDetailPage').modal();
-    Meteor.call('stockTransferIssued.detailPage', id, (err, res) => {
-      if (!err) {
-        template.modalLoader.set(false);
-        $(detailTransferId).html(res.temporaryId);
-        $(detailvertical).html(res.verticalName);
-        $(detailDate).html(res.transferDate);
-        $(detailStatus).html(res.statusVal);
-        $(detailEmp).html(res.empName);
-        if (res.stockTransferRes.length > 0) {
-          template.itemsDetailsList.set(res.stockTransferRes);
-        }
-      }
-    });
-
-  },
-
-  /**
-* TODO: Complete JS doc
-*/
-  'click #filterSearch': (event, template) => {
-    document.getElementById('filterDisplay').style.display = "block";
-    Meteor.call('stock.stockList', (stockError, stockResult) => {
-      if (!stockError) {
-        template.stockNameArray.set(stockResult);
-      }
-    });
-  },
-  /**
-* TODO: Complete JS doc
-*/
-  'click #removeSearch': () => {
-    document.getElementById('filterDisplay').style.display = "none";
-  },
-  /**
-           * TODO: Complete JS doc
-           * @param event
-           */
-  'click #fileUploadstock': (event, template) => {
-    event.preventDefault();
-    $("#uploadstock").each(function () {
-      this.reset();
-    });
-    template.fileName.set('');
-    fileName = '';
-    let header = $('#stockUploadHeader');
-    $('#stockUploadConfirmation').modal();
-    $(header).html('Confirm Upload');
-  },
-  'submit #uploadstock': (event, template) => {
-    event.preventDefault();
-    //Reference the FileUpload element.
-    let fileUpload = document.getElementById("uploadstockFile");
-    let myFile = $('.uploadstockFile').prop('files')[0];
-    let fileType = myFile["type"];
-    console.log("fileType", fileType);
-    if (myFile.type === 'application/vnd.ms-excel' || myFile.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
-
-      if (fileUpload !== null && fileUpload !== '' && fileUpload !== undefined) {
-        if (typeof (FileReader) != "undefined") {
-          let reader = new FileReader();
-          //For Browsers other than IE.
-          if (reader.readAsBinaryString) {
-            reader.onload = function (e) {
-              processExcel(e.target.result);
-            };
-            reader.readAsBinaryString(fileUpload.files[0]);
-          } else {
-            //For IE Browser.
-            reader.onload = function (e) {
-              let data = "";
-              let bytes = new Uint8Array(e.target.result);
-              for (let i = 0; i < bytes.byteLength; i++) {
-                data += String.fromCharCode(bytes[i]);
-              }
-              processExcel(data);
-            };
-            reader.readAsArrayBuffer(fileUpload.files[0]);
-          }
-        }
-        else {
-          $(window).scrollTop(0);
-          setTimeout(function () {
-            $("#fileArrayspan").html('<style>#fileArrayspan {color :#fc5f5f }</style><span id="fileArrayspan">This browser does not support HTML5.</span>').fadeIn('fast');
-          }, 0);
-          setTimeout(function () {
-            $('#fileArrayspan').fadeOut('slow');
-          }, 3000);
-        }
-      }
-      else {
-        $(window).scrollTop(0);
-        setTimeout(function () {
-          $("#fileArrayspan").html('<style>#fileArrayspan {color :#fc5f5f }</style><span id="fileArrayspan">A file needed</span>').fadeIn('fast');
-        }, 0);
-        setTimeout(function () {
-          $('#fileArrayspan').fadeOut('slow');
-        }, 3000);
-      }
-    }
-    else {
-      $('#stockErrorModal').find('.modal-body').text('Invalid File Format!');
-      $('#stockErrorModal').modal();
-      $('#stockUploadConfirmation').modal('hide');
-      $("#uploadstock")[0].reset();
-      template.fileName.set('');
-      fileName = '';
-    }
-    function processExcel(data) {
-      //Read the Excel File data.
-      let stockArray = [];
-      let workbook = XLSX.read(data, {
-        type: 'binary'
+    else if (toDate && isNaN(fromDate)) {
+      toDate.setDate(toDate.getDate() + 1);
+      Template.instance().pagination.settings.set('filters', {
+        createdAt: {
+          $lte: toDate
+        }, branch: { $in: managerBranch }
       });
-      //Fetch the name of First Sheet.
-      let firstSheet = workbook.SheetNames[0];
-      //Read all rows from First Sheet into an JSON array.
-      let excelRows = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[firstSheet]);
-      if (excelRows !== undefined && excelRows.length > 0) {
-        //Add the data rows from Excel file.
-        for (let i = 0; i < excelRows.length; i++) {
-          let subDistributor = excelRows[i].SubDistributor;
-          let vertical = excelRows[i].Vertical;
-          let product = excelRows[i].Product;
-          let stock = excelRows[i].Stock;
-          if (subDistributor !== undefined && subDistributor !== '' &&
-            product !== undefined && product !== '' &&
-            stock !== undefined && stock !== '' &&
-            vertical !== undefined && vertical !== '') {
-            stockArray.push({
-              subDistributor: subDistributor, vertical: vertical, product: product, stock: stock.toString()
-            });
-          }
-        }
-      }
-      else {
-        $('#stockErrorModal').find('.modal-body').text('Invalid File Format!');
-        $('#stockErrorModal').modal();
-        $('#stockUploadConfirmation').modal('hide');
-        $("#uploadstock")[0].reset();
-        template.fileName.set('');
-        fileName = '';
-      }
-      if (stockArray.length !== 0 && stockArray !== undefined) {
-        $('#stockUploadConfirmation').modal('hide');
-        return Meteor.call('stock.createUpload', stockArray, (error, result) => {
-          if (error) {
-            $('#stockErrorModal').find('.modal-body').text(error.reason);
-            $('#stockErrorModal').modal();
-            $('#stockUploadConfirmation').modal('hide');
-            $("#uploadstock")[0].reset();
-            template.fileName.set('');
-            fileName = '';
-          }
-          else {
-            $('#stockUploadConfirmation').modal('hide');
-            $("#uploadstock")[0].reset();
-            $('#stockSuccessModal').find('.modal-body').text(` Stock has been updated successfully (${stockArray.length} Nos)`);
-            $('#stockSuccessModal').modal();
-            template.fileName.set('');
-            fileName = '';
-          }
+    }
+    else if (fromDate && toDate) {
+      if (fromDate.toString() === toDate.toString()) {
+        toDate.setDate(toDate.getDate() + 1);
+        Template.instance().pagination.settings.set('filters', {
+          createdAt: {
+            $gte: fromDate, $lte: toDate
+          }, branch: { $in: managerBranch }
         });
       }
       else {
-        $('#stockErrorModal').find('.modal-body').text('Invalid File Format!');
-        $('#stockErrorModal').modal();
-        $('#stockUploadConfirmation').modal('hide');
-        $("#uploadstock")[0].reset();
-        template.fileName.set('');
-        fileName = '';
+        toDate.setDate(toDate.getDate() + 1);
+        Template.instance().pagination.settings.set('filters', {
+          createdAt: {
+            $gte: fromDate, $lte: toDate
+          }, branch: { $in: managerBranch }
+        });
       }
-    };
+    }
+    else {
+      Template.instance().pagination.settings.set('filters', {});
+    }
   },
-  /**
-  * TODO: Complete JS doc
-  */
-  'click #stockFileClose': (event, template) => {
-    $("#uploadstock").each(function () {
-      this.reset();
-    });
-    template.fileName.set('');
-    fileName = '';
-  },
-
   /**
    * TODO: Complete JS doc
+   * for reset filter
    */
-  'click #downloadstock': (event, template) => {
-    event.preventDefault();
-    let data = [{
-      SubDistributor: '', Vertical: '', Product: '', Stock: ''
-    }];
-    dataCSV = data.map(element => ({
-      'SubDistributor': '',
-      'Vertical': '',
-      'Product': '',
-      'Stock': '',
-    }))
-    let excel = Papa.unparse(dataCSV);
-    let blob = new Blob([excel], { type: "text/xls;charset=utf-8" });
-    saveAs(blob, "stockFormat.xls");
-  },
-  'change .uploadstockFile': function (event, template) {
-    let func = this;
-    let file = event.currentTarget.files[0];
-    let reader = new FileReader();
-    reader.onload = function () {
-      fileName = file.name,
-        fileContent = reader.result,
-        template.fileName.set(file.name);
-    };
-    reader.readAsDataURL(file);
-  },
-
-  /**
-* TODO: Complete JS doc
-* 
-*/
-  'click .activeFilter': (event, template) => {
-    event.preventDefault();
+  'click .reset': () => {
+    let today = moment(new Date()).format("YYYY-MM-DD 00:00:00.0");
+    toDay = new Date(today);
+    nextDay = new Date(toDay);
+    nextDay.setDate(nextDay.getDate() + 1);
+    let managerBranch = Session.get("managerBranch");
     Template.instance().pagination.settings.set('filters', {
-      active: "Y"
-    });
-  },
-  /**
-  * TODO: Complete JS doc
-  * 
-  */
-  'click .inactiveFilter': (event, template) => {
-    event.preventDefault();
-    Template.instance().pagination.settings.set('filters', {
-      active: "N"
-    });
-  },
-  /**
-   * 
-   * @param {*} event 
-   * @param {*} template 
-   */
-  'click .export': (event, template) => {
-    event.preventDefault();
-    $('#deliveryExportH').html('Export Data');
-    $('#employeeIdExport').val('').trigger('change');
-    $('.startDate1').val('');
-    $('.endDate1').val('');
-    $('#stockTransferExport').modal();
-    template.stockTransferExports.set('');
-  },
-  /**
-* 
-* @param {*} event 
-* @param {*} template 
-*/
-  'change #employeeIdExport': (event, template) => {
-    $(".startDate1").val('');
-    $(".endDate1").val('');
-    template.stockTransferExports.set('');
-  },
-
-  'change .endDate1': (event, template) => {
-    let sdate = $(".startDate1").val();
-    let edate = $(".endDate1").val();
-    let sdUser = $("#employeeIdExport").val();
-    let fromDate = new Date(moment(sdate, 'DD-MM-YYYY').format("YYYY-MM-DD"));
-    let toDates = new Date(moment(edate, 'DD-MM-YYYY').format("YYYY-MM-DD"));
-    toDates.setDate(toDates.getDate() + 1);
-    template.stockTransferExports.set('');
-    template.modalLoader.set(true);
-    Meteor.call('stockTransfer.exportData', Meteor.userId(), sdUser, fromDate, toDates, (err, res) => {
-      if (!err) {
-        template.modalLoader.set(false);
-        if (res.length === 0) {
-          setTimeout(function () {
-            $("#emptyDataSpan").html('<style>#emptyDataSpans {color :#fc5f5f }</style><span id="emptyDataSpans">No Records Found !</span>').fadeIn('fast');
-          }, 0);
-          setTimeout(function () {
-            $('#emptyDataSpan').fadeOut('slow');
-          }, 3000);
-        } else {
-          template.stockTransferExports.set(res);
-          setTimeout(function () {
-            $("#emptyDataSpan").html('<style> #emptyDataSpans { color:#2ECC71 }</style><span id ="emptyDataSpans">Records are ready for export.</span>').fadeIn('fast');
-          }, 0);
-          setTimeout(function () {
-            $('#emptyDataSpan').fadeOut('slow');
-          }, 3000);
-        }
-      }
-      else {
-        template.modalLoader.set(false);
+      branch: { $in: managerBranch },
+      createdAt: {
+        $gte: toDay,
+        $lt: nextDay
       }
     });
+    $('form :input').val("");
   },
-
-  /**
-   * TODO:Complete JS doc
-   */
-  'click .exportToday': (event, template) => {
+  'submit .exportToday': (event, template) => {
     event.preventDefault();
-    $('#stockTransferExport').modal('hide');
-    let exportData = Template.instance().stockTransferExports.get();
+    let exportData = Template.instance().todayExport.get();
     if (exportData.length === 0) {
       toastr["error"]('No Records Found');
     }
@@ -900,10 +288,114 @@ Template.stockTransferReport.events({
             saveAs(file, "Stock Transfer Report (" + moment(new Date()).format("DD-MM-YYYY") + ").xls");
           });
         $("#exportButtons").prop('disabled', false);
-        $('#employeeIdExport').val('').trigger('change');
-        $('.startDate1').val('');
-        $('.endDate1').val('');
       }, 5000);
     }
+  },
+  /**
+  * TODO:Complete JS doc
+  * @param event
+  */
+  'click .view': (event, template) => {
+    event.preventDefault();
+
+    let id = event.currentTarget.id;
+    template.modalLoader.set('');
+    let header = $('#orderHs');
+    let dueDate = $('#detailDocDelivers');
+    let docDate = $('#detailDocDates');
+    let detailRemark = $('#detailRemark');
+    let wareHouseFromName = $('#wareHouseFromName');
+    let wareHouseToName = $('#wareHouseToName');
+    let stockNoDetail = $('#stockNoDetail');
+    let detailBranch = $('#detailBranch');
+    let detailApprovedBy = $("#detailApprovedBy");
+    let detailApprovedDate = $("#detailApprovedDate");
+    let detailApprovedRemark = $("#detailApprovedRemark");
+    let detailUniqueId = $('#detailUniqueId');
+    let detailSalesperson = $('#detailSalesperson');
+    let weights = $('#detailWeight');
+    $('#stockRejectedPage').modal();
+    Meteor.call('stockTransfer.id', id, (err, res) => {
+      let order = res;
+      $(header).html('Details of Stock Transfer Request');
+      $(stockNoDetail).html(order.stockId);
+      $(detailRemark).html(order.remark_stock);
+      $(wareHouseFromName).html(order.wareHouseFromName);
+      $(wareHouseToName).html(order.wareHouseToName);
+      $(detailSalesperson).html(order.salesmanName);
+      $(dueDate).html(moment(order.dueDate).format("DD-MM-YYYY"));
+      $(docDate).html(moment(order.docDate).format('DD-MM-YYYY hh:mm:ss A'));
+      $(detailBranch).html(order.branchName);
+      template.itemsDetailsList.set(order.itemLines);
+      if (order.weight !== undefined && order.weight !== null) {
+        let weightAmt = Number(order.weight).toFixed(2);
+        $(weights).html(weightAmt.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
+      }
+      else {
+        $(weights).html('');
+      }
+      if (order.tempId !== undefined && order.tempId !== '') {
+        $(detailUniqueId).html(order.tempId);
+      }
+      else {
+        $(detailUniqueId).html('');
+      }
+      template.modalLoader.set(order.itemLines);
+      if (order.approvedByName) {
+        $(detailApprovedBy).html(order.approvedByName + ' ' + '(Approved)');
+        $(detailApprovedDate).html(moment(order.approvedByDate).format("DD-MM-YYYY") + ' ' + '(Approved)');
+        $(detailApprovedRemark).html(order.oRRemark + ' ' + '(Approved)');
+      }
+      else if (order.rejectedByName) {
+        $(detailApprovedBy).html(order.rejectedByName + ' ' + '(Rejected)');
+        $(detailApprovedDate).html(moment(order.rejectedDate).format("DD-MM-YYYY") + ' ' + '(Rejected)');
+        $(detailApprovedRemark).html(order.oRRemark + ' ' + '(Rejected)');
+      }
+      else if (order.onHoldByName) {
+        $(detailApprovedBy).html(order.onHoldByName + ' ' + '(On hold)');
+        $(detailApprovedDate).html(moment(order.onHoldDate).format("DD-MM-YYYY") + ' ' + '(On hold)');
+        $(detailApprovedRemark).html(order.oRRemark + ' ' + '(On Hold)');
+      }
+      else {
+        $(detailApprovedBy).html('');
+        $(detailApprovedDate).html('');
+        $(detailApprovedRemark).html('');
+      }
+    });
+  },
+  /**
+* TODO: Complete JS
+* clear data when click close button
+*/
+  'click .closen': (event, template) => {
+    $('form :input').val("");
+    //Session.set("itemsDetailsList",'');
+    template.itemsDetailsList.set('');
+    template.modalLoader.set('');
+  },
+  /**
+* TODO: Complete JS doc
+* clear data when click close button
+*/
+  'click .close': (event, template) => {
+    $('form :input').val("");
+    // Session.set("itemsDetailsList",'');
+    template.itemsDetailsList.set('');
+    template.modalLoader.set('');
+    $(".save").attr("disabled", false);
+  },
+  /**
+* TODO: Complete JS doc
+* to show filter display
+*/
+  'click #filterSearch': () => {
+    document.getElementById('filterDisplay').style.display = "block";
+  },
+  /**
+* TODO: Complete JS doc
+* to hide filter display
+*/
+  'click #removeSearch': () => {
+    document.getElementById('filterDisplay').style.display = "none";
   },
 });

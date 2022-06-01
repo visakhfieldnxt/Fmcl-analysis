@@ -21,41 +21,35 @@ Template.routeAssignReport.onCreated(function () {
   this.modalLoaderBody = new ReactiveVar();
   this.branchNameArray = new ReactiveVar();
   this.routeCodeList = new ReactiveVar();
+  this.vansaleUserListGet = new ReactiveVar(); 
+  let managerBranch = Session.get("managerBranch");
   this.pagination = new Meteor.Pagination(RouteAssign, {
     sort: {
       createdAt: -1
     },
     filters: {
-    },
-    fields: {
-      routeId: 1,
-      routeDate: 1,
-      routeDateEnd: 1,
-      assignedTo: 1,
-      routeStatus: 1
+      branch: { $in: managerBranch }
     },
     perPage: 25
   });
 });
 Template.routeAssignReport.onRendered(function () {
-  this.modalLoaderBody.set(true);
+  $('#bodySpinVal').css('display', 'block');
+  let vansaleRoles = Session.get("vansaleRoles");
   /**
 * TODO:Complete Js doc
 * Getting vansale user list
 */
-
-  Meteor.call('routeGroup.masterDataGet', (err, res) => {
+  Meteor.call('routeGroup.list', (err, res) => {
     if (!err) {
-      this.vansaleUserFullList.set(res.userRes);
-      this.routeCodeList.set(res.groupRes);
-      this.branchNameArray.set(res.branchRes);
-      this.modalLoaderBody.set(false);
-    }
-    else {
-      this.modalLoaderBody.set(false);
+      this.routeCodeList.set(res);
     }
   });
-
+  let managerBranch = Session.get("managerBranch");
+  Meteor.call('branch.managerBranchGet', managerBranch, (err, res) => {
+    if (!err)
+      this.branchNameArray.set(res);
+  });
   /**
    * TODO:Complete Js doc
    * Getting customer list
@@ -70,18 +64,11 @@ Template.routeAssignReport.onRendered(function () {
       // Session.set("userNameArray",res);
       this.userNameArray.set(res)
   });
-  /**
-* TODO: Complete JS doc
-*/
-  Meteor.setInterval(() => {
-    Meteor.call('routeGroup.masterDataGet', (err, res) => {
-      if (!err) {
-        this.vansaleUserFullList.set(res.userRes);
-        this.branchNameArray.set(res.branchRes);
-        this.routeCodeList.set(res.groupRes);
-      }
-    });
-  }, 600000);
+  // for getting allUser Name 
+  Meteor.call('user.vansaleListBranch', managerBranch,vansaleRoles, (err, res) => {
+    if (!err)
+      this.vansaleUserListGet.set(res)
+  });
 
   /**
    * TODO:Complete Js doc
@@ -98,7 +85,30 @@ Template.routeAssignReport.onRendered(function () {
     allowClear: true,
     dropdownParent: $(".selectRouteName").parent(),
   });
-
+  $('#selectBranchName').select2({
+    placeholder: "Select Branch",
+    tokenSeparators: [','],
+    allowClear: true,
+    dropdownParent: $("#selectBranchName").parent(),
+  });
+  $('#selectVanemp').select2({
+    placeholder: "Select Employee",
+    tokenSeparators: [','],
+    allowClear: true,
+    dropdownParent: $("#selectVanemp").parent(),
+  });
+  $('#selectBranchNameExport').select2({
+    placeholder: "Select Branch",
+    tokenSeparators: [','],
+    allowClear: true,
+    dropdownParent: $("#selectBranchNameExport").parent(),
+  });
+  $('#selectVanempExport').select2({
+    placeholder: "Select Employee",
+    tokenSeparators: [','],
+    allowClear: true,
+    dropdownParent: $("#selectVanempExport").parent(),
+  });
 });
 Template.routeAssignReport.helpers({
   /**
@@ -108,8 +118,26 @@ Template.routeAssignReport.helpers({
   isReady: function () {
     return Template.instance().pagination.ready();
   },
-
-
+  vanUsersList: () => {
+    return Template.instance().vansaleUserListGet.get()
+  },
+  /**
+   * 
+   * @param {*} index 
+   * @returns get row index
+   */
+  indexCountGet: (index) => {
+    let res = Template.instance().pagination;
+    if (res) {
+      let pageValue = res.settings.keys.page;
+      if (pageValue !== undefined && pageValue > 1) {
+        return (25 * (pageValue - 1)) + index + 1;
+      }
+      else {
+        return index + 1;
+      }
+    }
+  },
   /**
    * TODO: Complete JS doc
    * @returns {Meteor.Pagination}
@@ -122,7 +150,12 @@ Template.routeAssignReport.helpers({
    * @param {*} dates 
    * formatting date time
    */
-
+  /**
+* TODO:Complete JS doc
+*/
+  branchList: function () {
+    return Template.instance().branchNameArray.get();
+  },
   dateFormats: (dates) => {
     if (dates) {
       return moment(dates).format('DD-MM-YYYY hh:mm A');
@@ -135,62 +168,7 @@ Template.routeAssignReport.helpers({
     return Template.instance().routeUpdatedData.get();
 
   },
-  /**
-* get vansale user name
-*/
 
-  routeCodeHelp: (id) => {
-    let routeData = Template.instance().routeCodeList.get();
-    if (routeData) {
-      let res = routeData.find(x => x._id === id);
-      if (res) {
-        return res.routeCode;
-      }
-    }
-  },
-  /**
-  * get vansale user name
-  */
-
-  routeNameHelp: (id) => {
-    let routeData = Template.instance().routeCodeList.get();
-    if (routeData) {
-      let res = routeData.find(x => x._id === id);
-      if (res) {
-        return res.routeName;
-      }
-    }
-  },
-  /**
-  * get vansale user name
-  */
-
-  routeBranchHelp: (id) => {
-    let routeData = Template.instance().routeCodeList.get();
-    let branchNameArrayData = Template.instance().branchNameArray.get();
-    if (routeData) {
-      let res = routeData.find(x => x._id === id);
-      if (res) {
-        let branchRes = branchNameArrayData.find(x => x.bPLId === res.branchCode);
-        if (branchRes) {
-          return branchRes.bPLName;
-        }
-      }
-    }
-  },
-  /**
-  * get vansale user name
-  */
-
-  vanUserName: (id) => {
-    let userData = Template.instance().vansaleUserFullList.get();
-    if (userData) {
-      let res = userData.find(x => x._id === id);
-      if (res) {
-        return `${res.profile.firstName} ${res.profile.lastName}`;
-      }
-    }
-  },
   /**
 * TODO:Complete JS doc
 * @param docDate
@@ -206,6 +184,10 @@ Template.routeAssignReport.helpers({
   orderes: function () {
     let exportValue = Template.instance().pagination.getPage();
     Template.instance().todayExport.set(exportValue);
+    let result = Template.instance().pagination.getPage();
+    if (result.length === 0) {
+      $('#bodySpinVal').css('display', 'none');
+    }
     return Template.instance().pagination.getPage();
   },
   /**
@@ -216,15 +198,6 @@ Template.routeAssignReport.helpers({
     return Template.instance().todayExport.get();
   },
 
-  printLoadBody: () => {
-    let res = Template.instance().modalLoaderBody.get();
-    if (res === true) {
-      return true;
-    }
-    else {
-      return false;
-    }
-  },
 
   /**
  * TODO:Complete JS doc
@@ -274,16 +247,119 @@ Template.routeAssignReport.helpers({
  * get vansale user name
  */
 
+
   custNameHelp: (cardCode) => {
-    let custData = Template.instance().customerNameArray.get();
-    if (custData) {
-      let res = custData.find(x => x.cardCode === cardCode);
-      if (res) {
-        return res.cardName;
-      }
+    let promiseVal = new Promise((resolve, reject) => {
+      Meteor.call("customer.idCardName", cardCode, (error, result) => {
+        if (!error) {
+          resolve(result);
+        } else {
+          reject(error);
+        }
+      });
+    });
+    promiseVal.then((result) => {
+      $('.customerVal_' + cardCode).html(result);
+      $('.loadersSpinPromise').css('display', 'none');
     }
+    ).catch((error) => {
+      $('.customerVal_' + cardCode).html('');
+      $('.loadersSpinPromise').css('display', 'none');
+    }
+    );
   },
 
+
+  vanUserName: (id) => {
+    let promiseVal = new Promise((resolve, reject) => {
+      Meteor.call("user.idName", id, (error, result) => {
+        if (!error) {
+          resolve(result);
+        } else {
+          reject(error);
+        }
+      });
+    });
+    promiseVal.then((result) => {
+      $('.vanUserName_' + id).html(result);
+      $('#bodySpinVal').css('display', 'none');
+    }
+    ).catch((error) => {
+      $('.vanUserName_' + id).html('');
+      $('#bodySpinVal').css('display', 'none');
+    }
+    );
+  },
+  /**
+ * get vansale route code
+ */
+
+  routeCodeHelp: (id) => {
+    let promiseVal = new Promise((resolve, reject) => {
+      Meteor.call("routeGroup.idRouteCode", id, (error, result) => {
+        if (!error) {
+          resolve(result);
+        } else {
+          reject(error);
+        }
+      });
+    });
+    promiseVal.then((result) => {
+      $('.routeCodeVal_' + id).html(result);
+      $('#bodySpinVal').css('display', 'none');
+    }
+    ).catch((error) => {
+      $('.routeCodeVal_' + id).html('');
+      $('#bodySpinVal').css('display', 'none');
+    }
+    );
+  },
+  /**
+ * get vansale route name
+ */
+
+  routeNameHelp: (id) => {
+    let promiseVal = new Promise((resolve, reject) => {
+      Meteor.call("routeGroup.idRouteName", id, (error, result) => {
+        if (!error) {
+          resolve(result);
+        } else {
+          reject(error);
+        }
+      });
+    });
+    promiseVal.then((result) => {
+      $('.routeVal_' + id).html(result);
+      $('#bodySpinVal').css('display', 'none');
+    }
+    ).catch((error) => {
+      $('.routeVal_' + id).html('');
+      $('#bodySpinVal').css('display', 'none');
+    });
+  },
+  /**
+* get vansale route name
+*/
+
+  routeBranchHelp: (id) => {
+    let promiseVal = new Promise((resolve, reject) => {
+      Meteor.call("routeGroup.idBranchDetails", id, (error, result) => {
+        if (!error) {
+          resolve(result);
+        } else {
+          reject(error);
+        }
+      });
+    });
+    promiseVal.then((result) => {
+      $('.branchVal_' + id).html(result);
+      $('#bodySpinVal').css('display', 'none');
+    }
+    ).catch((error) => {
+      $('.branchVal_' + id).html('');
+      $('#bodySpinVal').css('display', 'none');
+    });
+  },
   /**
      * TODO: Complete JS doc
      * @returns {*}
@@ -393,35 +469,77 @@ Template.routeAssignReport.events({
     let fromDate = new Date(dateOne);
     let toDate = new Date(dateTwo);
     let routeCode = event.target.selectRouteName.value;
-    if (routeCode && isNaN(fromDate) && isNaN(toDate)) {
+    let branch = event.target.selectBranchName.value;
+    let salesman = event.target.selectVanemp.value;
+    if (routeCode && isNaN(fromDate) && isNaN(toDate) && branch === '' && salesman === '') {
       Template.instance().pagination.settings.set('filters', {
+        routeId: routeCode,
+        branch: { $in: managerBranch }
+      });
+      console.log("routeCode", routeCode)
+    }
+    else if (routeCode === '' && isNaN(fromDate) && isNaN(toDate) && branch === '' && salesman) {
+      Template.instance().pagination.settings.set('filters', {
+        assignedTo: salesman,
+        branch: { $in: managerBranch }
+      });
+    }
+    else if (routeCode === '' && isNaN(fromDate) && isNaN(toDate) && branch && salesman === '') {
+      Template.instance().pagination.settings.set('filters', {
+        branch: branch
+      });
+    }
+    else if (routeCode && isNaN(fromDate) && isNaN(toDate) && branch && salesman === '') {
+      Template.instance().pagination.settings.set('filters', {
+        branch: branch,
         routeId: routeCode,
       });
     }
-    else if (fromDate && isNaN(toDate) && routeCode === '') {
+    else if (routeCode === '' && isNaN(fromDate) && isNaN(toDate) && branch && salesman) {
+      Template.instance().pagination.settings.set('filters', {
+        branch: branch,
+        assignedTo: salesman,
+      });
+    }
+    else if (routeCode && isNaN(fromDate) && isNaN(toDate) && branch === '' && salesman) {
+      Template.instance().pagination.settings.set('filters', {
+        branch: { $in: managerBranch },
+        routeId: routeCode,
+        assignedTo: salesman,
+      });
+    }
+    else if (routeCode && isNaN(fromDate) && isNaN(toDate) && branch && salesman) {
+      Template.instance().pagination.settings.set('filters', {
+        branch: { $in: managerBranch },
+        routeId: routeCode,
+        assignedTo: salesman,
+        branch: branch,
+      });
+    }
+    else if (fromDate && isNaN(toDate) && routeCode === '' && branch === '' && salesman === '') {
       fromDate.setDate(fromDate.getDate() + 1);
       Template.instance().pagination.settings.set('filters', {
         routeDateIso: {
           $lte: fromDate
-        }
+        }, branch: { $in: managerBranch }
       });
     }
-    else if (toDate && isNaN(fromDate) && routeCode === '') {
+    else if (toDate && isNaN(fromDate) && routeCode === '' && branch === '' && salesman === '') {
       toDate.setDate(toDate.getDate() + 1);
       Template.instance().pagination.settings.set('filters', {
         routeDateIso: {
           $lte: toDate
-        }
+        }, branch: { $in: managerBranch }
       });
     }
 
-    else if (fromDate && toDate && routeCode === '') {
+    else if (fromDate && toDate && routeCode === '' && branch === '' && salesman === '') {
       if (fromDate.toString() === toDate.toString()) {
         toDate.setDate(toDate.getDate() + 1);
         Template.instance().pagination.settings.set('filters', {
           routeDateIso: {
             $gte: fromDate, $lt: toDate
-          }
+          }, branch: { $in: managerBranch }
         });
       }
       else {
@@ -429,11 +547,65 @@ Template.routeAssignReport.events({
         Template.instance().pagination.settings.set('filters', {
           routeDateIso: {
             $gte: fromDate, $lte: toDate
-          }
+          }, branch: { $in: managerBranch }
         });
       }
     }
-    else if (routeCode && toDate && fromDate) {
+    else if (fromDate && toDate && routeCode === '' && branch && salesman === '') {
+      if (fromDate.toString() === toDate.toString()) {
+        toDate.setDate(toDate.getDate() + 1);
+        Template.instance().pagination.settings.set('filters', {
+          routeDateIso: {
+            $gte: fromDate, $lt: toDate
+          }, branch: branch
+        });
+      }
+      else {
+        toDate.setDate(toDate.getDate() + 1);
+        Template.instance().pagination.settings.set('filters', {
+          routeDateIso: {
+            $gte: fromDate, $lte: toDate
+          }, branch: branch
+        });
+      }
+    }
+    else if (fromDate && toDate && routeCode && branch === '' && salesman === '') {
+      if (fromDate.toString() === toDate.toString()) {
+        toDate.setDate(toDate.getDate() + 1);
+        Template.instance().pagination.settings.set('filters', {
+          routeDateIso: {
+            $gte: fromDate, $lt: toDate
+          }, routeId: routeCode,
+        });
+      }
+      else {
+        toDate.setDate(toDate.getDate() + 1);
+        Template.instance().pagination.settings.set('filters', {
+          routeDateIso: {
+            $gte: fromDate, $lte: toDate
+          }, routeId: routeCode,
+        });
+      }
+    }
+    else if (fromDate && toDate && routeCode === '' && branch === '' && salesman) {
+      if (fromDate.toString() === toDate.toString()) {
+        toDate.setDate(toDate.getDate() + 1);
+        Template.instance().pagination.settings.set('filters', {
+          routeDateIso: {
+            $gte: fromDate, $lt: toDate
+          }, assignedTo: salesman,
+        });
+      }
+      else {
+        toDate.setDate(toDate.getDate() + 1);
+        Template.instance().pagination.settings.set('filters', {
+          routeDateIso: {
+            $gte: fromDate, $lte: toDate
+          }, assignedTo: salesman,
+        });
+      }
+    }
+    else if (routeCode && toDate && fromDate && branch && salesman === '') {
       if (fromDate.toString() === toDate.toString()) {
         toDate.setDate(toDate.getDate() + 1);
         Template.instance().pagination.settings.set('filters', {
@@ -441,6 +613,7 @@ Template.routeAssignReport.events({
             $gte: fromDate, $lt: toDate
           },
           routeId: routeCode,
+          branch: branch
         });
       }
       else {
@@ -450,6 +623,76 @@ Template.routeAssignReport.events({
             $gte: fromDate, $lte: toDate
           },
           routeId: routeCode,
+          branch: branch
+        });
+      }
+    }
+    else if (routeCode === '' && toDate && fromDate && branch && salesman) {
+      if (fromDate.toString() === toDate.toString()) {
+        toDate.setDate(toDate.getDate() + 1);
+        Template.instance().pagination.settings.set('filters', {
+          routeDateIso: {
+            $gte: fromDate, $lt: toDate
+          },
+          assignedTo: salesman,
+          branch: branch
+        });
+      }
+      else {
+        toDate.setDate(toDate.getDate() + 1);
+        Template.instance().pagination.settings.set('filters', {
+          routeDateIso: {
+            $gte: fromDate, $lte: toDate
+          },
+          assignedTo: salesman,
+          branch: branch
+        });
+      }
+    }
+    else if (routeCode && toDate && fromDate && branch === '' && salesman) {
+      if (fromDate.toString() === toDate.toString()) {
+        toDate.setDate(toDate.getDate() + 1);
+        Template.instance().pagination.settings.set('filters', {
+          routeDateIso: {
+            $gte: fromDate, $lt: toDate
+          },
+          assignedTo: salesman,
+          routeId: routeCode,
+        });
+      }
+      else {
+        toDate.setDate(toDate.getDate() + 1);
+        Template.instance().pagination.settings.set('filters', {
+          routeDateIso: {
+            $gte: fromDate, $lte: toDate
+          },
+          assignedTo: salesman,
+          routeId: routeCode,
+        });
+      }
+    }
+
+    else if (routeCode && toDate && fromDate && branch && salesman) {
+      if (fromDate.toString() === toDate.toString()) {
+        toDate.setDate(toDate.getDate() + 1);
+        Template.instance().pagination.settings.set('filters', {
+          routeDateIso: {
+            $gte: fromDate, $lt: toDate
+          },
+          assignedTo: salesman,
+          routeId: routeCode,
+          branch: branch
+        });
+      }
+      else {
+        toDate.setDate(toDate.getDate() + 1);
+        Template.instance().pagination.settings.set('filters', {
+          routeDateIso: {
+            $gte: fromDate, $lte: toDate
+          },
+          assignedTo: salesman,
+          routeId: routeCode,
+          branch: branch
         });
       }
     }
@@ -462,7 +705,11 @@ Template.routeAssignReport.events({
    */
   'click .reset': () => {
     $("#selectRouteName").val('').trigger('change');
+    $("#selectBranchName").val('').trigger('change');
+    $("#selectVanemp").val('').trigger('change');
+    let managerBranch = Session.get("managerBranch");
     Template.instance().pagination.settings.set('filters', {
+      branch: { $in: managerBranch }
     });
     $('form :input').val("");
   },
@@ -475,6 +722,7 @@ Template.routeAssignReport.events({
     template.modalLoader.set(true);
     template.itemsDetailsList.set('');
     template.assignedHistoryData.set('');
+    $('.loadersSpinPromise').css('display', 'block');
     template.routeUpdatedData.set('');
     let id = event.currentTarget.id;
     let header = $('#orderHs');
@@ -516,6 +764,9 @@ Template.routeAssignReport.events({
         $(detailStatus).html(res.routeAssignRes.routeStatus);
         template.modalLoader.set(false);
         template.itemsDetailsList.set(res.customerDetailsArray);
+        if (res.customerDetailsArray.length === 0) {
+          $('.loadersSpinPromise').css('display', 'none');
+        }
         template.routeUpdatedData.set(res.routeUpdatesArray);
       }
       else {
@@ -579,6 +830,8 @@ Template.routeAssignReport.events({
           });
         $("#exportButtons").prop('disabled', false);
         $('form :input').val("");
+        $('#selectVanempExport').val('').trigger('change');
+        $('#selectBranchNameExport').val('').trigger('change');
       }, 5000);
     }
   },
@@ -586,8 +839,10 @@ Template.routeAssignReport.events({
   /**
    * TODO:CompleteJS doc
    */
-  'change .startDate': () => {
+  'change .startDate': (event, template) => {
     $(".endDate").attr("disabled", false);
+    $('.endDate').val('');
+    template.routeExportData.set('');
   },
   /**
    * TODO:CompleteJS doc
@@ -602,17 +857,39 @@ Template.routeAssignReport.events({
     let toDate = new Date(dateTwo);
     toDate.setDate(toDate.getDate() + 1);
     template.modalLoader.set(false);
+    let salesman = '';
+    $('#selectVanempExport').find(':selected').each(function () {
+      salesman = $(this).val();
+    });
+    let branch = '';
+    $('#selectBranchNameExport').find(':selected').each(function () {
+      branch = $(this).val();
+    });
+    let managerBranch = Session.get("managerBranch");
+    template.routeExportData.set('');
     if (startDate.toString() !== 'Invalid Date') {
       template.modalLoader.set(true);
       console.log("fromDate", fromDate);
       console.log("toDate", toDate);
-      Meteor.call('routeAssign.export', fromDate, toDate, (err, res) => {
+      Meteor.call('routeAssign.exportRouteData', fromDate, toDate, managerBranch, branch, salesman, (err, res) => {
         if (!err) {
           template.routeExportData.set(res);
           template.modalLoader.set(false);
-          console.log("ress", res);
           if (res.length === 0) {
-            toastr["error"]('No Records Found');
+            setTimeout(function () {
+              $("#emptyDataSpan").html('<style>#emptyDataSpans {color :#fc5f5f }</style><span id="emptyDataSpans">No Records Found !</span>').fadeIn('fast');
+            }, 0);
+            setTimeout(function () {
+              $('#emptyDataSpan').fadeOut('slow');
+            }, 3000);
+          } else {
+            setTimeout(function () {
+              $("#emptyDataSpan").html('<style> #emptyDataSpans { color:#2ECC71 }</style><span id ="emptyDataSpans">Records are ready for export.</span>').fadeIn('fast');
+            }, 0);
+            setTimeout(function () {
+              $('#emptyDataSpan').fadeOut('slow');
+
+            }, 3000);
           }
         }
         else {
@@ -630,6 +907,19 @@ Template.routeAssignReport.events({
       $('.mainLoader').css('display', 'none');
     }
   },
+
+  'change #selectBranchNameExport': (event, template) => {
+    $('#selectVanempExport').val('').trigger('change');
+    $('.startDate').val('');
+    $('.endDate').val('');
+    template.routeExportData.set('');
+  },
+
+  'change #selectVanempExport': (event, template) => {
+    $('.startDate').val('');
+    $('.endDate').val('');
+    template.routeExportData.set('');
+  },
   /**
    * TODO:Complete JS doc
    */
@@ -640,7 +930,8 @@ Template.routeAssignReport.events({
     template.routeExportData.set('');
     $(".endDate").attr("disabled", true);
     $('.mainLoader').css('display', 'none');
-
+    $('#selectVanempExport').val('').trigger('change');
+    $('#selectBranchNameExport').val('').trigger('change');
   },
   /**
     * TODO:Complete JS doc
@@ -651,6 +942,8 @@ Template.routeAssignReport.events({
     $(header).html('Export Details');
     $('.mainLoader').css('display', 'none');
     template.routeExportData.set('');
+    $('#selectVanempExport').val('').trigger('change');
+    $('#selectBranchNameExport').val('').trigger('change');
   },
   // /**
   //  * TODO:Complete JS doc

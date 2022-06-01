@@ -1,5 +1,5 @@
 /**
- * @author Greeshma
+ * @author Visakh
  */
 import { Meteor } from 'meteor/meteor';
 import { Order } from "../../../api/order/order";
@@ -15,125 +15,88 @@ Template.orderReport.onCreated(function () {
   this.stockInvoice = new ReactiveVar();
   this.todayExport = new ReactiveVar();
   this.modalLoader = new ReactiveVar();
-  this.verticalArray = new ReactiveVar();
-  this.outletArray = new ReactiveVar();
+  this.approvalCheckVal = new ReactiveVar();
+  this.approvalValueGet = new ReactiveVar();
   this.accValue = new ReactiveVar();
-  this.routeList = new ReactiveVar();
-  this.userExpoList = new ReactiveVar();
-  this.deliveryDetails = new ReactiveVar();
-  this.userIdData = new ReactiveVar();
-  this.routeData = new ReactiveVar();
-  this.outletData = new ReactiveVar();
-  this.fromDate = new ReactiveVar();
-  this.toDate = new ReactiveVar();
-  this.userIdDataExport = new ReactiveVar();
-  this.routeDataExport = new ReactiveVar();
-  this.outletDataExport = new ReactiveVar();
-  this.fromDateExport = new ReactiveVar();
-  this.toDateExport = new ReactiveVar();
-  this.employelIstVar = new ReactiveVar();
-  this.employeeData = new ReactiveVar();
-  this.employeeDataExport = new ReactiveVar();
   let today = moment(new Date()).format("YYYY-MM-DD 00:00:00.0");
   toDay = new Date(today);
   nextDay = new Date(toDay);
   nextDay.setDate(nextDay.getDate() + 1);
-  let date = new Date();
-  let fromiDate = new Date(moment(new Date(date.getFullYear(), date.getMonth(), 1)).format('YYYY-MM-DD 00:00:00.0'));
-  let toiDate = new Date(moment(new Date()).format('YYYY-MM-DD 00:00:00.0'));
-  toiDate.setDate(toiDate.getDate() + 1);
+  let managerBranch = Session.get("managerBranch");
   this.pagination = new Meteor.Pagination(Order, {
-    filters: {
-      subDistributor: Meteor.userId(),
-      createdAt: { $gte: fromiDate, $lt: toiDate }
-    },
     sort: {
       createdAt: -1
     },
-    fields: {
-      sdUser: 1,
-      subDistributor: 1,
-      vertical: 1,
-      outlet: 1,
-      routeId: 1,
-      docDate: 1,
-      docTotal: 1,
-      // itemArray: 1,
-      taxAmount: 1,
-      status: 1,
-      createdAt: 1
+    filters: {
+      docDate: {
+        $gte: toDay,
+        $lt: nextDay
+      },
+      branch: { $in: managerBranch }
     },
-    perPage: 20
+    perPage: 25
   });
-
 });
 
 Template.orderReport.onRendered(function () {
-  $('#bodySpinLoaders').css('display', 'block');
-  this.userIdData.set(Meteor.userId());
-  this.userIdDataExport.set(Meteor.userId());
-  $("#my-datepicker").datepicker({
-    format: "mm-yyyy",
-    startView: "months",
-    minViewMode: "months"
-  });
-  Meteor.call('verticals.verticalList', (err, res) => {
+  // for getting all Customer Name & cardcode.
+  Meteor.call('customer.customerNameGet', (err, res) => {
     if (!err)
-      this.verticalArray.set(res);
-  });
-  Meteor.call('outlet.sdBase', Meteor.userId(), (err, res) => {
-    if (!err)
-      this.outletArray.set(res);
-  });
-  Meteor.call('user.userSdList', Meteor.userId(), (err, res) => {
-    if (!err)
-      this.employelIstVar.set(res);
-  });
-
-
-  $('.selectEmployeeName').select2({
-    placeholder: "Select Employee Name",
-    tokenSeparators: [','],
-    allowClear: true
+      this.customerNameArray.set(res);
   });
 
   $('.selectCustomerName').select2({
-    placeholder: "Select Outlet Name",
+    placeholder: "Select Dealer Name",
     tokenSeparators: [','],
     allowClear: true
-  });
-  Meteor.call('routeGroup.sdWiselist', Meteor.userId(), (err, res) => {
-    if (!err) {
-      this.routeList.set(res);
-    };
-  });
-  $('.selectrouteName').select2({
-    placeholder: "Select Route Name",
-    tokenSeparators: [','],
-    allowClear: true
-  });
-  $('.selectCustomerName1').select2({
-    placeholder: "Select Outlet Name",
-    tokenSeparators: [','],
-    allowClear: true
-  });
-  $('.selectrouteName1').select2({
-    placeholder: "Select Route Name",
-    tokenSeparators: [','],
-    allowClear: true
-  });
-  let date = new Date();
-  let fromDate1 = new Date(moment(new Date(date.getFullYear(), date.getMonth(), 1)).format('YYYY-MM-DD 00:00:00.0'));
-  let toDate1 = new Date(moment(new Date()).format('YYYY-MM-DD 00:00:00.0'));
-  this.fromDate.set(fromDate1);
-  this.toDate.set(toDate1);
-
-  this.fromDateExport.set('');
-  this.toDateExport.set('');
-
+  }); 
 });
 
 Template.orderReport.helpers({
+
+
+  orderStatusValue: function (canceled) {
+    if (canceled === 'Y') {
+      return true;
+    }
+    else {
+      return false;
+    }
+
+  },
+  currencyGet: () => {
+    let currencyValues = Session.get("currencyValues");
+    return currencyValues;
+  },
+  /**
+  * 
+  * @param {*} index 
+  * @returns get row index
+  */
+  indexCountGet: (index) => {
+    let res = Template.instance().pagination;
+    if (res) {
+      let pageValue = res.settings.keys.page;
+      if (pageValue !== undefined && pageValue > 1) {
+        return (25 * (pageValue - 1)) + index + 1;
+      }
+      else {
+        return index + 1;
+      }
+    }
+  },
+  /**
+ * TODO:Complete JS doc
+ * @param vansale
+ */
+  vansaleAppCheck: (dataVal) => {
+    if (dataVal === true) {
+      return 'Mobile APP';
+    }
+    else {
+      return 'Web APP';
+    }
+  },
   /**
    * TODO: Complete JS doc
    * @returns {any | *}
@@ -149,15 +112,84 @@ Template.orderReport.helpers({
   templatePagination: function () {
     return Template.instance().pagination;
   },
+
+  /**
+ * TODO: Complete JS doc
+ * first approval details
+ */
+  firstApproveData: () => {
+    return Template.instance().approvalValueGet.get();
+  },
+  datesVal: (dateVal) => {
+    let date = moment(dateVal).format('DD-MM-YYYY hh:mm:ss A');
+    if (!date) {
+      return '';
+    } else {
+      return date;
+    }
+  },
+  /**
+     * TODO: Complete JS doc
+     * first approval check
+     */
+  firstApproveCheck: () => {
+    let res = Template.instance().approvalCheckVal.get();
+    if (res === true) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  },
+
   /**
    * TODO: Complete JS doc
    * @returns {*}
    */
   orderes: function () {
     let exportValue = Template.instance().pagination.getPage();
-    if (exportValue.length === 0) {
-      $('#bodySpinLoaders').css('display', 'none');
+    let uniqueSlNo = 0;
+    for (let i = 0; i < exportValue.length; i++) {
+      uniqueSlNo = parseInt(uniqueSlNo + 1);
+      for (let j = 0; j < exportValue[i].itemLines.length; j++) {
+        exportValue[i].itemLines[j].orderId = exportValue[i].orderId,
+          exportValue[i].itemLines[j].createdAt = exportValue[i].createdAt,
+          exportValue[i].itemLines[j].cardName = exportValue[i].cardName,
+          exportValue[i].itemLines[j].street = exportValue[i].street,
+          exportValue[i].itemLines[j].block = exportValue[i].block,
+          exportValue[i].itemLines[j].city = exportValue[i].city,
+          exportValue[i].itemLines[j].custRefNo = exportValue[i].custRefNo,
+          exportValue[i].itemLines[j].custRefDate = exportValue[i].custRefDate,
+          exportValue[i].itemLines[j].totalItem = exportValue[i].totalItem,
+          exportValue[i].itemLines[j].totalQty = exportValue[i].totalQty,
+          exportValue[i].itemLines[j].salesmanName = exportValue[i].salesmanName,
+          exportValue[i].itemLines[j].sQId = exportValue[i].sQId,
+          exportValue[i].itemLines[j].branchName = exportValue[i].branchName,
+          exportValue[i].itemLines[j].docTotal = exportValue[i].docTotal,
+          exportValue[i].itemLines[j].approvedByName = exportValue[i].approvedByName,
+          exportValue[i].itemLines[j].firstAppovalName = exportValue[i].firstAppovalName,
+          exportValue[i].itemLines[j].firstAppovalDate = exportValue[i].firstAppovalDate,
+          exportValue[i].itemLines[j].rejectedByName = exportValue[i].rejectedByName,
+          exportValue[i].itemLines[j].approvedByDate = exportValue[i].approvedByDate,
+          exportValue[i].itemLines[j].onHoldByName = exportValue[i].onHoldByName,
+          exportValue[i].itemLines[j].rejectedDate = exportValue[i].rejectedDate,
+          exportValue[i].itemLines[j].onHoldDate = exportValue[i].onHoldDate,
+          exportValue[i].itemLines[j].oRStatus = exportValue[i].oRStatus,
+          exportValue[i].itemLines[j].canceled = exportValue[i].canceled,
+          exportValue[i].itemLines[j].discPrcnt = exportValue[i].discPrcnt,
+          exportValue[i].itemLines[j].beforeDiscount = exportValue[i].beforeDiscount,
+          exportValue[i].itemLines[j].afterDiscount = exportValue[i].afterDiscount,
+          exportValue[i].itemLines[j].GST = exportValue[i].GST,
+          exportValue[i].itemLines[j].discPercnt = exportValue[i].discPercnt,
+          exportValue[i].itemLines[j].accountantApproved = exportValue[i].accountantApproved,
+          exportValue[i].itemLines[j].accountantRejected = exportValue[i].accountantRejected,
+          exportValue[i].itemLines[j].accountantOnHold = exportValue[i].accountantOnHold,
+          exportValue[i].itemLines[j].vansaleApp = exportValue[i].vansaleApp,
+          exportValue[i].itemLines[j].uniqueSlNo = uniqueSlNo
+      }
     }
+    Template.instance().todayExport.set(exportValue);
+
     return Template.instance().pagination.getPage();
   },
   /**
@@ -166,6 +198,38 @@ Template.orderReport.helpers({
     */
   orderTodayExport: function () {
     return Template.instance().todayExport.get();
+  },
+
+  /**
+ * TODO:Complete JS doc
+ * @param discPrcnt 
+ */
+  discountFormat: (discPrcnt) => {
+    return Number(discPrcnt).toFixed(6);
+  },
+  /**
+ * TODO:Complete JS doc
+ * @param discPrcnt 
+ */
+  diff: (itQuantity, deliveredQuantity) => {
+    return Number(itQuantity - deliveredQuantity).toFixed(6);
+  },
+  /**
+ * TODO: Complete Js doc
+ * @param deliveredBy
+ */
+  customer: (cardCode) => {
+    let custAr = Template.instance().customerNameArray.get();
+    if (custAr) {
+      return custAr.find(x => x.cardCode === cardCode).cardName;
+    }
+  },
+  /**
+* TODO:Complete JS doc
+*/
+  customersList: function () {
+
+    return Template.instance().customerNameArray.get();
   },
   /**
   * TODO: Complete JS doc
@@ -196,9 +260,6 @@ Template.orderReport.helpers({
   */
   items: () => {
     return Template.instance().itemsDetailsList.get();
-  }, vertical1: function () {
-    return Template.instance().verticalArray.get();
-
   },
   /**
    * TODO:Complete JS doc
@@ -231,28 +292,28 @@ Template.orderReport.helpers({
       return false;
     }
   },
-  // /**
-  // * TODO:Complete JS doc
-  // * 
-  // * @param docStatus
-  // */
-  // status: (docStatus) => {
-  //   if (docStatus === 'approved') {
-  //     return 'Approved';
-  //   }
-  //   else if (docStatus === 'rejected') {
-  //     return 'Rejected';
-  //   }
-  //   else if (docStatus === 'onHold') {
-  //     return 'On Hold';
-  //   }
-  //   else if (docStatus === 'Pending') {
-  //     return 'Pending';
-  //   }
-  //   else {
-  //     return '';
-  //   }
-  // },
+  /**
+  * TODO:Complete JS doc
+  * 
+  * @param docStatus
+  */
+  status: (docStatus) => {
+    if (docStatus === 'approved') {
+      return 'Approved';
+    }
+    else if (docStatus === 'rejected') {
+      return 'Rejected';
+    }
+    else if (docStatus === 'onHold') {
+      return 'On Hold';
+    }
+    else if (docStatus === 'Pending') {
+      return 'Pending';
+    }
+    else {
+      return '';
+    }
+  },
   /**
 * TODO:Complete JS doc
 * 
@@ -276,11 +337,67 @@ Template.orderReport.helpers({
     }
   },
   /**
-   * TODO:Complete JS doc
-   * 
+  * TODO:Complete JS doc
+  * @param quantity
+  * @param actualQuantity
+  */
+  deliveredQty: (quantity, actualQuantity) => {
+    let diff = Number(actualQuantity) - Number(quantity);
+    return Number(diff).toFixed(6);
+  },
+
+  priceFormat: (salesPrice) => {
+    let res = Number(salesPrice).toFixed(6);
+    return res.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+  },
+
+  quantityFormat: (quantity) => {
+    let res = Number(quantity).toFixed(3);
+    return res.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+  },
+  taxFormats: (quantity, taxRate) => {
+    let res = (parseInt(quantity) * Number(taxRate)).toFixed(6);
+    return res.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+  },
+  /**
+  * TODO:Complete Js doc
+  * for getting total weight
+  */
+  weightCal: (quantity, weight, unitQuantity) => {
+    let result = (parseInt(quantity) * Number(weight) * parseInt(unitQuantity)).toFixed(2);
+    return result.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+  },
+  approveCheckVal: (accountantApproved, accountantRejected, accountantOnHold) => {
+    if (accountantApproved === true || accountantRejected === true || accountantOnHold === true) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  },
+  /**
+   * TODO:Complete Js doc
+   * for getting total price based on quantity
    */
-  printLoad: () => {
-    let res = Template.instance().modalLoader.get();
+  totalIn: (price, quantity) => {
+    let res = Number(Number(price) * Number(quantity)).toFixed(6);
+    let result = Number(res).toFixed(6);
+    return result.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+  },
+  /**
+ * TODO:Complete JS doc
+ * @param docTotal
+ */
+  total: (docTotal) => {
+    let total = Number(docTotal).toFixed(2);
+    return total.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+  },
+  totalAmt: (docTotal) => {
+    let res = Number(docTotal).toFixed(6);
+    return res.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+  },
+  accCheck: () => {
+    let res = Template.instance().accValue.get();
     if (res === true) {
       return true;
     }
@@ -288,251 +405,13 @@ Template.orderReport.helpers({
       return false;
     }
   },
-  getUserName: (user) => {
-    let promiseVal = new Promise((resolve, reject) => {
-      Meteor.call("user.idName", user, (error, result) => {
-        if (!error) {
-          resolve(result);
-        } else {
-          reject(error);
-        }
-      });
-    });
-    promiseVal.then((result) => {
-      $('.userIdVal_' + user).html(result);
-      $('#bodySpinLoaders').css('display', 'none');
-    }
-    ).catch((error) => {
-      $('.userIdVal_' + user).html('');
-      $('#bodySpinLoaders').css('display', 'none');
-    }
-    );
-  },/**
-  * get vertical name
-  * @param {} vertical 
-  */
-  getVerticalName: (vertical) => {
-    let promiseVal = new Promise((resolve, reject) => {
-      Meteor.call("verticals.idName", vertical, (error, result) => {
-        if (!error) {
-          resolve(result);
-        } else {
-          reject(error);
-        }
-      });
-    });
-    promiseVal.then((result) => {
-      $('.verticalIdVal_' + vertical).html(result);
-      $('#bodySpinLoaders').css('display', 'none');
-    }
-    ).catch((error) => {
-      $('.verticalIdVal_' + vertical).html('');
-      $('#bodySpinLoaders').css('display', 'none');
-    }
-    );
-  },
-  outletHelp: (id) => {
-    let promiseVal = new Promise((resolve, reject) => {
-      Meteor.call("outlet.idName", id, (error, result) => {
-        if (!error) {
-          resolve(result);
-        } else {
-          reject(error);
-        }
-      });
-    });
-    promiseVal.then((result) => {
-      $('.outletVal_' + id).html(result);
-      $('#bodySpinLoaders').css('display', 'none');
-
-    }
-    ).catch((error) => {
-      $('.outletVal_' + id).html('');
-      $('#bodySpinLoaders').css('display', 'none');
-
-    });
-  },
-  routeHelp: (id) => {
-    let promiseVal = new Promise((resolve, reject) => {
-      Meteor.call('routeGroup.id', id, (error, result) => {
-        if (!error) {
-          resolve(result);
-        } else {
-          reject(error);
-        }
-      });
-    });
-    promiseVal.then((result) => {
-      $('.routeVal_' + id).html(result.routeName);
-      $('#bodySpinLoaders').css('display', 'none');
-
-    }
-    ).catch((error) => {
-      $('.routeVal_' + id).html('');
-      $('#bodySpinLoaders').css('display', 'none');
-
-    });
-  },
-  getproductHelp: (id) => {
-    let promiseVal = new Promise((resolve, reject) => {
-      Meteor.call('product.id', id, (error, result) => {
-        if (!error) {
-          resolve(result);
-        } else {
-          reject(error);
-        }
-      });
-    });
-    promiseVal.then((result) => {
-      $('.productVal_' + id).html(result.productName);
-      $('.loadersSpinVals').css('display', 'none');
-    }
-    ).catch((error) => {
-      $('.productVal_' + id).html('');
-      $('.loadersSpinVals').css('display', 'none');
-    });
-  },
-  getunitHelp: (id) => {
-    let promiseVal = new Promise((resolve, reject) => {
-      Meteor.call('unit.id', id, (error, result) => {
-        if (!error) {
-          resolve(result);
-        } else {
-          reject(error);
-        }
-      });
-    });
-    promiseVal.then((result) => {
-      $('.unitVal_' + id).html(result.unitName);
-      $('.loadersSpinVals').css('display', 'none');
-    }
-    ).catch((error) => {
-      $('.unitVal_' + id).html('');
-      $('.loadersSpinVals').css('display', 'none');
-    });
-  }, outlet1: function () {
-    return Template.instance().outletArray.get();
-
-  },
-  routeLists: function () {
-    return Template.instance().routeList.get();
-
-  },
-  formateAmountFix: (docTotal) => {
-    return Number(docTotal).toFixed(2);
-  },
-  userExport: function () {
-    return Template.instance().userExpoList.get();
-  },
   /**
-   * get delivery details
+   * TODO:Complete JS doc
+   * 
    */
-  deliveryDetails: () => {
-    return Template.instance().deliveryDetails.get();
+  printLoad: () => {
+    return Template.instance().modalLoader.get();
   },
-  docTotalSum: () => {
-    let routeData = Template.instance().routeData.get();
-    let outletData = Template.instance().outletData.get();
-    let employeeData = Template.instance().employeeData.get();
-    let fromDate = Template.instance().fromDate.get();
-    let toDate = Template.instance().toDate.get();
-    let promiseVal = new Promise((resolve, reject) => {
-      Meteor.call('order.docTotalSum', Meteor.userId(), routeData, outletData, fromDate, toDate, employeeData, (error, result) => {
-        if (!error) {
-          resolve(result);
-        } else {
-          reject(error);
-        }
-      });
-    });
-    promiseVal.then((result) => {
-      $('.docTotalSum').html(result);
-      $('#bodySpinLoaders').css('display', 'none');
-    }).catch((error) => {
-      $('.docTotalSum').html('');
-      $('#bodySpinLoaders').css('display', 'none');
-    });
-  },
-  docTotalSumExport: () => {
-    let userIdData = Template.instance().userIdDataExport.get();
-    let routeData = Template.instance().routeDataExport.get();
-    let outletData = Template.instance().outletDataExport.get();
-    let employeeData = Template.instance().employeeDataExport.get();
-    let fromDate = Template.instance().fromDateExport.get();
-    let toDate = Template.instance().toDateExport.get();
-    let promiseVal = new Promise((resolve, reject) => {
-      Meteor.call('order.docTotalSum', userIdData, routeData, outletData, fromDate, toDate, employeeData, (error, result) => {
-        if (!error) {
-          resolve(result);
-        } else {
-          reject(error);
-        }
-      });
-    });
-    promiseVal.then((result) => {
-      $('.docTotalSumExport').html(result);
-    }).catch((error) => {
-      $('.docTotalSumExport').html('');
-    });
-  },
-  taxAmountSum: () => {
-    let userIdData = Template.instance().userIdData.get();
-    let routeData = Template.instance().routeData.get();
-    let outletData = Template.instance().outletData.get();
-    let employeeData = Template.instance().employeeData.get();
-    let fromDate = Template.instance().fromDate.get();
-    let toDate = Template.instance().toDate.get();
-    let promiseVal = new Promise((resolve, reject) => {
-      Meteor.call('order.taxAmountSum', userIdData, routeData, outletData, fromDate, toDate, employeeData, (error, result) => {
-        if (!error) {
-          resolve(result);
-        } else {
-          reject(error);
-        }
-      });
-    });
-    promiseVal.then((result) => {
-      $('.taxAmountSum').html(result);
-      $('#bodySpinLoaders').css('display', 'none');
-    }).catch((error) => {
-      $('.taxAmountSum').html('');
-      $('#bodySpinLoaders').css('display', 'none');
-    });
-    promiseVal.then((result) => {
-      $('.taxAmountSum').html(result);
-      $('#bodySpinLoaders').css('display', 'none');
-    }).catch((error) => {
-      $('.taxAmountSum').html('');
-      $('#bodySpinLoaders').css('display', 'none');
-    });
-
-  },
-  taxAmountSumExport: () => {
-    let userIdData = Template.instance().userIdDataExport.get();
-    let routeData = Template.instance().routeDataExport.get();
-    let outletData = Template.instance().outletDataExport.get();
-    let employeeData = Template.instance().employeeDataExport.get();
-    let fromDate = Template.instance().fromDateExport.get();
-    let toDate = Template.instance().toDateExport.get();
-    let promiseVal = new Promise((resolve, reject) => {
-      Meteor.call('order.taxAmountSum', userIdData, routeData, outletData, fromDate, toDate, employeeData, (error, result) => {
-        if (!error) {
-          resolve(result);
-        } else {
-          reject(error);
-        }
-      });
-    });
-    promiseVal.then((result) => {
-      $('.taxAmountSumExport').html(result);
-    }).catch((error) => {
-      $('.taxAmountSumExport').html('');
-    });
-
-  },
-  employelIst: () => {
-    return Template.instance().employelIstVar.get();
-  }
 });
 Template.registerHelper('incremented', function (index) {
   index++;
@@ -544,143 +423,102 @@ Template.orderReport.events({
    * TODO: Complete JS doc
    * @param event
    */
-  'submit .order-filter': (event, template) => {
+  'submit .order-filter': (event) => {
     event.preventDefault();
-    let outletSerach = event.target.selectCustomerName.value;
-    let routeSearch = event.target.selectrouteName.value;
-    let employeeSearch = event.target.selectEmployeeName.value;
+
     let first = $("#fromDate").val();
     let second = $("#toDate").val();
-    let dateOne = moment(first, 'DD-MM-YYYY').format('YYYY-MM-DD  00:00:00.0');
-    let dateTwo = moment(second, 'DD-MM-YYYY').format('YYYY-MM-DD  00:00:00.0');
+    let managerBranch = Session.get("managerBranch");
+    let dateOne = moment(first, 'DD-MM-YYYY').format('YYYY-MM-DD');
+    let dateTwo = moment(second, 'DD-MM-YYYY').format('YYYY-MM-DD');
     let fromDate = new Date(dateOne);
     let toDate = new Date(dateTwo);
-    if (first === '' && second === '') {
-      toastr["error"]('Please fill Dates');
-      return;
+    let cardName = event.target.selectCustomerName.value;
+    if (cardName && isNaN(fromDate) && isNaN(toDate)) {
+      Template.instance().pagination.settings.set('filters', {
+        cardName: cardName,
+        branch: { $in: managerBranch }
+      });
     }
-    template.outletData.set('');
-    template.routeData.set('');
-    template.employeeData.set('');
-
-    template.fromDate.set(fromDate);
-    template.toDate.set(toDate);
-
-    if (outletSerach && routeSearch === '' && employeeSearch === '' && fromDate && toDate) {
-      template.outletData.set(outletSerach);
+    else if (fromDate && isNaN(toDate) && cardName === '') {
+      fromDate.setDate(fromDate.getDate() + 1);
+      Template.instance().pagination.settings.set('filters', {
+        docDate: {
+          $lte: fromDate
+        },
+        branch: { $in: managerBranch }
+      });
+    }
+    else if (toDate && isNaN(fromDate) && cardName === '') {
       toDate.setDate(toDate.getDate() + 1);
       Template.instance().pagination.settings.set('filters', {
-        subDistributor: Meteor.userId(),
-        outlet: outletSerach,
-        createdAt: {
-          $gte: fromDate, $lt: toDate
-        }
+        docDate: {
+          $lte: toDate
+        },
+        branch: { $in: managerBranch }
       });
-    } else if (outletSerach === '' && routeSearch && employeeSearch === '' && fromDate && toDate) {
-      template.routeData.set(routeSearch);
-      toDate.setDate(toDate.getDate() + 1);
-      Template.instance().pagination.settings.set('filters', {
-        subDistributor: Meteor.userId(),
-        routeId: routeSearch,
-        createdAt: {
-          $gte: fromDate, $lt: toDate
-        }
-      });
-    } else if (outletSerach === '' && routeSearch === '' && employeeSearch && fromDate && toDate) {
-      template.employeeData.set(employeeSearch);
-      toDate.setDate(toDate.getDate() + 1);
-      Template.instance().pagination.settings.set('filters', {
-        subDistributor: Meteor.userId(),
-        sdUser: employeeSearch,
-        createdAt: {
-          $gte: fromDate, $lt: toDate
-        }
-      });
-    } else if (outletSerach && routeSearch && employeeSearch === '' && fromDate && toDate) {
-      template.routeData.set(routeSearch);
-      template.outletData.set(outletSerach);
-      toDate.setDate(toDate.getDate() + 1);
-      Template.instance().pagination.settings.set('filters', {
-        subDistributor: Meteor.userId(),
-        outlet: outletSerach,
-        routeId: routeSearch,
-        createdAt: {
-          $gte: fromDate, $lt: toDate
-        }
-      });
-    } else if (outletSerach && routeSearch === '' && employeeSearch && fromDate && toDate) {
-      template.employeeData.set(employeeSearch);
-      template.outletData.set(outletSerach);
-      toDate.setDate(toDate.getDate() + 1);
-      Template.instance().pagination.settings.set('filters', {
-        subDistributor: Meteor.userId(),
-        outlet: outletSerach,
-        sdUser: employeeSearch,
-        createdAt: {
-          $gte: fromDate, $lt: toDate
-        }
-      });
-    } else if (outletSerach === '' && routeSearch && employeeSearch && fromDate && toDate) {
-      template.employeeData.set(employeeSearch);
-      template.routeData.set(routeSearch);
-      toDate.setDate(toDate.getDate() + 1);
-      Template.instance().pagination.settings.set('filters', {
-        subDistributor: Meteor.userId(),
-        routeId: routeSearch,
-        sdUser: employeeSearch,
-        createdAt: {
-          $gte: fromDate, $lt: toDate
-        }
-      });
-    } else if (outletSerach && routeSearch && employeeSearch && fromDate && toDate) {
-      template.employeeData.set(employeeSearch);
-      template.routeData.set(routeSearch);
-      template.outletData.set(outletSerach);
-      toDate.setDate(toDate.getDate() + 1);
-      Template.instance().pagination.settings.set('filters', {
-        subDistributor: Meteor.userId(),
-        outlet: outletSerach,
-        routeId: routeSearch,
-        sdUser: employeeSearch,
-        createdAt: {
-          $gte: fromDate, $lt: toDate
-        }
-      });
-    } else {
-      toDate.setDate(toDate.getDate() + 1);
-      Template.instance().pagination.settings.set('filters', {
-        subDistributor: Meteor.userId(),
-        createdAt: {
-          $gte: fromDate, $lt: toDate
-        }
-      });
+    }
+    else if (fromDate && toDate && cardName === '') {
+      if (fromDate.toString() === toDate.toString()) {
+        toDate.setDate(toDate.getDate() + 1);
+        Template.instance().pagination.settings.set('filters', {
+          docDate: {
+            $gte: fromDate, $lt: toDate
+          },
+          branch: { $in: managerBranch }
+        });
+      }
+      else {
+        toDate.setDate(toDate.getDate() + 1);
+        Template.instance().pagination.settings.set('filters', {
+          docDate: {
+            $gte: fromDate, $lte: toDate
+          }, branch: { $in: managerBranch }
+        });
+      }
+    }
+    else if (cardName && toDate && fromDate) {
+      if (fromDate.toString() === toDate.toString()) {
+        toDate.setDate(toDate.getDate() + 1);
+        Template.instance().pagination.settings.set('filters', {
+          docDate: {
+            $gte: fromDate, $lt: toDate
+          },
+          cardName: cardName,
+          branch: { $in: managerBranch }
+        });
+      }
+      else {
+        toDate.setDate(toDate.getDate() + 1);
+        Template.instance().pagination.settings.set('filters', {
+          docDate: {
+            $gte: fromDate, $lte: toDate
+          },
+          cardName: cardName,
+          branch: { $in: managerBranch }
+        });
+      }
+    }
+    else {
+      Template.instance().pagination.settings.set('filters', {});
     }
   },
   /**
    * TODO: Complete JS doc
    */
-  'click .reset': (event, template) => {
+  'click .reset': () => {
     $("#selectCustomerName").val('').trigger('change');
-    $("#selectrouteName").val('').trigger('change');
-    $("#selectEmployeeName").val('').trigger('change');
     let today = moment(new Date()).format("YYYY-MM-DD 00:00:00.0");
     toDay = new Date(today);
     nextDay = new Date(toDay);
+    let managerBranch = Session.get("managerBranch");
     nextDay.setDate(nextDay.getDate() + 1);
-    template.outletData.set('');
-    template.routeData.set('');
-    template.employeeData.set('');
-
-    let date = new Date();
-    let fDate = new Date(moment(new Date(date.getFullYear(), date.getMonth(), 1)).format('YYYY-MM-DD 00:00:00.0'));
-    let tDate = new Date(moment(new Date()).format('YYYY-MM-DD 00:00:00.0'));
-    template.fromDate.set(fDate);
-    template.toDate.set(tDate);
-
-    tDate.setDate(tDate.getDate() + 1);
     Template.instance().pagination.settings.set('filters', {
-      subDistributor: Meteor.userId(),
-      createdAt: { $gte: fDate, $lt: tDate }
+      branch: { $in: managerBranch },
+      docDate: {
+        $gte: toDay,
+        $lt: nextDay
+      }
     });
     $('form :input').val("");
   },
@@ -690,69 +528,149 @@ Template.orderReport.events({
     */
   'click .view': (event, template) => {
     event.preventDefault();
-    template.itemsDetailsList.set('');
-    template.modalLoader.set(true);
-    template.deliveryDetails.set('');
+    Template.instance().itemsDetailsList.set('');
+    Template.instance().modalLoader.set('');
+    template.approvalValueGet.set('');
+    template.approvalCheckVal.set(false);
+    template.accValue.set(false);
     let id = event.currentTarget.id;
     let header = $('#orderHs');
-    let sdUser = $('#ordersdUser');
-    let subDistributor = $('#ordersubDistributor');
-    let vertical = $('#ordervertical');
-    let outlet = $('#orderoutletoutlet');
-    let routeId = $('#orderrouteIdrouteId');
-    let docDate = $('#orderdocDatedocDate');
-    let docTotal = $('#orderdocTotal');
-    let discountAmt = $('#orderdiscountAmt');
-    let taxAmount = $('#ordertaxAmount');
-    // itemArray  = $('#orderitemArray')
-    let totalQty = $('#ordertotalQty');
-    // totalItems
-    let docNum = $('#orderdocNum');
-    let status = $('#orderstatus');
-    let createdBy = $('#ordercreatedBy');
-    let discountAmtData = $('#discountAmtData');
-    let orderDevice = $('#orderDevice');
-
+    let cardName = $('#detailCardNames');
+    let cardCode = $('#detailCardCodes');
+    let branch = $('#detailBranchs');
+    let docTotal = $('#detailDocTotals');
+    let beforeDiscount = $('#detailBeforeDiscounts');
+    let afterDiscount = $('#detailAfterDiscounts');
+    let gst = $('#detailGSTs');
+    let docEntry = $('#detailDocEntrys');
+    let docDeliver = $('#detailDocDelivers');
+    let docDate = $('#detailDocDates');
+    let custRef = $('#detailcustRef');
+    let custRefDate = $('#detailCustRefDate');
+    let orderId = $('#detailOrderIds');
+    let detailApprovedBy = $('#detailApprovedBy');
+    let detailApprovedDate = $('#detailApprovedDate');
+    let detailRemark = $('#detailRemark');
+    let weights = $('#detailWeight');
+    let ribNumberS = $('#detailribNumber');
+    let driverNameS = $('#detaildriverName');
+    let address = $('#detailAddress');
+    let street = '';
+    let city = '';
+    let block = '';
+    let salesPerson = $('#detailSalesPerson');
+    let detailApprovedRemark = $("#detailApprovedRemark");
+    let detailcreated = $('#detailcreated');
     $('#orderDetailPage').modal();
-    $('.loadersSpinVals').css('display', 'block');
-    Meteor.call('order.orderData', id, (orderError, orderResult) => {
+    Meteor.call('order.id', id, (orderError, orderResult) => {
       if (!orderError) {
-        // template.modalLoader.set(false);
-        let orderResult1 = orderResult.orderList;
-
-        if (orderResult1.status === 'Delivered') {
-          template.deliveryDetails.set(orderResult1)
-        }
+        let order = orderResult;
         $(header).html('Details of Order');
-        $(sdUser).html(orderResult.sdName);
-        $(subDistributor).html(orderResult.sdName1);
-        $(vertical).html(orderResult.verticalName);
-        $(outlet).html(orderResult.outletName);
-        $(routeId).html(orderResult.routeName);
-        $(docDate).html(orderResult1.docDate);
-        $(docTotal).html(orderResult1.docTotal);
-        $(discountAmt).html(orderResult1.discountAmt);
-        $(taxAmount).html(orderResult1.taxAmount);
-        $(totalQty).html(orderResult1.totalQty);
-        $(docNum).html(orderResult1.docNum);
-        $(status).html(orderResult1.status);
-        $(createdBy).html(orderResult.createdByName);
-        if (orderResult1.deviceInfo !== undefined) {
-          $(orderDevice).html(orderResult1.deviceInfo);
+        let totalAmt = Number(order.docTotal).toFixed(6);
+        $(docTotal).html(totalAmt.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
+        $(beforeDiscount).html(Number(order.beforeDiscount).toFixed(6));
+        $(afterDiscount).html(Number(order.afterDiscount).toFixed(6));
+        $(cardCode).html(order.cardCode);
+        $(custRef).html(order.custRefNo);
+        $(custRefDate).html(moment(order.custRefDate).format("DD-MM-YYYY"));
+        $(detailRemark).html(order.remark_order);
+        $(salesPerson).html(order.salesmanName);
+        $(branch).html(order.branchName);
+        $(cardName).html(order.cardName);
+        if (order.ribNumber !== undefined && order.ribNumber !== '') {
+          $(ribNumberS).html(order.ribNumber);
         }
         else {
-          $(orderDevice).html('');
+          $(ribNumberS).html('');
         }
-        $(discountAmtData).html(Number(orderResult1.discountAmt).toFixed(2));
-        if (orderResult1.itemArray !== undefined && orderResult1.itemArray.length > 0) {
-          $('.loadersSpinVals').css('display', 'none');
-          template.modalLoader.set(false);
-          console.log('as');
-          template.itemsDetailsList.set(orderResult1.itemArray);
+        if (order.driverName !== undefined && order.driverName !== '') {
+          $(driverNameS).html(order.driverName);
+        }
+        else {
+          $(driverNameS).html('');
+        }
+        let weightAmt = Number(order.weight).toFixed(2)
+        $(weights).html(weightAmt.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
+        $(docDeliver).html(moment(order.docDueDate).format("DD-MM-YYYY"));
+        if (order.oRStatus === 'Pending') {
+          $(detailApprovedBy).html(order.firstAppovalName);
+          $(detailApprovedDate).html(moment(order.firstAppovalDate).format("DD-MM-YYYY"));
+          $(detailApprovedRemark).html(order.firstApprovalRemarks);
+        }
+        else if (order.approvedByName) {
+          $(detailApprovedBy).html(order.approvedByName + ' ' + '(Approved)');
+          $(detailApprovedDate).html(moment(order.approvedByDate).format("DD-MM-YYYY") + ' ' + '(Approved)');
+          $(detailApprovedRemark).html(order.oRRemark + ' ' + '(Approved)');
+        }
+        else if (order.rejectedByName) {
+          $(detailApprovedBy).html(order.rejectedByName + ' ' + '(Rejected)');
+          $(detailApprovedDate).html(moment(order.rejectedDate).format("DD-MM-YYYY") + ' ' + '(Rejected)');
+          $(detailApprovedRemark).html(order.oRRemark + ' ' + '(Rejected)');
+        }
+        else if (order.onHoldByName) {
+          $(detailApprovedBy).html(order.onHoldByName + ' ' + '(On hold)');
+          $(detailApprovedDate).html(moment(order.onHoldDate).format("DD-MM-YYYY") + ' ' + '(On hold)');
+          $(detailApprovedRemark).html(order.oRRemark + ' ' + '(On Hold)');
+        }
+        else {
+          $(detailApprovedBy).html('');
+          $(detailApprovedDate).html('');
+          $(detailApprovedRemark).html('');
+        }
+
+        if (order.street === undefined) {
+          street = '';
+        }
+        else {
+          street = order.street;
+        }
+        if (order.block === undefined) {
+          block = '';
+        }
+        else {
+          block = order.block;
+        }
+        if (order.city === undefined) {
+          city = '';
+        }
+        else {
+          city = order.city;
+        }
+        $(address).html(street + "&nbsp;" + block + "&nbsp;" + city);
+        if (order.GST === undefined) {
+          $(gst).html('0.00');
+        }
+        else {
+          let gstAmt = Number(order.GST).toFixed(6);
+          $(gst).html(gstAmt.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
+        }
+        $(docDate).html(moment(order.createdAt).format('DD-MM-YYYY hh:mm:ss A'));
+        if (order.orderId === '' || order.orderId === undefined) {
+          $(orderId).html('');
         } else {
-          console.log('hai');
-          template.modalLoader.set(true);
+          $(orderId).html(order.orderId);
         }
+        if (order.docEntry === '' || order.docEntry === undefined) {
+          $(docEntry).html('');
+        } else {
+          $(docEntry).html(order.docEntry);
+        }
+        if (order.oRStatus === 'Pending') {
+          template.approvalCheckVal.set(true);
+          template.approvalValueGet.set(order);
+        }
+        if (order.accountantApproved === true || order.accountantRejected === true || order.accountantOnHold === true) {
+          template.accValue.set(true);
+          template.approvalValueGet.set(order);
+        }
+
+        if (order.mobileId !== '' && order.mobileId !== undefined) {
+          $(detailcreated).html('Mobile App');
+        } else {
+          $(detailcreated).html('Web App');
+        }
+        template.itemsDetailsList.set(order.itemLines);
+        template.modalLoader.set(order.itemLines);
       }
     });
   },
@@ -771,10 +689,9 @@ Template.orderReport.events({
   /**
     * TODO:Complete JS doc
     */
-  'click .exportToday': (event, template) => {
+  'submit .exportToday': (event, template) => {
     event.preventDefault();
-    $('#deliveryReportExportPage').modal('hide');
-    let exportData = Template.instance().userExpoList.get();
+    let exportData = Template.instance().todayExport.get();
     if (exportData.length === 0) {
       toastr["error"]('No Records Found');
     }
@@ -813,8 +730,6 @@ Template.orderReport.events({
         $("#exportButtons").prop('disabled', false);
       }, 5000);
     }
-    template.outletData.set('');
-    template.routeData.set('');
   },
   /**
    * TODO:CompleteJS doc
@@ -862,63 +777,10 @@ Template.orderReport.events({
     * TODO:Complete JS doc
     */
   'click .export': () => {
-    $('.exportToday').attr("disabled", true);
     let header = $('#deliveryExportH');
     $('#deliveryReportExportPage').modal();
     $(header).html('Export Details');
     $('.mainLoader').css('display', 'none');
-    $('#selectCustomerName1').val('').trigger('change');
-    $('#selectrouteName1').val('').trigger('change');
-    $('.startDate1').val('');
-    $('.endDate1').val('');
-  },
-  'change .startDate1': (event, template) => {
-    let sdate = $(".startDate1").val();
-    let outlet = $("#selectCustomerName1").val();
-    let route = ''
-    $('#selectrouteName1').find(':selected').each(function () {
-      route = $(this).val();
-    });
-    $('#selectCustomerName1').find(':selected').each(function () {
-      outlet = $(this).val();
-    });
-    let fromDate = new Date(moment(sdate, 'MM-YYYY').format("YYYY-MM-01 00:00:00.0"));
-    var toDate = new Date(fromDate.getFullYear(), fromDate.getMonth() + 1, 0);
-    template.routeDataExport.set(route);
-    template.outletDataExport.set(outlet);
-    template.employeeDataExport.set('');
-    template.fromDateExport.set(fromDate);
-    template.toDateExport.set(toDate);
-    template.outletData.set('');
-    template.userExpoList.set('');
-    template.modalLoader.set(true);
-    Meteor.call('order.orderlistExpo', outlet, route, Meteor.userId(), fromDate, toDate, (err, res) => {
-      if (!err) {
-        template.modalLoader.set(false);
-        if (res.length === 0) {
-          $('.exportToday').attr("disabled", true);
-          setTimeout(function () {
-            $("#emptyDataSpan").html('<style>#emptyDataSpans {color :#fc5f5f }</style><span id="emptyDataSpans">No Records Found !</span>').fadeIn('fast');
-          }, 0);
-          setTimeout(function () {
-            $('#emptyDataSpan').fadeOut('slow');
-          }, 3000);
-        }
-        else {
-          template.userExpoList.set(res);
-          $('.exportToday').attr("disabled", false);
-          setTimeout(function () {
-            $("#emptyDataSpan").html('<style> #emptyDataSpans { color:#2ECC71 }</style><span id ="emptyDataSpans">Records are ready for export.</span>').fadeIn('fast');
-          }, 0);
-          setTimeout(function () {
-            $('#emptyDataSpan').fadeOut('slow');
-          }, 3000);
-        }
-      }
-      else {
-        template.modalLoader.set(false);
-      }
-    });
   },
   /**
    * TODO:Complete JS doc
@@ -985,21 +847,4 @@ Template.orderReport.events({
     template.modalLoader.set('');
     $('.loadersSpin').css('display', 'none');
   },
-  /**
-* 
-* @param {*} event 
-* @param {*} template 
-*/
-  'change .selectrouteName1': (event, template) => {
-    $(".startDate1").val('');
-  },
-  /**
- * 
- * @param {*} event 
- * @param {*} template 
- */
-  'change .selectCustomerName1': (event, template) => {
-    $(".startDate1").val('');
-    $('#selectrouteName1').val('').trigger('change');
-  }
 });

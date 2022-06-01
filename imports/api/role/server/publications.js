@@ -1,5 +1,5 @@
 /**
- * @author Nithin
+ * @author Visakh
  */
 
 import {roles} from "../role";
@@ -11,7 +11,7 @@ Meteor.startup(() => {
   /**
  * TODO: Complete JS doc
  */
-  roles._ensureIndex({name: 1}, {unique: true});
+  roles.createIndex({name: 1}, {unique: true});
   publishPagination(roles);
   
 });
@@ -20,7 +20,7 @@ Meteor.startup(() => {
  * TODO: Complete JS doc
  */
 Meteor.publish('role.list', function () {
-  return Meteor.roles.find({},{fields:{name:1,homePage:1,permissions:1,rolesUnder:1,isDeleted:1}});
+  return Meteor.roles.find({});
 
 });
 

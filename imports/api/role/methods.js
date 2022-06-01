@@ -1,11 +1,8 @@
 /**
- * @author Nithin
+ * @author Visakh
  */
 import { Meteor } from "meteor/meteor";
-import { allUsers } from '../user/user';
-import { Verticals } from '../verticals/verticals';
-import { CreditSale } from "../creditSale/creditSale";
-import { Order } from '../order/order';
+
 Meteor.methods({
 
   /**
@@ -14,7 +11,8 @@ Meteor.methods({
    * @param name
    * @param description
    * @param historyView
-   * @param reportView 
+   * @param reportView
+   * @param reportOwnView
    * @param userView
    * @param userUpdate
    * @param userCreate
@@ -26,57 +24,101 @@ Meteor.methods({
    * @param roleView
    * @param roleUpdate
    * @param roleCreate
-   * @param roleDelete 
+   * @param roleDelete
+   * @param designationView
+   * @param designationUpdate
+   * @param designationCreate
+   * @param designationDelete
+   * @param leadView
+   * @param leadUpdate
+   * @param leadCreate
+   * @param leadDelete
    * @param adminDashboard
    * @param salesDashboard
    * @param orderCreate
-   * @param superAdminDashboard 
-   * @param superAdminView
-   * @param businessHeadView
-   * @param bdmView
-   * @param coordinatorView
-   * @param sdView
-   * @param sdUserApproveView
-   * @param stockTransferView
-   * @param masterDataView
-   * @param masterDataUpdate
-   * @param masterDataCreate
-   * @param masterDataDelete  
-   * @param outletsApproveView
-   * @param routeAssignView
-   * @param vsrView
-   * @param omrView
-   * @param wseView
-   * @param attendanceView
-   * @param stockListView
-   * @param outletTrackerView
-  */
-  'role.createOrUpdate': (id, name, description, url, historyView, reportView,
+   * @param orderView
+   * @param orderSeniorCreate
+   * @param orderSeniorView
+   * @param salesReturnCreate
+   * @param salesReturnView
+   * @param stockTransferRequestCreate
+   * @param stockTransferRequestView
+   * @param deliveryView
+   * @param deliveryUpdate
+   * @param dispatchView
+   * @param dispatchUpdate
+   * @param dispatchReportView
+   * @param dispatchRejectView
+   * @param collectionDueTomorrowReportView
+   * @param creditInvoiceView
+   * @param creditInvoiceCreate
+   * @param creditNoteView
+   * @param creditNoteCreate
+   * @param arInvoicePaymentView
+   * @param arInvoicePaymentCreate
+   * @param arInvoiceSeniorPaymentView
+   * @param arInvoiceSeniorPaymentCreate
+   * @param salesQuotationView
+   * @param salesQuotationCreate
+   * @param salesQuotationSeniorView
+   * @param salesQuotationSeniorCreate
+   * @param pickListView
+   * @param orderReportView
+   * @param salesQuotationReportView
+   * @param arInvoiceReportView
+   * @param creditInvoiceReportView
+   * @param salesReturnReportView
+   * @param creditNoteReportView
+   * @param branchTransferReportView
+   * @param collectionReportView
+   * @param stockTransferReportView
+   * @param invoiceReportView
+   * @param purchasePrintView
+   * @param activityView
+   * @param activityCreate
+   * @param activitySeniorView
+   * @param accountantView
+   * @param bpAdminView
+   * @param posReportView
+   * @param routeView 
+   * @param targetOutletReportView
+   * @param callRateReportView
+   * @param strikeRateReportView
+   * @param priceUpdateView
+   * @param vansaleReportView
+   * @param cxoDashboardView
+   * @param itemWiseReportView
+   * @param routeWiseReportView
+   * @param numericalDistributonReportView
+   * @param whsStockReportView
+   * @param weightageDistributionReportView
+   * @param coverageDistributionReportView
+   * @param priceTypeEditView
+   */
+  'role.createOrUpdate': (id, name, description, url, historyView, reportView, reportOwnView,
     userView, userUpdate, userCreate, userDelete, vanSaleUserView, vanSaleUserUpdate, vanSaleUserCreate, vanSaleUserDelete,
-    roleView, roleUpdate, roleCreate, roleDelete, adminDashboard, salesDashboard,
-    orderCreate, orderView, superAdminDashboard, rolesUnder, superAdminView, businessHeadView,
-    bdmView, coordinatorView, sdView, sdUserApproveView, stockTransferView,
-    masterDataView, masterDataUpdate, masterDataCreate, masterDataDelete, outletsApproveView,
-    routeView, routeUpdate, routeCreate, routeDelete, routeAssignView,
-    vsrView, omrView, wseView, attendanceView, stockListView,
-    verticalsView, verticalsUpdate, verticalsCreate, verticalsDelete,
-    outletsView, outletsUpdate, outletsCreate, outletsDelete,
-    sdMasterView, sdMasterUpdate, sdMasterCreate, sdMasterDelete, branchView, branchCreate,
-    branchUpdate, branchDelete, locationView, locationCreate, locationUpdate,
-    locationDelete, priceTypeView, priceTypeCreate, priceTypeUpdate,
-    priceTypeDelete, productView, productCreate, productUpdate, productDelete, unitView, unitCreate,
-    unitUpdate, unitDelete, priceView, priceCreate, priceUpdate, priceDelete, taxView, taxCreate,
-    taxUpdate, taxDelete, administrationView, sdPriceListView, deliveryListView, collectionListView,
-    deliveryUpdate, collectionUpdate, orderApprove, stockAcceptView,
-    sdOutletsView, sdOutletsUpdate, sdOutletsCreate, sdOutletsDelete,
-    cashSalesView, cashSalesUpdate, cashSalesCreate, cashSalesDelete,
-    cashSalesReportView, stockReportView,
-    creditSaleView, creditSaleUpdate, creditSaleCreate, creditSaleDelete,
-    stockReturnView, orderReport, stockSummaryView, creditSaleReport,
-    brandView, brandUpdate, brandCreate, brandDelete,
-    categoryView, categoryUpdate, categoryCreate, categoryDelete,
-    sdUserStockHistoryView, sdUserStockSummaryView, verticalSaleReportview,
-    sdReportsView, bdmReportsView, bhReportsView, outletTrackerView,
+    roleView, roleUpdate, roleCreate, roleDelete,
+    designationView, designationUpdate, designationCreate, designationDelete,
+    branchTransferView, branchTransferCreate, branchTransferApproveView,
+    leadView, leadUpdate, leadCreate, leadDelete,
+    adminDashboard, salesDashboard,
+    orderCreate, orderView, orderSeniorCreate, orderSeniorView, salesReturnCreate, salesReturnView, stockTransferRequestCreate, stockTransferRequestView, deliveryView,
+    deliveryUpdate, dispatchView, dispatchUpdate, dispatchRejectView, collectionDueTodayView, collectionDueTodayCreate,
+    creditInvoiceView, creditInvoiceCreate, creditNoteView, creditNoteCreate, arInvoicePaymentView, arInvoicePaymentCreate,
+    arInvoiceSeniorPaymentView, arInvoiceSeniorPaymentCreate, salesQuotationView, salesQuotationCreate,
+    salesQuotationSeniorView, salesQuotationSeniorCreate, invoiceView, deliveryBoyView, orderApproveView, quotationApproveView, salesReturnApproveView, stockTransferApproveView, creditNoteApproveView, creditInvoiceApproveView, pickListView,
+    orderReportView, salesQuotationReportView, arInvoiceReportView, creditInvoiceReportView,
+    salesReturnReportView, creditNoteReportView, branchTransferReportView, collectionReportView,
+    stockTransferReportView, invoiceReportView, deliveryReportView, purchasePrintView,
+    activityView, activityCreate, activitySeniorView, accountantView, bpAdminView, posPrint,
+    posReportView, routeView, routeUpdate, routeCreate, routeDelete, locationView, pendingArInvoiceView,
+    pendingPosInvoiceView, attendanceView, routeApproveView, salesSummaryReportView,
+    stockSummaryReportView, skippedCustomerReportView, noSalesReportView, superAdminDashboard,
+    targetOutletReportView, callRateReportView, strikeRateReportView,
+    priceUpdateView, vansaleReportView, cxoDashboardView, itemWiseReportView, routeWiseReportView,
+    numericalDistributonReportView, whsStockReportView, weightageDistributionReportView,
+    coverageDistributionReportView, priceTypeEditView, expenseListView,
+    masterDataView, masterDataUpdate, masterDataCreate, masterDataDelete
   ) => {
 
     let permission = [];
@@ -85,6 +127,9 @@ Meteor.methods({
     };
     if (reportView === true) {
       permission.push('reportView');
+    };
+    if (reportOwnView === true) {
+      permission.push('reportOwnView');
     };
     if (userView === true) {
       permission.push('userView');
@@ -124,58 +169,221 @@ Meteor.methods({
     if (roleDelete === true) {
       permission.push('roleDelete');
     };
+    if (designationView === true) {
+      permission.push('designationView');
+    };
+    if (designationUpdate === true) {
+      permission.push('designationUpdate');
+    };
+    if (designationCreate === true) {
+      permission.push('designationCreate');
+    };
+    if (designationDelete === true) {
+      permission.push('designationDelete');
+    };
+    if (branchTransferView === true) {
+      permission.push('branchTransferView');
+    };
+    if (branchTransferCreate === true) {
+      permission.push('branchTransferCreate');
+    };
+    if (branchTransferApproveView === true) {
+      permission.push('branchTransferApproveView');
+    };
 
+
+    if (leadView === true) {
+      permission.push('leadView');
+    };
+    if (leadUpdate === true) {
+      permission.push('leadUpdate');
+    };
+    if (leadCreate === true) {
+      permission.push('leadCreate');
+    };
+    if (leadDelete === true) {
+      permission.push('leadDelete');
+    };
     if (orderCreate === true) {
       permission.push('orderCreate');
     };
     if (orderView === true) {
       permission.push('orderView');
     };
-
+    if (orderSeniorCreate === true) {
+      permission.push('orderSeniorCreate');
+    };
+    if (orderSeniorView === true) {
+      permission.push('orderSeniorView');
+    };
+    if (salesReturnCreate === true) {
+      permission.push('salesReturnCreate');
+    };
+    if (salesReturnView === true) {
+      permission.push('salesReturnView');
+    };
+    if (stockTransferRequestCreate === true) {
+      permission.push('stockTransferRequestCreate');
+    };
+    if (stockTransferRequestView === true) {
+      permission.push('stockTransferRequestView');
+    };
     if (adminDashboard === true) {
       permission.push('adminDashboard');
     };
     if (salesDashboard === true) {
       permission.push('salesDashboard');
     };
-    if (superAdminDashboard === true) {
-      permission.push('superAdminDashboard');
+    if (deliveryView === true) {
+      permission.push('deliveryView');
     };
-    if (superAdminView === true) {
-      permission.push('superAdminView');
+    if (deliveryUpdate === true) {
+      permission.push('deliveryUpdate');
     };
-    if (businessHeadView === true) {
-      permission.push('businessHeadView');
+    if (dispatchView === true) {
+      permission.push('dispatchView');
     };
-    if (bdmView === true) {
-      permission.push('bdmView');
+    if (dispatchUpdate === true) {
+      permission.push('dispatchUpdate');
     };
-    if (coordinatorView === true) {
-      permission.push('coordinatorView');
+    if (dispatchRejectView === true) {
+      permission.push('dispatchRejectView');
     };
-    if (sdView === true) {
-      permission.push('sdView');
+    if (collectionDueTodayView === true) {
+      permission.push('collectionDueToday');
     };
-    if (sdUserApproveView === true) {
-      permission.push('sdUserApproveView');
+    if (collectionDueTodayCreate === true) {
+      permission.push('createCollectionDueToday');
     };
-    if (stockTransferView === true) {
-      permission.push('stockTransferView');
+    if (collectionDueTodayView === true) {
+      permission.push('collectionDueToday');
     };
-    if (masterDataCreate === true) {
-      permission.push('masterDataCreate');
+    if (creditInvoiceView === true) {
+      permission.push('creditInvoiceView');
     };
-    if (masterDataDelete === true) {
-      permission.push('masterDataDelete');
+    if (creditInvoiceCreate === true) {
+      permission.push('creditInvoiceCreate');
     };
-    if (masterDataUpdate === true) {
-      permission.push('masterDataUpdate');
+    if (creditNoteView === true) {
+      permission.push('creditNoteView');
     };
-    if (masterDataView === true) {
-      permission.push('masterDataView');
+    if (creditNoteCreate === true) {
+      permission.push('creditNoteCreate');
     };
-    if (outletsApproveView === true) {
-      permission.push('outletsApproveView');
+    if (arInvoicePaymentView === true) {
+      permission.push('arInvoicePaymentView');
+    };
+    if (arInvoicePaymentCreate === true) {
+      permission.push('arInvoicePaymentCreate');
+    };
+    if (arInvoiceSeniorPaymentView === true) {
+      permission.push('arInvoiceSeniorPaymentView');
+    };
+    if (arInvoiceSeniorPaymentCreate === true) {
+      permission.push('arInvoiceSeniorPaymentCreate');
+    };
+    if (salesQuotationView === true) {
+      permission.push('salesQuotationView');
+    };
+    if (salesQuotationCreate === true) {
+      permission.push('salesQuotationCreate');
+    };
+    if (salesQuotationSeniorView === true) {
+      permission.push('salesQuotationSeniorView');
+    };
+    if (salesQuotationSeniorCreate === true) {
+      permission.push('salesQuotationSeniorCreate');
+    };
+    if (invoiceView === true) {
+      permission.push('invoiceView');
+    };
+    if (deliveryBoyView === true) {
+      permission.push('deliveryBoyView');
+    };
+    if (orderApproveView === true) {
+      permission.push('orderApproveView');
+    };
+    if (quotationApproveView === true) {
+      permission.push('quotationApproveView');
+    };
+    if (salesReturnApproveView === true) {
+      permission.push('salesReturnApproveView');
+    };
+    if (stockTransferApproveView === true) {
+      permission.push('stockTransferApproveView');
+    };
+    if (creditNoteApproveView === true) {
+      permission.push('creditNoteApproveView');
+    };
+    if (creditInvoiceApproveView === true) {
+      permission.push('creditInvoiceApproveView');
+    };
+    if (pickListView === true) {
+      permission.push('pickListView');
+    };
+    if (orderReportView === true) {
+      permission.push('orderReportView');
+    };
+    if (salesQuotationReportView === true) {
+      permission.push('salesQuotationReportView');
+    };
+    if (arInvoiceReportView === true) {
+      permission.push('arInvoiceReportView');
+    };
+    if (creditInvoiceReportView === true) {
+      permission.push('creditInvoiceReportView');
+    };
+    if (salesReturnReportView === true) {
+      permission.push('salesReturnReportView');
+    };
+    if (creditNoteReportView === true) {
+      permission.push('creditNoteReportView');
+    };
+    if (branchTransferReportView === true) {
+      permission.push('branchTransferReportView');
+    };
+    if (collectionReportView === true) {
+      permission.push('collectionReportView');
+    };
+    if (stockTransferReportView === true) {
+      permission.push('stockTransferReportView');
+    };
+    if (invoiceReportView === true) {
+      permission.push('invoiceReportView');
+    };
+    if (deliveryReportView === true) {
+      permission.push('deliveryReportView');
+    };
+    if (purchasePrintView === true) {
+      permission.push('purchasePrintView');
+    };
+    if (activityView === true) {
+      permission.push('activityView');
+    };
+    if (activityCreate === true) {
+      permission.push('activityCreate');
+    };
+    if (activitySeniorView === true) {
+      permission.push('activitySeniorView');
+    };
+    if (accountantView === true) {
+      permission.push('accountantView');
+    };
+    if (bpAdminView === true) {
+      permission.push('bpAdminView');
+    };
+    if (posPrint === true) {
+      permission.push('salepos');
+    };
+    if (posReportView === true) {
+      permission.push('posReportView');
+    };
+
+    if (routeView === true) {
+      permission.push('routeView');
+    };
+    if (routeUpdate === true) {
+      permission.push('routeUpdate');
     };
     if (routeCreate === true) {
       permission.push('routeCreate');
@@ -183,284 +391,92 @@ Meteor.methods({
     if (routeDelete === true) {
       permission.push('routeDelete');
     };
-    if (routeUpdate === true) {
-      permission.push('routeUpdate');
+    if (locationView === true) {
+      permission.push('locationView');
     };
-    if (routeView === true) {
-      permission.push('routeView');
+    if (pendingArInvoiceView === true) {
+      permission.push('pendingArInvoiceView');
     };
-    if (routeAssignView === true) {
-      permission.push('routeAssignView');
-    };
-    if (vsrView === true) {
-      permission.push('vsrView');
-    };
-    if (omrView === true) {
-      permission.push('omrView');
-    };
-    if (wseView === true) {
-      permission.push('wseView');
+
+    if (pendingPosInvoiceView === true) {
+      permission.push('pendingPosInvoiceView');
     };
     if (attendanceView === true) {
       permission.push('attendanceView');
     };
-    if (stockListView === true) {
-      permission.push('stockListView');
+    if (routeApproveView === true) {
+      permission.push('routeApproveView');
+    };
+    if (salesSummaryReportView === true) {
+      permission.push('salesSummaryReportView');
+    };
+    if (stockSummaryReportView === true) {
+      permission.push('stockSummaryReportView');
+    };
+    if (skippedCustomerReportView === true) {
+      permission.push('skippedCustomerReportView');
+    };
+    if (noSalesReportView === true) {
+      permission.push('noSalesReportView');
+    };
+    if (superAdminDashboard === true) {
+      permission.push('superAdminDashboard');
+    };
+    if (targetOutletReportView === true) {
+      permission.push('targetOutletReportView');
+    };
+    if (callRateReportView === true) {
+      permission.push('callRateReportView');
+    };
+    if (strikeRateReportView === true) {
+      permission.push('strikeRateReportView');
+    };
+    if (priceUpdateView === true) {
+      permission.push('priceUpdateView');
+    };
+    if (vansaleReportView === true) {
+      permission.push('vansaleReportView');
+    };
+    if (cxoDashboardView === true) {
+      permission.push('cxoDashboardView');
+    };
+    if (itemWiseReportView === true) {
+      permission.push('itemWiseReportView');
+    };
+    if (routeWiseReportView === true) {
+      permission.push('routeWiseReportView');
+    };
+    if (numericalDistributonReportView === true) {
+      permission.push('numericalDistributonReportView');
+    };
+    if (whsStockReportView === true) {
+      permission.push('whsStockReportView');
+    };
+    if (weightageDistributionReportView === true) {
+      permission.push('weightageDistributionReportView');
+    };
+    if (coverageDistributionReportView === true) {
+      permission.push('coverageDistributionReportView');
+    };
+    if (priceTypeEditView === true) {
+      permission.push('priceTypeEditView');
+    };
+    if (expenseListView === true) {
+      permission.push('expenseListView');
     };
 
-    if (verticalsCreate === true) {
-      permission.push('verticalsCreate');
+    if (masterDataView === true) {
+      permission.push('masterDataView');
     };
-    if (verticalsDelete === true) {
-      permission.push('verticalsDelete');
+    if (masterDataUpdate === true) {
+      permission.push('masterDataUpdate');
     };
-    if (verticalsUpdate === true) {
-      permission.push('verticalsUpdate');
+    if (masterDataCreate === true) {
+      permission.push('masterDataCreate');
     };
-    if (verticalsView === true) {
-      permission.push('verticalsView');
+    if (masterDataDelete === true) {
+      permission.push('masterDataDelete');
     };
-
-    if (outletsCreate === true) {
-      permission.push('outletsCreate');
-    };
-    if (outletsDelete === true) {
-      permission.push('outletsDelete');
-    };
-    if (outletsUpdate === true) {
-      permission.push('outletsUpdate');
-    };
-    if (outletsView === true) {
-      permission.push('outletsView');
-    };
-
-    if (sdMasterCreate === true) {
-      permission.push('sdMasterCreate');
-    };
-    if (sdMasterDelete === true) {
-      permission.push('sdMasterDelete');
-    };
-    if (sdMasterUpdate === true) {
-      permission.push('sdMasterUpdate');
-    };
-    if (sdMasterView === true) {
-      permission.push('sdMasterView');
-    };
-
-    if (branchView === true) {
-      permission.push('branchView');
-    };
-    if (branchCreate === true) {
-      permission.push('branchCreate');
-    };
-    if (branchUpdate === true) {
-      permission.push('branchUpdate');
-    };
-    if (branchDelete === true) {
-      permission.push('branchDelete');
-    };
-    if (locationView === true) {
-      permission.push('locationView');
-    };
-    if (locationCreate === true) {
-      permission.push('locationCreate');
-    };
-    if (locationUpdate === true) {
-      permission.push('locationUpdate');
-    };
-    if (locationDelete === true) {
-      permission.push('locationDelete');
-    };
-    if (priceTypeView === true) {
-      permission.push('priceTypeView');
-    };
-    if (priceTypeCreate === true) {
-      permission.push('priceTypeCreate');
-    };
-    if (priceTypeUpdate === true) {
-      permission.push('priceTypeUpdate');
-    };
-    if (priceTypeDelete === true) {
-      permission.push('priceTypeDelete');
-    };
-    if (productView === true) {
-      permission.push('productView');
-    };
-    if (productCreate === true) {
-      permission.push('productCreate');
-    };
-    if (productUpdate === true) {
-      permission.push('productUpdate');
-    };
-    if (productDelete === true) {
-      permission.push('productDelete');
-    };
-    if (unitView === true) {
-      permission.push('unitView');
-    };
-    if (unitCreate === true) {
-      permission.push('unitCreate');
-    };
-    if (unitUpdate === true) {
-      permission.push('unitUpdate');
-    };
-    if (unitDelete === true) {
-      permission.push('unitDelete');
-    };
-    if (priceView === true) {
-      permission.push('priceView');
-    };
-    if (priceCreate === true) {
-      permission.push('priceCreate');
-    };
-    if (priceUpdate === true) {
-      permission.push('priceUpdate');
-    };
-    if (priceDelete === true) {
-      permission.push('priceDelete');
-    };
-    if (taxView === true) {
-      permission.push('taxView');
-    };
-    if (taxCreate === true) {
-      permission.push('taxCreate');
-    };
-    if (taxUpdate === true) {
-      permission.push('taxUpdate');
-    };
-    if (taxDelete === true) {
-      permission.push('taxDelete');
-    };
-    if (administrationView === true) {
-      permission.push('administrationView');
-    };
-
-    if (sdPriceListView === true) {
-      permission.push('sdPriceListView');
-    };
-
-    if (deliveryListView === true) {
-      permission.push('deliveryListView');
-    };
-    if (collectionListView === true) {
-      permission.push('collectionListView');
-    };
-    if (deliveryUpdate === true) {
-      permission.push('deliveryUpdate');
-    };
-    if (collectionUpdate === true) {
-      permission.push('collectionUpdate');
-    };
-    if (orderApprove === true) {
-      permission.push('orderApprove');
-    };
-    if (stockAcceptView === true) {
-      permission.push('stockAcceptView');
-    };
-
-    if (sdOutletsCreate === true) {
-      permission.push('sdOutletsCreate');
-    };
-    if (sdOutletsDelete === true) {
-      permission.push('sdOutletsDelete');
-    };
-    if (sdOutletsUpdate === true) {
-      permission.push('sdOutletsUpdate');
-    };
-    if (sdOutletsView === true) {
-      permission.push('sdOutletsView');
-    };
-    if (cashSalesCreate === true) {
-      permission.push('cashSalesCreate');
-    };
-    if (cashSalesDelete === true) {
-      permission.push('cashSalesDelete');
-    };
-    if (cashSalesUpdate === true) {
-      permission.push('cashSalesUpdate');
-    };
-    if (cashSalesView === true) {
-      permission.push('cashSalesView');
-    };
-    if (cashSalesReportView === true) {
-      permission.push('cashSalesReportView');
-    };
-    if (orderReport === true) {
-      permission.push('orderReport');
-    };
-    if (stockReportView === true) {
-      permission.push('stockReportView');
-    };
-    if (creditSaleCreate === true) {
-      permission.push('creditSaleCreate');
-    };
-    if (creditSaleDelete === true) {
-      permission.push('creditSaleDelete');
-    };
-    if (creditSaleUpdate === true) {
-      permission.push('creditSaleUpdate');
-    };
-    if (creditSaleView === true) {
-      permission.push('creditSaleView');
-    };
-    if (stockReturnView === true) {
-      permission.push('stockReturnView');
-    };
-    if (stockSummaryView === true) {
-      permission.push('stockSummaryView');
-    };
-    if (creditSaleReport === true) {
-      permission.push('creditSaleReport');
-    };
-
-    if (brandCreate === true) {
-      permission.push('brandCreate');
-    };
-    if (brandDelete === true) {
-      permission.push('brandDelete');
-    };
-    if (brandUpdate === true) {
-      permission.push('brandUpdate');
-    };
-    if (brandView === true) {
-      permission.push('brandView');
-    };
-
-    if (categoryCreate === true) {
-      permission.push('categoryCreate');
-    };
-    if (categoryDelete === true) {
-      permission.push('categoryDelete');
-    };
-    if (categoryUpdate === true) {
-      permission.push('categoryUpdate');
-    };
-    if (categoryView === true) {
-      permission.push('categoryView');
-    };
-    if (sdUserStockHistoryView === true) {
-      permission.push('sdUserStockHistoryView');
-    };
-    if (sdUserStockSummaryView === true) {
-      permission.push('sdUserStockSummaryView');
-    };
-    if (verticalSaleReportview === true) {
-      permission.push('verticalSaleReportview');
-    };
-
-    if (sdReportsView === true) {
-      permission.push('sdReportsView');
-    };
-
-    if (bdmReportsView === true) {
-      permission.push('bdmReportsView');
-    }; if (bhReportsView === true) {
-      permission.push('bhReportsView');
-    };
-    if (outletTrackerView === true) {
-      permission.push('outletTrackerView');
-    };
-
     if (id) {
       return Meteor.roles.update({ _id: id }, {
         $set: {
@@ -468,7 +484,6 @@ Meteor.methods({
           description: description,
           homePage: url,
           permissions: permission,
-          rolesUnder: rolesUnder,
           updatedAt: new Date(),
           updatedBy: Meteor.user().username
         }
@@ -480,7 +495,6 @@ Meteor.methods({
         description: description,
         homePage: url,
         permissions: permission,
-        rolesUnder: rolesUnder,
         createdAt: new Date(),
         isDeleted: false,
         createdBy: Meteor.user().username,
@@ -525,7 +539,7 @@ Meteor.methods({
     });
   },
   'role.roleNameGet': () => {
-    return Meteor.roles.find({ 'isDeleted': false, rolesUnder: "MD" }, { sort: { name: 1 } }).fetch();
+    return Meteor.roles.find({ 'isDeleted': false }, { sort: { name: 1 } }).fetch();
   },
   'role.details': (r) => {
     return Meteor.roles.find({ _id: r }, { isDeleted: false }).fetch();
@@ -533,172 +547,38 @@ Meteor.methods({
   'role.roleName': (id) => {
     return Meteor.roles.findOne({ _id: id });
   },
-  'role.roleName1': (user) => {
-    let userDetails = allUsers.findOne({ _id: user });
-    let id = userDetails.roles;
-    let data = Meteor.roles.findOne({ _id: { $in: id } });
-    let vsrNot = '';
-    if (data) {
-      if (data.name == "VSR") {
-        vsrNot = userDetails.profile.firstName + '' + userDetails.profile.lastName;
-      }
-    }
-    return vsrNot;
-  },
-  'role.roleNameUser': (role, user) => {
-    let id = role;
-    let data = Meteor.roles.findOne({ _id: { $in: id } });
-    let vsrNot = '';
-    if (data) {
-      vsrNot = data.name;
-    }
-    return vsrNot;
-  },
   'role.roleCount': (roleName) => {
     return Meteor.roles.find({
       name: { $regex: new RegExp(roleName.trim(), "i") }
     }).count();
   },
-  'role.channelNameGet': () => {
-    return Meteor.roles.find({ 'isDeleted': false, rolesUnder: "SD" }, { sort: { name: 1 } }).fetch();
-  },
-
-  'roles.rolesListGet': () => {
-    return Meteor.roles.find({},).fetch();
-  },
-
-  'roles.getTransactionDetails': () => {
-    let results = [];
-    let subDistributorList = allUsers.find({ active: "Y", userType: "SD" }, {
-      fields: {
-        profile: 1
-      }
-    }).fetch();
-
-    if (subDistributorList.length > 0) {
-      for (let i = 0; i < subDistributorList.length; i++) {
-        let orderCount = Order.find({ subDistributor: subDistributorList[i]._id }).count();
-        let creditSales = CreditSale.find({ subDistributor: subDistributorList[i]._id, salesType: 'Credit' }).count();
-        let cashSales = CreditSale.find({ subDistributor: subDistributorList[i]._id, salesType: 'Cash' }).count();
-
-        let sudUsers = allUsers.find({ active: "Y", userType: "SDUser", subDistributor: subDistributorList[i]._id }, {
-          fields: {
-            profile: 1
-          }
-        }).fetch();
-        let userArrays = [];
-        if (sudUsers.length > 0) {
-          for (let j = 0; j < sudUsers.length; j++) {
-            let orderCount1 = Order.find({ sdUser: sudUsers[j]._id }).count();
-            let creditSales1 = CreditSale.find({ sdUser: sudUsers[j]._id, salesType: 'Credit' }).count();
-            let cashSales1 = CreditSale.find({ sdUser: sudUsers[j]._id, salesType: 'Cash' }).count();
-            userArrays.push({
-              sdUserName: `${sudUsers[j].profile.firstName} ${sudUsers[j].profile.lastName}`,
-              orderCount1: orderCount1,
-              creditSales1: creditSales1,
-              cashSales1: cashSales1
-            })
-          }
-        }
-        results.push({
-          subDistributorName: `${subDistributorList[i].profile.firstName} ${subDistributorList[i].profile.lastName}`,
-          orderCount: orderCount,
-          creditSales: creditSales,
-          cashSales: cashSales,
-          userArrays: userArrays
-        });
-      }
-    } 
-    return results;
-  },
   /**
    * 
-   * @returns get role wise user details for export
+   * @param {*} roleArray get roles name array
    */
-  'roles.getUserExport': () => {
-    // get all active roles
-    let roleRes = Meteor.roles.find({ 'isDeleted': false }, { sort: { name: 1 } }, { fields: { name: 1 } },).fetch();
-    let userListArray = [];
-    let roleDetailsGet = [];
-    let activeUser = allUsers.find({ active: "Y" }).count();
-    let inActiveUser = allUsers.find({ active: "N" }).count();
+  'role.idNameArray': (roleArray) => {
+    let roleNames = [];
+    if (roleArray !== undefined && roleArray.length > 0) {
+      for (let i = 0; i < roleArray.length; i++) {
+        let roleRes = Meteor.roles.findOne({ _id: roleArray[i] });
+        if (roleRes) {
+          roleNames.push(roleRes.name);
+        }
+      }
+    }
+    return roleNames.toString();
+  },
+
+  'roles.vansaleRoleGet': () => {
+    let rolesArray = [];
+    let roleRes = Meteor.roles.find({
+      name: { $ne: "Merchandiser" }
+    }, { fields: { _id: 1 } }).fetch();
     if (roleRes.length > 0) {
       for (let i = 0; i < roleRes.length; i++) {
-        // get role based user name
-        let userDetails = allUsers.find({ roles: roleRes[i]._id },
-          { sort: { 'profile.firstName': 1 } },
-          {
-            fields: {
-              profile: 1, username: 1, emails: 1,
-              active: 1, vertical: 1, subDistributor: 1, userType: 1
-            }
-          }).fetch();
-        // get inactive use count
-        let userDetailsInactive = allUsers.find({ roles: roleRes[i]._id, active: "N" },
-        ).count();
-        // get active user count
-        let userDetailsActive = allUsers.find({ roles: roleRes[i]._id, active: "Y" }
-        ).count();
-        let roleUserArray = [];
-        if (userDetails.length > 0) {
-          for (let j = 0; j < userDetails.length; j++) {
-            let verticalArray = [];
-            let verticalNameArray = [];
-            if (userDetails[j].userType === 'SDUser') {
-              let sdUserVal = allUsers.findOne({ _id: userDetails[j].subDistributor }, { fields: { vertical: 1 } });
-              if (sdUserVal) {
-                verticalArray = sdUserVal.vertical;
-              }
-            }
-            else {
-              verticalArray = userDetails[j].vertical;
-            }
-            if (verticalArray.length > 0) {
-              for (let k = 0; k < verticalArray.length; k++) {
-                let verticalRes = Verticals.findOne({ _id: verticalArray[k] }, { fields: { verticalName: 1 } });
-                if (verticalRes) {
-                  verticalNameArray.push(verticalRes.verticalName);
-                }
-              }
-            }
-
-            let status = '';
-            if (userDetails[j].active === "Y") {
-              status = "Active";
-            }
-            else {
-              status = "InActive";
-            }
-            let roleUserObj = {
-              firstName: userDetails[j].profile.firstName,
-              lastName: userDetails[j].profile.lastName,
-              gender: userDetails[j].profile.gender,
-              empCode: userDetails[j].profile.empCode,
-              dob: userDetails[j].profile.dateOfBirth,
-              userNameVal: userDetails[j].username,
-              email: userDetails[j].emails[0].address,
-              verticalNameArray: verticalNameArray.toString(),
-              status: status,
-            };
-            roleUserArray.push(roleUserObj);
-          }
-        }
-        let userObj = {
-          roleNameVal: roleRes[i].name,
-          totalUsersActiveVal: userDetailsActive,
-          totalUsersInActiveVal: userDetailsInactive,
-          userDetails: roleUserArray,
-        };
-        userListArray.push(userObj);
+        rolesArray.push(roleRes[i]._id);
       }
-      let resDataObj =
-      {
-        activeUser: activeUser,
-        inActiveUser: inActiveUser,
-        userListArray: userListArray
-      }
-      roleDetailsGet.push(resDataObj);
     }
-    return roleDetailsGet;
+    return rolesArray;
   }
 });

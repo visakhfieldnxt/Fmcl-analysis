@@ -10,15 +10,14 @@ Meteor.startup(() => {
   /**
  * TODO: Complete JS doc
  */
-RouteGroup._ensureIndex({ uuid: 1 }, { unique: true });
-RouteGroup._ensureIndex({ createdAt: 1 }, { unique: false }); 
+RouteGroup.createIndex({ uuid: 1 }, { unique: true });
   publishPagination(RouteGroup);
 
 });
 /**
  * TODO: Complete JS doc
  */
-// Meteor.publish('routeGroup.list', function () {
-//   return RouteGroup.find({});
+Meteor.publish('routeGroup.list', function () {
+  return RouteGroup.find({});
 
-// });
+});

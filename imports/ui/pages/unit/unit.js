@@ -11,41 +11,27 @@ Template.unit.onCreated(function () {
   self.autorun(() => {
 
   });
-  this.unitNameArray = new ReactiveVar();
-  this.modalLoader = new ReactiveVar();
-  this.productListGet = new ReactiveVar();
-  this.productEdit = new ReactiveVar();
   this.fileName = new ReactiveVar();
-  this.productNameArray = new ReactiveVar();
-  this.productFullList = new ReactiveVar();
-  let loginUserVerticals = Session.get("loginUserVerticals");
-  let superAdminValue = Session.get("superAdminValue");
-  if (superAdminValue === true) {
-    this.pagination = new Meteor.Pagination(Unit, {
-      filters: {
-        active: "Y"
-      },
-      sort: { createdAt: -1 },
-      fields:{unitCode:1,unitName:1,product:1,active:1},
-      perPage: 20
-    });
-  }
-  else {
-    this.pagination = new Meteor.Pagination(Unit, {
-      filters: {
-        active: "Y", vertical: { $in: loginUserVerticals }
-      },
-      sort: { createdAt: -1 },
-      perPage: 20
-    });
-  }
+  this.unitLists = new ReactiveVar();
+  this.modalLoader = new ReactiveVar();
+  this.itemFullList = new ReactiveVar();
+  this.unitUgpEdits = new ReactiveVar();
+  this.bodyLoaderValue = new ReactiveVar();
+  this.pagination = new Meteor.Pagination(Unit, {
+    filters: {
+      disabled: { $ne: 'Y' },
+    },
+    sort: { createdAt: -1 },
+    perPage: 20
+  });
+
 });
 
 Template.unit.onRendered(function () {
-  $('#bodySpinLoaders').css('display', 'block');
+  this.bodyLoaderValue.set(true);
   /**
- * active and inactive list based on nav bar
- */
+* active and inactive list based on nav bar
+*/
   $('.taskHeaderList').css('display', 'inline');
   var header = document.getElementById("taskHeader");
   if (header) {
@@ -59,83 +45,51 @@ Template.unit.onRendered(function () {
     }
   }
   /**
-    * TODO: Complete JS doc
-    * for filter
-    */
-  Meteor.call('unit.unitList', (unitError, unitResult) => {
-    if (!unitError) {
-      this.unitNameArray.set(unitResult);
+     * TODO:Complete Js doc
+     * Getting user itemGetPrice list
+     */
+  Meteor.call('item.itemListGet', (err, res) => {
+    if (!err) {
+      this.bodyLoaderValue.set(false);
+      this.itemFullList.set(res);
     }
+    this.bodyLoaderValue.set(false);
   });
   /**
-   * get branch list for edit
-   */
-  let loginUserVerticals = Session.get("loginUserVerticals");
-  Meteor.call('product.userWiseList', loginUserVerticals, (err, res) => {
+     * TODO:Complete Js doc
+     * Getting user itemGetPrice list
+     */
+  Meteor.call('unit.unitList', (err, res) => {
     if (!err) {
-      this.productListGet.set(res);
+      this.unitLists.set(res);
     }
   });
-
-  Meteor.call('product.productList', (err, res) => {
-    if (!err) {
-      this.productFullList.set(res);
-    }
-  });
-  let superAdminValue = Session.get("superAdminValue");
-  if (superAdminValue === true) {
-    Meteor.call('product.productList', (err, res) => {
-      if (!err) {
-        this.productNameArray.set(res);
-      }
-    });
-  }
-  else {
-    Meteor.call('product.filterList', loginUserVerticals, (err, res) => {
-      if (!err) {
-        this.productNameArray.set(res);
-      }
-    });
-  }
-
-  /**
-   * TODO: Complete JS doc
-   */
-  $('.unitNameSelection').select2({
-    placeholder: "Select Unit Name",
+  $('.itemCodeEdits').select2({
+    placeholder: "Select Item ",
     tokenSeparators: [','],
     allowClear: true,
-    dropdownParent: $(".unitNameSelection").parent(),
+    dropdownParent: $(".itemCodeEdits").parent(),
   });
-  /**
-   * TODO: Complete JS doc
-   */
+
   $('.unitCodeSelection').select2({
-    placeholder: "Select Unit Code",
+    placeholder: "Select Unit",
     tokenSeparators: [','],
     allowClear: true,
     dropdownParent: $(".unitCodeSelection").parent(),
   });
-
-  $('.selectProductEdit').select2({
-    placeholder: "Select Product",
+  $('.unitEntrySelection').select2({
+    placeholder: "Select Item",
     tokenSeparators: [','],
     allowClear: true,
-    dropdownParent: $(".selectProductEdit").parent(),
-  });
-  $('.productNameSelection').select2({
-    placeholder: "Select Product",
-    tokenSeparators: [','],
-    allowClear: true,
-    dropdownParent: $(".productNameSelection").parent(),
+    dropdownParent: $(".unitEntrySelection").parent(),
   });
 });
 
 Template.unit.helpers({
   /**
-               * TODO: Complete JS doc
-               * @returns {any | *}
-               */
+             * TODO: Complete JS doc
+             * @returns {any | *}
+             */
   labelName: function () {
     let name = Template.instance().fileName.get();
     if (name !== undefined) {
@@ -146,80 +100,20 @@ Template.unit.helpers({
     }
   },
   /**
- * get branch list
- */
-  getProductListEdit: () => {
-    let productId = Template.instance().productEdit.get();
-    if (productId) {
-      Meteor.setTimeout(function () {
-        $('#selectProductEdit').val(productId).trigger('change');
-      }, 100);
-    }
-    return Template.instance().productListGet.get();
-  },
-  /**
    * TODO: Complete JS doc
    * @returns {{collection, acceptEmpty, substitute, eventType}}
    */
   optionsHelper: () => {
     return globalOptionsHelper('units');
   },
-   /**
-   * TODO: Complete JS doc
-   * @returns {rolelist}
-   */
-    productLists: function () {
-      return Template.instance().productNameArray.get();
-    },
   /**
   * TODO:Complete JS doc
   * 
   */
   printLoad: () => {
-    let res = Template.instance().modalLoader.get();
-    if (res === true) {
-      return true;
-    }
-    else {
-      return false;
-    }
+    return Template.instance().modalLoader.get();
   },
-  /**
-   * get status values
-   * @param {*} status 
-   */
-  getActiveStatus: (status) => {
-    if (status === 'Y') {
-      return 'Active';
-    }
-    else {
-      return 'Inactive';
-    }
-  },
-  /**
-   * get branch name
-   * @param {} product 
-   */
-  getProductName: (product) => {
-    let promiseVal = new Promise((resolve, reject) => {
-      Meteor.call("product.idName", product, (error, result) => {
-        if (!error) {
-          resolve(result);
-        } else {
-          reject(error);
-        }
-      });
-    });
-    promiseVal.then((result) => {
-      $('.productIdVal_' + product).html(result);
-      $('#bodySpinLoaders').css('display', 'none');
-    }
-    ).catch((error) => {
-      $('.productIdVal_' + product).html('');
-      $('#bodySpinLoaders').css('display', 'none');
-    }
-    );
-  },
+
   /**
    * TODO: Complete JS doc
    * @returns {{collection: *, acceptEmpty: boolean, substitute: string, eventType: string}}
@@ -260,18 +154,30 @@ Template.unit.helpers({
    * @returns {*}
    */
   unitList: function () {
-    let result = Template.instance().pagination.getPage();
-    if (result.length === 0) {
-      $('#bodySpinLoaders').css('display', 'none');
-    }
     return Template.instance().pagination.getPage();
   },
   /**
-   * TODO: Complete JS doc
-   * @returns {rolelist}
-   */
-  unitLists: function () {
-    return Template.instance().unitNameArray.get();
+* TODO:COmplete Js doc
+* Getting specific customers base on itemGetPrice
+*/
+  unitsLists: function () {
+    return Template.instance().unitLists.get();
+  },
+  /**
+* TODO:COmplete Js doc
+* Getting specific customers base on itemGetPrice
+*/
+  itemsList: function () {
+    let itemval = Template.instance().unitUgpEdits.get();
+    if (itemval) {
+      Meteor.setTimeout(function () {
+        if (itemval) {
+          $('#itemCodeEdits').val(itemval).trigger('change');
+        }
+      }, 200);
+    }
+
+    return Template.instance().itemFullList.get();
   },
   /**
      * TODO: Complete JS doc
@@ -279,7 +185,7 @@ Template.unit.helpers({
      */
   activeHelper: function (active) {
     let activeCheck = active;
-    if (activeCheck === "Y") {
+    if (activeCheck !== "Y") {
       return true;
     }
     else {
@@ -292,11 +198,37 @@ Template.unit.helpers({
    */
   inactiveHelper: function (active) {
     let activeCheck = active;
-    if (activeCheck === "N") {
+    if (activeCheck === "Y") {
       return true;
     }
     else {
       return false
+    }
+  },
+  /**
+ * TODO:Complete Js doc
+ * @param branch
+ */
+  itemNameGet: (ugpCode) => {
+    if (ugpCode) {
+      let itemRes = Template.instance().itemFullList.get();
+      let res = itemRes.find(x => x.ugpCode === ugpCode);
+      if (res) {
+        return res.itemNam;
+      }
+    }
+  },
+  /**
+  * TODO:Complete JS doc
+  * 
+  */
+  printLoadBody: () => {
+    let res = Template.instance().bodyLoaderValue.get();
+    if (res === true) {
+      return true;
+    }
+    else {
+      return false;
     }
   },
   /**
@@ -306,11 +238,10 @@ Template.unit.helpers({
     return new Date();
   },
 
-
-
 });
 
 Template.unit.events({
+
 
   /**
    * TODO: Complete JS doc
@@ -318,98 +249,50 @@ Template.unit.events({
    */
   'submit .unitFilter': (event) => {
     event.preventDefault();
-    let unitCode = ''
-    let unitName = ''
-    let product = event.target.productNameSelection.value;
-    let loginUserVerticals = Session.get("loginUserVerticals");
-    let superAdminValue = Session.get("superAdminValue");
-    if (superAdminValue === true) {
-      if (product && unitName === '') {
-        Template.instance().pagination.settings.set('filters',
-          {
-            product: product,
-          }
-        );
-        $('.taskHeaderList').css('display', 'none');
-      }
-      else if (unitName && product === '') {
-        Template.instance().pagination.settings.set('filters',
-          {
-            unitName: unitName
-          }
-        );
-        $('.taskHeaderList').css('display', 'none');
-      }
-      else if (product && unitName) {
-        Template.instance().pagination.settings.set('filters',
-          {
-            product: product,
-            unitName: unitName
-          }
-        );
-        $('.taskHeaderList').css('display', 'none');
-      }
-      else {
-        Template.instance().pagination.settings.set('filters', {
-        });
-        $('.taskHeaderList').css('display', 'none');
-      }
-    }
-    //else
+    let unitCode = event.target.unitCodeSelection.value;
+    let ugpCode = event.target.unitEntrySelection.value;
 
+    if (unitCode && ugpCode === '') {
+      Template.instance().pagination.settings.set('filters',
+        {
+          uomCode: unitCode
+        }
+      );
+      $('.taskHeaderList').css('display', 'none');
+    }
+    else if (ugpCode && unitCode === '') {
+      Template.instance().pagination.settings.set('filters',
+        {
+          ugpCode: ugpCode
+        }
+      );
+      $('.taskHeaderList').css('display', 'none');
+    }
+    else if (unitCode && ugpCode) {
+      Template.instance().pagination.settings.set('filters',
+        {
+          uomCode: unitCode,
+          ugpCode: ugpCode
+        }
+      );
+      $('.taskHeaderList').css('display', 'none');
+    }
     else {
-      if (product && unitName === '') {
-        Template.instance().pagination.settings.set('filters',
-          {
-            product: product, vertical: { $in: loginUserVerticals }
-          }
-        );
-        $('.taskHeaderList').css('display', 'none');
-      }
-      else if (unitName && product === '') {
-        Template.instance().pagination.settings.set('filters',
-          {
-            unitName: unitName, vertical: { $in: loginUserVerticals }
-          }
-        );
-        $('.taskHeaderList').css('display', 'none');
-      }
-      else if (product && unitName) {
-        Template.instance().pagination.settings.set('filters',
-          {
-            product: product,
-            unitName: unitName, vertical: { $in: loginUserVerticals }
-          }
-        );
-        $('.taskHeaderList').css('display', 'none');
-      }
-      else {
-        Template.instance().pagination.settings.set('filters', {
-        });
-        $('.taskHeaderList').css('display', 'none');
-      }
+      Template.instance().pagination.settings.set('filters', {});
+      $('.taskHeaderList').css('display', 'inline');
     }
   },
   /**
    * TODO: Complete JS doc
    */
   'click .reset': () => {
-    let loginUserVerticals = Session.get("loginUserVerticals");
-    let superAdminValue = Session.get("superAdminValue");
-    if (superAdminValue === true) {
-      Template.instance().pagination.settings.set('filters', {
-        active: "Y"
-      });
-    }
-    else {
-      Template.instance().pagination.settings.set('filters', {
-        active: "Y", vertical: { $in: loginUserVerticals }
-      });
-    }
-    $('form :input').val(""); 
-    $("#productNameSelection").val('').trigger('change');
+    Template.instance().pagination.settings.set('filters', {
+      disabled: { $ne: 'Y' },
+    });
     $('.taskHeaderList').css('display', 'inline');
-
+    $('form :input').val("");
+    $("#unitCodeSelection").val('').trigger('change');
+    $("#unitEntrySelection").val('').trigger('change');
     let element = document.getElementById("inactiveFilter");
     element.classList.remove("active");
     let elements = document.getElementById("activeFilter");
@@ -436,7 +319,7 @@ Template.unit.events({
     let confirmedUuid = $('#confirmedUuid');
     $('#unitDelConfirmation').modal();
     let _id = event.currentTarget.attributes.id.value;
-    let unitname = $('#unitName_' + _id).val();
+    let unitname = $('#uomCode_' + _id).val();
     $(header).html('Confirm Deletion Of ' + $.trim(unitname));
     $(unitName).html(unitname);
     $(unitNameDup).html(unitname);
@@ -450,6 +333,7 @@ Template.unit.events({
     event.preventDefault();
     let _id = $('#confirmedUuid').val();
     if (_id && $.trim(_id)) {
+      $("#unitDelConfirmation").modal('hide');
       Meteor.call('unit.inactive', $.trim(_id), (error) => {
         if (error) {
           $('#message').html("Internal error - unable to remove entry. Please try again");
@@ -474,7 +358,7 @@ Template.unit.events({
     let confirmedUuid = $('#confirmedUuids');
     $('#unitActiveConfirmation').modal();
     let _id = event.currentTarget.attributes.id.value;
-    let unitname = $('#unitName_' + _id).val();
+    let unitname = $('#uomCode_' + _id).val();
     $(header).html('Confirm Activation Of ' + $.trim(unitname));
     $(unitName).html(unitname);
     $(unitNameDup).html(unitname);
@@ -488,6 +372,7 @@ Template.unit.events({
     event.preventDefault();
     let _id = $('#confirmedUuids').val();
     if (_id && $.trim(_id)) {
+      $("#unitActiveConfirmation").modal('hide');
       Meteor.call('unit.active', $.trim(_id), (error) => {
         if (error) {
           $('#message').html("Internal error - unable to remove entry. Please try again");
@@ -506,22 +391,25 @@ Template.unit.events({
    */
   'click .edit': (event, template) => {
     event.preventDefault();
+    let header = $('#categoryH');
     $('#unitEditPage').modal();
+    $('div.hint').hide();
+    template.unitUgpEdits.set('');
     template.modalLoader.set(true);
-    template.productEdit.set('');
+    $(header).html('Update Unit');
     let _id = event.currentTarget.attributes.id.value;
-    Meteor.call('unit.id', _id, (err, res) => {
+    Meteor.call('unit.unit_id', _id, (err, res) => {
       let unitDetail = res;
-      let header = $('#categoryH');
-      $('div.hint').hide();
       template.modalLoader.set(false);
       let unitDetailId = _id;
+      let unitDetailItemUnitName = unitDetail.uomCode;
+      let unitDetailItemUnitCode = unitDetail.uomEntry;
+      let unitDetailItemUnitBaseQty = unitDetail.baseQty;
+      template.unitUgpEdits.set(unitDetail.ugpCode);
       $(".id").val(unitDetailId);
-      $("#unitNameEdits").val(unitDetail.unitName);
-      $("#unitCodeEdits").val(unitDetail.unitCode);
-      $("#baseQtyEdit").val(unitDetail.baseQuantity);
-      template.productEdit.set(unitDetail.product);
-      $(header).html('Update Unit');
+      $("#baseQtyEdits").val(unitDetailItemUnitBaseQty);
+      $("#uomCodeEdits").val(unitDetailItemUnitName);
+      $("#uomEntryEdits").val(unitDetailItemUnitCode);
     });
   },
   /**
@@ -530,13 +418,12 @@ Template.unit.events({
    */
   'submit .updateunit': (event) => {
     event.preventDefault();
-    let product = '';
-    $('#selectProductEdit').find(':selected').each(function () {
-      product = $(this).val();
+    let ugpCode = '';
+    $('.itemCodeEdits').find(':selected').each(function () {
+      ugpCode = $(this).val();
     });
-    let loginUserVerticals = Session.get("loginUserVerticals");
-    updateunitlist(event.target, product, loginUserVerticals);
-    $('#selectProductEdit').val('').trigger('change');
+    updateunitlist(event.target, ugpCode);
+    $('#unitEditPage').modal('hide');
   },
   /**
    * TODO: Complete JS doc
@@ -546,7 +433,6 @@ Template.unit.events({
       this.reset();
     });
     template.modalLoader.set(false);
-    $('#selectProductEdit').val('').trigger('change');
   },
   /**
    * TODO:Complete JS doc
@@ -557,55 +443,39 @@ Template.unit.events({
     let id = event.currentTarget.id;
     template.modalLoader.set(true);
     let header = $('#unitH');
-    let unitName = $('#detailunitName');
-    let unitCode = $('#detailunitCode');
+    let unitName = $('#detailUnitName');
+    let unitCode = $('#detailUnitCode');
     let baseQty = $('#detailBaseQty');
-    let productName = $('#detailProduct');
+    let ugpCode = $('#detailUgpCode');
     let status = $('#detailStatus');
     $('#unitDetailPage').modal();
-    Meteor.call('unit.idDataGet', id, (unitError, unitResult) => {
+    Meteor.call('unit.dataGet', id, (unitError, unitResult) => {
       if (!unitError) {
         template.modalLoader.set(false);
-        $(header).html('Details of ' + $.trim(unitResult.unitRes.unitName));
-        if (unitResult.unitRes.active === "Y") {
+        let unit = unitResult.unitRes;
+        $(header).html('Details of ' + $.trim(unit.uomCode));
+        $(unitName).html(unit.uomCode);
+        $(unitCode).html(unit.uomEntry);
+        $(baseQty).html(unit.baseQty);
+        $(ugpCode).html(unitResult.itemName);
+        if (unit.disabled !== "Y") {
           $(status).html("Active");
         }
-        else if (unitResult.unitRes.active === "N") {
+        else if (unit.active === "Y") {
           $(status).html("Inactive");
         }
         else {
           $(status).html("");
         }
-        $(unitName).html(unitResult.unitRes.unitName);
-        $(unitCode).html(unitResult.unitRes.unitCode);
-        $(baseQty).html(unitResult.unitRes.baseQuantity);
-        $(productName).html(unitResult.productName);
       }
     });
-
   },
 
   /**
 * TODO: Complete JS doc
 */
-  'click #filterSearch': (event, template) => {
+  'click #filterSearch': () => {
     document.getElementById('filterDisplay').style.display = "block";
-    let loginUserVerticals = Session.get("loginUserVerticals");
-    let superAdminValue = Session.get("superAdminValue");
-    if (superAdminValue === true) {
-      Meteor.call('product.productList', (err, res) => {
-        if (!err) {
-          template.productNameArray.set(res);
-        }
-      });
-    }
-    else {
-      Meteor.call('product.filterList', loginUserVerticals, (err, res) => {
-        if (!err) {
-          template.productNameArray.set(res);
-        }
-      });
-    }
   },
   /**
 * TODO: Complete JS doc
@@ -614,9 +484,9 @@ Template.unit.events({
     document.getElementById('filterDisplay').style.display = "none";
   },
   /**
-           * TODO: Complete JS doc
-           * @param event
-           */
+         * TODO: Complete JS doc
+         * @param event
+         */
   'click #fileUploadunit': (event, template) => {
     event.preventDefault();
     $("#uploadunit").each(function () {
@@ -632,16 +502,19 @@ Template.unit.events({
     event.preventDefault();
     //Reference the FileUpload element.
     let fileUpload = document.getElementById("uploadunitFile");
+    let itemMaster = Template.instance().itemFullList.get();
     let myFile = $('.uploadunitFile').prop('files')[0];
     let fileType = myFile["type"];
-    let loginUserVerticals = Session.get("loginUserVerticals");
-    let productArray = Template.instance().productFullList.get();
     console.log("fileType", fileType);
     if (myFile.type === 'application/vnd.ms-excel' || myFile.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
 
       if (fileUpload !== null && fileUpload !== '' && fileUpload !== undefined) {
+        //Validate whether File is valid Excel file.
+        // let regex = /^([a-zA-Z0-9\s_\\.\-:])+(.xls|.xlsx)$/;
+        // if (regex.test(fileUpload.value.toLowerCase())) {
         if (typeof (FileReader) != "undefined") {
           let reader = new FileReader();
+
           //For Browsers other than IE.
           if (reader.readAsBinaryString) {
             reader.onload = function (e) {
@@ -660,8 +533,7 @@ Template.unit.events({
             };
             reader.readAsArrayBuffer(fileUpload.files[0]);
           }
-        }
-        else {
+        } else {
           $(window).scrollTop(0);
           setTimeout(function () {
             $("#fileArrayspan").html('<style>#fileArrayspan {color :#fc5f5f }</style><span id="fileArrayspan">This browser does not support HTML5.</span>').fadeIn('fast');
@@ -670,8 +542,7 @@ Template.unit.events({
             $('#fileArrayspan').fadeOut('slow');
           }, 3000);
         }
-      }
-      else {
+      } else {
         $(window).scrollTop(0);
         setTimeout(function () {
           $("#fileArrayspan").html('<style>#fileArrayspan {color :#fc5f5f }</style><span id="fileArrayspan">A file needed</span>').fadeIn('fast');
@@ -699,42 +570,31 @@ Template.unit.events({
       let firstSheet = workbook.SheetNames[0];
       //Read all rows from First Sheet into an JSON array.
       let excelRows = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[firstSheet]);
-      if (excelRows !== undefined && excelRows.length > 0) {
-        //Add the data rows from Excel file.
-        for (let i = 0; i < excelRows.length; i++) {
-          let unitCode = excelRows[i].UnitCode;
-          let unitName = excelRows[i].UnitName;
-          let product = excelRows[i].Product;
-          let baseQuantity = excelRows[i].BaseQuantity;
-          let productId = '';
-          if (product !== undefined && product !== '') {
-            let resVal = productArray.find(x => x.productName === product.trim())
-            if (resVal !== undefined) {
-              productId = resVal._id;
-            }
+      //Add the data rows from Excel file.
+      for (let i = 0; i < excelRows.length; i++) {
+
+        let ugpCode = excelRows[i].ItemName;
+        let uomCode = excelRows[i].UomCode;
+        let baseQty = excelRows[i].BaseQuantity;
+        let uomEntry = excelRows[i].UomEntry;
+
+        if (ugpCode !== undefined && ugpCode !== '' &&
+          uomCode !== undefined && uomCode !== '' &&
+          baseQty !== undefined && baseQty !== '' &&
+          uomEntry !== undefined && uomEntry !== '') {
+          let itemCode = '';
+          let itemRes = itemMaster.find(x => x.itemNam === ugpCode);
+          if (itemRes) {
+            itemCode = itemRes.ugpCode;
           }
-          if (unitCode !== undefined && unitCode !== '' &&
-            unitName !== undefined && unitName !== '' &&
-            productId !== undefined && productId !== '' &&
-            baseQuantity !== undefined && baseQuantity !== ''
-          ) {
-            unitArray.push({
-              unitCode: unitCode.toString(), unitName: unitName, product: productId, baseQuantity: baseQuantity.toString()
-            });
+          if (itemCode !== '') {
+
+            unitArray.push({ ugpCode: itemCode, uomCode: uomCode.toString(), baseQty: baseQty.toString(), uomEntry: uomEntry.toString() });
           }
         }
       }
-      else {
-        $('#unitErrorModal').find('.modal-body').text('Invalid File Format!');
-        $('#unitErrorModal').modal();
-        $('#unitUploadConfirmation').modal('hide');
-        $("#uploadunit")[0].reset();
-        template.fileName.set('');
-        fileName = '';
-      }
       if (unitArray.length !== 0 && unitArray !== undefined) {
-        $('#unitUploadConfirmation').modal('hide');
-        return Meteor.call('unit.createUpload', unitArray, loginUserVerticals, (error, result) => {
+        return Meteor.call('unit.createUpload', unitArray, (error, result) => {
           if (error) {
             $('#unitErrorModal').find('.modal-body').text(error.reason);
             $('#unitErrorModal').modal();
@@ -746,7 +606,7 @@ Template.unit.events({
           else {
             $('#unitUploadConfirmation').modal('hide');
             $("#uploadunit")[0].reset();
-            $('#unitSuccessModal').find('.modal-body').text(` Unit has been registered successfully (${unitArray.length} Nos)`);
+            $('#unitSuccessModal').find('.modal-body').text(`Unit has been registered successfully(${unitArray.length} Nos)`);
             $('#unitSuccessModal').modal();
             template.fileName.set('');
             fileName = '';
@@ -779,18 +639,17 @@ Template.unit.events({
    */
   'click #downloadunit': (event, template) => {
     event.preventDefault();
-    let data = [{
-      unitCode: '', unitName: '', Product: '', BaseQuantity: ''
-    }];
+    let data = [{ itemName: '', uomCode: '', baseQty: '', uomEntry: '' }];
     dataCSV = data.map(element => ({
-      'UnitCode': '',
-      'UnitName': '',
-      'Product': '',
-      'BaseQuantity': '',
+      'ItemName': '',
+      'UomCode': '',
+      'UomEntry': '',
+      'BaseQuantity': ''
+
     }))
     let excel = Papa.unparse(dataCSV);
     let blob = new Blob([excel], { type: "text/xls;charset=utf-8" });
-    saveAs(blob, "unitFormat.xls");
+    saveAs(blob, "UnitFormat.xls");
   },
   'change .uploadunitFile': function (event, template) {
     let func = this;
@@ -803,29 +662,15 @@ Template.unit.events({
     };
     reader.readAsDataURL(file);
   },
-
   /**
 * TODO: Complete JS doc
 * 
 */
   'click .activeFilter': (event, template) => {
     event.preventDefault();
-    $('#bodySpinLoaders').css('display', 'block');
-    Meteor.setTimeout(function () {
-      $('#bodySpinLoaders').css('display', 'none');
-    }, 3000);
-    let loginUserVerticals = Session.get("loginUserVerticals");
-    let superAdminValue = Session.get("superAdminValue");
-    if (superAdminValue === true) {
-      Template.instance().pagination.settings.set('filters', {
-        active: "Y"
-      });
-    }
-    else {
-      Template.instance().pagination.settings.set('filters', {
-        active: "Y", vertical: { $in: loginUserVerticals }
-      });
-    }
+    Template.instance().pagination.settings.set('filters', {
+      disabled: { $ne: 'Y' },
+    });
   },
   /**
   * TODO: Complete JS doc
@@ -833,23 +678,8 @@ Template.unit.events({
   */
   'click .inactiveFilter': (event, template) => {
     event.preventDefault();
-    $('#bodySpinLoaders').css('display', 'block');
-    Meteor.setTimeout(function () {
-      $('#bodySpinLoaders').css('display', 'none');
-    }, 3000);
-    let loginUserVerticals = Session.get("loginUserVerticals");
-    let superAdminValue = Session.get("superAdminValue");
-    if (superAdminValue === true) {
-      Template.instance().pagination.settings.set('filters', {
-        active: "N"
-      });
-    }
-    else {
-      Template.instance().pagination.settings.set('filters', {
-        active: "N", vertical: { $in: loginUserVerticals }
-      });
-
-    }
+    Template.instance().pagination.settings.set('filters', {
+      disabled: "Y",
+    });
   },
-
 });

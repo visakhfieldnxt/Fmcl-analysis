@@ -1,19 +1,21 @@
 <template name="routeAssign">
-  {{#if userCan 'routeAssignView'}}
+  {{#if userCan 'routeView'}}
   <section class="content-header">
     <h1>Route Assign
       <small>Listing All Assigned Routes</small>
     </h1>
     <ol class="breadcrumb">
       <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
-      <li class="active">Assigned Routes</li>
+      <li class="active">Listing All Assigned Routes</li>
     </ol>
   </section>
   <section class="content">
 
     <div class="row">
       <div style="float: right;">
+        {{#if userCan 'routeCreate'}}
         <button class="btn btn-primary btn-flat" id="routeAssign-create-button">Assign Route</button>
+        {{/if}}
         <button class="btn btn-primary btn-flat" id="filterSearch"><i class="fa fa-search"> </i>&nbsp; Search</button>
       </div>
     </div>
@@ -29,18 +31,28 @@
           <form class="route-filter">
             <div class="row">
               <div class="col-md-3 col-sx-12 col-sm-12">
-                <label for="EMPcode">Sub Distributor</label>
-                <select name="sdUserVal" style="width:100% !important" id="sdUserVal" class="sdUserVal"
-                  placeholder="Select Sub Distributor">
-                  <option disabled selected value=''>Select Sub Distributor</option>
-                  {{# each sdUsersFullList}}
+                <label for="EMPcode">Route Name</label>
+                <select name="routeCodeVal" style="width:100% !important" id="routeCodeVal" class="routeCodeVal"
+                  placeholder="Select Route Name">
+                  <option disabled selected value=''>Select Route Name</option>
+                  {{# each routeCodeLists}}
+                  <option value="{{_id}}">{{routeName}}
+                  </option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EMPcode">Assigned To</label>
+                <select name="selectVanemp" style="width:100% !important" id="selectVanemp" class="selectVanemp"
+                  placeholder="Select Route Name">
+                  <option disabled selected value=''>Select Employee Name</option>
+                  {{# each vanUsersList}}
                   <option value="{{_id}}">{{profile.firstName}} {{profile.lastName}}
                   </option>
                   {{/each}}
                 </select>
               </div>
-
-              <!-- <div class="col-md-3 col-sx-12 col-sm-12">
+              <div class="col-md-3 col-sx-12 col-sm-12">
                 <label for="EmailId">From Date</label>
                 <input type="text" autocomplete="off" class="form-control datepicker date validation"
                   data-date-autoclose="true" onkeydown="event.preventDefault()" id="fromDate" data-provide="datepicker"
@@ -51,7 +63,7 @@
                 <input type="text" autocomplete="off" class="form-control datepicker date validation"
                   data-date-autoclose="true" onkeydown="event.preventDefault()" id="toDate" data-provide="datepicker"
                   data-date-format="dd-mm-yyyy" placeholder="To Date " name="toDate" />
-              </div> -->
+              </div>
               <div class="row" style="float: right">
                 <button type="submit" name="filter" class="btn btn-primary">Filter</button>
                 <button type="button" name="reset" class="btn btn-info reset">Reset Filter</button>
@@ -62,10 +74,10 @@
       </div>
     </div>
     <div class="row">
-      <!-- {{#if isReady}}
+      {{#if isReady}}
       {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
       onClick=clickEvent}}
-      {{/if}} -->
+      {{/if}}
       <div class="nav-tabs-custom taskHeader" id="taskHeader">
         <ul class="nav nav-tabs taskHeaderList" id="taskHeaderList">
           <li class="active paginationFilterValue activeFilter activeHeaders" id="activeFilter"><a href=""
@@ -76,9 +88,9 @@
         </ul>
         <div class="tab-content" style="padding : 0px !important">
           <div class="box box-default box-solid">
-            <!-- <div class="box-header with-border bg-aqua">
+            <div class="box-header with-border bg-aqua">
               <h3 class="box-title">Route</h3>
-            </div> -->
+            </div>
             {{#if isReady}}
             <div class="box-body no-padding table-responsive">
               <table class="table table-striped generic">
@@ -86,8 +98,8 @@
                   <tr>
                     <th class="text-center sorted-column">Route Name</th>
                     <th class="text-center sorted-column">Route Code</th>
-                    <th class="text-center sorted-column"> Date</th>
-                    <th class="text-center sorted-column">Sub Distributor</th>
+                    <th class="text-center sorted-column">Start Date</th>
+                    <th class="text-center sorted-column">End Date</th>
                     <th class="text-center sorted-column">Assigned To</th>
                     <th class="text-center sorted-column">Status</th>
                     <th class="text-center"> </th>
@@ -97,9 +109,7 @@
                     <td class=" text-center routeVal_{{routeId}}" width="15%">{{routeNameHelp routeId}}</td>
                     <td class="text-center routeCodeVal_{{routeId}}" width="15%">{{routeCodeHelp routeId}}</td>
                     <td class="text-center " width="10%">{{routeDate}}</td>
-                    <td class="text-center sorted-column word-wrap: break-word userIdVal_{{subDistributor}}"
-                      width="15%">
-                      {{getUserName subDistributor}}</td>
+                    <td class="text-center " width="10%">{{routeDateEnd}}</td>
                     {{#if assignedTo}}
                     <td class="text-center  vanUserName_{{assignedTo}}" width="15%">{{vanUserName assignedTo}}</td>
                     {{else}}
@@ -107,17 +117,22 @@
                     {{/if}}
                     <td class="text-center " width="15%">{{{statCheck routeStatus}}}</td>
                     <td class="text-center" width="25%">
-                      {{#if routeCompCheck routeStatus}}
+                      {{#if routeCompCheck routeStatus}} 
+                      {{#if activeCheck active}} 
+                      <a href="javascript:void(0)" id="{{_id}}" class="boundaryUpdates">
+                        <button title="Update Route Boundary" class="pd-20 btn btn-info"> <i class="fa fa-street-view"></i></button>
+                      </a> &nbsp;
+                      {{/if}}
                       {{#if userCan 'routeDelete'}}
                       {{#if activeCheck active}}
-                      <input type="hidden" class="routeIdVals" id="routeCode_{{_id}}" value="">
+                      <input type="hidden" id="routeCode_{{_id}}" value="{{routeNameHelp routeId}}">
                       <a href="javascript:void(0)" class="remove routeValTitle_{{routeId}}" id="{{_id}}">
                         <button class="pd-20 btn btn-warning"> <i class="fa fa-close"></i></button>
                       </a> &nbsp;
                       {{/if}}
                       {{#if inactiveCheck active}}
                       {{#if activateStatCheck groupDeactivated}}
-                      <input type="hidden" id="routeCode_{{_id}}" class="routeIdVals" value="">
+                      <input type="hidden" id="routeCode_{{_id}}" value="{{routeNameHelp routeId}}">
                       <a href="javascript:void(0)" class="activate danger-color routeValTitleDe_{{routeId}}"
                         id="{{_id}}">
                         <button class="pd-20 btn btn-info"><i class="fa fa-check"></i></button>
@@ -127,22 +142,29 @@
                       {{/if}}
                       {{#if activeCheck active}}
                       {{#if routeAssigneeRemove routeStatus}}
-                      <input type="hidden" id="routeCodeGet_{{_id}}" class="routeIdVals" value="">
-                      <a href="javascript:void(0)" title="Click To Remove Assignee" name="removeAssigneeButton"
-                        class="removeAssigneeButton " id="{{_id}}">
+                      <input type="hidden" id="routeCodeGet_{{_id}}" value="{{routeNameHelp routeId}}">
+                      <a href="javascript:void(0)" name="removeAssigneeButton"
+                        class="removeAssigneeButton assigneVal_{{assignedTo}}" id="{{_id}}">
                         <button class="pd-20 btn btn-danger"><i class="fa fa-user-times"></i></button>
                       </a> &nbsp;
                       {{/if}}
                       {{/if}}
                       {{#if activeCheck active}}
                       {{#if assigneeAddCheck routeStatus}}
-                      <input type="hidden" id="routeCodeGet_{{_id}}" class="routeIdVals" value="">
+                      <input type="hidden" id="routeCodeGet_{{_id}}" value="{{routeNameHelp routeId}}}">
                       <a href="javascript:void(0)" name="routeAssignButton" class="routeAssignButton"
                         title="Click to assign route" id="{{_id}}">
                         <button class="pd-20 btn btn-success"><i class="fa fa-paper-plane-o"></i></button>
                       </a> &nbsp;
                       {{/if}}
                       {{/if}}
+                      {{/if}}
+                      {{#if routeUpdateCheck routeDataUpdated}}
+                      <input type="hidden" id="routeCodeGet_{{_id}}" value="{{_id}}">
+                      <a href="javascript:void(0)" name="viewMap" class="viewMap" title="Click To View Map "
+                        id="{{_id}}">
+                        <button class="pd-20 btn btn-primary"><i class="fa fa-map-marker"></i></button>
+                      </a> &nbsp;
                       {{/if}}
                       <input type="hidden" id="userId" name="userid" value="{{_id}}">
                       <a href="javascript:void(0)" class="view " title="Click to view details" id="{{_id}}">
@@ -273,9 +295,9 @@ justify-content: center;background: #f1f1f1;">
         </div>
         <div class="modal-body">
           <div class="box box-default box-solid">
-            <!-- <div class="box-header with-border bg-aqua">
+            <div class="box-header with-border bg-aqua">
               <h3 class="box-title">Route Details</h3>
-            </div> -->
+            </div>
             <table style="width:100%; table-layout:fixed; border-collapse:collapse;" class="table table-striped">
               <tbody>
                 <tr class="table-border">
@@ -290,18 +312,28 @@ justify-content: center;background: #f1f1f1;">
                 </tr>
                 <tr class="table-border">
                   <td width="50%">
-                    <label for="Employee ">Route Date</label>
-                    <div id="detailDate"></div>
+                    <label for="firstName">Branch Name</label>
+                    <div id="detailBranch"></div>
                   </td>
                   <td width="50%">
-                    <label for="firstName">Description</label>
-                    <div id="detailDescription"></div>
+                    <label for="Employee ">Route Start Date</label>
+                    <div id="detailDate"></div>
                   </td>
                 </tr>
                 <tr class="table-border">
                   <td width="50%">
-                    <label for="firstName">Sub Distributor</label>
-                    <div id="detailSubDistributor"></div>
+                    <label for="Employee ">Route End Date</label>
+                    <div id="detailDateEnd"></div>
+                  </td>
+                  <td width="50%">
+                    <label for="Employee ">Status</label>
+                    <div id="detailStatus"></div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="firstName">Description</label>
+                    <div id="detailDescription"></div>
                   </td>
                   <td width="50%">
                     <label for="firstName">Assigned By</label>
@@ -323,12 +355,53 @@ justify-content: center;background: #f1f1f1;">
                     <label for="firstName">Assigned Date</label>
                     <div id="detailedAssignedDate"></div>
                   </td>
-                  <td></td>
+                  <td width="50%">
+                  </td>
                 </tr>
+                {{#with approvedDataGet}}
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="Employee ">Approved By</label>
+                    <div>{{approvedName}}</div>
+                  </td>
+                  <td width="50%">
+                    <label for="firstName">Approved Date</label>
+                    <div>{{dateFormats routeAssignRes.approvedDate}}</div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="firstName">Approved Remarks</label>
+                    <div>{{routeAssignRes.statusRemarks}}</div>
+                  </td>
+                  <td width="50%">
+                  </td>
+                </tr>
+                {{/with}}
+                {{#with rejectedDataGet}}
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="Employee ">Rejected By</label>
+                    <div>{{rejectedName}}</div>
+                  </td>
+                  <td width="50%">
+                    <label for="firstName">Rejected Date</label>
+                    <div>{{dateFormats routeAssignRes.rejectedDate}}</div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="firstName">Rejected Remarks</label>
+                    <div>{{routeAssignRes.statusRemarks}}</div>
+                  </td>
+                  <td width="50%">
+                  </td>
+                </tr>
+                {{/with}}
               </tbody>
             </table>
             {{#with items}}
-            <span style="padding-left: 10px;"><label for="Employee " style="padding-top: 10px;">Outlet
+            <span style="padding-left: 10px;"><label for="Employee " style="padding-top: 10px;">Customer
                 List</label></span>
             <div id="detailUsername" class="table-responsive">
               <div class="row ">
@@ -336,7 +409,7 @@ justify-content: center;background: #f1f1f1;">
                   <thead>
                     <tr>
                       <th width="100px">Sl No. </th>
-                      <th width="200px">Outlet Name</th>
+                      <th width="200px">Customer Name</th>
                       <th width="100px">Priority</th>
                     </tr>
                   </thead>
@@ -344,8 +417,47 @@ justify-content: center;background: #f1f1f1;">
                     {{#each items}}
                     <tr class="table-border">
                       <td>{{incremented @index}}</td>
-                      <td style="word-wrap: break-word">{{name}}</td>
-                      <td style="word-wrap: break-word">{{priority}}</td>
+                      <td style="word-wrap: break-word" class="customerVal_{{customer}}">{{custNameHelp customer}}</td>
+                      <td style="word-wrap: break-word">{{ priority}}</td>
+                    </tr>
+                    {{/each}}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            {{/with}}
+            {{#with routeDataList}}
+
+            <span style="padding-left: 10px;"><label for="Employee ">Route Updated Data</label></span>
+            <div id="detailUsername" class="table-responsive">
+              <div class="row ">
+                <table style="width:100%;margin-bottom:0;table-layout: fixed" class="table table-striped with-border">
+                  <thead>
+                    <tr>
+                      <th width="100px">Sl no. </th>
+                      <th width="200px">Customer Name </th>
+                      <th width="200px">Check In</th>
+                      <th width="200px">Check Out</th>
+                      <th width="200px">Time Spent</th>
+                      <th width="200px">Remark</th>
+                      <th width="200px">Remark Description</th>
+
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {{#each routeDataList}}
+                    <tr class="table-border">
+                      <td style="word-wrap: break-word">{{incremented @index}}</td>
+                      <td style="word-wrap: break-word" class="customerVal_{{customer}}">{{custNameHelp customer}}</td>
+                      <td style="word-wrap: break-word">{{dateValue}} {{checkIn}}</td>
+                      <td style="word-wrap: break-word">{{dateValue}} {{checkOut}}</td>
+                      <td style="word-wrap: break-word">{{timeSpent}}</td>
+                      <td style="word-wrap: break-word">{{remark}}</td>
+                      {{#if remarkDescription}}
+                      <td style="word-wrap: break-word">{{remarkDescription}}</td>
+                      {{else}}
+                      <td class="text-center sorted-column">-</td>
+                      {{/if}}
                     </tr>
                     {{/each}}
                   </tbody>
@@ -368,6 +480,16 @@ justify-content: center;background: #f1f1f1;">
           <div class="loadersSpin">
           </div>
           {{/if}}
+
+          <div class="loadersSpinPromise" style=" width: 98%;opacity: 0.9;position: 
+          absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+            {{#with printLoaderImage}}
+            <div class="loader-lg" style="width: 100%;height: 100%;display: 
+            flex; align-items: center;justify-content: center;background: #fff;">
+              <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+            </div>
+            {{/with}}
+          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default closen" data-dismiss="modal">Close</button>
@@ -375,6 +497,207 @@ justify-content: center;background: #f1f1f1;">
       </div>
     </div>
   </div>
+  <div class="modal fade in" id="routeEditPage">
+    <div class="modal-dialog">
+      <form autocomplete="off" class="routeEditPage" id="routeEditPagess">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close closeEdit" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span></button>
+            <h4 class="modal-title text-bold" id="orderHsEdit"></h4>
+          </div>
+          <div class="modal-body">
+            <div class="box box-default box-solid">
+              <div class="box-header with-border bg-aqua">
+                <h3 class="box-title">Route Details</h3>
+              </div>
+              <table style="width:100%;table-layout: fixed;border-collapse: collapse;" class="table table-striped">
+                <tr>
+                  <td>
+                    <div class="form-group has-feedback">
+                      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                        <label for="empCode">Route Code <span class="asteric_red">*</span></label>
+                        <input type="text" id="routeCodevalueEdit" disabled
+                          class="form-control validation routeCodevalueEdit" placeholder="Enter Route Code"
+                          name="routeCodevalueEdit" required>
+                      </div>
+                      <div class="col-sm-6" style="padding: 10px 10px 20px 10px;">
+                        <label for="date">Select Date <span class="asteric_red">*</span></label>
+                        <input type="text" class="form-control datepicker date validation routeDateEdit"
+                          onkeydown="event.preventDefault()" id="my-datepickersRouteDateEdit" data-provide="datepicker"
+                          data-date-autoclose="true" data-date-format="dd-mm-yyyy" placeholder="Select  Date"
+                          name="routeDateEdit" required />
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="form-group has-feedback">
+                      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                        <label for="customer">Select Branch <span class="asteric_red">*</span></label>
+                        <select class="selectBranchEdits" disabled style="width:100%;" required name="branchEdit"
+                          id="selectBranchEdits">
+                          <option selected='selected' value="">Select Branch</option>
+                          {{# each branchListEdits}}
+                          <option value="{{bPLId}}">{{bPLName}}</option>
+                          {{/each}}
+                        </select>
+                      </div>
+                      <div class="col-sm-6" style="padding: 10px 10px 20px 10px;">
+                        <label for="Description">Enter Description <span class="asteric_red">*</span></label>
+                        <textarea name="routeDescripEdit" required id="routeDescripEdit" cols="7" rows="10"
+                          style="height:85px" placeholder="Enter Description"></textarea>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="lightGreenBG">
+                  <td>
+                    <div class="form-group has-feedback">
+                      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                        <label for="customer">Select Customer <span class="asteric_red">*</span></label>
+                        <select class="selectCustomersEdit" style="width:100%;" name="selectCustomersEdit"
+                          id="selectCustomersEdit">
+                          <option selected='selected' value="">Select Customer</option>
+                          {{# each customerDataList}}
+                          <option value="{{cardCode}}">{{cardName}}</option>
+                          {{/each}}
+                        </select>
+                        <span id="customerArrayspanEdit"></span>
+                      </div>
+                      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                        <label for="Priority">Select Priority <span class="asteric_red">*</span></label>
+                        <select class=" selectPriorityEdit" style="width:100%;" name="selectPriorityEdit"
+                          id="selectPriorityEdit">
+                          <option selected='selected' value="">Select Priority</option>
+                          <option value="1">1</option>
+                          <option value="2">2</option>
+                          <option value="3">3</option>
+                          <option value="4">4</option>
+                          <option value="5">5</option>
+                        </select>
+                        <span id="priorityArrayspanEdit"></span>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="lightGreenBG">
+                  <td>
+                    <div class="form-group has-feedback">
+                      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                        <label for="customer">Select Customer <span class="asteric_red">*</span></label>
+                        <select class="selectCustomersEdit" style="width:100%;" name="selectCustomersEdit"
+                          id="selectCustomersEdit">
+                          <option selected='selected' value="">Select Customer</option>
+                          {{# each customerDataList}}
+                          <option value="{{cardCode}}">{{cardName}}</option>
+                          {{/each}}
+                        </select>
+                        <span id="customerArrayspanEdit"></span>
+                      </div>
+                      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                        <label for="Priority">Select Priority <span class="asteric_red">*</span></label>
+                        <select class=" selectPriorityEdit" style="width:100%;" name="selectPriorityEdit"
+                          id="selectPriorityEdit">
+                          <option selected='selected' value="">Select Priority</option>
+                          <option value="1">1</option>
+                          <option value="2">2</option>
+                          <option value="3">3</option>
+                          <option value="4">4</option>
+                          <option value="5">5</option>
+                        </select>
+                        <span id="priorityArrayspanEdit"></span>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="lightGreenBG">
+                  <td>
+                    <div class="form-group has-feedback">
+                      <div class="col-sm-12" style="padding: 10px">
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="lightGreenBG">
+                  <td>
+                    <div class="form-group has-feedback">
+                      <div class="col-sm-12" style="padding: 10px">
+                        <button type="button" class="btn btn-success addCustomerEdit"
+                          style="width:50%;padding: 10px;box-shadow: #a8a8a8 2px 3px 12px;">
+                          Add Customer
+                        </button>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <div class="col-sm-12" style="padding:20px 10px">
+                  </div>
+                </tr>
+              </table>
+              {{#with customerArrayList}}
+              <span style="padding-left: 10px;"><label for="Employee " style="font-weight: bold; color: black;">
+                  Customer List</label></span>
+              <div id="detailUsername" class="table-responsive" style="border: none;">
+                <div class="row">
+                  <table style="width:100%;table-layout: fixed; border: solid 1px #e0d8d8;"
+                    class="table table-striped with-border">
+                    <thead>
+                      <tr class="bg-light-blue-4">
+                        <th width="100px">Sl No. </th>
+                        <th width="200px">Customer Name </th>
+                        <th width="110px">Priority</th>
+                        <th width="110px"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {{#each customerArrayList}}
+                      <tr class="table-border">
+                        <td>{{incremented @index}}</td>
+                        <td style="word-wrap: break-word">{{cardName}}</td>
+                        <td>{{priority}}</td>
+                        <td>
+                          <a href="javascript:void(0)" class="deleteCustumerEdit"
+                            style="border:none !important;font-size: 17px;" id="{{randomId}}"
+                            title="Click To Delete Customer">
+                            <i class="fa fa-close danger-color"></i>
+                          </a>
+                        </td>
+                      </tr>
+                      {{/each}}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              {{/with}}
+            </div>
+            {{#if printLoad}}
+            <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+            absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+              {{#with printLoaderImage}}
+              <div class="loader-lg" style="width: 100%;height: 100%;display: 
+              flex; align-items: center;justify-content: center;background: #fff;">
+                <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+              </div>
+              {{/with}}
+            </div>
+            {{else}}
+            <div class="loadersSpin">
+            </div>
+            {{/if}}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default pull-left closeEdit" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary pull-right">Save Route</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
   <div class="modal fade in" id="routeAssignModal">
     <div class="modal-dialog">
       <form class="assignEmployeeDetails" autocomplete="off">
@@ -386,9 +709,9 @@ justify-content: center;background: #f1f1f1;">
           </div>
           <div class="modal-body" style="overflow: auto;">
             <div class="box box-default box-solid">
-              <!-- <div class="box-header with-border bg-aqua">
+              <div class="box-header with-border bg-aqua">
                 <h3 class="box-title">Assign Route</h3>
-              </div> -->
+              </div>
               <div id="status" style="text-align:left; padding: 10px;">
                 <b>Select Employee <span class="asteric_red">*</span></b><br>
                 <select name="selectAssignEmp" id="selectAssignEmp" style="width:100%" class="selectAssignEmp" required>

@@ -1,562 +1,767 @@
 /**
- * @author Greeshma
+ * @author Visakh
  */
+
 import { Order } from './order';
-import { Verticals } from '../verticals/verticals';
-import { RouteGroup } from '../routeGroup/routeGroup';
-import { Outlets } from '../outlets/outlets';
-import { Delivery } from '../delivery/delivery';
-import { allUsers } from '../user/user';
-import { RouteAssign } from '../routeAssign/routeAssign';
-import { TempSerialNo } from "../tempSerialNo/tempSerialNo";
+import { Branch } from '../branch/branch';
 import { Notification } from '../notification/notification';
+import { Config } from '../config/config';
+import { Customer } from '../customer/customer';
+import { allUsers } from '../user/user';
+import { DeletedOrder } from "../deletedOrder/deletedOrder";
+import { CustomerPriceList } from '../customerPriceList/customerPriceList';
+// import {salesOrderPost_Url} from '../../startup/client/sapUrls';
+
+let call = true;
+let count = 0;
 Meteor.methods({
-   /**
-    * 
-    * @param {*} productsArray 
-    * @param {*} vertical 
-    * @param {*} grandTotal 
-    * @param {*} taxTotal 
-    * @param {*} latitude 
-    * @param {*} longitude 
-    * @param {*} outlet 
-    * create order
-    */
-   'order.create': (productsArray, vertical, grandTotal, taxTotal, latitude, longitude, outlet, discount) => {
-      let sdVal = '';
-      let userDetails = allUsers.findOne({ _id: Meteor.userId() });
-      if (userDetails) {
-         sdVal = userDetails.subDistributor;
-         notificationOrdrFun(userDetails.subDistributor);
-      }
-      let a = new Date();
-      let days = new Array(7);
-      days[0] = "Sunday";
-      days[1] = "Monday";
-      days[2] = "Tuesday";
-      days[3] = "Wednesday";
-      days[4] = "Thursday";
-      days[5] = "Friday";
-      days[6] = "Saturday";
-      let todaysDate = days[a.getDay()];
-      let routeId = '';
-      let routeRes = RouteAssign.find({ assignedTo: Meteor.userId(), routeDate: todaysDate, active: "Y" }).fetch();
-      if (routeRes.length > 0) {
-         routeId = routeRes[0].routeId;
-      }
 
-      let totalQty = 0;
-      let itemsQty = productsArray;
-      for (let i = 0; i < itemsQty.length; i++) {
-         totalQty += Number(itemsQty[i].quantity);
-      }
+  /**
+   * TODO: Complete JS doc
+   * @param customer
+   * @param dueDate
+   * @param itemArray
+   * @param branch
+   * @param employee
+   * @param beforeDiscount
+   * @param afterDiscount
+   * @param GST
+   * @param grandTotal
+   */
+  'order.createOrUpdate': (customer, dueDate, itemArray, branch, employee, beforeDiscount, afterDiscount, GST,
+    grandTotal, totalDiscPercent, remark_order, custRefDate, custRef, address, priceType, priceMode, currency, latitude, longitude, mVATArrayList, weight, taxTotal, street, block, city, ribNumber, driverName, approvalValue, approvalResonArray) => {
+    let customerName = Customer.findOne({ cardCode: customer }).cardName;
+    let priceTypeName = CustomerPriceList.findOne({ cardCode: customer }).pLName;
+    let salesmanName = allUsers.findOne({ _id: employee }).profile.firstName;
+    let slpcode = Meteor.user().slpCode;
 
-      return Order.insert({
-         sdUser: Meteor.userId(),
-         subDistributor: sdVal,
-         vertical: vertical,
-         outlet: outlet,
-         routeId: routeId,
-         docDate: moment(new Date).format('DD-MM-YYYY'),
-         docTotal: grandTotal.toString(),
-         discountAmt: discount,
-         taxAmount: taxTotal.toString(),
-         latitude: latitude,
-         longitude: longitude,
-         itemArray: productsArray,
-         totalQty: totalQty.toString(),
-         totalItems: productsArray.length.toString(),
-         afterDiscount: '',
-         beforeDiscount: '',
-         docNum: '',
-         status: "Pending",
-         createdBy: Meteor.userId(),
-         uuid: Random.id(),
-         createdAt: new Date(),
-      });
-   },
-   'order.idSdName': (id) => {
-      let sdName = '';
-      let sdList = Meteor.users.findOne({ _id: id });
-      if (sdList) {
-         sdName = `${sdList.profile.firstName} ${sdList.profile.lastName}`;
-      }
-      return sdName;
-   },
-   'order.orderData': (id) => {
-      let sdName = '';
-      let sdName1 = '';
-      let verticalName = '';
-      let routeName = '';
-      let createdByName = '';
-      let outletName = '';
-      let approvedByName = '';
-      let orderList = Order.findOne({ _id: id });
-      if (orderList) {
-         if (orderList.sdUser) {
-            let sdNameList = Meteor.users.findOne({ _id: orderList.sdUser });
-            if (sdNameList) sdName = `${sdNameList.profile.firstName} ${sdNameList.profile.lastName}`;
-         }
-         if (orderList.subDistributor) {
-            let sdNameList1 = Meteor.users.findOne({ _id: orderList.subDistributor });
-            if (sdNameList1) sdName1 = `${sdNameList1.profile.firstName} ${sdNameList1.profile.lastName}`;
-         }
-         if (orderList.createdBy) {
-            let createdBy12 = Meteor.users.findOne({ _id: orderList.createdBy });
-            if (createdBy12) createdByName = `${createdBy12.profile.firstName} ${createdBy12.profile.lastName}`;
-         }
-         if (orderList.vertical) {
-            let verticalNameList = Verticals.findOne({ _id: orderList.vertical });
-            if (verticalNameList) verticalName = verticalNameList.verticalName;
-         }
-         if (orderList.outlet) {
-            let outletNameList = Outlets.findOne({ _id: orderList.outlet });
-            if (outletNameList) outletName = outletNameList.name;
-         }
-         if (orderList.routeId) {
-            let routeNameList = RouteGroup.findOne({ _id: orderList.routeId });
-            if (routeNameList) routeName = routeNameList.routeName;
-         }
-         if (orderList.approvedBy) {
-            let userDatas = Meteor.users.findOne({ _id: orderList.approvedBy });
-            if (userDatas) {
-               approvedByName = `${userDatas.profile.firstName} ${userDatas.profile.lastName}`;
-            }
+    let totalQty = 0;
+    let itemsQty = itemArray;
+    for (let i = 0; i < itemsQty.length; i++) {
+      totalQty += Number(itemsQty[i].quantity);
+    }
 
-         }
-      }
+    let branchName = Branch.findOne({ bPLId: branch }).bPLName;
 
-      return {
-         orderList: orderList, sdName: sdName,
-         verticalName: verticalName, outletName: outletName,
-         routeName: routeName, sdName1: sdName1, createdByName: createdByName, approvedByName: approvedByName
-      }
+    let orderId = Order.insert({
+      cardCode: customer,
+      cardName: customerName,
+      address: address,
+      branch: branch,
+      branchName: branchName,
+      employeeId: employee,
+      userId: Meteor.userId(),
+      docDueDate: dueDate,
+      custRefDate: custRefDate,
+      custRefNo: custRef,
+      priceMode: priceMode,
+      priceType: priceType,
+      priceTypeName: priceTypeName,
+      currency: currency,
+      latitude: latitude,
+      longitude: longitude,
+      docStatus: "O",
+      SAPStatus: "Not Approved",
+      docDate: new Date(),
+      itemLines: itemArray,
+      totalQty: totalQty.toString(),
+      totalItem: itemsQty.length.toString(),
+      beforeDiscount: beforeDiscount,
+      afterDiscount: afterDiscount,
+      GST: GST,
+      weight: weight,
+      discPrcnt: totalDiscPercent.toString(),
+      remark_order: remark_order,
+      docTotal: grandTotal,
+      oRStatus: '',
+      orderId: '',
+      draftNo: '',
+      street: street,
+      city: city,
+      block: block,
+      salesmanName: salesmanName,
+      slpcode: slpcode,
+      approvalStatus: '',
+      flag: true,
+      mvats: mVATArrayList,
+      ribNumber: ribNumber,
+      driverName: driverName,
+      approvalValue: approvalValue,
+      approvalResonArray: approvalResonArray,
+      ord_webId: 'ord_' + Random.id(),
+      uuid: Random.id(),
+      taxTotal: taxTotal,
+      createdAt: new Date(),
+    });
+    return orderId;
+  },
+  /**
+  * TODO:Complete JS doc
+  */
+  'order.approved': (id, status, remark) => {
+    let ordId = Order.findOne({ _id: id });
+    let approvedByName = allUsers.findOne({ _id: Meteor.userId() }).profile.firstName;
+    // console.log("orderId", ordId);
+    if (id) {
+      let orderFlag = Order.findOne({ _id: id }).flag;
+      // console.log("orderFlag", orderFlag);
+      if (orderFlag !== false) {
+        call = true;
+        count = 0;
+        Order.update({
+          _id: id
+        }, {
+          $set: {
+            updatedAt: new Date(),
+            approvalStatus: "Approved",
+          }
+        });
 
-   },
-   /**
-      * 
-      * @param {*} id 
-      * @param {*} remarks 
-      * @returns approve outlets
-      */
-   'order.approve': (id, remarks, outlet, assigned_to) => {
-      let idNew = 0;
-
-      let temporaryId = '';
-
-      // generate temp code
-      let tempVal = TempSerialNo.findOne({
-         order: true,
-      }, { sort: { $natural: -1 } });
-      if (!tempVal) {
-         temporaryId = "ORDR/" + "FMC" + "/1";
-      } else {
-         temporaryId = "ORDR/" + "FMC" + "/" + parseInt(tempVal.serial + 1);
-      }
-      if (!tempVal) {
-         TempSerialNo.insert({
-            serial: 1,
-            order: true,
-            uuid: Random.id(),
-            createdAt: new Date()
-         });
-      } else {
-         TempSerialNo.update({ _id: tempVal._id }, {
+        if (ordId.approvalValue === true) {
+          Order.update({
+            _id: id
+          }, {
             $set: {
-               serial: parseInt(tempVal.serial + 1),
-               updatedAt: new Date()
+              updatedAt: new Date(),
+              oRStatus: 'Pending',
+              docStatus: "O",
+              SAPStatus: "Pending",
+              accountantApproval: true,
+              firstAppoval: Meteor.userId(),
+              firstAppovalName: approvedByName,
+              firstAppovalDate: new Date(),
+              firstApprovalRemarks: remark,
+              onHoldByName: '',
+              onHoldDate: '',
             }
-         });
+          });
+        }
+        else {
+          aPICall()
+          // console.log("hiii");
+        }
       }
-      let ordrDetail = Order.findOne({ _id: id });
-      if (ordrDetail) {
-         NotificationOrdrAprvd(ordrDetail.sdUser);
+    }
+    function aPICall() {
+      for (let i = 0; i < ordId.itemLines.length; i++) {
+        ordId.itemLines[i].refType = "-1";
+      }
+      if (call === true) {
 
+        let base_url = Config.findOne({
+          name: 'base_url'
+        }).value;
+        let dbId = Config.findOne({
+          name: 'dbId'
+        }).value;
+        let url = base_url + salesOrderPost_Url;
+        let dataArray = {
+          dbId: dbId,
+          cardCode: ordId.cardCode,
+          address: ordId.address,
+          branch: ordId.branch,
+          currency: ordId.currency,
+          priceMode: ordId.priceMode,
+          priceType: ordId.priceType,
+          priceTypeName: ordId.priceTypeName,
+          referenceNo: ordId.custRefNo,
+          driverName: ordId.driverName,
+          RibNo: ordId.ribNumber,
+          discountPercentage: ordId.discPrcnt,
+          docDueDate: moment(ordId.docDueDate).format('YYYYMMDD'),
+          docDate: moment(ordId.docDate).format('YYYYMMDD'),
+          itemLines: ordId.itemLines,
+          mvats: ordId.mvats,
+          ord_webId: ordId.ord_webId,
+        };
+        let options = {
+          data: dataArray,
+          headers: {
+            'content-type': 'application/json'
+          }
+        };
+        // console.log("dataArray", dataArray);
+        HTTP.call("POST", url, options, (err, result) => {
+          if (err) {
+            // console.log("err", err);
+            // if (count === 1) {
+            Notification.insert({
+              userId: Meteor.userId(),
+              message: err.response,
+              uuid: Random.id()
+            });
+            // }
+
+            // if (count < 3) {
+            //   count = count + 1;
+            //   aPICall();
+            // }
+          } else {
+
+            call = false;
+            Order.update({
+              _id: id
+            }, {
+              $set: {
+                orderId: result.data.RefNo,
+                docEntry: result.data.DocEntry,
+                series: result.data.Series,
+                flag: false,
+                updatedBy: Meteor.userId(),
+                updatedAt: new Date(),
+                approvedBy: Meteor.userId(),
+                approvedByName: approvedByName,
+                approvedByDate: new Date(),
+                oRStatus: status,
+                oRRemark: remark,
+                docStatus: "O",
+                SAPStatus: "Approved"
+              }
+            });
+          }
+        });
       }
-      let data = Order.update({ _id: id }, {
-         $set:
-         {
-            status: "Approved",
-            approvalRemark: remarks,
-            docNum: temporaryId,
-            approvedBy: Meteor.userId(),
-            approvedDate: new Date(),
+    }
+    return id;
+  },
+  /**
+   * TODO:Complete JS doc
+   */
+  'order.updates': (id, status, remark) => {
+    //
+    let updatedByName = allUsers.findOne({ _id: Meteor.userId() }).profile.firstName;
+    if (status === 'rejected') {
+      return Order.update({
+        _id: id
+      }, {
+        $set: {
+          oRStatus: status,
+          oRRemark: remark,
+          docStatus: 'R',
+          flag: true,
+          updatedBy: Meteor.userId(),
+          rejectedByName: updatedByName,
+          rejectedDate: new Date(),
+          updatedAt: new Date(),
+          SAPStatus: "Rejected"
+        }
+      });
+    }
+    else if (status === 'onHold') {
+      return Order.update({
+        _id: id
+      }, {
+        $set: {
+          oRStatus: status,
+          oRRemark: remark,
+          docStatus: 'onHold',
+          SAPStatus: "On Hold",
+          flag: true,
+          updatedBy: Meteor.userId(),
+          onHoldByName: updatedByName,
+          updatedAt: new Date(),
+          onHoldDate: new Date()
+        }
+      });
+    }
+    //
+  },
+
+
+  /**
+ * TODO:Complete JS doc
+ * approved by accountant
+ */
+  'order.accountantApproved': (id, status, remark) => {
+    let ordId = Order.findOne({ _id: id });
+    let approvedByName = allUsers.findOne({ _id: Meteor.userId() }).profile.firstName;
+    // console.log("orderId", ordId);
+    if (id) {
+      let orderFlag = Order.findOne({ _id: id }).flag;
+      // console.log("orderFlag", orderFlag);
+      if (orderFlag !== false) {
+        call = true;
+        count = 0;
+        Order.update({
+          _id: id
+        }, {
+          $set: {
             updatedAt: new Date(),
-         }
+            approvalStatus: "Approved",
+          }
+        });
+        aPICall()
+        // console.log("hiii");
+      }
+    }
+    function aPICall() {
+      for (let i = 0; i < ordId.itemLines.length; i++) {
+        ordId.itemLines[i].refType = "-1";
+      }
+      if (call === true) {
+
+        let base_url = Config.findOne({
+          name: 'base_url'
+        }).value;
+        let dbId = Config.findOne({
+          name: 'dbId'
+        }).value;
+        let url = base_url + salesOrderPost_Url;
+        let dataArray = {
+          dbId: dbId,
+          cardCode: ordId.cardCode,
+          address: ordId.address,
+          branch: ordId.branch,
+          currency: ordId.currency,
+          priceMode: ordId.priceMode,
+          priceType: ordId.priceType,
+          priceTypeName: ordId.priceTypeName,
+          referenceNo: ordId.custRefNo,
+          driverName: ordId.driverName,
+          RibNo: ordId.ribNumber,
+          discountPercentage: ordId.discPrcnt,
+          docDueDate: moment(ordId.docDueDate).format('YYYYMMDD'),
+          docDate: moment(ordId.docDate).format('YYYYMMDD'),
+          itemLines: ordId.itemLines,
+          mvats: ordId.mvats,
+          ord_webId: ordId.ord_webId,
+        };
+        let options = {
+          data: dataArray,
+          headers: {
+            'content-type': 'application/json'
+          }
+        };
+        // console.log("dataArray", dataArray);
+        HTTP.call("POST", url, options, (err, result) => {
+          if (err) {
+            // console.log("err", err);
+            // if (count === 1) {
+            Notification.insert({
+              userId: Meteor.userId(),
+              message: err.response,
+              uuid: Random.id()
+            });
+            // }
+
+            // if (count < 3) {
+            //   count = count + 1;
+            //   aPICall();
+            // }
+          } else {
+
+            call = false;
+            Order.update({
+              _id: id
+            }, {
+              $set: {
+                orderId: result.data.RefNo,
+                docEntry: result.data.DocEntry,
+                series: result.data.Series,
+                flag: false,
+                updatedBy: Meteor.userId(),
+                updatedAt: new Date(),
+                approvedBy: Meteor.userId(),
+                approvedByName: approvedByName,
+                approvedByDate: new Date(),
+                accountantApproved: true,
+                oRStatus: status,
+                oRRemark: remark,
+                docStatus: "O",
+                SAPStatus: "Approved"
+              }
+            });
+          }
+        });
+      }
+    }
+    return id;
+  },
+
+  /**
+ * TODO:Complete JS doc
+ * update by accountant
+ */
+  'order.accountantUpdates': (id, status, remark) => {
+    //
+    let updatedByName = allUsers.findOne({ _id: Meteor.userId() }).profile.firstName;
+    if (status === 'rejected') {
+      return Order.update({
+        _id: id
+      }, {
+        $set: {
+          oRStatus: status,
+          oRRemark: remark,
+          docStatus: 'R',
+          flag: true,
+          updatedBy: Meteor.userId(),
+          rejectedByName: updatedByName,
+          rejectedDate: new Date(),
+          accountantRejected: true,
+          updatedAt: new Date(),
+          SAPStatus: "Rejected"
+        }
       });
-      if (data) {
-         idNew = Delivery.insert({
-            uuid: Random.id(),
-            outlet: outlet,
-            assigned_to: assigned_to,
-            date: new Date(),
-            location: "",
-            active: "Y",
-            status: "Pending"
-         });
-      }
-      return idNew;
-   },
-
-   /**
-        * fetching directsale id
-        * @returns 
-        */
-   'order.id': (id) => {
-      let sdName = '';
-      let verticalName = '';
-      let routeIdName = '';
-      let outletName = '';
-      let createdName = '';
-      let data = Order.findOne({ _id: id });
-      if (data) {
-         if (data.sdUser) {
-            let sdUser1 = allUsers.findOne({ _id: data.sdUser });
-            if (sdUser1) {
-               sdName = sdUser1.username;
-            }
-         }
-         if (data.vertical) {
-            let vertical1 = Verticals.findOne({ _id: data.vertical });
-            if (vertical1) {
-               verticalName = vertical1.verticalName;
-            }
-         }
-         if (data.routeId) {
-            let routeId1 = RouteGroup.findOne({ _id: data.routeId });
-            if (routeId1) {
-               routeIdName = routeId1.routeName;
-            }
-         }
-         if (data.outlet) {
-            let outlet1 = Outlets.findOne({ _id: data.outlet });
-            if (outlet1) {
-               outletName = outlet1.name;
-            }
-         }
-         if (data.createdBy) {
-            let created1 = allUsers.findOne({ _id: data.createdBy });
-            if (created1) {
-               createdName = created1.username;
-            }
-         }
-
-      }
-      return {
-         orderData: data, sdName: sdName, verticalName: verticalName,
-         routeIdName: routeIdName, outletName: outletName, createdName: createdName
-      };
-   },
-   /**
-      * 
-      * @param {*} id 
-      * @param {*} remarks 
-      * @returns update order status
-      */
-   'order.statusUpdate': (id, remarks, status) => {
-      return Order.update({ _id: id }, {
-         $set:
-         {
-            status: status,
-            approvalRemark: remarks,
-            docNum: '',
-            statusUpdatedBy: Meteor.userId(),
-            statusUpdatedDate: new Date(),
-            updatedAt: new Date(),
-         }
+    }
+    else if (status === 'onHold') {
+      return Order.update({
+        _id: id
+      }, {
+        $set: {
+          oRStatus: status,
+          oRRemark: remark,
+          docStatus: 'onHold',
+          SAPStatus: "On Hold",
+          flag: true,
+          updatedBy: Meteor.userId(),
+          accountantOnHold: true,
+          onHoldByName: updatedByName,
+          updatedAt: new Date(),
+          onHoldDate: new Date()
+        }
       });
-   },
-   'order.update': (productsArray, vertical, grandTotal, taxTotal, outlet, idOrder, discountVal) => {
-      let totalQty = 0;
-      let itemsQty = productsArray;
-      for (let i = 0; i < itemsQty.length; i++) {
-         // totalQty += Number(itemsQty[i].quantity);
+    }
+    //
+  },
+
+  /**
+ * TODO: Complete Js doc
+ * Fetching full details with id
+ */
+  'order.id': (id) => {
+    return Order.findOne({ _id: id });
+  },
+  'order.GetUuid': (id) => {
+    return Order.findOne({ uuid: id });
+  },
+  'order.orderPrint': (id) => {
+    return Order.findOne({ _id: id });
+
+  },
+  'order.docNumArray': (docNum) => {
+    let data = Order.findOne({ orderId: docNum }).docDate;
+    return moment(data).format('DD-MMM-YYYY');
+  },
+  'order.editOrUpdate': (id, itemArray, beforeDiscount, afterDiscount, GST,
+    grandTotal, totalDiscPercent, latitude, longitude, mVATArrayList, weight, taxTotal, approvalValue, approvalResonArray) => {
+    // remark, custRefDate, custRef,
+    let totalQty = 0;
+    let itemsQty = itemArray;
+    for (let i = 0; i < itemsQty.length; i++) {
+      totalQty += Number(itemsQty[i].quantity);
+    }
+
+    return Order.update({
+      _id: id
+    }, {
+      $set: {
+        latitude: latitude,
+        longitude: longitude,
+        itemLines: itemArray,
+        totalQty: totalQty.toString(),
+        totalItem: itemsQty.length.toString(),
+        beforeDiscount: beforeDiscount,
+        afterDiscount: afterDiscount,
+        discPercnt: totalDiscPercent,
+        approvalResonArray: approvalResonArray,
+        GST: GST,
+        weight: weight,
+        docTotal: grandTotal,
+        approvalValue: approvalValue,
+        flag: true,
+        oRStatus: '',
+        orderId: '',
+        mvats: mVATArrayList,
+        taxTotal: taxTotal,
+        uuid: Random.id(),
+        updatedAt: new Date()
       }
-      return Order.update({ _id: idOrder }, {
-         $set:
-         {
-            vertical: vertical,
-            outlet: outlet,
-            docTotal: grandTotal,
-            taxAmount: taxTotal,
-            itemArray: productsArray,
-            totalQty: totalQty,
-            totalItems: productsArray.length,
-            discountAmt: discountVal,
-            afterDiscount: '',
-            beforeDiscount: '',
-            docNum: '',
-            UpdatedBy: Meteor.userId(),
-            UpdatedDate: new Date()
-         }
+    });
+  },
+  /**
+  * TODO: Complete Js doc
+  * Fetching full item lines
+  */
+  'order.itemLines': (id) => {
+    return Order.findOne({ _id: id });
+  },
+  /**
+   * TODO:Complete Js doc
+   */
+  'order.itemArrayUpdate': (id, itemArray) => {
+    return Order.update({
+      _id: id
+    }, {
+      $set: {
+        itemLines: itemArray,
+        itemArrayUpdated: new Date(),
+        updatedAt: new Date()
+      }
+    });
+  },
+  /**
+  * TODO: Complete Js doc
+  * Fetching full details with id
+  */
+  'order.docEntry': (docEntry) => {
+    return Order.findOne({ docEntry: docEntry });
+  },
+  /**
+  * TODO: Complete Js doc
+  * Fetching full details with id
+  */
+  'order.orderId': (orderId) => {
+    return Order.findOne({ orderId: orderId });
+  },
+  /**
+   * TODO:Complete Js doc
+   * Open order list
+   */
+  'order.open': () => {
+    return Order.find({ docStatus: "O" }).fetch();
+
+  },
+  'order.idList': (id) => {
+    return Order.findOne({ _id: id }, {
+      fields: {
+        itemLines: 1, cardName: 1, cardCode: 1, grandTotal: 1, beforeDiscount: 1, afterDiscount: 1
+        , GST: 1, docDueDate: 1, createdAt, orderId: 1, docEntry: 1, branch: 1
+      }
+    });
+  },
+  'order.delete': (_id) => {
+    let orderData = Order.findOne({ _id: _id });
+    let DeletedOrderData = DeletedOrder.insert({
+      cardCode: orderData.cardCode,
+      cardName: orderData.cardName,
+      address: orderData.address,
+      branch: orderData.branch,
+      branchName: orderData.branchName,
+      employeeId: orderData.employeeId,
+      userId: orderData.userId,
+      docDueDate: orderData.docDueDate,
+      custRefDate: orderData.custRefDate,
+      custRefNo: orderData.custRefNo,
+      priceMode: orderData.priceMode,
+      priceType: orderData.priceType,
+      currency: orderData.currency,
+      latitude: orderData.latitude,
+      longitude: orderData.longitude,
+      docStatus: orderData.docStatus,
+      docDate: orderData.docDate,
+      itemLines: orderData.itemLines,
+      totalQty: orderData.totalQty,
+      totalItem: orderData.totalItem,
+      beforeDiscount: orderData.beforeDiscount,
+      afterDiscount: orderData.afterDiscount,
+      GST: orderData.GST,
+      weight: orderData.weight,
+      discPrcnt: orderData.discPrcnt,
+      remark_order: orderData.remark_order,
+      docTotal: orderData.docTotal,
+      oRStatus: orderData.oRStatus,
+      orderId: orderData.orderId,
+      draftNo: orderData.draftNo,
+      street: orderData.street,
+      city: orderData.city,
+      block: orderData.block,
+      salesmanName: orderData.salesmanName,
+      flag: orderData.flag,
+      mvats: orderData.mvats,
+      uuid: Random.id(),
+      taxTotal: orderData.taxTotal,
+      createdAt: orderData.createdAt,
+      deletedAt: new Date,
+      deletedBy: Meteor.userId()
+
+    }
+    );
+    if (DeletedOrderData) {
+      return Order.remove({ _id: _id });
+    }
+    return DeletedOrderData;
+  },
+  /**
+   * TODO:Complete Js doc
+   * Open order list
+   */
+  'order.dashBoardApproved': () => {
+    let today = moment(new Date()).format("YYYY-MM-DD 00:00:00.0");
+    let toDate = new Date(today);
+    let nextDay = new Date(toDate);
+    nextDay.setDate(nextDay.getDate() + 1);
+    return Order.find({
+      oRStatus: { $eq: 'approved' },
+      // approvedByDate: {
+      //   $gte: toDay,
+      //   $lt: nextDay
+      // }, 
+      docStatus: 'O'
+    }).count();
+  },
+  /**
+  * TODO:Complete Js doc
+  * Open order list
+  */
+  'order.dashBoardPending': () => {
+    let today = moment(new Date()).format("YYYY-MM-DD 00:00:00.0");
+    let toDate = new Date(today);
+    let nextDay = new Date(toDate);
+    nextDay.setDate(nextDay.getDate() + 1);
+    return Order.find({
+      $or: [{ oRStatus: { $eq: '' } }, { oRStatus: { $eq: 'Pending' } }],
+      orderId: { $eq: '' },
+      docStatus: 'O',
+    }).count();
+  },
+  /**
+  * TODO:Complete Js doc
+  * Open order list
+  */
+  'order.dashBoardRejected': () => {
+    let today = moment(new Date()).format("YYYY-MM-DD 00:00:00.0");
+    let toDate = new Date(today);
+    let nextDay = new Date(toDate);
+    nextDay.setDate(nextDay.getDate() + 1);
+    return Order.find({
+      oRStatus: { $eq: 'rejected' },
+      docStatus: 'R',
+      // rejectedDate: {
+      //   $gte: toDay,
+      //   $lt: nextDay
+      // },
+    }).count();
+  },
+  /**
+  * TODO:Complete Js doc
+  * Open order list
+  */
+  'order.dashBoardOnHold': () => {
+    let today = moment(new Date()).format("YYYY-MM-DD 00:00:00.0");
+    let toDate = new Date(today);
+    let nextDay = new Date(toDate);
+    nextDay.setDate(nextDay.getDate() + 1);
+    return Order.find({
+      oRStatus: { $eq: 'onHold' },
+      docStatus: 'onHold',
+      // onHoldDate: {
+      //   $gte: toDay,
+      //   $lt: nextDay
+      // },
+    }).count();
+  },
+  'order.orderCount': () => {
+    let today = moment(new Date()).format("YYYY-MM-DD 00:00:00.0");
+    toDay = new Date(today);
+    let nextDay = new Date(toDay);
+    nextDay.setDate(nextDay.getDate() + 1);
+    return Order.find({
+      userId: Meteor.userId(),
+      docDate: {
+        $gte: toDay,
+        $lt: nextDay
+      }
+    }).count();
+
+  },
+  'order.orderApprovedCount': () => {
+    let today = moment(new Date()).format("YYYY-MM-DD 00:00:00.0");
+    toDay = new Date(today);
+    let nextDay = new Date(toDay);
+    nextDay.setDate(nextDay.getDate() + 1);
+    return Order.find({
+      userId: Meteor.userId(),
+      oRStatus: { $eq: 'approved' },
+      approvedByDate: {
+        $gte: toDay,
+        $lt: nextDay
+      }
+    }).count();
+  },
+  'order.orderonHoldCount': () => {
+    let today = moment(new Date()).format("YYYY-MM-DD 00:00:00.0");
+    toDay = new Date(today);
+    let nextDay = new Date(toDay);
+    nextDay.setDate(nextDay.getDate() + 1);
+    return Order.find({
+      userId: Meteor.userId(),
+      oRStatus: { $eq: 'onHold' },
+      docStatus: 'onHold',
+      onHoldDate: {
+        $gte: toDay,
+        $lt: nextDay
+      }
+    }).count();
+  },
+  'order.orderRejectCount': () => {
+    let today = moment(new Date()).format("YYYY-MM-DD 00:00:00.0");
+    toDay = new Date(today);
+    let nextDay = new Date(toDay);
+    nextDay.setDate(nextDay.getDate() + 1);
+    return Order.find({
+      userId: Meteor.userId(),
+      oRStatus: { $eq: 'rejected' },
+      docStatus: 'R',
+      rejectedDate: {
+        $gte: toDay,
+        $lt: nextDay
+      }
+    }).count();
+  },
+  'order.docEntryOrder': (orderEntry) => {
+    return Order.findOne({ docEntry: orderEntry });
+  },
+  /**
+   * TODO:Complete Js doc
+   * Open Print Count
+   * 
+   */
+  'order.printCheck': (id) => {
+    let user = allUsers.findOne({ _id: Meteor.userId() }).profile.firstName;
+    let order = Order.findOne({ _id: id });
+    if (order.printCount === undefined) {
+      Order.update({
+        _id: id
+      }, {
+        $set: {
+          printType: "Duplicate",
+          printTimeFirst: new Date(),
+          printByFirst: Meteor.userId(),
+          printByFirstName: user,
+          printCount: 0
+        }
       });
-
-   },
-   'order.orderCount': (id, fromDate, toDate) => {
-      fromDate = new Date(fromDate);
-      toDate = new Date(toDate);
-      toDate.setDate(toDate.getDate() + 1);
-      return Order.find({ subDistributor: id, createdAt: { $gte: fromDate, $lte: toDate } }).count();
-   },
-   'order.orderApproved': (id, fromDate, toDate) => {
-      fromDate = new Date(fromDate);
-      toDate = new Date(toDate);
-      toDate.setDate(toDate.getDate() + 1);
-      return Order.find({ status: 'Approved', subDistributor: id, createdAt: { $gte: fromDate, $lte: toDate } }).count();
-   },
-   'order.orderOnHold': (id, fromDate, toDate) => {
-      fromDate = new Date(fromDate);
-      toDate = new Date(toDate);
-      toDate.setDate(toDate.getDate() + 1);
-      return Order.find({ status: 'On Hold', subDistributor: id, createdAt: { $gte: fromDate, $lte: toDate } }).count();
-   },
-   'order.orderRejected': (id, fromDate, toDate) => {
-      fromDate = new Date(fromDate);
-      toDate = new Date(toDate);
-      toDate.setDate(toDate.getDate() + 1);
-      return Order.find({ status: 'Rejected', subDistributor: id, createdAt: { $gte: fromDate, $lte: toDate } }).count();
-   },
-
-
-   'order.orderlistExpo': (outlet, route, sd, fromDate, toDates) => {
-      console.log("outlet, route, sd, fromDate, toDates", outlet, route, sd, fromDate, toDates);
-      if (outlet && route === '') {
-         return Order.find({ subDistributor: sd, outlet: outlet, createdAt: { $gte: fromDate, $lte: toDates } }, { fields: { sdUser: 1, vertical: 1, outlet: 1, routeId: 1, docDate: 1, status: 1, docTotal: 1, taxAmount: 1, itemArray: 1 } }).fetch();
+    } else {
+      let printC = order.printCount + 1;
+      if (printC === 1) {
+        Order.update({
+          _id: id
+        }, {
+          $set: {
+            printType: "Triplicate",
+            printTimeSecond: new Date(),
+            printBySecond: Meteor.userId(),
+            printBySecondName: user,
+            printCount: 1
+          }
+        });
       }
-      else if (outlet === '' && route) {
-         return Order.find({ subDistributor: sd, routeId: route, createdAt: { $gte: fromDate, $lte: toDates } }, { fields: { sdUser: 1, vertical: 1, outlet: 1, routeId: 1, docDate: 1, status: 1, docTotal: 1, taxAmount: 1, itemArray: 1 } }).fetch();
+      else if (printC >= 2) {
+        Order.update({
+          _id: id
+        }, {
+          $set: {
+            printType: "Copy",
+            printTimeThird: new Date(),
+            printByThird: Meteor.userId(),
+            printByThirdName: user,
+            printCount: 2
+          }
+        });
       }
-      else if (outlet && route) {
-         return Order.find({ subDistributor: sd, outlet: outlet, routeId: route, createdAt: { $gte: fromDate, $lte: toDates } }, { fields: { sdUser: 1, vertical: 1, outlet: 1, routeId: 1, docDate: 1, status: 1, docTotal: 1, taxAmount: 1, itemArray: 1 } }).fetch();
-      }
-      else {
-         return Order.find({ subDistributor: sd, createdAt: { $gte: fromDate, $lte: toDates } }, { fields: { sdUser: 1, vertical: 1, outlet: 1, routeId: 1, docDate: 1, status: 1, docTotal: 1, taxAmount: 1, itemArray: 1 } }).fetch();
-      }
-
-   },
-   /**
-    * 
-    * @param {*} sd 
-    * @param {*} route 
-    * @param {*} outletData 
-    * @param {*} fromDate 
-    * @param {*} toDate 
-    * @param {*} employeeData 
-    * @returns 
-    */
-   'order.docTotalSum': (sd, route, outletData, fromDate, toDate, employeeData) => {
-      let docTotalSum = 0;
-      let orderData = [];
-      if (fromDate && toDate) {
-         toDate.setDate(toDate.getDate() + 1)
-         if (employeeData && outletData === '' && route === '') {
-            orderData = Order.find({
-               subDistributor: sd,
-               sdUser: employeeData,
-               createdAt: { $gte: fromDate, $lt: toDate }
-            }, {
-               fields: {
-                  docTotal: 1
-               }
-            }).fetch();
-         } else if (employeeData === '' && outletData && route === '') {
-            orderData = Order.find({
-               subDistributor: sd,
-               outlet: outletData,
-               createdAt: { $gte: fromDate, $lt: toDate }
-            }, {
-               fields: {
-                  docTotal: 1
-               }
-            }).fetch();
-         } else if (employeeData === '' && outletData === '' && route) {
-            orderData = Order.find({
-               subDistributor: sd,
-               routeId: route,
-               createdAt: { $gte: fromDate, $lt: toDate }
-            }, {
-               fields: {
-                  docTotal: 1
-               }
-            }).fetch();
-         } else if (employeeData && outletData && route === '') {
-            orderData = Order.find({
-               subDistributor: sd,
-               outlet: outletData,
-               sdUser: employeeData,
-               createdAt: { $gte: fromDate, $lt: toDate }
-            }).fetch();
-         } else if (employeeData && outletData === '' && route) {
-            orderData = Order.find({
-               subDistributor: sd,
-               routeId: route,
-               sdUser: employeeData,
-               createdAt: { $gte: fromDate, $lt: toDate }
-            }, {
-               fields: {
-                  docTotal: 1
-               }
-            }).fetch();
-         } else if (employeeData === '' && outletData && route) {
-            orderData = Order.find({
-               subDistributor: sd,
-               outlet: outletData,
-               routeId: route,
-               createdAt: { $gte: fromDate, $lt: toDate }
-            }, {
-               fields: {
-                  docTotal: 1
-               }
-            }).fetch();
-         } else if (employeeData && outletData && route) {
-            orderData = Order.find({
-               subDistributor: sd,
-               outlet: outletData,
-               sdUser: employeeData,
-               routeId: route,
-               createdAt: { $gte: fromDate, $lt: toDate }
-            }, {
-               fields: {
-                  docTotal: 1
-               }
-            }).fetch();
-         } else {
-            orderData = Order.find({
-               subDistributor: sd,
-               createdAt: { $gte: fromDate, $lt: toDate }
-            }, {
-               fields: {
-                  docTotal: 1
-               }
-            }).fetch();
-         }
-         if (orderData.length > 0) {
-            for (let j = 0; j < orderData.length; j++) {
-               docTotalSum += Number(orderData[j].docTotal);
-            }
-         }
-      }
-      return docTotalSum.toFixed(2);
-   },
-   'order.taxAmountSum': (sd, route, outletData, fromDate, toDate, employeeData) => {
-      let docTotalSum = 0, orderData = '';
-      if (fromDate && toDate) {
-         toDate.setDate(toDate.getDate() + 1);
-         if (employeeData && outletData === null && route === null) {
-            orderData = Order.find({
-               subDistributor: sd,
-               sdUser: employeeData,
-               createdAt: { $gte: fromDate, $lt: toDate }
-            }, {
-               fields: { taxAmount: 1 }
-            }).fetch();
-         } else if (employeeData === null && outletData && route === null) {
-            orderData = Order.find({
-               subDistributor: sd,
-               outlet: outletData,
-               createdAt: { $gte: fromDate, $lt: toDate }
-            }, {
-               fields: { taxAmount: 1 }
-            }).fetch();
-         } else if (employeeData === null && outletData === null && route) {
-            orderData = Order.find({
-               subDistributor: sd,
-               routeId: route,
-               createdAt: { $gte: fromDate, $lt: toDate }
-            }, {
-               fields: { taxAmount: 1 }
-            }).fetch();
-         } else if (employeeData && outletData && route === null) {
-            orderData = Order.find({
-               subDistributor: sd,
-               outlet: outletData,
-               sdUser: employeeData,
-               createdAt: { $gte: fromDate, $lt: toDate }
-            }, {
-               fields: { taxAmount: 1 }
-            }).fetch();
-         } else if (employeeData && outletData === null && route) {
-            orderData = Order.find({
-               subDistributor: sd,
-               routeId: route,
-               sdUser: employeeData,
-               createdAt: { $gte: fromDate, $lt: toDate }
-            }, {
-               fields: { taxAmount: 1 }
-            }).fetch();
-         } else if (employeeData === null && outletData && route) {
-            orderData = Order.find({
-               subDistributor: sd,
-               outlet: outletData,
-               routeId: route,
-               createdAt: { $gte: fromDate, $lt: toDate }
-            }, {
-               fields: { taxAmount: 1 }
-            }).fetch();
-         } else if (employeeData && outletData && route) {
-            orderData = Order.find({
-               subDistributor: sd,
-               outlet: outletData,
-               sdUser: employeeData,
-               routeId: route,
-               createdAt: { $gte: fromDate, $lt: toDate }
-            },
-               {
-                  fields: { taxAmount: 1 }
-               }).fetch();
-         } else {
-            orderData = Order.find({
-               subDistributor: sd,
-               createdAt: { $gte: fromDate, $lt: toDate }
-            }, {
-               fields: { taxAmount: 1 }
-            }).fetch();
-         }
-         if (orderData.length > 0) {
-            for (let j = 0; j < orderData.length; j++) {
-               docTotalSum += Number(orderData[j].taxAmount);
-            }
-         }
-      }
-
-      return docTotalSum.toFixed(2);
-   },
-   'order.orderIdVarList': (sdUser) => {
-      let data = Order.find({ sdUser: sdUser }, { fields: { docNum: 1 } }).fetch();
-      if (data) {
-         return data;
-      }
-   }
-
+    }
+  },
+  'order.pickListOrderDetails': (orderEntry) => {
+    return Order.findOne({ docEntry: orderEntry });
+  },
 });
-// For Notification for Oredr Add
-function notificationOrdrFun(subd) {
-   let notData = Notification.findOne({ type: "New Order", user: subd });
-   if (notData) {
-      let countData = Number(notData.count + 1);
-      return Notification.update({ type: "New Order", user: subd }, { $set: { count: countData } })
-   } else {
-      return Notification.insert({
-         user: subd,
-         type: "New Order",
-         count: 1,
-         uuid: Random.id(),
-         createdAt: new Date()
-      });
-   }
-}
-// For Notification for Oredr Add
-function NotificationOrdrAprvd(subd) {
-   let notData = Notification.findOne({ type: "Ordr Aprvd", user: subd });
-   if (notData) {
-      let countData = Number(notData.count + 1);
-      return Notification.update({ type: "Ordr Aprvd", user: subd }, { $set: { count: countData } })
-   } else {
-      return Notification.insert({
-         user: subd,
-         type: "Ordr Aprvd",
-         count: 1,
-         createdAt: new Date()
-      });
-   }
-}

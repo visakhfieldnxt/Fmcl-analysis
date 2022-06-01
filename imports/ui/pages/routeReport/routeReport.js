@@ -1,5 +1,5 @@
 /**
- * @author Nithin
+ * @author Visakh
  */
 import { Meteor } from 'meteor/meteor';
 import { RouteGroup } from '../../../api/routeGroup/routeGroup';
@@ -16,76 +16,76 @@ Template.routeReport.onCreated(function () {
   this.modalLoader = new ReactiveVar();
   this.routeUpdatedData = new ReactiveVar();
   this.assignedHistoryData = new ReactiveVar();
-  this.vansaleUserFullList = new ReactiveVar();
-  this.customerUserDetail = new ReactiveVar();
   this.routeCodeList = new ReactiveVar();
   this.bodyLoaders = new ReactiveVar();
   this.branchArrayList = new ReactiveVar();
   this.routeCustomerList = new ReactiveVar();
-  let loginUserVerticals = Session.get("loginUserVerticals");
+  this.branchNameArray = new ReactiveVar();
+  let managerBranch = Session.get("managerBranch");
   this.pagination = new Meteor.Pagination(RouteGroup, {
     sort: {
       createdAt: -1
     },
     filters: {
-      vertical: { $in: loginUserVerticals }
-    },
-    fields: {
-      routeName: 1,
-      routeCode: 1,
-      active: 1,
-      subDistributor: 1,
-      vertical: 1,
-      createdAt: 1
+      branchCode: { $in: managerBranch }
     },
     perPage: 25
   });
 });
 Template.routeReport.onRendered(function () {
   $('#bodySpinLoaders').css('display', 'block');
-  let loginUserVerticals = Session.get("loginUserVerticals");
+  /**
+* TODO:Complete Js doc
+* Getting vansale user list
+*/
 
-  Meteor.call('routeGroup.verticalList', loginUserVerticals, (err, res) => {
+  Meteor.call('routeGroup.list', (err, res) => {
     if (!err) {
       this.routeCodeList.set(res);
     }
   });
-
-  Meteor.call('user.sdListGet', loginUserVerticals, (err, res) => {
+  Meteor.call('routeCustomer.list', (err, res) => {
     if (!err) {
-      this.vansaleUserFullList.set(res);
+      this.routeCustomerList.set(res);
     }
+  });
+
+  let managerBranch = Session.get("managerBranch");
+  Meteor.call('branch.managerBranchGet', managerBranch, (err, res) => {
+    if (!err)
+      this.branchNameArray.set(res);
+  });
+
+  // for getting allUser Name 
+  Meteor.call('user.userNameGet', (err, res) => {
+    if (!err)
+      // Session.set("userNameArray",res);
+      this.userNameArray.set(res)
   });
   /**
 * TODO: Complete JS doc
 */
 
 
-
-  /**
-   * TODO:Complete Js doc
-   * Getting customer list
-   */
-
-
-  $('#selectSubD').select2({
-    placeholder: "Sub Distributor",
-    tokenSeparators: [','],
-    allowClear: true,
-    dropdownParent: $("#selectSubD").parent(),
-  });
-  $('#routeCode').select2({
-    placeholder: "Route Code",
-    tokenSeparators: [','],
-    allowClear: true,
-    dropdownParent: $("#routeCode").parent(),
-  });
-
   $('#routeCodeVal').select2({
-    placeholder: "Select Route Name",
-    tokenSeparators: [','],
+    placeholder: "Select Route Code",
+    tokenSeparators: [',', ' '],
     allowClear: true,
     dropdownParent: $("#routeCodeVal").parent(),
+  });
+
+  $('#routeNameVal').select2({
+    placeholder: "Select Route Name",
+    tokenSeparators: [',', ' '],
+    allowClear: true,
+    dropdownParent: $("#routeNameVal").parent(),
+  });
+
+  $('#selectBranchName').select2({
+    placeholder: "Select Branch",
+    tokenSeparators: [',', ' '],
+    allowClear: true,
+    dropdownParent: $("#selectBranchName").parent(),
   });
 
 });
@@ -98,39 +98,62 @@ Template.routeReport.helpers({
     return Template.instance().pagination.ready();
   },
   /**
-* get vansale user name
-*/
-
-  branchNameHelp: (branch) => {
-    let branchData = Template.instance().branchArrayList.get();
-    if (branchData) {
-      let res = branchData.find(x => x.bPLId === branch);
-      if (res) {
-        return res.bPLName;
+ * get vansale user name
+ */
+  /**
+   * 
+   * @param {*} index 
+   * @returns get row index
+   */
+  indexCountGet: (index) => {
+    let res = Template.instance().pagination;
+    if (res) {
+      let pageValue = res.settings.keys.page;
+      if (pageValue !== undefined && pageValue > 1) {
+        return (25 * (pageValue - 1)) + index + 1;
+      }
+      else {
+        return index + 1;
       }
     }
   },
+  branchNameHelp: (branch) => {
+    let promiseVal = new Promise((resolve, reject) => {
+      Meteor.call("branch.idBranchName", branch, (error, result) => {
+        if (!error) {
+          resolve(result);
+        } else {
+          reject(error);
+        }
+      });
+    });
+    promiseVal.then((result) => {
+      $('.branchIdVal_' + branch).html(result);
+      $('#bodySpinLoaders').css('display', 'none');
+    }
+    ).catch((error) => {
+      $('.branchIdVal_' + branch).html('');
+      $('#bodySpinLoaders').css('display', 'none');
+    }
+    );
+  },
 
+  /**
+* TODO:Complete JS doc
+*/
+  branchList: function () {
+    return Template.instance().branchNameArray.get();
+  },
   /**
 * get vansale user name
 */
+  /**
+ * get customer name
+ */
 
   custNameHelp: (cardCode) => {
-    let custData = Template.instance().customerUserDetail.get();
-    if (custData) {
-      let res = custData.find(x => x.cardCode === cardCode);
-      if (res) {
-        return res.cardName;
-      }
-    }
-  },
-  /**
-* get vansale user name
-*/
-
-  getUserName: (user) => {
     let promiseVal = new Promise((resolve, reject) => {
-      Meteor.call("user.idName", user, (error, result) => {
+      Meteor.call("customer.idCardName", cardCode, (error, result) => {
         if (!error) {
           resolve(result);
         } else {
@@ -139,85 +162,12 @@ Template.routeReport.helpers({
       });
     });
     promiseVal.then((result) => {
-      $('.userIdVal_' + user).html(result);
-      $('#bodySpinLoaders').css('display', 'none');
+      $('.customerVal_' + cardCode).html(result);
+      $('.loadersSpinPromise').css('display', 'none');
     }
     ).catch((error) => {
-      $('.userIdVal_' + user).html('');
-      $('#bodySpinLoaders').css('display', 'none');
-    }
-    );
-  },
-  /**
-* get vansale user name
-*/
-
-  getOutletCount: (id) => {
-    let promiseVal = new Promise((resolve, reject) => {
-      Meteor.call("outlet.routeCountGet", id, (error, result) => {
-        if (!error) {
-          resolve(result);
-        } else {
-          reject(error);
-        }
-      });
-    });
-    promiseVal.then((result) => {
-      $('.getOutletCountGet_' + id).html(result);
-      $('#bodySpinLoaders').css('display', 'none');
-    }
-    ).catch((error) => {
-      $('.getOutletCountGet_' + id).html('');
-      $('#bodySpinLoaders').css('display', 'none');
-    }
-    );
-  },
-  /**
-* get vansale user name
-*/
-
-  getOutletCount: (id) => {
-    let promiseVal = new Promise((resolve, reject) => {
-      Meteor.call("outlet.routeCountGet", id, (error, result) => {
-        if (!error) {
-          resolve(result);
-        } else {
-          reject(error);
-        }
-      });
-    });
-    promiseVal.then((result) => {
-      $('.getOutletCountGet_' + id).html(result);
-      $('#bodySpinLoaders').css('display', 'none');
-    }
-    ).catch((error) => {
-      $('.getOutletCountGet_' + id).html('');
-      $('#bodySpinLoaders').css('display', 'none');
-    }
-    );
-  },
-
-  /**
-* get vansale user name
-*/
-
-  getVerticalNam: (id, vertical) => {
-    let promiseVal = new Promise((resolve, reject) => {
-      Meteor.call("vertical.nameArrayList", vertical, (error, result) => {
-        if (!error) {
-          resolve(result);
-        } else {
-          reject(error);
-        }
-      });
-    });
-    promiseVal.then((result) => {
-      $('.getVerticalNames_' + id).html(result);
-      $('#bodySpinLoaders').css('display', 'none');
-    }
-    ).catch((error) => {
-      $('.getVerticalNames_' + id).html('');
-      $('#bodySpinLoaders').css('display', 'none');
+      $('.customerVal_' + cardCode).html('');
+      $('.loadersSpinPromise').css('display', 'none');
     }
     );
   },
@@ -259,14 +209,7 @@ Template.routeReport.helpers({
       return 'Inactive';
     }
   },
-  /**
-  * get vansale user name
-  */
 
-  vanUserNameList: () => {
-    return Template.instance().vansaleUserFullList.get();
-
-  },
   /**
 * TODO:Complete JS doc
 * @param docDate
@@ -280,6 +223,8 @@ Template.routeReport.helpers({
    * @returns {*}
    */
   orderes: function () {
+    let exportValue = Template.instance().pagination.getPage();
+    Template.instance().todayExport.set(exportValue);
     let result = Template.instance().pagination.getPage();
     if (result.length === 0) {
       $('#bodySpinLoaders').css('display', 'none');
@@ -291,8 +236,20 @@ Template.routeReport.helpers({
     * @returns {*}
     */
   orderTodayExport: function () {
-
-    return Template.instance().todayExport.get();
+    let custRes = Template.instance().routeCustomerList.get();
+    let exportRes = Template.instance().todayExport.get();
+    if (exportRes !== undefined && exportRes.length > 0 && custRes !== undefined && custRes !== '') {
+      for (let i = 0; i < exportRes.length; i++) {
+        let resultArray = [];
+        resultArray = custRes.filter(function (e) {
+          return e.routeId === exportRes[i]._id;
+        });
+        if (resultArray !== undefined && resultArray.length > 0) {
+          exportRes[i].customerArray = resultArray;
+        }
+      }
+    }
+    return exportRes;
   },
 
   printLoadBody: () => {
@@ -333,16 +290,7 @@ Template.routeReport.helpers({
       }
     }
   },
-  /**
- * TODO: Complete Js doc
- * @param deliveredBy
- */
-  customerNameHelp: (cardCode) => {
-    let custAr = Template.instance().customerUserDetail.get();
-    if (custAr) {
-      return custAr.find(x => x.cardCode === cardCode).cardName;
-    }
-  },
+
   /**
 * TODO:Complete JS doc
 */
@@ -509,68 +457,71 @@ Template.routeReport.events({
    */
   'submit .route-filter': (event, template) => {
     event.preventDefault();
-    let routeName = event.target.routeCodeVal.value;
-    let routeCode = event.target.routeCode.value;
-    let subDistributor = event.target.selectSubD.value;
-    let loginUserVerticals = Session.get("loginUserVerticals");
-
-    if(routeName && routeCode==='' && subDistributor===''){
+    let managerBranch = Session.get("managerBranch");
+    let routeCode = event.target.routeCodeVal.value;
+    let routeName = event.target.routeNameVal.value;
+    let branch = event.target.selectBranchName.value;
+    if (routeCode && branch === '' && routeName === '') {
+      Template.instance().pagination.settings.set('filters',
+        {
+          routeCode: routeCode,
+          branchCode: { $in: managerBranch }
+        }
+      );
+    }
+    else if (routeName && routeCode === '' && branch === '') {
       Template.instance().pagination.settings.set('filters', {
         routeName: routeName,
-        vertical: { $in: loginUserVerticals }
-      },);
-    }else if(routeName==='' && routeCode && subDistributor===''){
+        branchCode: { $in: managerBranch }
+      });
+    }
+    else if (routeName === '' && routeCode === '' && branch) {
+      Template.instance().pagination.settings.set('filters', {
+        branchCode: branch,
+      });
+    }
+    else if (routeName && routeCode && branch === '') {
       Template.instance().pagination.settings.set('filters', {
         routeCode: routeCode,
-        vertical: { $in: loginUserVerticals }
-      },);
-    }else if(routeName==='' && routeCode==='' && subDistributor){
-      Template.instance().pagination.settings.set('filters', {
-        subDistributor: subDistributor,
-        vertical: { $in: loginUserVerticals }
-      },);
-    }else if(routeName && routeCode && subDistributor===''){
-      Template.instance().pagination.settings.set('filters', {
         routeName: routeName,
-        routeCode: routeCode,
-        vertical: { $in: loginUserVerticals }
-      },);
-    }else if(routeName && routeCode==='' && subDistributor){
+        branchCode: { $in: managerBranch }
+      });
+    }
+    else if (routeName && routeCode === '' && branch) {
       Template.instance().pagination.settings.set('filters', {
+        branchCode: branch,
         routeName: routeName,
-        subDistributor: subDistributor,
-        vertical: { $in: loginUserVerticals }
-      },);
-    }else if(routeName==='' && routeCode && subDistributor){
+      });
+    }
+    else if (routeName === '' && routeCode && branch) {
       Template.instance().pagination.settings.set('filters', {
+        branchCode: branch,
         routeCode: routeCode,
-        subDistributor: subDistributor,
-        vertical: { $in: loginUserVerticals }
-      },);
-    }else if(routeName && routeCode && subDistributor){
+      });
+    }
+    else if (routeName && routeCode && branch) {
       Template.instance().pagination.settings.set('filters', {
-        routeName: routeName,
+        branchCode: branch,
         routeCode: routeCode,
-        subDistributor: subDistributor,
-        vertical: { $in: loginUserVerticals }
-      },);
-    }else{
+        routeName: routeName
+      });
+    }
+    else {
       Template.instance().pagination.settings.set('filters', {});
     }
-    
   },
   /**
   * TODO: Complete JS doc
   * for reset filter
   */
   'click .reset': (event, target) => {
-    let loginUserVerticals = Session.get("loginUserVerticals");
+    let managerBranch = Session.get("managerBranch");
     Template.instance().pagination.settings.set('filters', {
-      vertical: { $in: loginUserVerticals }
-    },
-    );
+      branchCode: { $in: managerBranch }
+    });
     $('#routeCodeVal').val('').trigger('change');
-    $('#selectSubD').val('').trigger('change');
+    $('#routeNameVal').val('').trigger('change');
+    $('#selectBranchName').val('').trigger('change');
     $('form :input').val("");
   },
   /**
@@ -585,6 +536,7 @@ Template.routeReport.events({
     event.preventDefault();
     $('#orderDetailPage').modal();
     template.modalLoader.set(true);
+    $('.loadersSpinPromise').css('display', 'block');
     template.itemsDetailsList.set('');
     let id = event.currentTarget.id;
     let header = $('#orderHs');
@@ -592,6 +544,7 @@ Template.routeReport.events({
     let description = $('#detailDescription');
     let routeName = $('#detailrouteName');
     let detailBranch = $('#detailBranch');
+    let detailStatus = $('#detailStatus');
     Meteor.call('routeGroup.idGet', id, (err, res) => {
       if (!err) {
         $(header).html('Details of Route');
@@ -600,7 +553,16 @@ Template.routeReport.events({
         $(routeName).html(res.groupRes.routeName);
         $(detailBranch).html(res.branchName);
         template.modalLoader.set(false);
+        if (res.customerList.length === 0) {
+          $('.loadersSpinPromise').css('display', 'none');
+        }
         template.itemsDetailsList.set(res.customerList);
+        if (res.groupRes.active === "Y") {
+          $(detailStatus).html("Active");
+        }
+        else {
+          $(detailStatus).html("Inactive");
+        }
       }
       else {
         template.modalLoader.set(false);
@@ -624,50 +586,45 @@ Template.routeReport.events({
     */
   'submit .exportToday': (event, template) => {
     event.preventDefault();
-    let loginUserVerticals = Session.get("loginUserVerticals");
-    template.todayExport.set('');
-    Meteor.call('routeGroup.exportDataValues', loginUserVerticals, (err, res) => {
-      if (!err) {
-        if (res.length === 0) {
-          toastr["error"]('No Records Found');
-        }
-        else {
-          template.todayExport.set(res);
-          $("#exportButtons").prop('disabled', true);
-          Meteor.setTimeout(() => {
-            let uri = 'data:application/vnd.ms-excel;base64,',
-              templates = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>',
-              base64 = function (s) {
-                return window.btoa(unescape(encodeURIComponent(s)))
-              },
-              format = function (s, c) {
-                return s.replace(/{(\w+)}/g, function (m, p) {
-                  return c[p];
-                });
-              }
-            let toExcel = document.getElementById("exportTodayOrder").innerHTML;
-            let ctx = {
-              worksheet: name || 'Excel',
-              table: toExcel
-            };
-            //return a promise that resolves with a File instance
-            function urltoFile(url, filename, mimeType) {
-              return (fetch(url)
-                .then(function (res) { return res.arrayBuffer(); })
-                .then(function (buf) { return new File([buf], filename, { type: mimeType }); })
-              );
-            };
+    let exportData = Template.instance().todayExport.get();
+    if (exportData.length === 0) {
+      toastr["error"]('No Records Found');
+    }
+    else {
+      $("#exportButtons").prop('disabled', true);
+      Meteor.setTimeout(() => {
+        let uri = 'data:application/vnd.ms-excel;base64,',
+          template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>',
+          base64 = function (s) {
+            return window.btoa(unescape(encodeURIComponent(s)))
+          },
+          format = function (s, c) {
+            return s.replace(/{(\w+)}/g, function (m, p) {
+              return c[p];
+            });
+          }
+        let toExcel = document.getElementById("exportTodayOrder").innerHTML;
+        let ctx = {
+          worksheet: name || 'Excel',
+          table: toExcel
+        };
+        //return a promise that resolves with a File instance
+        function urltoFile(url, filename, mimeType) {
+          return (fetch(url)
+            .then(function (res) { return res.arrayBuffer(); })
+            .then(function (buf) { return new File([buf], filename, { type: mimeType }); })
+          );
+        };
 
-            //Usage example:
-            urltoFile(uri + base64(format(templates, ctx)), 'hello.xls', 'text/csv')
-              .then(function (file) {
-                saveAs(file, "Route Report (" + moment(new Date()).format("DD-MM-YYYY") + ").xls");
-              });
-            $("#exportButtons").prop('disabled', false);
-          }, 5000);
-        }
-      }
-    });
+        //Usage example:
+        urltoFile(uri + base64(format(template, ctx)), 'hello.xls', 'text/csv')
+          .then(function (file) {
+
+            saveAs(file, "Route Report (" + moment(new Date()).format("DD-MM-YYYY") + ").xls");
+          });
+        $("#exportButtons").prop('disabled', false);
+      }, 5000);
+    }
   },
 
   /**
@@ -720,8 +677,6 @@ Template.routeReport.events({
     $('#deliveryReportExportPage').modal();
     $(header).html('Export Details');
     $('.mainLoader').css('display', 'none');
-    $('.startDate').val('');
-    $('.endDate').val('');
   },
   /**
    * TODO:Complete JS doc
@@ -729,6 +684,7 @@ Template.routeReport.events({
    */
   'submit .exportByDate': (event) => {
     event.preventDefault();
+
     let uri = 'data:application/vnd.ms-excel;base64,',
       template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>',
       base64 = function (s) {

@@ -10,8 +10,7 @@ Meteor.startup(() => {
   /**
  * TODO: Complete JS doc
  */
-RouteUpdates._ensureIndex({ uuid: 1 }, { unique: true });
-RouteUpdates._ensureIndex({ createdAt: 1 }, { unique: false }); 
+RouteUpdates.createIndex({ uuid: 1 }, { unique: true });
   publishPagination(RouteUpdates);
 
 });

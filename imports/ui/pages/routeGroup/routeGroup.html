@@ -6,7 +6,7 @@
     </h1>
     <ol class="breadcrumb">
       <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
-      <li class="active"> Route</li>
+      <li class="active">Listing All Route</li>
     </ol>
   </section>
   <section class="content">
@@ -23,9 +23,9 @@
     <div class="row" id="filterDisplay" style="display:none">
       <div class="box box-default box-solid">
         <div class="box-header with-border bg-aqua">
-          <h3 class="box-title"  style="color: black;">Route Filter</h3><button type="button" id="removeSearch"
+          <h3 class="box-title">Route Filter</h3><button type="button" id="removeSearch"
             style="color: white; background-color: transparent; border-color:transparent" class="pull-right"><i
-              class="fa fa-close"  style="color: black;"></i></button>
+              class="fa fa-close"></i></button>
         </div>
         <div class="box-body no-padding">
           <form class="route-filter">
@@ -62,10 +62,10 @@
       </div>
     </div>
     <div class="row">
-      <!-- {{#if isReady}}
+      {{#if isReady}}
       {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
       onClick=clickEvent}}
-      {{/if}} -->
+      {{/if}}
       <div class="nav-tabs-custom taskHeader" id="taskHeader">
         <ul class="nav nav-tabs taskHeaderList" id="taskHeaderList">
           <li class="active paginationFilterValue activeFilter activeHeaders" id="activeFilter"><a href=""
@@ -76,9 +76,9 @@
         </ul>
         <div class="tab-content" style="padding : 0px !important">
           <div class="box box-default box-solid">
-            <!-- <div class="box-header with-border bg-aqua">
+            <div class="box-header with-border bg-aqua">
               <h3 class="box-title">Route</h3>
-            </div> -->
+            </div>
             {{#if isReady}}
             <div class="box-body no-padding table-responsive">
               <table class="table table-striped generic">
@@ -86,17 +86,21 @@
                   <tr>
                     <th class="text-center sorted-column">Route Name</th>
                     <th class="text-center sorted-column">Route Code</th>
-                    <th class="text-center sorted-column">Sub Ditributor</th>
+                    <th class="text-center sorted-column">Branch</th>
                     <th class="text-center"> </th>
                   </tr>
                   {{#each routeGroupLists}}
                   <tr>
-                    <td class="sorted-column text-center" width="15%">{{routeName}}</td>
-                    <td class="sorted-column text-center" width="15%">{{routeCode}}</td>
-                    <td class="text-center sorted-column word-wrap: break-word userIdVal_{{subDistributor}}"
-                      width="15%">
-                      {{getUserName subDistributor}}</td>
+                    <td class="pl-20 text-center" width="15%">{{routeName}}</td>
+                    <td class="pl-20 text-center" width="15%">{{routeCode}}</td>
+                    <td class="text-center word-wrap: break-word branchIdVal_{{branchCode}}" width="15%">
+                      {{branchNameHelp branchCode}}</td>
                     <td class="text-center" width="25%">
+                      <input type="hidden" id="routeName_{{_id}}" value="{{routeName}}">
+                      <a href="javascript:void(0)" class="uploadExcel success-color"
+                        title="Click To Upload Customer {{routeName}}" id="{{_id}}">
+                        <button class="pd-20 btn btn-success"><i class="fa fa-upload"></i></button>
+                      </a> &nbsp;
                       {{#if userCan 'routeUpdate'}}
                       <input type="hidden" id="routeCode_{{_id}}" value="{{routeCode}}">
                       <a href="javascript:void(0)" class="routeEdit" title="Click to edit {{routeCode}}" id="{{_id}}">
@@ -115,17 +119,11 @@
                       <input type="hidden" id="routeCode_{{_id}}" value="{{routeCode}}">
                       <a href="javascript:void(0)" class="activate danger-color" title="Click to activate {{routeCode}}"
                         id="{{_id}}">
-                        <button class="pd-20 btn btn-success"><i class="fa fa-check"></i></button>
+                        <button class="pd-20 btn btn-info"><i class="fa fa-check"></i></button>
                       </a> &nbsp;
                       {{/if}}
                       {{/if}}
-                      <!-- For the Map Button -->
-                      <input type="hidden" id="routeCodeGet_{{_id}}" value="{{_id}}">
-                      <a href="javascript:void(0)" name="viewMap" class="viewMap" title="Click To View Map "
-                        id="{{_id}}">
-                        <button class="pd-20 btn btn-info"><i class="fa fa-map-marker"></i></button>
-                      </a> &nbsp;
-                      <!-- End map Button -->
+
                       <input type="hidden" id="userId" name="userid" value="{{_id}}">
                       <a href="javascript:void(0)" class="view " title="Click to view details" id="{{_id}}">
                         <button class="pd-20 btn btn-default"><i class="fa fa-ellipsis-v"></i></button>
@@ -252,9 +250,9 @@ justify-content: center;background: #f1f1f1;">
         </div>
         <div class="modal-body">
           <div class="box box-default box-solid">
-            <!-- <div class="box-header with-border bg-aqua">
+            <div class="box-header with-border bg-aqua">
               <h3 class="box-title">Route Details</h3>
-            </div> -->
+            </div>
             <table style="width:100%; table-layout:fixed; border-collapse:collapse;" class="table table-striped">
               <tbody>
                 <tr class="table-border">
@@ -269,8 +267,8 @@ justify-content: center;background: #f1f1f1;">
                 </tr>
                 <tr class="table-border">
                   <td width="50%">
-                    <label for="firstName">Sub Distributor Name</label>
-                    <div id="detailSdUser"></div>
+                    <label for="firstName">Branch Name</label>
+                    <div id="detailBranch"></div>
                   </td>
                   <td width="50%">
                     <label for="firstName">Description</label>
@@ -280,7 +278,7 @@ justify-content: center;background: #f1f1f1;">
               </tbody>
             </table>
             {{#with items}}
-            <span style="padding-left: 10px;"><label for="Employee " style="padding-top: 10px;">Oulet
+            <span style="padding-left: 10px;"><label for="Employee " style="padding-top: 10px;">Customer
                 List</label></span>
             <div id="detailUsername" class="table-responsive">
               <div class="row ">
@@ -288,7 +286,7 @@ justify-content: center;background: #f1f1f1;">
                   <thead>
                     <tr>
                       <th width="100px">Sl No. </th>
-                      <th width="200px">Outlet Name</th>
+                      <th width="200px">Customer Name</th>
                       <th width="100px">Priority</th>
                     </tr>
                   </thead>
@@ -296,7 +294,7 @@ justify-content: center;background: #f1f1f1;">
                     {{#each items}}
                     <tr class="table-border">
                       <td>{{incremented @index}}</td>
-                      <td style="word-wrap: break-word" class="outletIdVal_{{customer}}">{{getOutletName customer}}</td>
+                      <td style="word-wrap: break-word">{{custNameHelp customer}}</td>
                       <td style="word-wrap: break-word">{{ priority}}</td>
                     </tr>
                     {{/each}}
@@ -320,15 +318,6 @@ justify-content: center;background: #f1f1f1;">
           <div class="loadersSpin">
           </div>
           {{/if}}
-          <div class="loadersSpinVals" style=" width: 98%;opacity: 0.9;position: 
-          absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
-            {{#with printLoaderImage}}
-            <div class="loader-lg" style="width: 100%;height: 100%;display: 
-            flex; align-items: center;justify-content: center;background: #fff;">
-              <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
-            </div>
-            {{/with}}
-          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default closen" data-dismiss="modal">Close</button>
@@ -347,9 +336,9 @@ justify-content: center;background: #f1f1f1;">
           </div>
           <div class="modal-body">
             <div class="box box-default box-solid">
-              <!-- <div class="box-header with-border bg-aqua">
+              <div class="box-header with-border bg-aqua">
                 <h3 class="box-title">Route Details</h3>
-              </div> -->
+              </div>
               <table style="width:100%;table-layout: fixed;border-collapse: collapse;" class="table table-striped">
                 <tr>
                   <td>
@@ -360,17 +349,14 @@ justify-content: center;background: #f1f1f1;">
                           placeholder="Enter Route Code" name="routeNameEdit" required>
                       </div>
                       <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
-                        <label for="customer">Select Sub Distributor <span class="asteric_red">*</span></label>
-                        <select class="selectSdIdsEdit" disabled style="width:100%;" required name="selectSdIdsEdit"
-                          id="selectSdIdsEdit">
-                          <option selected='selected' value="">Select Sub Distributor</option>
-                          {{# each sdUsersGetEdit}}
-                          <option value="{{_id}}">{{profile.firstName}} {{profile.lastName}}</option>
+                        <label for="customer">Select Branch <span class="asteric_red">*</span></label>
+                        <select class="selectBranchEdits" disabled style="width:100%;" required name="branchEdit"
+                          id="selectBranchEdits">
+                          <option selected='selected' value="">Select Branch</option>
+                          {{# each branchListEdits}}
+                          <option value="{{bPLId}}">{{bPLName}}</option>
                           {{/each}}
                         </select>
-                        <span id="verticalSpanEdit"> </span> <br>
-                        <span id="branchSpanEdit"></span> <br>
-                        <span id="locationSpanEdit"></span><br>
                       </div>
                     </div>
                   </td>
@@ -390,16 +376,33 @@ justify-content: center;background: #f1f1f1;">
                   <td>
                     <div class="form-group has-feedback">
                       <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
-                        <label for="customer">Select Outlet <span class="asteric_red">*</span></label>
+                        <label for="customer">Select Customer <span class="asteric_red">*</span></label>
                         <select class="selectCustomersEdit" style="width:100%;" name="selectCustomersEdit"
                           id="selectCustomersEdit">
-                          <option selected='selected' value="">Select Outlet</option>
+                          <option selected='selected' value="">Select Customer</option>
                           {{# each customerDataList}}
-                          <option value="{{_id}}">{{name}}</option>
+                          <option value="{{cardCode}}">{{cardName}}</option>
                           {{/each}}
                         </select>
                         <span id="customerArrayspanEdit"></span>
                       </div>
+                      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                        <label for="customer">Select Customer Address <span class="asteric_red">*</span></label>
+                        <select class="selectCustomersAddressEdit" style="width:100%;" name="selectCustomersAddressEdit"
+                          id="selectCustomersAddressEdit">
+                          <option selected='selected' value="">Select Customer Address</option>
+                          {{# each customerAddressGet}}
+                          <option value="{{_id}}">{{address}}</option>
+                          {{/each}}
+                        </select>
+                        <span id="customerAddressArrayspanEdit"></span>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="lightGreenBG">
+                  <td>
+                    <div class="form-group has-feedback">
                       <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
                         <label for="Priority">Select Priority <span class="asteric_red">*</span></label>
                         <select class=" selectPriorityEdit" style="width:100%;" name="selectPriorityEdit"
@@ -416,7 +419,6 @@ justify-content: center;background: #f1f1f1;">
                     </div>
                   </td>
                 </tr>
-
                 <tr class="lightGreenBG">
                   <td>
                     <div class="form-group has-feedback">
@@ -431,7 +433,7 @@ justify-content: center;background: #f1f1f1;">
                       <div class="col-sm-12" style="padding: 10px">
                         <button type="button" class="btn btn-success addCustomerEdit"
                           style="width:50%;padding: 10px;box-shadow: #a8a8a8 2px 3px 12px;">
-                          Add Outlet
+                          Add Customer
                         </button>
                       </div>
                     </div>
@@ -444,7 +446,7 @@ justify-content: center;background: #f1f1f1;">
               </table>
               {{#with customerArrayList}}
               <span style="padding-left: 10px;"><label for="Employee " style="font-weight: bold; color: black;">
-                  Outelet Lists</label></span>
+                  Customer List</label></span>
               <div id="detailUsername" class="table-responsive" style="border: none;">
                 <div class="row">
                   <table style="width:100%;table-layout: fixed; border: solid 1px #e0d8d8;"
@@ -452,7 +454,7 @@ justify-content: center;background: #f1f1f1;">
                     <thead>
                       <tr class="bg-light-blue-4">
                         <th width="100px">Sl No. </th>
-                        <th width="200px">Outlet Name </th>
+                        <th width="200px">Customer Name </th>
                         <th width="110px">Priority</th>
                         <th width="110px"></th>
                       </tr>
@@ -461,13 +463,12 @@ justify-content: center;background: #f1f1f1;">
                       {{#each customerArrayList}}
                       <tr class="table-border">
                         <td>{{incremented @index}}</td>
-                        <td style="word-wrap: break-word" class="outletIdVal_{{customer}}">{{getOutletName customer}}
-                        </td>
+                        <td style="word-wrap: break-word">{{custNameHelp customer}}</td>
                         <td>{{priority}}</td>
                         <td>
                           <a href="javascript:void(0)" class="deleteCustumerEdit"
                             style="border:none !important;font-size: 17px;" id="{{randomId}}"
-                            title="Click To Delete Outlet">
+                            title="Click To Delete Customer">
                             <i class="fa fa-close danger-color"></i>
                           </a>
                         </td>
@@ -493,15 +494,6 @@ justify-content: center;background: #f1f1f1;">
             <div class="loadersSpin">
             </div>
             {{/if}}
-            <div class="loadersSpinVals" style=" width: 98%;opacity: 0.9;position: 
-            absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
-              {{#with printLoaderImage}}
-              <div class="loader-lg" style="width: 100%;height: 100%;display: 
-              flex; align-items: center;justify-content: center;background: #fff;">
-                <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
-              </div>
-              {{/with}}
-            </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default pull-left closeEdit" data-dismiss="modal">Close</button>
@@ -524,9 +516,9 @@ justify-content: center;background: #f1f1f1;">
           </div>
           <div class="modal-body" style="overflow: auto;">
             <div class="box box-default box-solid">
-              <!-- <div class="box-header with-border bg-aqua">
+              <div class="box-header with-border bg-aqua">
                 <h3 class="box-title">Assign Route</h3>
-              </div> -->
+              </div>
               <div id="status" style="text-align:left; padding: 10px;">
                 <b>Select Employee <span class="asteric_red">*</span></b><br>
                 <select name="selectAssignEmp" id="selectAssignEmp" style="width:100%" class="selectAssignEmp" required>

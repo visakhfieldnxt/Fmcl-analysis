@@ -12,6 +12,7 @@
 
     <div class="row">
       <div style="float: right;">
+        <button type="button" title="Export Attendance Data" class="btn btn-primary btn-flat export">Export</button>
         <button class="btn btn-primary btn-flat" id="filterSearch"><i class="fa fa-search"> </i>&nbsp; Search</button>
       </div>
     </div>
@@ -19,24 +20,33 @@
     <div class="row" id="filterDisplay" style="display:none">
       <div class="box box-default box-solid">
         <div class="box-header with-border bg-aqua">
-          <h3 class="box-title"  style="color: black;">{{user}} Filter</h3><button type="button" id="removeSearch"
+          <h3 class="box-title">{{user}} Filter</h3><button type="button" id="removeSearch"
             style="color: white; background-color: transparent; border-color:transparent" class="pull-right"><i
-              class="fa fa-close"  style="color: black;"></i></button>
+              class="fa fa-close"></i></button>
         </div>
         <div class="box-body no-padding">
           <form class="order-filter">
             <div class="row">
               <div class="col-md-3 col-sx-12 col-sm-12">
                 <label for="EMPcode">Employee Name</label><br>
-                <select value='' name="cardName" style="width:100% !important" id="selectEmpData"
-                  class="selectEmpData" placeholder="Select Card Name">
+                <select value='' name="cardName" style="width:100% !important" id="selectEmpData" class="selectEmpData"
+                  placeholder="Select Card Name">
                   <option disabled selected value=''>Select Employee Name</option>
                   {{# each vansaleuserList}}
                   <option value="{{_id}}">{{profile.firstName}} {{profile.lastName}}</option>
                   {{/each}}
                 </select>
               </div>
-
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EMPcode"> Branch</label><br>
+                <select value='' name="selectBranchs" style="width:100% !important" id="selectBranchs"
+                  class="selectBranchs" placeholder="Select Branch">
+                  <option selected value=''>Select Branch</option>
+                  {{# each branchArrayListGet}}
+                  <option value="{{bPLId}}">{{bPLName}}</option>
+                  {{/each}}
+                </select>
+              </div>
               <div class="col-md-3 col-sx-12 col-sm-12">
                 <label for="EmailId">From Date</label>
                 <input type="text" autocomplete="off" class="form-control datepicker date validation"
@@ -67,25 +77,28 @@
       onClick=clickEvent}}
       {{/if}}
       <div class="box box-default box-solid">
-        <!-- <div class="box-header with-border bg-aqua">
+        <div class="box-header with-border bg-aqua">
           <h3 class="box-title">Attendance</h3>
-        </div> -->
+        </div>
         {{#if isReady}}
         <div class="box-body no-padding table-responsive">
           <table class="table table-striped generic">
             <tbody>
               <tr>
                 <th class="text-center sorted-column  " id="name">Employee Name</th>
-                <th class="text-center sorted-column">Sub Distributor</th>
+                <th class="text-center sorted-column">Branch</th>
+                <th class="text-center sorted-column">Role</th>
                 <th class="text-center sorted-column">Date</th>
-                <th class="text-center sorted-column">Time Of Punch In</th>
-                <th class="text-center sorted-column">Time Of Punch Out</th>
+                <th class="text-center sorted-column">Time Of Login</th>
+                <th class="text-center sorted-column">Time Of Logout</th>
                 <th class="text-center sorted-column"></th>
               </tr>
               {{#each attendances}}
               <tr>
-                <td class="pl-20 text-center vanUserName_{{employeeId}}" width="14%">{{vanUserName employeeId}}</td>
-                <td class="text-center vanUserName_{{subDistributor}}" width="10%">{{vanUserName subDistributor}}</td>
+                <td class="pl-20 text-center " width="14%">{{employeeName}}</td>
+                <td class="text-center" width="10%">{{branchName}}</td>
+                <td class="text-center getRoles_{{_id}}" width="15%" style="word-wrap: break-word;">{{getRoleNames role
+                  _id}}</td>
                 <td class="text-center" width="10%">{{attendenceDate}}</td>
                 <td class="text-center" width="10%">{{loginDate}}</td>
                 <td class="text-center" width="10%">{{logoutDate}}</td>
@@ -128,10 +141,10 @@
     </div>
     {{/if}}
     <div id="bodySpinVal" style=" width: 100%;position: 
-          fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+    fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
       {{#with bodyLoader}}
       <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
-      justify-content: center;background: #f1f1f1;">
+justify-content: center;background: #f1f1f1;">
         <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
       </div>
       {{/with}}
@@ -153,9 +166,9 @@
           </div>
           <div class="modal-body">
             <div class="box box-default box-solid">
-              <!-- <div class="box-header with-border bg-aqua">
+              <div class="box-header with-border bg-aqua">
                 <h3 class="box-title">Attendance Details</h3>
-              </div> -->
+              </div>
               <table style="width:100%;table-layout: fixed;border-collapse: collapse;" class="table table-striped">
                 <tbody>
                   <tr class="table-border">
@@ -164,8 +177,8 @@
                       <div id="detailEmpName" style="word-wrap:break-word;"></div>
                     </td>
                     <td width="50%">
-                      <label for="Employee ">Sub Distributor </label>
-                      <div id="detailSubD" style="word-wrap:break-word;"></div>
+                      <label for="Employee ">Branch </label>
+                      <div id="detailBranch" style="word-wrap:break-word;"></div>
                     </td>
                   </tr>
                   <tr class="table-border">
@@ -215,4 +228,141 @@
     </div>
   </div>
 
+  <div class="modal fade in" id="attendanceExport">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close exportClose" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="deliveryExportH"></h4>
+        </div>
+        <form class="exportByDate">
+          <div class="modal-body">
+            <div class="box box-default box-solid">
+              <div class="box-header with-border bg-aqua">
+                <h3 class="box-title">Details</h3>
+              </div>
+              <table style="width:100%;" class="table table-striped">
+                <tbody>
+                  <tr>
+                    <td>
+                      <label for="EMPcode">Sales Person</label><br>
+                      <select value='' name="selectSalesPersonExport" style="width:100% !important"
+                        id="selectSalesPersonExport" class="selectSalesPersonExport" placeholder="Select Sales Person">
+                        <option disabled selected value=''>Select Sales Person</option>
+                        {{# each vansaleuserList}}
+                        <option value="{{_id}}">{{profile.firstName}} {{profile.lastName}}</option>
+                        {{/each}}
+                      </select>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label for="EMPcode">Branch</label><br>
+                      <select value='' name="selectBranchNameExport" style="width:100% !important"
+                        id="selectBranchNameExport" class="selectBranchNameExport" placeholder="Select Branch Name">
+                        <option value="">Select Branch</option>
+                        {{# each branchArrayListGet}}
+                        <option value="{{bPLId}}">{{bPLName}}</option>
+                        {{/each}}
+                      </select>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label for="EMPcode">Role</label><br>
+                      <select value='' name="selectRoleExport" style="width:100% !important" id="selectRoleExport"
+                        class="selectRoleExport" placeholder="Select Role Name">
+                        <option value="">Select Role</option>
+                        {{# each rolesDataList}}
+                        <option value="{{_id}}">{{name}}</option>
+                        {{/each}}
+                      </select>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label for="Employee ">From Date <span class="asteric_red">*</span> </label>
+                      <input type="text" autocomplete="off" class="form-control datepicker date validation startDate"
+                        data-date-autoclose="true" onkeydown="event.preventDefault()" id="my-datepicker"
+                        data-provide="datepicker" data-date-format="dd-mm-yyyy" placeholder="From Date "
+                        name="startDate" required />
+                      <span id="startDateSpan"></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label for="firstName">To Date <span class="asteric_red">*</span> </label>
+                      <input type="text" autocomplete="off" class="form-control datepicker date validation endDate"
+                        data-date-autoclose="true" onkeydown="event.preventDefault()" id="my-datepicker" disabled='true'
+                        data-provide="datepicker" data-date-format="dd-mm-yyyy" placeholder="To Date " name="endDate"
+                        required />
+                      <span id="endDateSpan"></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-center">
+                      <span id="alertSpan"></span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            {{#if printLoad}}
+            <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+            absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+              {{#with printLoaderImage}}
+              <div class="loader-lg" style="width: 100%;height: 100%;display: 
+              flex; align-items: center;justify-content: center;background: #fff;">
+                <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+              </div>
+              {{/with}}
+            </div>
+            {{else}}
+            <div id="loaderSpin">
+            </div>
+            {{/if}}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default exportClose pull-left" data-dismiss="modal">Close</button>
+            {{#if orderByDateExport}}
+            <button type="submit" id="exportButton" class="btn btn-primary">Export</button>
+            {{else}}
+            <button type="submit" class="btn btn-primary" disabled>Export</button>
+            {{/if}}
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <table class="table table-striped generic" id="exportTodayOrder" style="display:none">
+    <tbody>
+      <tr>
+        <th class="text-center sorted-column" style="width:100px">Sl.No</th>
+        <th class="text-center sorted-column " id="name" style="width:200px">Employee Name</th>
+        <th class="text-center sorted-column" style="width:200px">Branch</th>
+        <th class="text-center sorted-column" style="width:200px">Role</th>
+        <th class="text-center sorted-column" style="width:200px">Date</th>
+        <th class="text-center sorted-column" style="width:200px">Time Of Login</th>
+        <th class="text-center sorted-column" style="width:200px">Time Of Logout</th>
+        <th class="text-center sorted-column" style="width:300px">Login Location</th>
+        <th class="text-center sorted-column" style="width:300px">Logout Location</th>
+      </tr>
+      {{#each orderByDateExport}}
+      <tr id="{{_id}}">
+        <td class="text-center" style="width:100px">{{incremented @index}}</td>
+        <td class="pl-20 text-center " style="width:200px">{{employeeName}}</td>
+        <td class="text-center" style="width:200px">{{branchName}}</td>
+        <td class="text-center getRoles_{{_id}}" style="word-wrap: break-word;width:200px;">{{getRoleNames role
+          _id}}</td>
+        <td class="text-center" style="width:200px">{{attendenceDate}}</td>
+        <td class="text-center" style="width:200px">{{loginDate}}</td>
+        <td class="text-center" style="width:200px">{{logoutDate}}</td>
+        <td class="text-center" style="width:300px">{{loginLocation}}</td>
+        <td class="text-center" style="width:300px">{{logoutLocation}}</td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
 </template>

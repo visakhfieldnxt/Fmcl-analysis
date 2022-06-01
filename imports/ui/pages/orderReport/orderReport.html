@@ -1,5 +1,5 @@
 <template name="orderReport">
-  <!-- {{#if userCan 'orderReportView'}} -->
+  {{#if userCan 'orderReportView'}}
   <section class="content-header">
     <h1>Order Report
       <small>Listing All Order Report</small>
@@ -13,8 +13,10 @@
   <section class="content">
     <div class="row">
       <div style="float: right;">
-        <form>
-          <button type="button" title="Export Today's Order" class="btn btn-primary btn-flat export">Export</button>
+        <form class="exportToday">
+          <!-- <button type="button" title="Email" class="btn btn-primary btn-flat email">Email</button>  -->
+          <button type="submit" title="Export Today's Order" id="exportButtons"
+            class="btn btn-primary btn-flat">Export</button>
           <button type="button" title="Search" class="btn btn-primary btn-flat" id="filterSearch"><i
               class="fa fa-search"> </i>&nbsp; Search</button>
         </form>
@@ -23,50 +25,23 @@
     <div class="row" id="filterDisplay" style="display:none">
       <div class="box box-default box-solid">
         <div class="box-header with-border bg-aqua">
-          <h3 class="box-title">{{user}} Filter</h3>
-          <!--   <button type="button" id="removeSearch"
+          <h3 class="box-title">{{user}} Filter</h3><button type="button" id="removeSearch"
             style="color: white; background-color: transparent; border-color:transparent" class="pull-right"><i
-              class="fa fa-close"></i></button> -->
-          <button type="button" id="removeSearch"
-            style="color: white; background-color: transparent; border-color:transparent" class="pull-right"><i
-              class="fa fa-close" style="color: black;"></i></button>
+              class="fa fa-close"></i></button>
         </div>
-
         <div class="box-body no-padding">
           <form class="order-filter">
             <div class="row">
               <div class="col-md-3 col-sx-12 col-sm-12">
-                <label for="EMPcode">Outlet</label><br>
+                <label for="EMPcode">Customer Name</label><br>
                 <select value='' name="cardName" style="width:100% !important" id="selectCustomerName"
-                  class="selectCustomerName" placeholder="Select Outlet Name">
-                  <option disabled selected value=''>Select Outlet Name</option>
-                  {{# each outlet1}}
-                  <option value="{{_id}}">{{name}}</option>
+                  class="selectCustomerName" placeholder="Select Card Name">
+                  <option disabled selected value=''>Select Customer Name</option>
+                  {{# each customersList}}
+                  <option value="{{cardName}}">{{cardName}}</option>
                   {{/each}}
                 </select>
               </div>
-              <div class="col-md-3 col-sx-12 col-sm-12">
-                <label for="EMPcode">Route</label><br>
-                <select value='' name="routeName" style="width:100% !important" id="selectrouteName"
-                  class="selectrouteName" placeholder="Select Route Name">
-                  <option disabled selected value=''>Select Route Name</option>
-                  {{# each routeLists}}
-                  <option value="{{_id}}">{{routeName}}</option>
-                  {{/each}}
-                </select>
-              </div>
-
-              <div class="col-md-3 col-sx-12 col-sm-12">
-                <label for="EMPcode">Employee</label><br>
-                <select value='' name="EmployeeName" style="width:100% !important" id="selectEmployeeName"
-                  class="selectEmployeeName" placeholder="Select Employee Name">
-                  <option disabled selected value=''>Select Employee Name</option>
-                  {{# each employelIst}}
-                  <option value="{{_id}}">{{profile.firstName}}</option>
-                  {{/each}}
-                </select>
-              </div>
-
               <div class="col-md-3 col-sx-12 col-sm-12">
                 <label for="EmailId">From Date</label>
                 <input type="text" autocomplete="off" class="form-control datepicker date validation"
@@ -81,8 +56,10 @@
                   data-date-format="dd-mm-yyyy" placeholder="To Date " name="toDate" />
               </div>
               <div class="row" style="float: right">
+
                 <button type="submit" name="filter" class="btn btn-primary">Filter</button>
                 <button type="button" name="reset" class="btn btn-info reset">Reset Filter</button>
+
               </div>
             </div>
           </form>
@@ -95,41 +72,105 @@
       {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
       onClick=clickEvent}}
       {{/if}}
-      <div class="box box-default box-solid"> 
+      <div class="box box-default box-solid">
+        <div class="box-header with-border bg-aqua">
+          <h3 class="box-title">Order Report List</h3>
+        </div>
         {{#if isReady}}
         <div class="box-body no-padding table-responsive">
           <table class="table table-striped generic" style="width:100%;margin-bottom:0;table-layout: fixed">
             <tbody>
               <tr>
-                <th class="text-center sorted-column" style="width:40px">Sl.No</th>
-                <th class="text-center sorted-column" style="width:30px">Employee</th>
-                <th class="text-center sorted-column" style="width:30px">Vertical</th>
-                <th class="text-center sorted-column" style="width:30px">Outlet</th>
-                <th class="text-center sorted-column" style="width:30px">Route</th>
-                <th class="text-center sorted-column" style="width:30px">Date</th>
-                <th class="text-center sorted-column" style="width:30px">Status</th>
-                <th class="text-center sorted-column" style="width:30px">Total Amount</th>
-                <th class="text-center sorted-column" style="width:30px">Tax Amount</th>
-
+                <th class="text-center sorted-column" style="width:30px">Sl.No</th>
+                <th class="text-center sorted-column" style="width:200px">Order No/Date</th>
+                <th class="text-center sorted-column" style="width:200px">Order Time</th>
+                <th class="text-center sorted-column" style="width:200px">Created From</th>
+                <th class="text-center sorted-column" style="width:300px" id="name">Customer Name</th>
+                <th class="text-center sorted-column" style="width:300px" id="name">Shipping Address</th>
+                <th class="text-center sorted-column" style="width:250px" id="name">Customer Reference No./Date</th>
+                <th class="text-center sorted-column" style="width:150px ;text-align:right" id="name">Total Items</th>
+                <th class="text-center sorted-column" style="width:150px ;text-align:right" id="name">Total Qty</th>
+                <th class="text-center sorted-column" style="width:200px" id="name">Delivery Date</th>
+                <th class="text-center sorted-column" style="width:150px">Sales Person</th>
+                <th class="text-center sorted-column" style="width:150px">SQ Id.</th>
+                <th class="text-center sorted-column" style="width:150px" id="name">Branch</th>
+                <th class="text-center sorted-column" style="width:150px ;text-align:right" id="name">Total Amount</th>
+                <th class="text-center sorted-column" style="width:200px" id="name">Approved/Rejected BY</th>
+                <th class="text-center sorted-column" style="width:200px" id="name">Approved/Rejected Date</th>
+                <th class="text-center sorted-column" style="width:200px" id="name">1<sup>st</sup>&nbsp; Approved BY
+                </th>
+                <th class="text-center sorted-column" style="width:200px" id="name">1<sup>st</sup>&nbsp; Approved Date
+                </th>
+                <th class="text-center sorted-column" style="width:150px">Order Status</th>
+                <th class="text-center sorted-column" style="width:150px">Sap Status</th>
+                <th class="text-center sorted-column" style="width:150px ;text-align:right">Discount Prcnt.</th>
               </tr>
               {{#each orderes}}
-              <tr class="view " style="cursor:pointer" title="Click to view details" id="{{_id}}">
-                <td class="text-center" style="width:40px">{{incremented @index}}</td>
-                <td class="text-center userIdVal_{{sdUser}}" style="width:30px">{{getUserName sdUser}}</td>
-                <td class="text-center verticalIdVal_{{vertical}}" style="width:30px">{{getVerticalName vertical}}</td>
-                <td class="text-center outletVal_{{outlet}}" style="width:30px">{{outletHelp outlet}}</td>
-                <td class="text-center routeVal_{{routeId}}" style="width:30px">{{routeHelp routeId}}</td>
-                <td class="text-center" style="width:30px">{{docDate}}</td>
-                <td class="text-center" style="width:30px">{{status}}</td>
-                <td class="text-center" style="width:30px">{{docTotal}}</td>
-                <td class="text-center" style="width:30px">{{taxAmount}}</td>
+              <tr class="view " title="Click to view details" id="{{_id}}">
+                <td class="text-center" style="width:30px">{{indexCountGet @index}}</td>
+                <td class="text-center" style="width:200px">{{#if orderId}}{{orderId}}{{else}} -
+                  {{/if}}/{{dateFormat docDate}}</td>
+                <td class="pl-20 text-center" style="width:200px">{{timeSeperate createdAt}}</td>
+                <td class="pl-20 text-center" style="width:300px">{{vansaleAppCheck vansaleApp}}</td>
+                <td class="pl-20 text-center" style="width:300px">{{cardName}}</td>
+                <td class="pl-20 text-center" style="width:300px">{{street}}&nbsp;{{block}}&nbsp;{{city}}</td>
+                <td class="pl-20 text-center" style="width:250px">{{custRefNo}}/{{dateFormat custRefDate}}</td>
+                <td style="width:150px; text-align: right">{{totalItem}}</td>
+                <td style="width:150px; text-align: right">{{quantityFormat totalQty}}</td>
+                <td class="pl-20 text-center" style="width:200px">{{dateFormat docDueDate}}</td>
+                <td class="text-center" style="width:150px"> {{salesmanName}}</td>
+                {{#if sQId}}
+                <td class="pl-20 text-center" style="width:150px">{{sQId}}</td>
+                {{else}}
+                <td class="pl-20 text-center" style="width:150px">-</td>
+                {{/if}}
+                <td class="pl-20 text-center" style="width:150px">{{branchName}}</td>
+                <td class="pl-20" style="width:150px; text-align: right">{{total docTotal}}</td>
+
+                {{#if statusValCheck oRStatus}}
+                <td class="pl-20 text-center" style="width:200px">{{firstAppovalName}}</td>
+                {{else if approvedByName}}
+                <td class="pl-20 text-center" style="width:200px">{{approvedByName}} (Approved)</td>
+                {{else if rejectedByName}}
+                <td class="pl-20 text-center" style="width:200px">{{rejectedByName}} (Rejected)</td>
+                {{else if onHoldByName}}
+                <td class="pl-20 text-center" style="width:200px">{{onHoldByName}} (Onhold)</td>
+                {{else}}
+                <td class="pl-20 text-center" style="width:200px">-</td>
+                {{/if}}
+                {{#if statusValCheck oRStatus}}
+                <td class="pl-20 text-center" style="width:200px">{{dateFormat firstAppovalDate}}</td>
+                {{else if approvedByDate}}
+                <td class="pl-20 text-center" style="width:200px">{{dateFormat approvedByDate}} (Approved)</td>
+                {{else if rejectedDate}}
+                <td class="pl-20 text-center" style="width:200px">{{dateFormat rejectedDate}} (Rejected)</td>
+                {{else if onHoldDate}}
+                <td class="pl-20 text-center" style="width:200px">{{dateFormat onHoldDate}} (Onhold)</td>
+
+                {{else}}
+                <td class="pl-20 text-center" style="width:200px">-</td>
+                {{/if}}
+                {{#if approveCheckVal accountantApproved accountantRejected accountantOnHold}}
+                <td class="pl-20 text-center" style="width:200px">{{firstAppovalName}}</td>
+                <td class="pl-20 text-center" style="width:200px">{{dateFormat firstAppovalDate}}</td>
+                {{else}}
+                <td class="pl-20 text-center" style="width:200px">-</td>
+                <td class="pl-20 text-center" style="width:200px">-</td>
+                {{/if}}
+                {{#if oRStatus}}
+                <td class="text-center" style="width:150px">{{statusExcel oRStatus}}</td>
+                {{else}}
+                <td class="text-center" style="width:150px">-</td>
+                {{/if}}
+                {{#if orderStatusValue canceled}}
+                <td class="text-center" width="10%" style="color:red;">Cancelled</td>
+                {{else}}
+                <td class="text-center" width="10%">Open</td>
+                {{/if}}
+
+                <td style="width:150px; text-align: right">{{ discPrcnt}}</td>
               </tr>
               {{/each}}
-              <tr>
-                <td class="text-left sorted-column" style="width:200px;font-weight: bold;" colspan="7">Total</td>
-                <td class="text-center sorted-column docTotalSum" style="width:200px">{{docTotalSum}}</td>
-                <td class="text-center sorted-column taxAmountSum" style="width:200px">{{taxAmountSum}}</td>
-              </tr>
             </tbody>
           </table>
         </div>
@@ -160,17 +201,10 @@
       {{/with}}
     </div>
     {{/if}}
-    <div id="bodySpinLoaders" style=" width: 100%;position: 
-    fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
-      {{#with bodyLoader}}
-      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
-justify-content: center;background: #f1f1f1;">
-        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
-      </div>
-      {{/with}}
-    </div>
 
   </section>
+
+
   <div class="modal fade in" id="orderDetailPage">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -181,77 +215,141 @@ justify-content: center;background: #f1f1f1;">
         </div>
         <div class="modal-body">
           <div class="box box-default box-solid">
-
+            <div class="box-header with-border bg-aqua">
+              <h3 class="box-title">Order Details</h3>
+            </div>
             <table style="width:100%;table-layout: fixed;border-collapse: collapse;" class="table table-striped">
               <tbody>
                 <tr class="table-border">
                   <td width="50%">
-                    <label for="Employee ">SD User</label>
-                    <div id="ordersdUser" style="word-wrap:break-word;"></div>
+                    <label for="Employee ">Customer Name </label>
+                    <div id="detailCardNames" style="word-wrap:break-word;"></div>
                   </td>
                   <td width="50%">
-                    <label for="Employee ">SD</label>
-                    <div id="ordersubDistributor" style="word-wrap:break-word;"></div>
-                  </td>
-                </tr>
-                <tr class="table-border">
-                  <td width="50%">
-                    <label for="Employee ">Vertical</label>
-                    <div id="ordervertical" style="word-wrap:break-word;"></div>
-                  </td>
-                  <td width="50%">
-                    <label for="Employee ">Outlet</label>
-                    <div id="orderoutletoutlet" style="word-wrap:break-word;"></div>
+                    <label for="Employee ">Shipping Address</label>
+                    <div id="detailAddress" style="word-wrap:break-word;"></div>
                   </td>
                 </tr>
                 <tr class="table-border">
                   <td width="50%">
-                    <label for="Employee ">Route</label>
-                    <div id="orderrouteIdrouteId" style="word-wrap:break-word;"></div>
+                    <label for="Employee ">Branch </label>
+                    <div id="detailBranchs" style="word-wrap:break-word;"></div>
                   </td>
                   <td width="50%">
-                    <label for="Employee ">Date</label>
-                    <div id="orderdocDatedocDate" style="word-wrap:break-word;"></div>
+                    <label for="firstName">Order Date </label>
+                    <div id="detailDocDates" style="word-wrap:break-word;"></div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td>
+                    <label for="Employee ">Delivery Date</label>
+                    <div id="detailDocDelivers" style="word-wrap:break-word;"></div>
+                  </td>
+                  <td>
+                    <label for="firstName">Order No.</label>
+                    <div id="detailOrderIds" style="word-wrap:break-word;"></div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td>
+                    <label for="Employee ">Customer Reference Date</label>
+                    <div id="detailCustRefDate" style="word-wrap:break-word;"></div>
+                  </td>
+                  <td>
+                    <label for="firstName">Customer Reference</label>
+                    <div id="detailcustRef" style="word-wrap:break-word;"></div>
                   </td>
                 </tr>
                 <tr class="table-border">
                   <td width="50%">
-                    <label for="Employee ">Doc Number</label>
-                    <div id="orderdocNum" style="word-wrap:break-word;"></div>
+                    <label for="customer"> RIB Number</label>
+                    <div id="detailribNumber" style="word-wrap:break-word;"></div>
                   </td>
-
-                  <td width="50%">
-                    <label for="Employee ">Status</label>
-                    <div id="orderstatus" style="word-wrap:break-word;"></div>
+                  <td>
+                    <label for="customer"> Driver Name</label>
+                    <div id="detaildriverName" style="word-wrap:break-word;"></div>
                   </td>
                 </tr>
-                {{#with deliveryDetails}}
                 <tr class="table-border">
                   <td width="50%">
-                    <label for="Employee ">Delivered Date</label>
-                    <div style="word-wrap:break-word;">{{dateFormat deliveredDate}}</div>
+                    <label for="Employee ">Sales Person</label>
+                    <div id="detailSalesPerson" style="word-wrap:break-word;"></div>
                   </td>
-
-                  <td width="50%">
-                    <label for="Employee ">Delivery Remarks</label>
-                    <div style="word-wrap:break-word;">{{deliveryRemarks}}</div>
+                  <td>
+                    <label for="Employee ">Remark</label>
+                    <div id="detailRemark" style="word-wrap:break-word;"></div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td>
+                    <label for="Employee "> Created From</label>
+                    <div id="detailcreated" style="word-wrap:break-word;"></div>
+                  </td>
+                  <td>
+                    <label for="Employee ">Approved/ Rejected By</label>
+                    <div id="detailApprovedBy" style="word-wrap:break-word;"></div>
+                  </td>
+                </tr>
+                <tr class="table-border"> 
+                  <td>
+                    <label for="Employee ">Approved/ Rejected Date</label>
+                    <div id="detailApprovedDate" style="word-wrap:break-word;"></div>
+                  </td>
+                  <td>
+                    <label for="Employee ">Approved/ Rejected Remark</label>
+                    <div id="detailApprovedRemark" style="word-wrap:break-word;"></div>
+                  </td>
+                </tr>
+                {{#if firstApproveCheck}}
+                {{#with firstApproveData}}
+                <tr class="table-border">  
+                  <td>
+                    <label for="Employee "> Approval Status</label>
+                    <div id="detailApprovedRemarks" style="word-wrap:break-word;">Waiting For Accountant Approval</div>
+                  </td> 
+                </tr>
+                {{/with}}
+                {{/if}}
+                {{#if accCheck}}
+                {{#with firstApproveData}}
+                <tr class="table-border">
+                  <td>
+                    <label for="Employee "> 1<sup>st</sup>&nbsp; Approved By </label>
+                    <div id="detailApprovedBys" style="word-wrap:break-word;">{{firstAppovalName}}</div>
+                  </td>
+                  <td>
+                    <label for="Employee ">1<sup>st</sup>&nbsp; Approved Date</label>
+                    <div id="detailApprovedDates" style="word-wrap:break-word;">{{datesVal firstAppovalDate}}</div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td>
+                    <label for="Employee ">1<sup>st</sup>&nbsp; Approved Remark</label>
+                    <div id="detailApprovedRemarks" style="word-wrap:break-word;">{{firstApprovalRemarks}}</div>
                   </td>
                 </tr>
                 {{/with}}
-                <tr>
-                  <td width="50%">
-                    <label for="Employee ">Created By</label>
-                    <div id="ordercreatedBy" style="word-wrap:break-word;"></div>
-                  </td>
-                  <td width="50%">
-                    <label for="Employee ">Device Info</label>
-                    <div id="orderDevice" style="word-wrap:break-word;"></div>
-                  </td>
-                </tr>
-
-
+                {{/if}}
               </tbody>
             </table>
+            {{#if firstApproveCheck}}
+            {{#with firstApproveData}}
+            <table style="width:100%;margin-bottom:20px;table-layout: fixed" class="table table-striped with-border">
+              <thead>
+                <tr>
+                  <th> Approval Reasons </th>
+                </tr>
+              </thead>
+              <tbody>
+                {{#each approvalResonArray}}
+                <tr class="table-border">
+                  <td>{{reason}}</td>
+                </tr>
+                {{/each}}
+              </tbody>
+            </table>
+            {{/with}}
+            {{/if}}
 
             <span style="padding-left: 10px;"><label for="Employee ">Items List</label></span>
             {{#with items}}
@@ -261,52 +359,61 @@ justify-content: center;background: #f1f1f1;">
                   <thead>
                     <tr>
                       <th width="30px">Sl no. </th>
-                      <th width="200px">Product</th>
-                      <th width="100px">Unit</th>
-                      <th width="100px">Unit price</th>
-                      <th width="100px">Quantity</th>
-                      <th width="100px">Total</th>
-                      <th width="100px">Taxt amount</th>
+                      <th width="130px">Item Name </th>
+                      <th width="110px">Price(Inc Price) </th>
+                      <th width="110px">Quantity</th>
+                      <th width="110px">UOM</th>
+                      <th width="110px">Tax Amount</th>
+                      <th width="110px">Weight</th>
+                      <th width="110px">Total</th>
+                      <th width="110px">Remark</th>
                     </tr>
                   </thead>
                   <tbody>
                     {{#each items}}
                     <tr class="table-border">
                       <td align="right">{{incremented @index}}</td>
-                      <td class="productVal_{{product}}">{{getproductHelp product}}</td>
-                      <td class="unitVal_{{unit}}">{{getunitHelp unit}}</td>
-                      <td>{{formateAmountFix unitPrice}}</td>
-                      <td>{{quantity}}</td>
-                      <td>{{formateAmountFix grossTotal}}</td>
-                      <td>{{formateAmountFix taxtAmount}}</td>
+                      <td style="word-wrap: break-word">{{itemNam}}</td>
+                      <td align="right">{{priceFormat incPrice}}</td>
+                      <td align="right">{{quantityFormat quantity}}</td>
+                      <td>{{ uomCode}}</td>
+                      <td align="right">{{taxFormats quantity taxRate}}</td>
+                      <td align="right">{{weightCal quantity invWeight unitQuantity}}</td>
+                      <td align="right">{{totalIn incPrice quantity}}</td>
+                      <td width="100px" style="word-wrap: break-word">{{itemRemark}}</td>
                     </tr>
                     {{/each}}
                   </tbody>
                 </table>
               </div>
-
             </div>
-
             {{/with}}
-
             <div class="row">
-              <table class="pull-right">
-                <tr>
-                  <td style="padding-right:20px;">Tax Amount[GHS] : </td>
-                  <td style="font-weight: bold;font-size: 17px;" id="ordertaxAmount"></td>
-                </tr>
-                <tr>
-                  <td>Discount[GHS] : </td>
-                  <td style="font-weight: bold;font-size: 17px;" id="discountAmtData"></td>
-                </tr>
-                <tr>
-                  <td style="padding-right:20px;">Grand Total[GHS] :</td>
-                  <td style="font-weight: bold;font-size: 17px;" id="orderdocTotal"></td>
-                </tr>
-              </table>
+              <div class="col-sm-5 pull-left">
+                <span class="pull-left">Weight[kg] :</span>
+                <span class="pull-right" style="text-align: right; font-weight: bold;" id="detailWeight">
+                </span>
+              </div>
+              <div class="col-sm-7 pull-right">
+                <table>
+                  <tr>
+                    <td class="pull-right">Tax Amount[{{currencyGet}}] : </td>
+                    <td style="text-align: right;font-weight: bold;" id="detailGSTs"></td>
+                  </tr>
+                  <tr>
+                    <td class="pull-right">Grand Total[{{currencyGet}}] :</td>
+                    <td style="text-align: right;font-weight: bold; width: 60%;" id="detailDocTotals">
+                    </td>
+                  </tr>
+
+                </table>
+              </div>
             </div>
           </div>
           {{#if printLoad}}
+          <div class="loadersSpin">
+          </div>
+          {{else}}
           <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
           absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
             {{#with printLoaderImage}}
@@ -316,19 +423,7 @@ justify-content: center;background: #f1f1f1;">
             </div>
             {{/with}}
           </div>
-          {{else}}
-          <div class="loadersSpin">
-          </div>
           {{/if}}
-           <div class="loadersSpinVals" style=" width: 98%;opacity: 0.9;position: 
-            absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
-              {{#with printLoaderImage}}
-              <div class="loader-lg" style="width: 100%;height: 100%;display: 
-              flex; align-items: center;justify-content: center;background: #fff;">
-                <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
-              </div>
-              {{/with}}
-            </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default closen" data-dismiss="modal">Close</button>
@@ -336,7 +431,7 @@ justify-content: center;background: #f1f1f1;">
       </div>
     </div>
   </div>
-  <!-- {{/if}} -->
+  {{/if}}
   <div class="modal fade in" id="deliveryReportExportPage">
     <div class="modal-dialog modal-sm">
       <div class="modal-content">
@@ -347,39 +442,20 @@ justify-content: center;background: #f1f1f1;">
         </div>
         <form class="exportByDate">
           <div class="modal-body">
-            <div class="box box-default box-solid"> 
+            <div class="box box-default box-solid">
+              <div class="box-header with-border bg-aqua">
+                <h3 class="box-title">Details</h3>
+              </div>
+
               <table style="width:100%;" class="table table-striped">
                 <tbody>
                   <tr>
                     <td>
-                      <label for="EMPcode">Outlet</label><br>
-                      <select value='' name="cardName1" style="width:100% !important" id="selectCustomerName1"
-                        class="selectCustomerName1" placeholder="Select Outlet Name">
-                        <option disabled selected value=''>Select Outlet Name</option>
-                        {{# each outlet1}}
-                        <option value="{{_id}}">{{name}}</option>
-                        {{/each}}
-                      </select>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <label for="EMPcode">Route</label><br>
-                      <select value='' name="routeName1" style="width:100% !important" id="selectrouteName1"
-                        class="selectrouteName1" placeholder="Select Route Name">
-                        <option disabled selected value=''>Select Route Name</option>
-                        {{# each routeLists}}
-                        <option value="{{_id}}">{{routeName}}</option>
-                        {{/each}}
-                      </select>
-                    </td>
-                  </tr>
-                  <!-- <tr>
-                    <td>
+
                       <label for="Employee ">From Date </label>
-                      <input type="text" autocomplete="off" class="form-control datepicker date validation startDate1"
+                      <input type="text" autocomplete="off" class="form-control datepicker date validation startDate"
                         data-date-autoclose="true" onkeydown="event.preventDefault()" id="my-datepicker"
-                        data-provide="datepicker" data-date-format="dd-mm-yyyy" placeholder="From Date "
+                        data-provide="datepicker" data-date-format="yyyy-mm-dd" placeholder="From Date "
                         name="startDate" required />
                       <span id="startDateSpan"></span>
                     </td>
@@ -387,30 +463,16 @@ justify-content: center;background: #f1f1f1;">
                   <tr>
                     <td>
                       <label for="firstName">To Date </label>
-                      <input type="text" autocomplete="off" class="form-control datepicker date validation endDate1"
-                        data-date-autoclose="true" onkeydown="event.preventDefault()" id="my-datepicker"
-                        data-provide="datepicker" data-date-format="dd-mm-yyyy" placeholder="To Date " name="endDate"
+                      <input type="text" autocomplete="off" class="form-control datepicker date validation endDate"
+                        data-date-autoclose="true" onkeydown="event.preventDefault()" id="my-datepicker" disabled='true'
+                        data-provide="datepicker" data-date-format="yyyy-mm-dd" placeholder="To Date " name="endDate"
                         required />
                       <span id="endDateSpan"></span>
-                    </td>
-                  </tr> -->
-                  <tr>
-                    <td>
-                      <label for="Employee ">Select Month And Year <span class="asteric_red">*</span> </label>
-                      <input type="text" autocomplete="off" class="form-control datepicker date validation startDate1"
-                        data-date-autoclose="true" onkeydown="event.preventDefault()" id="my-datepicker"
-                        data-provide="datepicker" data-date-format="dd-mm-yyyy" placeholder="Month And Year"
-                        name="startDate1" required />
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="text-center">
-                      <span id="emptyDataSpan"></span>
                     </td>
                   </tr>
                 </tbody>
               </table>
-              {{#if userExport}}
+              {{#if orderByDateExport}}
               <div id="loaderSpin">
               </div>
               {{else}}
@@ -425,8 +487,8 @@ justify-content: center;background: #f1f1f1;">
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default exportClose pull-left" data-dismiss="modal">Close</button>
-            {{#if userExport}}
-            <button type="button" class="btn btn-primary exportToday">Export</button>
+            {{#if orderByDateExport}}
+            <button type="submit" id="exportButton" class="btn btn-primary">Export</button>
             {{else}}
             <button type="submit" class="btn btn-primary" disabled>Export</button>
             {{/if}}
@@ -436,79 +498,147 @@ justify-content: center;background: #f1f1f1;">
     </div>
   </div>
 
+  <table class="table table-striped generic" id="viewNew" style="display:none">
+    <tbody>
+      <tr>
+        <th class="text-center sorted-column">Sl.No</th>
+        <th class="text-center sorted-column">Order Id/Date</th>
+        <th class="text-center sorted-column" id="name">Dealer Name</th>
+        <th class="text-center sorted-column" id="name">Dealer Code</th>
+
+        <th class="text-center sorted-column" id="name">Status</th>
+        <th class="text-center sorted-column">Amount</th>
+        <th class="text-center sorted-column">Salesman</th>
+      </tr>
+      {{#each orderByDateExport}}
+      <tr id="{{_id}}">
+        <td class="text-center" width="3%">{{incremented @index}}</td>
+        <td class="text-center" width="10%">{{orderId}}/{{dateFormat docDate}}</td>
+        <td class="pl-20 text-center" width="15%">{{cardName}}</td>
+        <td class="pl-20 text-center" width="10%">{{cardCode}}</td>
+
+        <td class="pl-20 text-center" width="10%">{{orderStatus}}</td>
+        <td class="text-center" width="15%">{{total grandTotal}}</td>
+        <td class="text-center" width="15%"> {{createdByName}}</td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
   <table class="table table-striped generic" id="exportTodayOrder" style="display:none">
     <tbody>
       <tr>
-        <th class="text-center sorted-column" style="width:40px">Sl.No</th>
-        <th class="text-center sorted-column" style="width:30px">Employee</th>
-        <th class="text-center sorted-column" style="width:30px">Vertical</th>
-        <th class="text-center sorted-column" style="width:30px">Outlet</th>
-        <th class="text-center sorted-column" style="width:30px">Route</th>
-        <th class="text-center sorted-column" style="width:30px">Date</th>
-        <th class="text-center sorted-column" style="width:30px">Status</th>
-        <th class="text-center sorted-column" style="width:30px">Delivered Date</th>
-        <th class="text-center sorted-column" style="width:30px">Delivery Remarks</th>
-        <th class="text-center sorted-column" style="width:30px">Total Amount</th>
-        <th class="text-center sorted-column" style="width:30px">Tax Amount</th>
-        <th class="text-center sorted-column" style="width:30px">Items</th>
+        <th class="text-center sorted-column" style="width:10px">Sl.No</th>
+        <th class="text-center sorted-column" style="width:200px">Order No/Date</th>
+        <th class="text-center sorted-column" style="width:200px">Order Time</th>
+        <th class="text-center sorted-column" style="width:200px">Created From</th>
+        <th class="text-center sorted-column" style="width:200px" id="name">Customer Name</th>
+        <th class="text-center sorted-column" style="width:200px" id="name">Shipping Address</th>
+        <th class="text-center sorted-column" style="width:200px" id="name">Customer Reference No./Date</th>
+        <th class="text-center sorted-column" style="width:150px" id="name">Total Items</th>
+        <th class="text-center sorted-column" style="width:150px" id="name">Total Qty</th>
+        <th class="text-center sorted-column" style="width:150px">Sales Person</th>
+        <th class="text-center sorted-column" style="width:150px">SQ Id.</th>
+        <th class="text-center sorted-column" style="width:150px" id="name">Branch</th>
+        <th class="text-center sorted-column" style="width:150px" id="name">Total Amount</th>
+        <th class="text-center sorted-column" style="width:200px" id="name">Approved/Rejected BY</th>
+        <th class="text-center sorted-column" style="width:200px" id="name">Approved/Rejected Date</th>
+        <th class="text-center sorted-column" style="width:200px" id="name">1<sup>st</sup>&nbsp; Approved BY</th>
+        <th class="text-center sorted-column" style="width:200px" id="name">1<sup>st</sup>&nbsp; Approved Date</th>
+        <th class="text-center sorted-column" style="width:150px">Order Status</th>
+        <th class="text-center sorted-column" style="width:150px">Sap Status</th>
+        <th class="text-center sorted-column" style="width:150px">Discount Prcnt.</th>
+        <th class="text-center sorted-column" style="width:150px">Sl no. </th>
+        <th class="text-center sorted-column" style="width:150px">Item Name </th>
+        <th class="text-center sorted-column" style="width:150px">Price(Inc Price) </th>
+        <th class="text-center sorted-column" style="width:150px">Quantity</th>
+        <th class="text-center sorted-column" style="width:150px">UOM</th>
+        <th class="text-center sorted-column" style="width:150px">Tax Amount</th>
+        <th class="text-center sorted-column" style="width:150px">Weight</th>
+        <th class="text-center sorted-column" style="width:150px">Total</th>
+        <th class="text-center sorted-column" style="width:150px">Remark</th>
+        <th class="text-center sorted-column" style="width:150px">Before Discount</th>
+        <th class="text-center sorted-column" style="width:150px">After Discount</th>
+        <th class="text-center sorted-column" style="width:150px">Tax & GST</th>
 
       </tr>
-      {{#each userExport}}
-      <tr class="view " style="cursor:pointer" title="Click to view details" id="{{_id}}">
-        <td class="text-center" style="width:40px">{{incremented @index}}</td>
-        <td class="text-center userIdVal_{{sdUser}}" style="width:30px">{{getUserName sdUser}}</td>
-        <td class="text-center verticalIdVal_{{vertical}}" style="width:30px">{{getVerticalName vertical}}</td>
-        <td class="text-center outletVal_{{outlet}}" style="width:30px">{{outletHelp outlet}}</td>
-        <td class="text-center routeVal_{{routeId}}" style="width:30px">{{routeHelp routeId}}</td>
-        <td class="text-center" style="width:30px">{{docDate}}</td>
-        <td class="text-center" style="width:30px">{{status}}</td>
-        {{#if deliveredDate}}
-        <td class="text-center" style="width:30px">{{dateFormat deliveredDate}}</td>
-        {{else}}
-        <td class="text-center" style="width:30px">-</td>
-        {{/if}}
-        {{#if deliveryRemarks}}
-        <td class="text-center" style="width:30px">{{deliveryRemarks}}</td>
-        {{else}}
-        <td class="text-center" style="width:30px">-</td>
-        {{/if}}
-        <td class="text-center" style="width:30px">{{docTotal}}</td>
-        <td class="text-center" style="width:30px">{{taxAmount}}</td>
-        <td class="text-center" style="width:30px">
-          <table style="width:100%;margin-bottom:0;table-layout: fixed" class="table table-striped with-border">
-            <thead>
-              <tr>
-                <th width="30px">Sl no. </th>
-                <th width="200px">Product</th>
-                <th width="100px">Unit</th>
-                <th width="100px">Unit price</th>
-                <th width="100px">Quantity</th>
-                <th width="100px">Total</th>
-                <th width="100px">Taxt amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              {{#each itemArray}}
-              <tr class="table-border">
-                <td align="right">{{incremented @index}}</td>
-                <td class="productVal_{{product}}">{{getproductHelp product}}</td>
-                <td class="unitVal_{{unit}}">{{getunitHelp unit}}</td>
-                <td>{{formateAmountFix unitPrice}}</td>
-                <td>{{quantity}}</td>
-                <td>{{formateAmountFix grossTotal}}</td>
-                <td>{{formateAmountFix taxtAmount}}</td>
-              </tr>
-              {{/each}}
-            </tbody>
-          </table>
+      {{#each orderTodayExport}}
+      {{#each itemLines}}
+      <tr id="{{_id}}">
+        <td class="text-center sorted-column" style="width:150px">{{uniqueSlNo}}</td>
+        <td class="text-center sorted-column" style="width:150px">{{#if orderId}}{{orderId}}{{else}} -
+          {{/if}}/{{dateFormat docDate}}
         </td>
+        <td class="text-center sorted-column" style="width:150px">{{timeSeperate createdAt}}</td>
+        <td class="text-center sorted-column" style="width:300px">{{vansaleAppCheck vansaleApp}}</td>
+        <td class="text-center sorted-column" style="width:200px">{{cardName}}</td>
+        <td class="text-center sorted-column" style="width:200px">{{street}}&nbsp;{{block}}&nbsp;{{city}}</td>
+        <td class="text-center sorted-column" style="width:150px">{{custRefNo}}/{{dateFormat custRefDate}}</td>
+        <td class="text-center sorted-column" style="width:150px">{{totalItem}}</td>
+        <td class="text-center sorted-column" style="width:150px">{{quantityFormat totalQty}}</td>
+        <td class="text-center sorted-column" style="width:150px"> {{salesmanName}}</td>
+        {{#if sQId}}
+        <td class="text-center sorted-column" style="width:150px">{{sQId}}</td>
+        {{else}}
+        <td class="text-center sorted-column" style="width:150px">-</td>
+        {{/if}}
+        <td class="text-center sorted-column" style="width:150px">{{branchName}}</td>
+        <td class="text-center sorted-column" style="width:150px">{{totalAmt docTotal}}</td>
+        {{#if statusValCheck oRStatus}}
+        <td class="text-center sorted-column" style="width:150px">{{firstAppovalName}}</td>
+        {{else if approvedByName}}
+        <td class="text-center sorted-column" style="width:150px">{{approvedByName}} (Approved)</td>
+        {{else if rejectedByName}}
+        <td class="text-center sorted-column" style="width:150px">{{rejectedByName}} (Rejected)</td>
+        {{else if onHoldByName}}
+        <td class="text-center sorted-column" style="width:150px">{{onHoldByName}} (Onhold)</td>
+        {{else}}
+        <td class="text-center sorted-column" style="width:150px">-</td>
+        {{/if}}
+        {{#if statusValCheck oRStatus}}
+        <td class="text-center sorted-column" style="width:150px">{{dateFormat firstAppovalDate}}</td>
+        {{else if approvedByDate}}
+        <td class="text-center sorted-column" style="width:150px">{{dateFormat approvedByDate}} (Approved)</td>
+        {{else if rejectedDate}}
+        <td class="text-center sorted-column" style="width:150px">{{dateFormat rejectedDate}} (Rejected)</td>
+        {{else if onHoldDate}}
+        <td class="text-center sorted-column" style="width:150px">{{dateFormat onHoldDate}} (Onhold)</td>
+
+        {{else}}
+        <td class="text-center sorted-column" style="width:150px">-</td>
+        {{/if}}
+        {{#if approveCheckVal accountantApproved accountantRejected accountantOnHold}}
+        <td class="pl-20 text-center" style="width:200px">{{firstAppovalName}}</td>
+        <td class="pl-20 text-center" style="width:200px">{{dateFormat firstAppovalDate}}</td>
+        {{else}}
+        <td class="pl-20 text-center" style="width:200px">-</td>
+        <td class="pl-20 text-center" style="width:200px">-</td>
+        {{/if}}
+        {{#if oRStatus}}
+        <td class="text-center sorted-column" style="width:150px">{{statusExcel oRStatus}}</td>
+        {{else}}
+        <td class="text-center sorted-column" style="width:150px">-</td>
+        {{/if}}
+        {{#if orderStatusValue canceled}}
+        <td class="text-center sorted-column" style="width:150px">Cancelled</td>
+        {{else}}
+        <td class="text-center sorted-column" style="width:150px">Open</td>
+        {{/if}}
+        <td class="text-center sorted-column" style="width:150px">{{discPrcnt}}</td>
+        <td class="text-center sorted-column" style="width:150px">{{incremented @index}}</td>
+        <td class="text-center sorted-column" style="width:200px">{{itemNam}}</td>
+        <td class="text-center sorted-column" style="width:150px">{{priceFormat incPrice}}</td>
+        <td class="text-center sorted-column" style="width:150px">{{quantityFormat quantity}}</td>
+        <td class="text-center sorted-column" style="width:150px">{{uomCode}}</td>
+        <td class="text-center sorted-column" style="width:150px">{{taxFormats quantity taxRate}}</td>
+        <td class="text-center sorted-column" style="width:150px">{{weightCal quantity invWeight unitQuantity}}</td>
+        <td class="text-center sorted-column" style="width:150px">{{totalIn incPrice quantity}}</td>
+        <td class="text-center sorted-column" style="width:150px">{{itemRemark}}</td>
+        <td class="text-center sorted-column" style="width:150px">{{totalAmt beforeDiscount}}</td>
+        <td class="text-center sorted-column" style="width:150px">{{totalAmt afterDiscount}}</td>
+        <td class="text-center sorted-column" style="width:150px">{{totalAmt GST}}</td>
       </tr>
       {{/each}}
-      <tr>
-        <td class="text-left sorted-column" style="width:200px;font-weight: bold;" colspan="9">Total</td>
-        <td class="text-center sorted-column docTotalSumExport" style="width:200px">{{docTotalSumExport}}</td>
-        <td class="text-center sorted-column taxAmountSumExport" style="width:200px">{{taxAmountSumExport}}</td>
-      </tr>
+      {{/each}}
     </tbody>
   </table>
 </template>

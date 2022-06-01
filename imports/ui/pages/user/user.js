@@ -6,24 +6,25 @@ import { allUsers } from "../../../api/user/user";
 
 
 Template.user.onCreated(function () {
-
+  Blaze._allowJavascriptUrls();
   const self = this;
   self.autorun(() => {
 
   });
+  this.userNameArray = new ReactiveVar();
   this.roleNameArray = new ReactiveVar();
-  this.verticalNameList = new ReactiveVar();
-  this.verticalEdits = new ReactiveVar();
-  this.rolesEdit = new ReactiveVar();
+  this.branchArray = new ReactiveVar();
+  this.employeeArray = new ReactiveVar();
   this.modalLoader = new ReactiveVar();
 
   this.pagination = new Meteor.Pagination(allUsers, {
-    filters: {
-      active: "Y",
-      userType: "MainUser"
+    filters: { 
+      'profile.isDeleted': false,
+      // _id: { $ne: Meteor.userId() }
+      $and: [{ userType: { $ne: 'V' } }, { userType: { $ne: 'C' } },
+      { userType: { $ne: 'S' } }]
     },
     sort: { createdAt: -1, 'profile.firstName': 1 },
-    fields: { profile: 1, username: 1, emails: 1, active: 1 },
     perPage: 20
   });
   this.defaultBrnch = new ReactiveVar();
@@ -33,41 +34,35 @@ Template.user.onCreated(function () {
 
 Template.user.onRendered(function () {
   /**
-* active and inactive list based on nav bar
-*/
-  $('.taskHeaderList').css('display', 'inline');
-  var header = document.getElementById("taskHeader");
-  if (header) {
-    var btns = header.getElementsByClassName("paginationFilterValue");
-    for (var i = 0; i < btns.length; i++) {
-      btns[i].addEventListener("click", function () {
-        var current = document.getElementsByClassName("activeHeaders");
-        current[0].className = current[0].className.replace(" activeHeaders", "");
-        this.className += " activeHeaders";
-      });
-    }
-  }
-  /**
    * TODO: Complete JS doc
 
    */
-
+  Meteor.call('user.userNameGetAdmin', (userError, userResult) => {
+    if (!userError) {
+      this.userNameArray.set(userResult);
+    }
+  });
   Meteor.call('role.roleNameGet', (roleError, roleResult) => {
     if (!roleError) {
       this.roleNameArray.set(roleResult);
     }
   });
-  Meteor.call('verticals.activeList', (err, res) => {
-    if (!err) {
-      this.verticalNameList.set(res);
-    };
+  Meteor.call('branch.branchList', (branchError, branchResult) => {
+    if (!branchError) {
+      this.branchArray.set(branchResult);
+    }
   });
-  $(".verticalEditSelection").select2({
-    placeholder: "Select Vertical",
+  Meteor.call('employee.employeeList', (employeeError, employeeResult) => {
+    if (!employeeError) {
+      this.employeeArray.set(employeeResult);
+    }
+  });
+  $(".userSelect").select2({
+    placeholder: "Select Supervisor",
     tokenSeparators: [','],
     noResults: 'No Users found.',
     allowClear: true,
-    dropdownParent: $(".verticalEditSelection").parent(),
+    dropdownParent: $(".userSelect").parent(),
   });
   $(".sapEmployees").select2({
     placeholder: "Select Employee",
@@ -79,22 +74,23 @@ Template.user.onRendered(function () {
   /**
    * TODO: Complete JS doc
    */
-  $('.userSelections').select2({
-    // placeholder: "Select User",
+  $('.branchSelections').select2({
+    // placeholder: "Select Branch",
     // tokenSeparators: [','],
-    // noResults: 'No User found.',
+    // noResults: 'No Branch found.',
     // allowClear: true
     multiple: true,
-    dropdownParent: $(".userSelections").parent(),
+    dropdownParent: $(".branchSelections").parent(),
     // tags: true
   });
+  
   /**
     * TODO: Complete JS doc
     */
   $(".selectDefaultBrnchs").select2({
-    placeholder: "Select User",
+    placeholder: "Select Branch",
     tokenSeparators: [','],
-    // noResults: 'No User found.',
+    // noResults: 'No Branch found.',
     allowClear: true,
     dropdownParent: $(".selectDefaultBrnchs").parent(),
   });
@@ -117,25 +113,14 @@ Template.user.helpers({
   optionsHelper: () => {
     return globalOptionsHelper('users');
   },
+  /**
+  * TODO:Complete JS doc
+  * 
+  */
   printLoad: () => {
-    let res = Template.instance().modalLoader.get();
-    if (res === true) {
-      return true;
-    }
-    else {
-      return false;
-    }
+    return Template.instance().modalLoader.get();
   },
-  verticalListEdit: function () {
-    let verticalId = Template.instance().verticalEdits.get();
-    if (verticalId) {
-      Meteor.setTimeout(function () {
-        $('#verticalEditSelection').val(verticalId).trigger('change');
-      }, 100);
-    }
-    return Template.instance().verticalNameList.get();
 
-  },
   /**
    * TODO: Complete JS doc
    * @returns {{collection: *, acceptEmpty: boolean, substitute: string, eventType: string}}
@@ -146,32 +131,7 @@ Template.user.helpers({
 
     return config;
   },
-  /**
-      * TODO: Complete JS doc
-      * @returns {*}
-      */
-  activeHelper: function (active) {
-    let activeCheck = active;
-    if (activeCheck === "Y") {
-      return true;
-    }
-    else {
-      return false
-    }
-  },
-  /**
-   * TODO: Complete JS doc
-   * @returns {*}
-   */
-  inactiveHelper: function (active) {
-    let activeCheck = active;
-    if (activeCheck === "N") {
-      return true;
-    }
-    else {
-      return false
-    }
-  },
+
   /**
    * TODO: Complete JS doc
    * @returns {any | *}
@@ -219,12 +179,7 @@ Template.user.helpers({
    * @returns {{Collection:*}}
    */
   rolesLists: function () {
-    let rolesId = Template.instance().rolesEdit.get();
-    if (rolesId) {
-      Meteor.setTimeout(function () {
-        $('#roleIdselect').val(rolesId).trigger('change');
-      }, 100);
-    }
+
     return Template.instance().roleNameArray.get();
   },
 
@@ -232,12 +187,12 @@ Template.user.helpers({
   * TODO: Complete JS doc
   * @returns {{Collection:*}}
   */
-  userLists: function () {
+  branchLists: function () {
 
-    return Template.instance().userArray.get();
+    return Template.instance().branchArray.get();
 
   },
-  duserLists: function () {
+  dbranchLists: function () {
     return Template.instance().defaultBrnch.get();
   },
   /**
@@ -277,6 +232,7 @@ Template.user.events({
     if (empCode && $.trim(empCode) && firstName && $.trim(firstName) && emailfilter && $.trim(emailfilter)) {
       Template.instance().pagination.settings.set('filters',
         {
+          // _id: { $ne: Meteor.userId()},
           'profile.empCode': {
             $regex: new RegExp($.trim(empCode), "i")
           },
@@ -286,36 +242,35 @@ Template.user.events({
           'emails.0.address': {
             $regex: new RegExp($.trim(emailfilter), "i")
           },
-          userType: "MainUser"
+          'profile.isDeleted': false,
         }
       );
-      $('.taskHeaderList').css('display', 'none');
     }
     else if (empCode && $.trim(empCode)) {
       Template.instance().pagination.settings.set('filters', {
+        // _id: { $ne: Meteor.userId()},
         'profile.empCode': { $regex: new RegExp($.trim(empCode), "i") },
-        userType: "MainUser"
+        'profile.isDeleted': false,
       });
-      $('.taskHeaderList').css('display', 'none');
     }
     else if (firstName && $.trim(firstName)) {
       Template.instance().pagination.settings.set('filters', {
+        // _id: { $ne: Meteor.userId()},
         'profile.firstName': {
           $regex: new RegExp($.trim(firstName), "i")
-        }, userType: "MainUser"
+        },
+        'profile.isDeleted': false,
       });
-      $('.taskHeaderList').css('display', 'none');
     }
     else if (emailfilter && $.trim(emailfilter)) {
       Template.instance().pagination.settings.set('filters', {
-        'emails.0.address': { $regex: new RegExp($.trim(emailfilter), "i"), },
-        userType: "MainUser"
+        // _id: { $ne: Meteor.userId()},
+        'emails.0.address': { $regex: new RegExp($.trim(emailfilter), "i") },
+        'profile.isDeleted': false,
       });
-      $('.taskHeaderList').css('display', 'none');
     }
     else {
-      Template.instance().pagination.settings.set({ userType: "MainUser" });
-      $('.taskHeaderList').css('display', 'none');
+      Template.instance().pagination.settings.set('filters', { 'profile.isDeleted': false, });
     }
   },
   /**
@@ -323,15 +278,11 @@ Template.user.events({
    */
   'click .reset': () => {
     Template.instance().pagination.settings.set('filters', {
-      active: "Y",
-      userType: "MainUser"
+      'profile.isDeleted': false,
+      $and: [{ userType: { $ne: 'V' } }, { userType: { $ne: 'C' } },
+      { userType: { $ne: 'S' } }]
     });
     $('form :input').val("");
-    $('.taskHeaderList').css('display', 'inline');
-    let element = document.getElementById("inactiveFilter");
-    element.classList.remove("active");
-    let elements = document.getElementById("activeFilter");
-    elements.classList.add("active");
   },
   /**
    * TODO: Complete JS doc
@@ -434,55 +385,79 @@ Template.user.events({
 
 
   },
-
   /**
    * TODO: Complete JS doc
    * @param event
    */
-  'click .edit': (event, template) => {
+  'click #userRemove': (event) => {
+    event.preventDefault();
+    let _id = $('#confirmedUuid').val();
+    if (_id && $.trim(_id)) {
+      Meteor.call('user.delete', $.trim(_id), (error) => {
+        if (error) {
+          $('#message').html("Internal error - unable to remove entry. Please try again");
+        } else {
+          $('#userSuccessModal').modal();
+          $('#userSuccessModal').find('.modal-body').text('User deleted successfully');
+        }
+        $("#userDelConfirmation").modal('hide');
+      });
+    }
+  },
+  /**
+   * TODO: Complete JS doc
+   * @param event
+   */
+  'click .edit': (event) => {
     event.preventDefault();
     let _id = event.currentTarget.attributes.id.value;
-    let header = $('#categoryH');
-    $(header).html('Update User');
-    $('#userEditPage').modal();
-    $('div.hint').hide();
-    template.verticalEdits.set('');
-    template.rolesEdit.set('');
-    template.modalLoader.set(true);
     Meteor.call('user.user_id', _id, (err, res) => {
-      if (!err) {
-        let userDetail = res;
-        template.modalLoader.set(false);
-        let userDetailFirstName = userDetail.profile.firstName;
-        let userDetailLastName = userDetail.profile.lastName;
-        let userDetailgender = userDetail.profile.gender;
-        let userDetailusername = userDetail.username;
-        let userDetailContactNo = userDetail.contactNo;
-        let userDetailemail = userDetail.emails[0].address;
-        let userDetaildateOfBirth = userDetail.profile.dateOfBirth;
-        let userDetailisDeleted = userDetail.profile.isDeleted;
-        let userDetailId = _id;
-        let userDetailempCode = userDetail.profile.empCode;
-        $("#userDetailFirstName").val(userDetailFirstName);
-        $("#userDetailLastName").val(userDetailLastName);
-        $("#userDetailusername").val(userDetailusername);
-        $("#userDetailContactNo").val(userDetailContactNo);
-        $(".email").val(userDetailemail);
-        $(".hiddenemail").val(userDetailemail);
-        $(".datevalue").val(userDetaildateOfBirth);
-        $(".datevalue").val(userDetaildateOfBirth);
-        $(".isDeleted").val(userDetailisDeleted);
-        $(".id").val(userDetailId);
-        $("#empCodenew").val(userDetailempCode);
-        $("#empCode").val(userDetailempCode);
-        $("input[name=genders][value=" + userDetailgender + "]").attr('checked', 'checked');
-        $('#contactPersonEdit').val(userDetail.contactPerson)
-        template.verticalEdits.set(userDetail.vertical[0]);
-        template.rolesEdit.set(userDetail.roles[0]);
-      }
-      else {
-        template.modalLoader.set(false);
-      }
+      let userDetail = res;
+      let header = $('#categoryH');
+      $('#userEditPage').modal();
+      $('div.hint').hide();
+      //  const userDetail = Meteor.users.findOne({ _id: _id });
+      let userDetailFirstName = userDetail.profile.firstName;
+      let userDetailLastName = userDetail.profile.lastName;
+      let userDetailgender = userDetail.profile.gender;
+      let userDetailusername = userDetail.username;
+      let userDetailContactNo = userDetail.contactNo;
+      let userDetailemail = userDetail.emails[0].address;
+      let userDetaildateOfBirth = userDetail.profile.dateOfBirth;
+      let userDetailisDeleted = userDetail.profile.isDeleted;
+      let userDetailId = _id;
+      let userDetailempCode = userDetail.profile.empCode;
+      let userDetailroleId = userDetail.roles;
+      // const userDetaildesignationId = userDetail.designation;
+      let userDetailsupervisor = userDetail.supervisor;
+      let userDetailbranch = userDetail.branch;
+
+      Meteor.setTimeout(function () {
+        let userDetailDbranch = userDetail.defaultBranch;
+        let userDetailSlpCode = userDetail.slpCode;
+        $('#defaultBranchs').val(userDetailDbranch).trigger("change");
+        $('#sapEmployees').val(userDetailSlpCode).trigger("change");
+      }, 2000);
+
+      $("#userDetailFirstName").val(userDetailFirstName);
+      $("#userDetailLastName").val(userDetailLastName);
+      $("#userDetailusername").val(userDetailusername);
+      $("#userDetailContactNo").val(userDetailContactNo);
+      $(".email").val(userDetailemail);
+      $(".hiddenemail").val(userDetailemail);
+      $(".datevalue").val(userDetaildateOfBirth);
+      $(".datevalue").val(userDetaildateOfBirth);
+      $(".isDeleted").val(userDetailisDeleted);
+      $(".id").val(userDetailId);
+      $("#empCodenew").val(userDetailempCode);
+      $("#empCode").val(userDetailempCode);
+      $("input[name=genders][value=" + userDetailgender + "]").attr('checked', 'checked');
+      $(header).html('Update User');
+      $('#roleIdselect').val(userDetailroleId).trigger("change");
+      $('#userSelection').val(userDetailsupervisor).trigger("change");
+      $('#usBranchess').val(userDetailbranch).trigger("change");
+
+
     });
   },
   /**
@@ -491,16 +466,32 @@ Template.user.events({
    */
   'submit .updateUser': (event) => {
     event.preventDefault();
+    let supervisor = '';
+    $('#userSelection').find(':selected').each(function () {
+      supervisor = $(this).val();
+
+    });
     let rolesArray = [];
     $('#roleIdselect').find(':selected').each(function () {
       rolesArray.push($(this).val());
     });
-    let vertical = '';
-    $('#verticalEditSelection').find(':selected').each(function () {
-      vertical = $(this).val();
+    let branch = '';
+    $('#defaultBranchs').find(':selected').each(function () {
+      branch = $(this).val();
+
     });
-    updateUserlist(event.target, rolesArray, vertical);
-    $('#userEditPage').modal('hide');
+    let defaultBranch = [];
+    $('.branchSelections').find(':selected').each(function () {
+      defaultBranch.push($(this).val());
+
+    });
+    let sapEmp = [];
+    $('.sapEmployees').find(':selected').each(function () {
+      sapEmp.push($(this).val());
+
+    });
+
+    updateUserlist(event.target, rolesArray, supervisor, branch, defaultBranch, sapEmp);
   },
   /**
    * TODO: Complete JS doc
@@ -509,73 +500,153 @@ Template.user.events({
     $(".updateUser").each(function () {
       this.reset();
     });
-    template.modalLoader.set(false);
+    template.modalLoader.set('');
     $('#roleSelection').prop('selectedIndex', 0);
     $('#designationSelection').prop('selectedIndex', 0);
   },
-  /** 
+  /**
    * TODO:Complete JS doc
    * @param event
    */
   'click .view': (event, template) => {
     event.preventDefault();
     let id = event.currentTarget.id;
-    template.modalLoader.set(true);
+    template.modalLoader.set('');
     let header = $('#userH');
     let firstName = $('#detailFirstName');
     let lastName = $('#detailLastName');
     let gender = $('#detailGender');
     let email = $('#detailEmailId');
     let roleN = $('#detailRole');
+    //const designationN = $('#detailDesignation');
     let empcode = $('#detailEMPCode');
     let username = $('#detailUsername');
     let dateOfBirth = $('#detailDateOfBirth');
-    let vertical = $('#verticalDetails');
+    let slp = $('#slp');
+    let brnch = $('#brnch');
+    let company = $('#company');
     let contactNum = $('#contactNum');
-    let detailContact = $('#detailContact');
+    let sapEmp = $('#detailSapEmp');
 
     $('#userDetailPage').modal();
-    Meteor.call('user.dataGets', id, (userError, userResult) => {
+
+    Meteor.call('user.user_id', id, (userError, userResult) => {
       if (!userError) {
-        template.modalLoader.set(false);
-        let user = userResult.userRes;
-        $(header).html('Details of ' + $.trim(user.profile.firstName));
-        $(firstName).html(user.profile.firstName);
-        $(lastName).html(user.profile.lastName);
-        $(gender).html(user.profile.gender);
-        $(email).html(user.emails[0].address);
-        $(roleN).html(userResult.roleName);
-        if (user.contactNo !== undefined && user.contactNo !== '') {
-          $(contactNum).html(user.contactNo);
-        } else {
-          $(contactNum).html('');
+        template.modalLoader.set(userResult);
+        if (userResult.slpCode !== undefined) {
+          salesExceName(userResult.slpCode);
         }
-        $(empcode).html(user.profile.empCode);
-        if (user.contactPerson !== undefined && user.contactPerson !== '') {
-          $(detailContact).html(user.contactPerson);
-        } else {
-          $(detailContact).html('');
+        else {
+          $(sapEmp).html('');
         }
-        $(dateOfBirth).html(user.profile.dateOfBirth);
-        $(username).html(user.username);
-        $(vertical).html(userResult.verticalName);
-      }
-      else {
-        template.modalLoader.set(false);
+        let user = userResult;
+        let rolesList = [];
+        rolesList = user.roles;
+        let roleNames = [];
+        let r = [];
+        let branchList = [];
+        branchList = user.branch;
+        let branchNames = [];
+        let b = [];
+        if (branchList !== undefined) {
+          for (let i = 0; i < branchList.length; i++) {
+            b = branchList[i];
+            Meteor.call('branch.branchUser', b, (branchError, branchResult) => {
+              if (!branchError) {
+                let branchName = branchResult;
+                branchNames.push(branchName);
+                if (branchNames) {
+                  $(brnch).html(branchNames + "<br>");
+
+                } else {
+                  $(brnch).html('');
+                }
+              }
+            });
+          }
+        }
+
+        if (rolesList !== undefined) {
+          for (let i = 0; i < rolesList.length; i++) {
+            r = rolesList[i];
+            Meteor.call('role.details', r, (roleError, roleResult) => {
+              if (!roleError) {
+
+                let roleName = roleResult;
+                roleNames.push(roleName[0].name);
+                let roleString = JSON.stringify(roleNames);
+                let roleArranged = roleString.replace(/["[\]]/g, '');
+
+                $(header).html('Details of ' + $.trim(user.profile.firstName));
+                $(firstName).html(user.profile.firstName);
+                $(lastName).html(user.profile.lastName);
+                $(gender).html(user.profile.gender);
+                $(email).html(user.emails[0].address);
+                $(roleN).html(roleArranged);
+
+                if (user.contactNo !== undefined) {
+                  $(contactNum).html(user.contactNo);
+                } else {
+                  $(contactNum).html('');
+                }
+                $(empcode).html(user.profile.empCode);
+                $(dateOfBirth).html(user.profile.dateOfBirth);
+                $(username).html(user.username);
+                $(slp).html(user.slpCode);
+                $(company).html(user.u_COMPANY_NAME);
+              }
+            });
+          }
+        }
       }
     });
+    function salesExceName(slpCode) {
+      if (Array.isArray(slpCode) === true) {
+        let salesExceArray = [];
+        if (slpCode !== undefined && slpCode !== []) {
+          for (let i = 0; i < slpCode.length; i++) {
+            Meteor.call('employee.employeeNameGet', slpCode[i], (invError, invRes) => {
+              if (!invError && invRes !== undefined) {
+                salesExceArray.push(invRes);
+                if (i + 1 === slpCode.length) {
+                  $(sapEmp).html(String(salesExceArray));
 
+
+                }
+                else {
+                  $(sapEmp).html('');
+                }
+              }
+            });
+          }
+        }
+        else {
+          salesExceArray = [];
+        }
+      }
+      else {
+        Meteor.call('employee.employeeNameGet', slpCode, (invError, invRes) => {
+          if (!invError && invRes !== undefined) {
+            $(sapEmp).html(invRes);
+          }
+          else {
+            $(sapEmp).html('');
+          }
+
+        });
+      }
+    }
   },
   /**
 * TODO: Complete JS doc
 */
-  'change .userSelections': (event, template) => {
+  'change .branchSelections'(event, template){
     let brnchs = [];
-    $('#ususeress :selected').each(function () {
+    $('#usBranchess :selected').each(function () {
       brnchs.push($(this).val());
     });
 
-    Meteor.call('user.userList', (err, res) => {
+    Meteor.call('branch.branchList', (err, res) => {
       let brnc = res;
       let brnchAry = [];
       for (let x = 0; x < brnc.length; x++) {
@@ -601,101 +672,5 @@ Template.user.events({
   'click #removeSearch': () => {
     document.getElementById('filterDisplay').style.display = "none";
   },
-  /**
-* TODO: Complete JS doc
-* 
-*/
-  'click .activeFilter': (event, template) => {
-    event.preventDefault();
-    Template.instance().pagination.settings.set('filters', {
-      active: "Y",
-      userType: "MainUser"
-    });
-  },
-  /**
-  * TODO: Complete JS doc
-  * 
-  */
-  'click .inactiveFilter': (event, template) => {
-    event.preventDefault();
-    Template.instance().pagination.settings.set('filters', {
-      active: "N",
-    });
-  },
 
-  /**
-   * TODO: Complete JS doc
-   * @param event
-   */
-  'click .deactivate': (event) => {
-    event.preventDefault();
-    let header = $('#userHeader');
-    let userName = $('#confuserName');
-    let userNameDup = $('#userNameDup');
-    let confirmedUuid = $('#confirmedUuid');
-    $('#userDelConfirmation').modal();
-    let _id = event.currentTarget.attributes.id.value;
-    let username = $('#userName_' + _id).val();
-    $(header).html('Confirm Deactivation Of ' + $.trim(username));
-    $(userName).html(username);
-    $(userNameDup).html(username);
-    $(confirmedUuid).val(_id);
-  },
-  /**
-   * TODO: Complete JS doc
-   * @param event
-   */
-  'click #userRemove': (event) => {
-    event.preventDefault();
-    let _id = $('#confirmedUuid').val();
-    if (_id && $.trim(_id)) {
-      Meteor.call('user.inactive', $.trim(_id), (error) => {
-        if (error) {
-          $('#message').html("Internal error - unable to remove entry. Please try again");
-        } else {
-          $('#userSuccessModal').modal();
-          $('#userSuccessModal').find('.modal-body').text('User inactivated successfully');
-        }
-        $("#userDelConfirmation").modal('hide');
-      });
-    }
-  },
-
-  /**
-   * TODO: Complete JS doc
-   * @param event
-   */
-  'click .activate': (event) => {
-    event.preventDefault();
-    let header = $('#userHeaders');
-    let userName = $('#confuserNames');
-    let userNameDup = $('#userNameDups');
-    let confirmedUuid = $('#confirmedUuids');
-    $('#userActiveConfirmation').modal();
-    let _id = event.currentTarget.attributes.id.value;
-    let username = $('#userName_' + _id).val();
-    $(header).html('Confirm Activation Of ' + $.trim(username));
-    $(userName).html(username);
-    $(userNameDup).html(username);
-    $(confirmedUuid).val(_id);
-  },
-  /**
-   * TODO: Complete JS doc
-   * @param event
-   */
-  'click #userActivate': (event) => {
-    event.preventDefault();
-    let _id = $('#confirmedUuids').val();
-    if (_id && $.trim(_id)) {
-      Meteor.call('user.active', $.trim(_id), (error) => {
-        if (error) {
-          $('#message').html("Internal error - unable to remove entry. Please try again");
-        } else {
-          $('#userSuccessModal').modal();
-          $('#userSuccessModal').find('.modal-body').text('User activated successfully');
-        }
-        $("#userActiveConfirmation").modal('hide');
-      });
-    }
-  },
 });

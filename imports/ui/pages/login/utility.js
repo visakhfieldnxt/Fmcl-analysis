@@ -57,22 +57,20 @@ loginUser = (target) => {
       toastr["error"]('Error: Invalid User Credentials');
     }
     else {
-      if (Meteor.user().active === 'Y') {
+      if (Meteor.user().profile.isDeleted === false) {
         // if (Meteor.user().emails[0].verified === true) {
         if (Meteor.user().roles !== undefined && Meteor.user().roles.length > 0) {
-          if (Meteor.user().userType === 'SDUser') {
-            if (Meteor.user().loggedIn !== undefined && Meteor.user().loggedIn === true) {
-              Meteor.logout();
-              toastr["error"]('Your account has been logged in another device.');
-            }
-            else {
-              FlowRouter.go('home');
-              updateLoginStatus(Meteor.user()._id);
-            }
+          // FlowRouter.redirect(currentPath); 
+          if (Meteor.user().userType === 'C') {
+            Meteor.logout();
+            //           toastr["error"]('email-not-verified', 'You must verify your email address before you can log in');
+            toastr["error"]('Error: Invalid User Credentials');
           }
           else {
             FlowRouter.go('home');
           }
+
+          //  return true;
         }
         else {
           Meteor.logout();
@@ -104,8 +102,3 @@ forgetEmail = (target) => {
     }
   });
 };
-
-
-function updateLoginStatus(id) {
-  Meteor.call("user.updateLoginVal", id);
-}

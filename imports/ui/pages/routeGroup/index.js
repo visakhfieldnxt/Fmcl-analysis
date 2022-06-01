@@ -7,5 +7,3 @@ import './create.html';
 import './utility';
 import './routeGroup';
 import './create'; 
-import './routeMap.html';
-import './routeMap.js';

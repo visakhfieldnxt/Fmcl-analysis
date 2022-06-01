@@ -41,6 +41,27 @@
                 </select>
               </div>
               <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EMPcode">Branch Name</label><br>
+                <select value='' name="selectBranchName" style="width:100% !important" id="selectBranchName"
+                  class="selectBranchName" placeholder="Select Branch Name">
+                  <option value="">Select Branch</option>
+                  {{# each branchList}}
+                  <option value="{{bPLId}}">{{bPLName}}</option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EMPcode">Employee Name</label>
+                <select name="selectVanemp" style="width:100% !important" id="selectVanemp" class="selectVanemp"
+                  placeholder="Select Employee Name">
+                  <option disabled selected value=''>Select Employee Name</option>
+                  {{# each vanUsersList}}
+                  <option value="{{_id}}">{{profile.firstName}} {{profile.lastName}}
+                  </option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="col-md-3 col-sx-12 col-sm-12">
                 <label for="EmailId">From Date</label>
                 <input type="text" autocomplete="off" class="form-control datepicker date validation"
                   data-date-autoclose="true" onkeydown="event.preventDefault()" id="fromDate" data-provide="datepicker"
@@ -79,7 +100,7 @@
           <table class="table table-striped generic" style="width:100%;margin-bottom:0;table-layout: fixed">
             <tbody>
               <tr>
-                <th class="text-center sorted-column" style="width:40px">Sl.No</th>
+                <th class="text-center sorted-column" style="width:10px">Sl.No</th>
                 <th class="text-center sorted-column" style="width:200px">Route Name</th>
                 <th class="text-center sorted-column" style="width:200px">Route Code</th>
                 <th class="text-center sorted-column" style="width:200px">Branch</th>
@@ -90,15 +111,15 @@
               </tr>
               {{#each orderes}}
               <tr class="view " title="Click to view details" id="{{_id}}">
-                <td class="text-center" style="width:40px">{{incremented @index}}</td>
-                <td class="text-center" style="width:200px">{{routeNameHelp routeId}}</td>
-                <td class="text-center" style="width:200px">{{routeCodeHelp routeId}}</td>
-                <td class="text-center" style="width:200px">{{routeBranchHelp routeId}}</td>
+                <td class="text-center" style="width:10px">{{indexCountGet @index}}</td>
+                <td class="text-center routeVal_{{routeId}}" style="width:200px">{{routeNameHelp routeId}}</td>
+                <td class="text-center routeCodeVal_{{routeId}}" style="width:200px">{{routeCodeHelp routeId}}</td>
+                <td class="text-center branchVal_{{routeId}}" style="width:200px">{{routeBranchHelp routeId}}</td>
 
                 <td class="text-center" style="width:200px">{{routeDate}}</td>
                 <td class="text-center" style="width:200px">{{routeDateEnd}}</td>
                 {{#if assignedTo}}
-                <td class="text-center" width="200px"> {{vanUserName assignedTo}}</td>
+                <td class="text-center vanUserName_{{assignedTo}}" width="200px"> {{vanUserName assignedTo}}</td>
                 {{else}}
                 <td class="text-center" width="200px">-</td>
                 {{/if}}
@@ -135,8 +156,7 @@
       {{/with}}
     </div>
     {{/if}}
-    {{#if printLoadBody}}
-    <div id="bodySpin" style=" width: 100%;position: 
+    <div id="bodySpinVal" style=" width: 100%;position: 
     fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
       {{#with bodyLoader}}
       <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
@@ -145,11 +165,6 @@ justify-content: center;background: #f1f1f1;">
       </div>
       {{/with}}
     </div>
-    {{else}}
-    <div id="bodySpin">
-    </div>
-    {{/if}}
-
   </section>
 
   <div class="modal fade in" id="orderDetailPage">
@@ -244,7 +259,7 @@ justify-content: center;background: #f1f1f1;">
                     {{#each items}}
                     <tr class="table-border">
                       <td>{{incremented @index}}</td>
-                      <td style="word-wrap: break-word">{{custNameHelp customer}}</td>
+                      <td style="word-wrap: break-word" class="customerVal_{{customer}}">{{custNameHelp customer}}</td>
                       <td style="word-wrap: break-word">{{ priority}}</td>
                     </tr>
                     {{/each}}
@@ -275,7 +290,7 @@ justify-content: center;background: #f1f1f1;">
                     {{#each routeDataList}}
                     <tr class="table-border">
                       <td style="word-wrap: break-word">{{incremented @index}}</td>
-                      <td style="word-wrap: break-word">{{custNameHelp customer}}</td>
+                      <td style="word-wrap: break-word" class="customerVal_{{customer}}">{{custNameHelp customer}}</td>
                       <td style="word-wrap: break-word">{{dateValue}} {{checkIn}}</td>
                       <td style="word-wrap: break-word">{{dateValue}} {{checkOut}}</td>
                       <td style="word-wrap: break-word">{{timeSpent}}</td>
@@ -338,19 +353,24 @@ justify-content: center;background: #f1f1f1;">
       {{#each orderByDateExport}}
       <tr id="{{_id}}">
         <td class="text-center sorted-column" style="width:100px">{{incremented @index}}</td>
-        <td class="text-center sorted-column" style="width:200px">{{routeNameHelp routeData.routeId}}</td>
-        <td class="text-center sorted-column" style="width:200px"> {{routeCodeHelp routeData.routeId}}</td>
-        <td class="text-center sorted-column" style="width:200px">{{routeBranchHelp routeData.routeId}}</td>
+        <td class="text-center sorted-column routeVal_{{routeData.routeId}}" style="width:200px">{{routeNameHelp
+          routeData.routeId}}</td>
+        <td class="text-center sorted-column routeCodeVal_{{routeData.routeId}}" style="width:200px"> {{routeCodeHelp
+          routeData.routeId}}</td>
+        <td class="text-center sorted-column branchVal_{{routeId}}" style="width:200px">{{routeBranchHelp
+          routeData.routeId}}</td>
         <td class="text-center sorted-column" style="width:200px">{{routeData.routeDate}}</td>
         <td class="text-center sorted-column" style="width:200px">{{routeData.routeDateEnd}}</td>
         <td class="text-center sorted-column" style="width:200px">{{routeData.routeStatus}}</td>
         {{#if routeData.assignedTo}}
-        <td class="text-center sorted-column" style="width:200px"> {{vanUserName routeData.assignedTo}}</td>
+        <td class="text-center sorted-column vanUserName_{{routeData.assignedTo}}" style="width:200px"> {{vanUserName
+          routeData.assignedTo}}</td>
         {{else}}
         <td class="text-center sorted-column" style="width:200px">-</td>
         {{/if}}
         {{#if routeData.assignedBy}}
-        <td class="text-center sorted-column" style="width:200px"> {{vanUserName routeData.assignedBy}}</td>
+        <td class="text-center sorted-column vanUserName_{{routeData.assignedBy}}" style="width:200px"> {{vanUserName
+          routeData.assignedBy}}</td>
         {{else}}
         <td class="text-center sorted-column" style="width:200px">-</td>
         {{/if}}
@@ -372,7 +392,8 @@ justify-content: center;background: #f1f1f1;">
               {{#each customerData}}
               <tr class="table-border">
                 <td class="text-center">{{incremented @index}}</td>
-                <td style="word-wrap: break-word !important">{{customerNameHelp customer}}</td>
+                <td style="word-wrap: break-word !important" class="customerVal_{{customer}}">{{custNameHelp customer}}
+                </td>
                 <td>{{priority}}</td>
               </tr>
               {{/each}}
@@ -397,7 +418,7 @@ justify-content: center;background: #f1f1f1;">
               {{#each routeUpdateData}}
               <tr class="table-border">
                 <td style="word-wrap: break-word">{{incremented @index}}</td>
-                <td style="word-wrap: break-word ">{{customerNameHelp customer}}</td>
+                <td style="word-wrap: break-word " class="customerVal_{{customer}}">{{custNameHelp customer}}</td>
                 <td style="word-wrap: break-word ">{{dateValue}} {{checkIn}}</td>
                 <td style="word-wrap: break-word">{{dateValue}} {{checkOut}}</td>
                 <td style="word-wrap: break-word">{{timeSpent}}</td>
@@ -435,7 +456,32 @@ justify-content: center;background: #f1f1f1;">
                 <tbody>
                   <tr>
                     <td>
-                      <label for="Employee ">From Date </label>
+                      <label for="EMPcode">Branch</label><br>
+                      <select value='' name="selectBranchNameExport" style="width:100% !important"
+                        id="selectBranchNameExport" class="selectBranchNameExport" placeholder="Select Branch Name">
+                        <option value="">Select Branch</option>
+                        {{# each branchList}}
+                        <option value="{{bPLId}}">{{bPLName}}</option>
+                        {{/each}}
+                      </select>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label for="EMPcode">Employee</label>
+                      <select name="selectVanempExport" style="width:100% !important" id="selectVanempExport" class="selectVanempExport"
+                        placeholder="Select Employee Name">
+                        <option disabled selected value=''>Select Employee Name</option>
+                        {{# each vanUsersList}}
+                        <option value="{{_id}}">{{profile.firstName}} {{profile.lastName}}
+                        </option>
+                        {{/each}}
+                      </select>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label for="Employee ">From Date <span class="asteric_red">*</span> </label>
                       <input type="text" autocomplete="off" class="form-control datepicker date validation startDate"
                         data-date-autoclose="true" onkeydown="event.preventDefault()" id="my-datepicker"
                         data-provide="datepicker" data-date-format="dd-mm-yyyy" placeholder="From Date "
@@ -445,12 +491,17 @@ justify-content: center;background: #f1f1f1;">
                   </tr>
                   <tr>
                     <td>
-                      <label for="firstName">To Date </label>
+                      <label for="firstName">To Date <span class="asteric_red">*</span> </label>
                       <input type="text" autocomplete="off" class="form-control datepicker date validation endDate"
                         data-date-autoclose="true" onkeydown="event.preventDefault()" id="my-datepicker" disabled='true'
                         data-provide="datepicker" data-date-format="dd-mm-yyyy" placeholder="To Date " name="endDate"
                         required />
                       <span id="endDateSpan"></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-center">
+                      <span id="emptyDataSpan"></span>
                     </td>
                   </tr>
                 </tbody>

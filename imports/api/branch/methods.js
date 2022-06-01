@@ -1,181 +1,360 @@
 /**
- * @author Nithin
+ * @author Visakh
  */
 import { Branch } from './branch';
-import { Verticals } from '../verticals/verticals';
-import { allUsers } from '../user/user';
+import { Config } from '../config/config';
+import { WareHouse } from '../wareHouse/wareHouse';
+import { Customer } from '../customer/customer';
+// import  {branchDataGet_Url} from'../../startup/client/sapUrls';
+
 
 Meteor.methods({
-
   /**
-   * create branch
-   * @param branchName
-   * @param branchCode
-   * @returns 
-   */
-  'branch.create': (branchName, branchCode, loginUserVerticals) => {
-    let branchRes = Branch.insert({
-      branchCode: branchCode,
-      branchName: branchName,
-      vertical: loginUserVerticals,
-      active: 'Y',
-      uuid: Random.id(),
-      createdBy: Meteor.userId(),
-      createdAt: new Date(),
-    });
-
-    if (branchRes) {
-      return branchRes;
-    }
-  },
-  /**
-   * update branch
-   * @param {*} id 
-   * @param {*} branchName 
-   * @param {*} branchCode 
-   * @returns 
-   */
-  'branch.update': (id, branchName, branchCode, loginUserVerticals) => {
-    return Branch.update({ _id: id }, {
-      $set:
-      {
-        branchCode: branchCode,
-        branchName: branchName,
-        vertical: loginUserVerticals,
-        updatedBy: Meteor.userId(),
-        updatedAt: new Date(),
-      }
-    });
-  },
-  /**
-   * get branch details using id
-   * @param {*} id 
-   * @returns 
-   */
-  'branch.id': (id) => {
-    return Branch.findOne({ _id: id }, { fields: { branchName: 1, branchCode: 1, active: 1 } });
-  },
-  'branch.findName': (id) => {
-    return Branch.findOne({ _id: id }).branchName;
-  },
-  /**
-   * fetching branch full details 
-   * @returns 
-   */
+ * TODO:Complete JS doc
+ * Fetching Branch List
+*/
   'branch.branchList': () => {
-    return Branch.find({}, { fields: { branchName: 1, branchCode: 1 } }, { sort: { branchName: 1 } }).fetch();
+    return Branch.find({ disabled: 'N' }, { sort: { bPLName: 1 } }).fetch();
   },
-  'branch.branchListVertical': (vertical) => {
-    let verticalVar = [];
-    verticalVar.push(vertical);
-    console.log("vertical ", verticalVar);
-    return Branch.find({ vertical: { $in: verticalVar } }, { fields: { branchName: 1, branchCode: 1 } }, { sort: { branchName: 1 } }).fetch();
+  'branch.userBranchList': (branch) => {
+    return Branch.find({ disabled: 'N', bPLId: { $in: branch } }, { sort: { bPLName: 1 } }).fetch();
+  },
+  'branch.listGet': (branch) => {
+    let branchArray = [];
+    let res = Branch.find({ disabled: 'N', bPLId: { $in: branch } },
+      { sort: { bPLName: 1 } }, { fields: { bPLName: 1 } }).fetch();
+    if (res.length > 0) {
+      for (let i = 0; i < res.length; i++) {
+        branchArray.push(res[i].bPLName);
+      }
+    }
+    return branchArray.toString();
   },
   /**
-   * activate branch
-   * @param {*} id  
-   * @returns 
+   * TODO:Complet Js doc
+   * Fetching the branch name with branch id 
    */
-  'branch.active': (id) => {
-    return Branch.update({ _id: id }, {
-      $set:
-      {
-        active: 'Y',
-        updatedBy: Meteor.userId(),
-        updatedAt: new Date(),
-      }
-    });
+  'branch.branchBPLId': (id) => {
+    return Branch.findOne({ bPLId: id, disabled: 'N' }).bPLName;
+  },
+  'branch.branchUser': (b) => {
+    let res = Branch.findOne({ bPLId: b, disabled: 'N' });
+    if (res !== undefined && res !== '') {
+      return res.bPLName;
+    }
   },
 
   /**
- * deactivate branch
- * @param {*} id  
- * @returns 
+  * TODO:Complet Js doc
+  * Fetching the branch name with branch id 
+  */
+  'branch.idBranchName': (id) => {
+    let res = Branch.findOne({ bPLId: id });
+    if (res) {
+      return res.bPLName;
+    }
+  },
+  /**
+* TODO:Complet Js doc
+* Fetching the branch name with branch id 
+*/
+  'branch.managerBranchGet': (branch) => {
+    return Branch.find({ bPLId: { $in: branch } }, { fields: { bPLId: 1, bPLName: 1 } }).fetch();
+
+  },
+  /**
+ * TODO:Complet Js doc
+ * Fetching the branch name with branch id 
  */
-  'branch.inactive': (id) => {
+  'branch.findOneCust': (id) => {
+    return Branch.findOne({ bPLId: id, disabled: 'N' }, { fields: { dflVendor: 1, dflCust: 1 } });
+  },
+  /**
+   * TODO:Complet Js doc
+   * Fetching the branch name with branch id 
+   */
+  'branch.findOne': (id) => {
+    return Branch.findOne({ bPLId: id, disabled: 'N' });
+  },
+  'branch.defWare': (brnch) => {
+    return Branch.findOne({ dflWhs: brnch, disabled: 'N' }).bPLName;
+  },
+  /**
+ * TODO:Complete Js doc
+ * Fetching the branch full list
+ */
+  'branch.branchNameGet': () => {
+    return Branch.find({ disabled: 'N' }, { fields: { bPLName: 1, bPLId: 1, address: 1 } }).fetch();
+  },
+  /**
+   * TODO:Complete Js doc
+   * Getting user branch
+   */
+  'branch.branchUserList': () => {
+    if (Meteor.user() !== undefined && Meteor.user() !== null) {
+      return Branch.find({ bPLId: { $in: Meteor.user().branch }, disabled: 'N' }, { sort: { bPLName: 1 } },
+        { fields: { bPLName: 1, bPLId: 1, dflWhs: 1 } }).fetch();
+    }
+
+  },
+  'branch.branchListArInv': (branch) => {
+    return Branch.find({ bPLId: branch, disabled: 'N' }, { fields: { bPLName: 1, bPLId: 1, dflWhs: 1 } }).fetch();
+  },
+  'branch.branchDetail': (branch) => {
+    return Branch.findOne({ bPLId: branch, disabled: 'N' });
+  },
+  'branch.dataSync': () => {
+    let base_url = Config.findOne({
+      name: 'base_url'
+    }).value;
+    let dbId = Config.findOne({
+      name: 'dbId'
+    }).value;
+    let url = base_url + branchDataGet_Url;
+    let dataArray = {
+      dbId: dbId
+    };
+    let options = {
+      data: dataArray,
+      headers: {
+        'content-type': 'application/json'
+      }
+    };
+    HTTP.call("POST", url, options, (err, result) => {
+      if (err) {
+        return err;
+      } else {
+        let branchResult = result.data.data;
+
+        for (let i = 0; i < branchResult.length; i++) {
+
+          let BFind = Branch.find({
+            bPLId: branchResult[i].BPLId
+          }).fetch();
+          if (BFind.length === 0) {
+            Branch.insert({
+              bPLId: branchResult[i].BPLId,
+              bPLName: branchResult[i].BPLName,
+              dflWhs: branchResult[i].DflWhs,
+              disabled: branchResult[i].Disabled,
+              address: branchResult[i].Address,
+              pmtClrAct: branchResult[i].PmtClrAct,
+              acctName: branchResult[i].AcctName,
+              dflCust: branchResult[i].DflCust,
+              dflVendor: branchResult[i].DflVendor,
+              streetNo: branchResult[i].StreetNo,
+              u_cashAcct: branchResult[i].U_CashAcct,
+              createdAt: new Date(),
+              uuid: Random.id()
+            });
+          } else {
+            Branch.update(BFind[0]._id, {
+              $set: {
+                bPLId: branchResult[i].BPLId,
+                bPLName: branchResult[i].BPLName,
+                dflWhs: branchResult[i].DflWhs,
+                disabled: branchResult[i].Disabled,
+                address: branchResult[i].Address,
+                pmtClrAct: branchResult[i].PmtClrAct,
+                acctName: branchResult[i].AcctName,
+                dflCust: branchResult[i].DflCust,
+                dflVendor: branchResult[i].DflVendor,
+                streetNo: branchResult[i].StreetNo,
+                u_cashAcct: branchResult[i].U_CashAcct,
+                updatedAt: new Date()
+              }
+            });
+
+          }
+          console.log("/**i**/", i);
+        }
+      }
+    });
+  },
+  'branch.branchDefaultCustomer': (branch) => {
+    return Branch.findOne({ bPLId: branch, disabled: 'N' }).dflCust;
+  },
+  'branch.branchDetailsGet': (id) => {
+    let branchRes = Branch.findOne({ _id: id });
+    let whsName = '';
+    let whsRes = WareHouse.findOne({ whsCode: branchRes.dflWhs });
+    if (whsRes) {
+      whsName = whsRes.whsName;
+    }
+    let dflCustName = '';
+    let defCustRes = Customer.findOne({ cardCode: branchRes.dflCust });
+    if (defCustRes) {
+      dflCustName = defCustRes.cardName;
+    }
+    let dflVenderName = '';
+    let dflVenderRes = Customer.findOne({ cardCode: branchRes.dflVendor });
+    if (dflVenderRes) {
+      dflVenderName = dflVenderRes.cardName;
+    }
+    return { branchRes: branchRes, whsName: whsName, dflCustName: dflCustName, dflVenderName: dflVenderName };
+  },
+  /**
+* TODO: Complete JS doc
+* 
+* @param cardCode
+* @param address
+* @param street
+* @param block
+* @param city
+* @param state
+*/
+  'branch.create': (branchName, branchCode, customerCode,
+    supplierCode, wareHouse, address, street, paymentClearAct) => {
+
+    let createdByName = '';
+    let user = Meteor.users.findOne({ _id: Meteor.userId() });
+    if (user !== undefined) {
+      createdByName = user.profile.firstName;
+    }
+
+    let branchId = Branch.insert({
+
+      bPLId: branchCode,
+      bPLName: branchName,
+      dflWhs: wareHouse,
+      disabled: "N",
+      address: address,
+      pmtClrAct: paymentClearAct,
+      acctName: "",
+      dflCust: customerCode,
+      dflVendor: supplierCode,
+      streetNo: street,
+      createdBy: Meteor.userId(),
+      createdByName: createdByName,
+      createdByWeb: true,
+      uuid: Random.id(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+    console.log("branch", branchId);
+    return branchId;
+  },
+
+  /**
+   * TODO: Complete JS doc
+   * 
+   * @param cardCode
+   * @param address
+   * @param street
+   * @param block
+   * @param city
+   * @param state
+    */
+  'branch.update': (id, branchName, branchCode, customerCode,
+    supplierCode, wareHouse, address, street, paymentClearAct) => {
+    let updatedByName = '';
+    let user = Meteor.users.findOne({ _id: Meteor.userId() });
+    if (user !== undefined) {
+      updatedByName = user.profile.firstName;
+    }
     return Branch.update({ _id: id }, {
       $set:
       {
-        active: 'N',
+        bPLId: branchCode,
+        bPLName: branchName,
+        dflWhs: wareHouse,
+        address: address,
+        pmtClrAct: paymentClearAct,
+        acctName: "",
+        dflCust: customerCode,
+        dflVendor: supplierCode,
+        streetNo: street,
         updatedBy: Meteor.userId(),
+        updatedName: updatedByName,
+        updatedAt: new Date(),
+      }
+    });
+  },
+  'branch.inactive': (id) => {
+    let updatedByName = '';
+    let user = Meteor.users.findOne({ _id: Meteor.userId() });
+    if (user !== undefined) {
+      updatedByName = user.profile.firstName;
+    }
+    return Branch.update({ _id: id }, {
+      $set:
+      {
+        disabled: "Y",
+        updatedBy: Meteor.userId(),
+        updatedName: updatedByName,
+        updatedAt: new Date(),
+      }
+    });
+  },
+  'branch.active': (id) => {
+    let updatedByName = '';
+    let user = Meteor.users.findOne({ _id: Meteor.userId() });
+    if (user !== undefined) {
+      updatedByName = user.profile.firstName;
+    }
+    return Branch.update({ _id: id }, {
+      $set:
+      {
+        disabled: "N",
+        updatedBy: Meteor.userId(),
+        updatedName: updatedByName,
         updatedAt: new Date(),
       }
     });
   },
   /**
-   * return active branch list
-   */
-  'branch.branchActiveList': () => {
-    return Branch.find({ active: "Y" }, { fields: { branchCode: 1, branchName: 1 } }, { sort: { branchName: 1 } }).fetch();
-  },
-  /**
-  * return active branch list
-  */
-  'branch.verticalListVar': (vertical) => {
-    let varAry = [];
-    varAry.push(vertical);
-    return Branch.find({ active: "Y", vertical: { $in: varAry } }, { fields: { branchCode: 1, branchName: 1 } }, { sort: { branchName: 1 } }).fetch();
-  },
-  'branch.verticalList': (vertical) => {
-    return Branch.find({ active: "Y", vertical: { $in: vertical } }, { fields: { branchCode: 1, branchName: 1 } }, { sort: { branchName: 1 } }).fetch();
-  },
-  'branch.verticalBranch': (vertical) => {
-    return Branch.find({ active: "Y", vertical: vertical }, { fields: { branchCode: 1, branchName: 1 } }, { sort: { branchName: 1 } }).fetch();
-  },
-  'branch.verticalBranch1': () => {
-    return Branch.find({ active: "Y" }, { fields: { branchCode: 1, branchName: 1 } }, { sort: { branchName: 1 } }).fetch();
-  },
-  /**
- * return active branch list
- */
-  'branch.verticalFullList': (vertical) => {
-    return Branch.find({ vertical: { $in: vertical } }, { fields: { branchCode: 1, branchName: 1 } }, { sort: { branchName: 1 } }).fetch();
-  },
-  /**
-   * get branch name based on id
-   * @param {*} id 
-   */
-  'branch.idBranchName': (id) => {
-    let res = Branch.findOne({ _id: id }, { fields: { branchName: 1 } });
-    if (res) {
-      return res.branchName;
-    }
-  },
-  'branch.withRegion': (region) => {
-    let userRes = allUsers.find({ branch: region, userType: 'SD' }).fetch();
-    let verticalArray = [];
-    if (userRes) {
-      for (let j = 0; j < userRes.length; j++) {
-        let verticalsAry = userRes[j].vertical;
-        for (let i = 0; i < verticalsAry.length; i++) {
-          let verticalRes = Verticals.findOne({ _id: verticalsAry[i] });
-          if (verticalRes) {
-            verticalArray.push(verticalRes);
-          }
+* TODO: Complete JS doc
+* 
+*/
+  'branch.createUpload': (branchArray) => {
+    if (branchArray !== undefined && branchArray !== []) {
+      for (let a = 0; a < branchArray.length; a++) {
+        let branchDetails = Branch.find({
+          bPLId: branchArray[a].bPLId,
+        }).fetch();
+        if (branchDetails.length === 0) {
+          Branch.insert({
+            bPLId: branchArray[a].bPLId,
+            bPLName: branchArray[a].bPLName,
+            dflWhs: branchArray[a].dflWhs,
+            address: branchArray[a].address,
+            pmtClrAct: branchArray[a].pmtClrAct,
+            dflCust: branchArray[a].dflCust,
+            dflVendor: branchArray[a].dflVendor,
+            streetNo: branchArray[a].streetNo,
+            acctName: "",
+            disabled: "N",
+            createdBy: Meteor.userId(),
+            createdByWeb: true,
+            uuid: Random.id(),
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          });
+        }
+        else {
+
+          Branch.update({
+            bPLId: branchArray[a].bPLId,
+            bPLName: branchArray[a].bPLName,
+          }, {
+            $set: {
+              bPLId: branchArray[a].bPLId,
+              bPLName: branchArray[a].bPLName,
+              dflWhs: branchArray[a].dflWhs,
+              address: branchArray[a].address,
+              pmtClrAct: branchArray[a].pmtClrAct,
+              dflCust: branchArray[a].dflCust,
+              dflVendor: branchArray[a].dflVendor,
+              streetNo: branchArray[a].streetNo,
+              updatedBy: Meteor.userId(),
+              updatedAt: new Date(),
+            }
+          });
         }
       }
     }
-    return verticalArray;
   },
-  'branch.withRegionVerical': (vertical) => {
-    let vertArray = [];
-    vertArray.push(vertical);
-    let regionList = Branch.find({ vertical: { $in: vertArray } }).fetch();
-    return regionList;
-
-  },
-  /**
-   * 
-   * @param {*} id 
-   * @returns get sd region
-   */
-  'branch.sdRegionGet': (id) => {
-    let sdDetials = allUsers.findOne({ _id: id }, { fields: { branch: 1 } });
-    if (sdDetials) {
-      let branchRes = Branch.findOne({ _id: sdDetials.branch }, { fields: { branchName: 1 } });
-      if (branchRes) {
-        return branchRes.branchName;
-      }
-    }
+  'branch.branch_id': (id) => {
+    return Branch.findOne({ _id: id });
   },
 });

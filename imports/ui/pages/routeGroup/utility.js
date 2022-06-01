@@ -9,10 +9,10 @@ import { HTTP } from 'meteor/http'
  * @param target
  * @param id
  */
-createrRouteGroup = (target, subDistributor, loginUserVerticals) => {
+createrRouteGroup = (target, customerArray, branch) => {
   let routeName = target.routeNameValue;
-  let description = target.descriptionVal;
-  Meteor.call('routeGroup.create', routeName.value, description.value, subDistributor, loginUserVerticals, (err, res) => {
+  let description = target.descriptionVal; 
+  Meteor.call('routeGroup.create', routeName.value, description.value, customerArray, branch, (err, res) => {
     if (err) {
       $('#routeErrorModal').modal();
       $('#routeErrorModal').find('.modal-body').text(err.reason);
@@ -31,20 +31,19 @@ createrRouteGroup = (target, subDistributor, loginUserVerticals) => {
  * update route based on id
  */
 
-editOrUpdateRouteGroup = (target, routeId, customerArray, loginUserVerticals) => {
+editOrUpdateRouteGroup = (target, routeId, customerArray) => {
   let routeName = target.routeNameEdit;
-  let description = target.routeDescripEdit;
-  Meteor.call('routeGroup.update', description.value, routeName.value, customerArray,
-    routeId, loginUserVerticals, (err, res) => {
-      if (err) {
-        $('#routeErrorModal').modal();
-        $('#routeErrorModal').find('.modal-body').text(err.reason);
-        $("#submit").attr("disabled", false);
-      }
-      else {
-        $('#routeSuccessModal').find('.modal-body').text('Route has been updated successfully');
-        $('#routeSuccessModal').modal();
-        $("#submit").attr("disabled", false);
-      }
-    });
+  let description = target.routeDescripEdit; 
+  Meteor.call('routeGroup.update', description.value,routeName.value, customerArray, routeId, (err, res) => {
+    if (err) {
+      $('#routeErrorModal').modal();
+      $('#routeErrorModal').find('.modal-body').text(err.reason);
+      $("#submit").attr("disabled", false);
+    }
+    else {
+      $('#routeSuccessModal').find('.modal-body').text('Route has been updated successfully');
+      $('#routeSuccessModal').modal();
+      $("#submit").attr("disabled", false);
+    }
+  });
 };

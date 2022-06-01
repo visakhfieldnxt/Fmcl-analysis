@@ -1,6 +1,7 @@
 /**
- * @author Nithin
+ * @author Visakh
  */
 
+
 stockTransferCollectionName = 'stockTransfer';
-export let StockTransfer = new Mongo.Collection(stockTransferCollectionName);
+export let StockTransfer = new Meteor.Collection(stockTransferCollectionName);

@@ -23,7 +23,7 @@ Template.routeAssign.onCreated(function () {
   this.routeAssignData = new ReactiveVar();
   this.branchEdits = new ReactiveVar();
   this.branchArrayList = new ReactiveVar();
-  this.sdList = new ReactiveVar();
+  // this.vansaleUserFullList = new ReactiveVar();
   this.assignedHistoryData = new ReactiveVar();
   this.routeUpdatedData = new ReactiveVar();
   this.bodyLoaders = new ReactiveVar();
@@ -31,51 +31,15 @@ Template.routeAssign.onCreated(function () {
   this.vanUsersFilter = new ReactiveVar();
   this.approvedData = new ReactiveVar();
   this.rejectedData = new ReactiveVar();
-  let loginUserVerticals = Session.get("loginUserVerticals");
-  let subDistributorValue = Session.get("subDistributorValue");
-  if (subDistributorValue === true) {
-    this.pagination = new Meteor.Pagination(RouteAssign, {
-      filters: {
-        active: "Y",
-        subDistributor: Meteor.userId()
-      },
-      sort: {
-        createdAt: -1
-      },
-      fields: {
-        routeId: 1,
-        routeDate: 1,
-        subDistributor: 1,
-        assignedTo: 1,
-        routeStatus: 1,
-        active: 1,
-        groupDeactivated: 1,
-        _id: 1,
-      },
-      perPage: 20
-    });
-  }
-  else {
-    this.pagination = new Meteor.Pagination(RouteAssign, {
-      filters: {
-        active: "Y",
-        // vertical: { $in: loginUserVerticals }
-      },
-      sort: {
-        createdAt: -1
-      },
-      fields: {
-        routeId: 1,
-        routeDate: 1,
-        subDistributor: 1,
-        assignedTo: 1,
-        routeStatus: 1,
-        active: 1,
-        groupDeactivated: 1
-      },
-      perPage: 20
-    });
-  }
+  this.pagination = new Meteor.Pagination(RouteAssign, {
+    filters: {
+      active: "Y",
+    },
+    sort: {
+      createdAt: -1
+    },
+    perPage: 20
+  });
 
 });
 
@@ -97,8 +61,8 @@ Template.routeAssign.onRendered(function () {
       });
     }
   }
-
-  Meteor.call('routeGroup.masterDataGet', (err, res) => {
+  let vansaleRoles = Session.get("vansaleRoles");
+  Meteor.call('routeGroup.masterForApprovalPages',vansaleRoles, (err, res) => {
     if (!err) {
       // this.vansaleUserFullList.set(res.userRes);
       this.routeCodeList.set(res.groupRes);
@@ -115,23 +79,7 @@ Template.routeAssign.onRendered(function () {
       this.branchArrayList.set(res);
     }
   });
-  let subDistributorValue = Session.get("subDistributorValue");
-  if (subDistributorValue === true) {
-    if (Meteor.user()) {
-      Meteor.call('user.sdUsersingleList', Meteor.userId(), (err, res) => {
-        if (!err) {
-          this.sdList.set(res);
-        }
-      });
-    }
-  }
-  else {
-    Meteor.call('user.sdUserFullList', (err, res) => {
-      if (!err) {
-        this.sdList.set(res);
-      }
-    });
-  }
+
 
   // Meteor.setInterval(() => {
   //   Meteor.call('routeGroup.masterDataGet', (err, res) => {
@@ -145,11 +93,11 @@ Template.routeAssign.onRendered(function () {
   /**
    * TODO: Complete JS doc
    */
-  $('#sdUserVal').select2({
-    placeholder: "Select Sub Distributor",
+  $('#routeCodeVal').select2({
+    placeholder: "Select Route Name",
     tokenSeparators: [',', ' '],
     allowClear: true,
-    dropdownParent: $("#sdUserVal").parent(),
+    dropdownParent: $("#routeCodeVal").parent(),
   });
 
   $('#selectAssignEmp').select2({
@@ -226,9 +174,6 @@ Template.routeAssign.helpers({
       return false;
     }
   },
-  sdUsersFullList: () => {
-    return Template.instance().sdList.get();
-  },
   /**
    * get vansale user name
    */
@@ -301,14 +246,12 @@ Template.routeAssign.helpers({
       $(".routeValTitle_" + id).attr("title", `Click To Deactivate ${result}`);
       $(".routeValTitleDe_" + id).attr("title", `Click To Activate ${result}`);
       $('#bodySpinVal').css('display', 'none');
-      $('.routeIdVals').val(result);
     }
     ).catch((error) => {
       $('.routeVal_' + id).html('');
       $(".routeValTitle_" + id).attr("title", `Click To Deactivate`);
       $(".routeValTitleDe_" + id).attr("title", `Click To Activate`);
       $('#bodySpinVal').css('display', 'none');
-      $('.routeIdVals').val('');
     });
   },
 
@@ -356,7 +299,30 @@ Template.routeAssign.helpers({
     return Template.instance().vansaleUsersData.get();
   },
 
+  /**
+ * get customer name
+ */
 
+  custNameHelp: (cardCode) => {
+    let promiseVal = new Promise((resolve, reject) => {
+      Meteor.call("customer.idCardName", cardCode, (error, result) => {
+        if (!error) {
+          resolve(result);
+        } else {
+          reject(error);
+        }
+      });
+    });
+    promiseVal.then((result) => {
+      $('.customerVal_' + cardCode).html(result);
+      $('.loadersSpinPromise').css('display', 'none');
+    }
+    ).catch((error) => {
+      $('.customerVal_' + cardCode).html('');
+      $('.loadersSpinPromise').css('display', 'none');
+    }
+    );
+  },
   /**
    * 
    *route assign data
@@ -412,7 +378,7 @@ Template.routeAssign.helpers({
   },
 
   routeAssignLists: function () {
-    let result = Template.instance().pagination.getPage(); 
+    let result = Template.instance().pagination.getPage();
     if (result.length === 0) {
       $('#bodySpinVal').css('display', 'none');
     }
@@ -544,30 +510,7 @@ Template.routeAssign.helpers({
       return '';
     }
   },
-  /**
- * get vansale user name
- */
 
-  getUserName: (user) => {
-    let promiseVal = new Promise((resolve, reject) => {
-      Meteor.call("user.idName", user, (error, result) => {
-        if (!error) {
-          resolve(result);
-        } else {
-          reject(error);
-        }
-      });
-    });
-    promiseVal.then((result) => {
-      $('.userIdVal_' + user).html(result);
-      $('#bodySpinVal').css('display', 'none');
-    }
-    ).catch((error) => {
-      $('.userIdVal_' + user).html('');
-      $('#bodySpinVal').css('display', 'none');
-    }
-    );
-  },
   /**
    * TODO:Complete Js doc
    * for getting order details
@@ -602,24 +545,23 @@ Template.routeAssign.events({
   'submit .route-filter': (event, template) => {
     event.preventDefault();
     $('#bodySpinVal').css('display', 'block');
-    let sdUser = event.target.sdUserVal.value;
+    let routeCode = event.target.routeCodeVal.value;
     let first = $("#fromDate").val();
     let second = $("#toDate").val();
     let dateOne = moment(first, 'DD-MM-YYYY').format('YYYY-MM-DD');
     let dateTwo = moment(second, 'DD-MM-YYYY').format('YYYY-MM-DD');
     let fromDate = new Date(dateOne);
     let toDate = new Date(dateTwo);
-    let vanEmp = '';
-
-    if (sdUser && isNaN(toDate) && isNaN(fromDate) && vanEmp === '') {
+    let vanEmp = event.target.selectVanemp.value;
+    if (routeCode && isNaN(toDate) && isNaN(fromDate) && vanEmp === '') {
       Template.instance().pagination.settings.set('filters',
         {
-          subDistributor: sdUser,
+          routeId: routeCode,
         }
       );
       $('.taskHeaderList').css('display', 'none');
     }
-    else if (sdUser === '' && isNaN(toDate) && isNaN(fromDate) && vanEmp) {
+    else if (routeCode === '' && isNaN(toDate) && isNaN(fromDate) && vanEmp) {
       Template.instance().pagination.settings.set('filters',
         {
           assignedTo: vanEmp,
@@ -627,11 +569,11 @@ Template.routeAssign.events({
       );
       $('.taskHeaderList').css('display', 'none');
     }
-    else if (sdUser && isNaN(toDate) && isNaN(fromDate) && vanEmp) {
+    else if (routeCode && isNaN(toDate) && isNaN(fromDate) && vanEmp) {
       Template.instance().pagination.settings.set('filters',
         {
           assignedTo: vanEmp,
-          subDistributor: sdUser,
+          routeId: routeCode,
         }
       );
       $('.taskHeaderList').css('display', 'none');
@@ -645,7 +587,7 @@ Template.routeAssign.events({
       });
       $('.taskHeaderList').css('display', 'none');
     }
-    else if (toDate && isNaN(fromDate) && sdUser === '' && vanEmp === '') {
+    else if (toDate && isNaN(fromDate) && routeCode === '' && vanEmp === '') {
       toDate.setDate(toDate.getDate() + 1);
       Template.instance().pagination.settings.set('filters', {
         routeDateIso: {
@@ -654,7 +596,7 @@ Template.routeAssign.events({
       });
       $('.taskHeaderList').css('display', 'none');
     }
-    else if (fromDate && toDate && sdUser === '' && vanEmp === '') {
+    else if (fromDate && toDate && routeCode === '' && vanEmp === '') {
       if (fromDate.toString() === toDate.toString()) {
         toDate.setDate(toDate.getDate() + 1);
         Template.instance().pagination.settings.set('filters', {
@@ -674,14 +616,14 @@ Template.routeAssign.events({
         $('.taskHeaderList').css('display', 'none');
       }
     }
-    else if (sdUser && toDate && fromDate && vanEmp === '') {
+    else if (routeCode && toDate && fromDate && vanEmp === '') {
       if (fromDate.toString() === toDate.toString()) {
         toDate.setDate(toDate.getDate() + 1);
         Template.instance().pagination.settings.set('filters', {
           routeDateIso: {
             $gte: fromDate, $lt: toDate
           },
-          subDistributor: sdUser,
+          routeId: routeCode,
         });
         $('.taskHeaderList').css('display', 'none');
       }
@@ -691,12 +633,12 @@ Template.routeAssign.events({
           routeDateIso: {
             $gte: fromDate, $lte: toDate
           },
-          subDistributor: sdUser,
+          routeId: routeCode,
         });
         $('.taskHeaderList').css('display', 'none');
       }
     }
-    else if (sdUser === '' && toDate && fromDate && vanEmp) {
+    else if (routeCode === '' && toDate && fromDate && vanEmp) {
       if (fromDate.toString() === toDate.toString()) {
         toDate.setDate(toDate.getDate() + 1);
         Template.instance().pagination.settings.set('filters', {
@@ -714,12 +656,11 @@ Template.routeAssign.events({
             $gte: fromDate, $lte: toDate
           },
           assignedTo: vanEmp,
-
         });
         $('.taskHeaderList').css('display', 'none');
       }
     }
-    else if (sdUser && toDate && fromDate && vanEmp) {
+    else if (routeCode && toDate && fromDate && vanEmp) {
       if (fromDate.toString() === toDate.toString()) {
         toDate.setDate(toDate.getDate() + 1);
         Template.instance().pagination.settings.set('filters', {
@@ -727,7 +668,7 @@ Template.routeAssign.events({
             $gte: fromDate, $lt: toDate
           },
           assignedTo: vanEmp,
-          subDistributor: sdUser,
+          routeId: routeCode,
         });
         $('.taskHeaderList').css('display', 'none');
       }
@@ -738,7 +679,7 @@ Template.routeAssign.events({
             $gte: fromDate, $lte: toDate
           },
           assignedTo: vanEmp,
-          subDistributor: sdUser,
+          routeId: routeCode,
         });
         $('.taskHeaderList').css('display', 'none');
       }
@@ -756,27 +697,22 @@ Template.routeAssign.events({
     let id = event.currentTarget.attributes.id.value;
     FlowRouter.go('routeWiseMap', { _id: id });
   },
+
+  'click .boundaryUpdates': (event, template) => {
+    event.preventDefault();
+    let id = event.currentTarget.attributes.id.value;
+    FlowRouter.go('routeBoundaryUpdate', { _id: id });
+  },
   /**
    * TODO: Complete JS doc
    * for reset filter
    */
   'click .reset': (event, target) => {
     // $('#bodySpinVal').css('display', 'block');
-    let subDistributorValue = Session.get("subDistributorValue");
-    let loginUserVerticals = Session.get("loginUserVerticals");
-    if (subDistributorValue === true) {
-      Template.instance().pagination.settings.set('filters', {
-        active: "Y",
-        subDistributor: Meteor.userId()
-      });
-    }
-    else {
-      Template.instance().pagination.settings.set('filters', {
-        active: "Y",
-        vertical: { $in: loginUserVerticals }
-      });
-    }
-    $('#sdUserVal').val('').trigger('change');
+    Template.instance().pagination.settings.set('filters', {
+      active: "Y"
+    });
+    $('#routeCodeVal').val('').trigger('change');
     $('#selectVanemp').val('').trigger('change');
     $('form :input').val("");
     $('.taskHeaderList').css('display', 'inline');
@@ -801,7 +737,10 @@ Template.routeAssign.events({
   'click .view': (event, template) => {
     event.preventDefault();
     template.modalLoader.set(true);
-    template.itemsDetailsList.set('');  
+    $('.loadersSpinPromise').css('display', 'block');
+    template.itemsDetailsList.set('');
+    template.routeAssignData.set('');
+    template.assignedHistoryData.set('');
     template.routeUpdatedData.set('');
     template.rejectedData.set('');
     template.approvedData.set('');
@@ -812,17 +751,16 @@ Template.routeAssign.events({
     let description = $('#detailDescription');
     let dateVal = $('#detailDate');
     let detailStatus = $('#detailStatus');
+    let detailBranch = $('#detailBranch');
     let detailedAssignedBy = $('#detailedAssignedBy');
     let detailedAssignedTo = $('#detailedAssignedTo');
     let detailedAssigneeRemark = $('#detailedAssigneeRemark');
     let detailedAssignedDate = $('#detailedAssignedDate');
     let detailDateEnd = $('#detailDateEnd');
-    let detailSubDistributor = $('#detailSubDistributor');
     $('#orderDetailPage').modal();
-    $(header).html('Details of Route');
     Meteor.call('routeAssign.id', id, (err, res) => {
       if (!err) {
-        template.modalLoader.set(false);
+        $(header).html('Details of Route');
         $(routeCode).html(res.routeGrpRes.routeCode);
         $(routeName).html(res.routeGrpRes.routeName);
         $(description).html(res.routeGrpRes.description);
@@ -842,11 +780,26 @@ Template.routeAssign.events({
           $(detailedAssignedDate).html('');
         }
         $(dateVal).html(res.routeAssignRes.routeDate);
-
+        if (res.branchName !== undefined) {
+          $(detailBranch).html(res.branchName);
+        }
+        else {
+          $(detailBranch).html('');
+        }
         $(detailStatus).html(res.routeAssignRes.routeStatus);
+        template.modalLoader.set(false);
         template.itemsDetailsList.set(res.customerDetailsArray);
+        if (res.customerDetailsArray.length === 0) {
+          $('.loadersSpinPromise').css('display', 'none');
+        }
         template.routeUpdatedData.set(res.routeUpdatesArray);
-        $(detailSubDistributor).html(res.subDitributorName);
+
+        if (res.routeAssignRes.routeStatus === 'Assigned' && res.routeAssignRes.approvalCheck === true) {
+          template.approvedData.set(res);
+        }
+        if (res.routeAssignRes.routeStatus === 'Rejected' && res.routeAssignRes.approvalCheck === true) {
+          template.rejectedData.set(res);
+        }
       }
       else {
         template.modalLoader.set(false);
@@ -931,7 +884,7 @@ Template.routeAssign.events({
     let confirmedUuid = $('#confirmedUuid');
     $('#routeDelConfirmation').modal();
     let _id = event.currentTarget.attributes.id.value;
-    let routeCode = $('#routeCode_' + _id).val(); 
+    let routeCode = $('#routeCode_' + _id).val();
     $(header).html(`Confirm Deactivation (${routeCode})`);
     $(confirmedUuid).val(_id);
   },
@@ -988,50 +941,22 @@ Template.routeAssign.events({
 * 
 */
   'click .activeFilter': (event, template) => {
-    event.preventDefault();
     $('#bodySpinVal').css('display', 'block');
-    Meteor.setTimeout(function () {
-      $('#bodySpinVal').css('display', 'none');
-    }, 3000);
-    let loginUserVerticals = Session.get("loginUserVerticals");
-    let subDistributorValue = Session.get("subDistributorValue");
-    if (subDistributorValue === true) {
-      Template.instance().pagination.settings.set('filters', {
-        active: "Y",
-        subDistributor: Meteor.userId()
-      });
-    }
-    else {
-      Template.instance().pagination.settings.set('filters', {
-        active: "Y",
-        // vertical: { $in: loginUserVerticals }
-      });
-    }
+    event.preventDefault();
+    Template.instance().pagination.settings.set('filters', {
+      active: "Y"
+    });
   },
   /**
   * TODO: Complete JS doc
   * 
   */
   'click .inactiveFilter': (event, template) => {
-    event.preventDefault();
     $('#bodySpinVal').css('display', 'block');
-    Meteor.setTimeout(function () {
-      $('#bodySpinVal').css('display', 'none');
-    }, 3000);
-    let loginUserVerticals = Session.get("loginUserVerticals");
-    let subDistributorValue = Session.get("subDistributorValue");
-    if (subDistributorValue === true) {
-      Template.instance().pagination.settings.set('filters', {
-        active: "N",
-        subDistributor: Meteor.userId()
-      });
-    }
-    else {
-      Template.instance().pagination.settings.set('filters', {
-        active: "N",
-        // vertical: { $in: loginUserVerticals }
-      });
-    }
+    event.preventDefault();
+    Template.instance().pagination.settings.set('filters', {
+      active: "N"
+    });
   },
 
   /**
@@ -1053,10 +978,10 @@ Template.routeAssign.events({
     let assignedNameDup = $('#assignedNameDup');
     let confirmedUuid = $('#confirmedUuidRemoveAssign');
     template.modalLoader.set(true);
-    Meteor.call('routeAssign.assignedIdName', _id, (userError, routeRes) => {
+    Meteor.call('routeAssign.id', _id, (userError, routeRes) => {
       if (!userError) {
         template.modalLoader.set(false);
-        let assignedTo = routeRes;
+        let assignedTo = routeRes.assignedToName;
         $(header).html('Confirm Deletion Of Assigned- ' + assignedTo);
         $(assignedNameDup).html(assignedTo);
         $(confirmedUuid).val(_id);
@@ -1094,13 +1019,15 @@ Template.routeAssign.events({
     $("#routeAssignModal").modal();
     $('#assignRemarks').val('');
     let confirmedUuid = $('#confirmedUuidAssign');
-    let _id = event.currentTarget.attributes.id.value; 
+    let _id = event.currentTarget.attributes.id.value;
+    console.log("_id", _id)
     let routeCode = $('#routeCodeGet_' + _id).val();
-    $('#assignRouteHeader').html(`Assign Route ( ${routeCode} )`);
+    $('#assignRouteHeader').html(`Assign Route`);
     $(confirmedUuid).val(_id);
     template.modalLoader.set(true);
     template.vansaleUsersData.set('');
-    Meteor.call('routeAssign.assignedEmployeeList', _id, (err, res) => {
+    let vansaleRoles = Session.get("vansaleRoles");
+    Meteor.call('routeAssign.assignedEmployeeList', _id,vansaleRoles, (err, res) => {
       if (!err) {
         template.vansaleUsersData.set(res.userRes);
         template.modalLoader.set(false);
@@ -1122,7 +1049,6 @@ Template.routeAssign.events({
     $('#selectAssignEmp').find(':selected').each(function () {
       employeename = $(this).val();
     });
-    let loginUserVerticals = Session.get("loginUserVerticals");
     let remarks = $('#assignRemarks').val();
     if (routeAssignVal === true) {
       toastr['error'](`Route already assigned !`);
@@ -1130,7 +1056,7 @@ Template.routeAssign.events({
     else {
       if (_id && $.trim(_id)) {
         $("#routeAssignModal").modal('hide');
-        Meteor.call('routeAssign.reAssignEmployee', $.trim(_id), employeename, remarks, loginUserVerticals, (error) => {
+        Meteor.call('routeAssign.reAssignEmployee', $.trim(_id), employeename, remarks, (error) => {
           if (error) {
             $('#routeErrorModal').modal();
             $('#routeErrorModal').find('.modal-body').text("Internal error - unable to remove entry. Please try again");

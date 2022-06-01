@@ -1,6 +1,6 @@
 /**
- * @author Greeshma
+ * @author Visakh
  */
- taxCollectionName = 'tax';
- export let Tax = new Meteor.Collection(taxCollectionName);
- 
+
+taxCollectionName = 'tax';
+export let Tax = new Mongo.Collection(taxCollectionName);

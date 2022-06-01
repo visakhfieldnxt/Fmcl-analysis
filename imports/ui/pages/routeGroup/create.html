@@ -2,7 +2,7 @@
   <form autocomplete="off" class="route-add" id="route">
     <div class="box box-default box-solid">
       <div class="box-header with-border bg-aqua">
-        <!-- <h3 class="box-title">Route Details</h3> -->
+        <h3 class="box-title">Route Details</h3>
         <button type="button" class="close closeRoute" id="closeRoute" data-dismiss="modal" aria-label="Close">
           <span style="margin-top: -65px;margin-left: -5px;position: absolute;" aria-hidden="true">×</span></button>
       </div>
@@ -17,16 +17,13 @@
                 <span id="routeCodeSpan"></span>
               </div>
               <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
-                <label for="customer">Select Sub Distributor <span class="asteric_red">*</span></label>
-                <select class="selectSdIds" style="width:100%;" required name="selectSdIds" id="selectSdIds">
-                  <option selected='selected' value="">Select Sub Distributor </option>
-                  {{# each sdUsersGet}}
-                  <option value="{{_id}}">{{profile.firstName}} {{profile.lastName}}</option>
+                <label for="customer">Select Branch <span class="asteric_red">*</span></label>
+                <select class="selectBranch" style="width:100%;" required name="branch" id="selectBranch">
+                  <option selected='selected' disabled value="">Select Branch</option>
+                  {{# each branchLists}}
+                  <option value="{{bPLId}}">{{bPLName}}</option>
                   {{/each}}
                 </select>
-                <span id="verticalSpan"> </span> <br>
-                <span id="branchSpan"></span> <br>
-                <span id="locationSpan"></span><br>
               </div>
             </div>
           </td>
@@ -42,7 +39,97 @@
             </div>
           </td>
         </tr>
+        <!-- <tr class="lightGreenBG">
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="customer">Select Customer <span class="asteric_red">*</span></label>
+                <select class="selectCustomers" style="width:100%;" name="selectCustomers" id="selectCustomers">
+                  <option selected='selected' value="">Select Customer</option>
+                  {{# each customersList}}
+                  <option value="{{cardCode}}">{{cardName}}</option>
+                  {{/each}}
+                </select>
+                <span id="customerArrayspan"></span>
+              </div>
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="Priority">Select Priority <span class="asteric_red">*</span></label>
+                <select class=" selectPriority" style="width:100%;" name="selectPriority" id="selectPriority">
+                  <option selected='selected' value="">Select Priority</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                </select>
+                <span id="priorityArrayspan"></span>
+              </div>
+            </div>
+          </td>
+        </tr> -->
+        <!-- <tr class="lightGreenBG">
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-12" style="padding: 10px">
+              </div>
+            </div>
+          </td>
+        </tr> -->
+        <!-- <tr class="lightGreenBG">
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-12" style="padding: 10px">
+                <button type="button" class="btn btn-success addCustomer"
+                  style="width:50%;padding: 10px;box-shadow: #a8a8a8 2px 3px 12px;">
+                  Add Customer
+                </button>
+              </div>
+            </div>
+          </td>
+        </tr> -->
+        <!-- <tr class="lightGreenBG">
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-12" style="padding: 10px">
+              </div>
+            </div>
+          </td>
+        </tr> -->
       </table>
+      <!-- {{#with customerDataArrayList}}
+      <span style="padding-left: 10px;"><label for="Employee " style="font-weight: bold; color: black;">
+          Customer List</label></span>
+      <div id="detailUsername" class="table-responsive" style="border: none;">
+        <div class="row ">
+          <table style="width:100%;table-layout: fixed; border: solid 1px #e0d8d8;"
+            class="table table-striped with-border">
+            <thead>
+              <tr class="bg-light-blue-4">
+                <th width="100px">Sl No. </th>
+                <th width="200px">Customer Name </th>
+                <th width="110px">Priority</th>
+                <th width="110px"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each customerDataArrayList}}
+              <tr class="table-border">
+                <td>{{incremented @index}}</td>
+                <td style="word-wrap: break-word">{{custNameHelp customer}}</td>
+                <td>{{priority}}</td>
+                <td>
+                  <a href="javascript:void(0)" class="deleteCustumer" style="border:none !important;font-size: 17px;"
+                    id="{{randomId}}" title="Click To Delete Customer">
+                    <i class="fa fa-close danger-color"></i>
+                  </a>
+                </td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {{/with}} -->
     </div>
     <button type="submit" name="submit" id="submit" class="btn btn-primary pull-right">Save Route</button>
     <button type="button" class="btn btn-default closeRoute" data-dismiss="modal">Close</button>

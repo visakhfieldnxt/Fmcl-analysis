@@ -9,8 +9,7 @@ Meteor.startup(() => {
   /**
  * TODO: Complete JS invResult
  */
-  Attendance._ensureIndex({ uuid: 1 }, { unique: false });
-  Attendance._ensureIndex({ createdAt: 1 }, { unique: false });
+  Attendance.createIndex({ uuid: 1 }, { unique: false });
   publishPagination(Attendance);
 
 });

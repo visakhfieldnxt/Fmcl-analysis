@@ -97,7 +97,7 @@
           <table class="table table-striped generic" style="width:100%;margin-bottom:0;table-layout: fixed">
             <tbody>
               <tr>
-                <th class="text-center sorted-column" style="width:40px">Sl.No</th>
+                <th class="text-center sorted-column" style="width:10px">Sl.No</th>
                 <th class="text-center sorted-column" style="width:200px">Sales Person</th>
                 <th class="text-center sorted-column" style="width:200px">Route Code</th>
                 <th class="text-center sorted-column" style="width:200px">Route Name</th>
@@ -106,12 +106,12 @@
               </tr>
               {{#each orderes}}
               <tr class="view " title="Click to view details" id="{{_id}}">
-                <td class="text-center" style="width:40px">{{incremented @index}}</td>
-                <td class="text-center" width="200px"> {{vanUserName assignedTo}}</td>
-                <td class="text-center" style="width:200px">{{routeCodeHelp routeId}}</td>
-                <td class="text-center" style="width:200px">{{routeNameHelp routeId}}</td>
-                <td class="text-center" style="width:200px">{{routeBranchHelp routeId}}</td>
-                <td class="text-center" width="200px">{{customerCount _id}}</td>
+                <td class="text-center" style="width:10px">{{indexCountGet @index}}</td>
+                <td class="text-center vanUserName_{{assignedTo}}" width="200px"> {{vanUserName assignedTo}}</td>
+                <td class="text-center routeCodeVal_{{routeId}}" style="width:200px">{{routeCodeHelp routeId}}</td>
+                <td class="text-center routeVal_{{routeId}}" style="width:200px">{{routeNameHelp routeId}}</td>
+                <td class="text-center branchVal_{{routeId}}" style="width:200px">{{routeBranchHelp routeId}}</td>
+                <td class="text-center outletCount_{{_id}}" width="200px">{{totalCust _id}}</td>
               </tr>
               {{/each}}
             </tbody>
@@ -144,8 +144,7 @@
       {{/with}}
     </div>
     {{/if}}
-    {{#if printLoadBody}}
-    <div id="bodySpin" style=" width: 100%;position: 
+    <div id="bodySpinVal" style=" width: 100%;position: 
     fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
       {{#with bodyLoader}}
       <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
@@ -154,10 +153,6 @@ justify-content: center;background: #f1f1f1;">
       </div>
       {{/with}}
     </div>
-    {{else}}
-    <div id="bodySpin">
-    </div>
-    {{/if}}
 
   </section>
 
@@ -237,9 +232,11 @@ justify-content: center;background: #f1f1f1;">
                     {{#each routeDataList}}
                     <tr class="table-border">
                       <td class="text-center sorted-column" style="word-wrap: break-word">{{incremented @index}}</td>
-                      <td class="text-center sorted-column" style="word-wrap: break-word">{{custNameHelp customer}}</td>
-                      <td class="text-center sorted-column" style="word-wrap: break-word">{{addressNameGetHelp customer
-                        routeGroup}}</td>
+                      <td class="text-center sorted-column customerVal_{{customer}}" style="word-wrap: break-word">
+                        {{custNameHelp customer}}</td>
+                      <td class="text-center sorted-column custAdd_{{_id}}" style="word-wrap: break-word">
+                        {{addressNameGetHelp customer
+                        routeGroup _id}}</td>
                       <td class="text-center sorted-column" style="word-wrap: break-word">{{dateValue}} {{checkIn}}</td>
                       <td class="text-center sorted-column" style="word-wrap: break-word">{{dateValue}} {{checkOut}}
                       </td>
@@ -272,6 +269,15 @@ justify-content: center;background: #f1f1f1;">
           <div class="loadersSpin">
           </div>
           {{/if}}
+          <div class="loadersSpinPromise" style=" width: 98%;opacity: 0.9;position: 
+          absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+            {{#with printLoaderImage}}
+            <div class="loader-lg" style="width: 100%;height: 100%;display: 
+            flex; align-items: center;justify-content: center;background: #fff;">
+              <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+            </div>
+            {{/with}}
+          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default closen" data-dismiss="modal">Close</button>
@@ -297,11 +303,15 @@ justify-content: center;background: #f1f1f1;">
       {{#each orderByDateExport}}
       <tr id="{{_id}}">
         <td class="text-center sorted-column" style="width:100px">{{incremented @index}}</td>
-        <td class="text-center" width="200px"> {{vanUserName routeData.assignedTo}}</td>
-        <td class="text-center" style="width:200px">{{routeCodeHelp routeData.routeId}}</td>
-        <td class="text-center" style="width:200px">{{routeNameHelp routeData.routeId}}</td>
-        <td class="text-center" style="width:200px">{{routeBranchHelp routeData.routeId}}</td>
-        <td class="text-center" width="200px">{{customerCount routeData._id}}</td>
+        <td class="text-center vanUserName_{{routeData.assignedTo}}" width="200px"> {{vanUserName routeData.assignedTo}}
+        </td>
+        <td class="text-center routeCodeVal_{{routeData.routeId}}" style="width:200px">{{routeCodeHelp
+          routeData.routeId}}</td>
+        <td class="text-center routeVal_{{routeData.routeId}}" style="width:200px">{{routeNameHelp routeData.routeId}}
+        </td>
+        <td class="text-center branchVal_{{routeData.routeId}}" style="width:200px">{{routeBranchHelp
+          routeData.routeId}}</td>
+        <td class="text-center outletCount_{{routeData._id}}" width="200px">{{totalCust routeData._id}}</td>
         <td class="text-center sorted-column" style="width:500px">
           <table style="width:100%" class="table table-striped with-border">
             <thead>
@@ -320,9 +330,11 @@ justify-content: center;background: #f1f1f1;">
               {{#each routeUpdateData}}
               <tr class="table-border">
                 <td class="text-center sorted-column" style="word-wrap: break-word">{{incremented @index}}</td>
-                <td class="text-center sorted-column" style="word-wrap: break-word">{{custNameHelp customer}}</td>
-                <td class="text-center sorted-column" style="word-wrap: break-word">{{addressNameGetHelp customer
-                  routeGroup}}</td>
+                <td class="text-center sorted-column customerVal_{{customer}}" style="word-wrap: break-word">
+                  {{custNameHelp customer}}</td>
+                <td class="text-center sorted-column custAdd_{{_id}}" style="word-wrap: break-word">{{addressNameGetHelp
+                  customer
+                  routeGroup _id}}</td>
                 <td class="text-center sorted-column" style="word-wrap: break-word">{{dateValue}} {{checkIn}}</td>
                 <td class="text-center sorted-column" style="word-wrap: break-word">{{dateValue}} {{checkOut}}
                 </td>
@@ -361,7 +373,32 @@ justify-content: center;background: #f1f1f1;">
                 <tbody>
                   <tr>
                     <td>
-                      <label for="Employee ">From Date </label>
+                      <label for="EMPcode">Branch</label><br>
+                      <select value='' name="selectBranchNameExport" style="width:100% !important"
+                        id="selectBranchNameExport" class="selectBranchNameExport" placeholder="Select Branch Name">
+                        <option value="">Select Branch</option>
+                        {{# each branchList}}
+                        <option value="{{bPLId}}">{{bPLName}}</option>
+                        {{/each}}
+                      </select>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label for="EMPcode">Employee</label>
+                      <select name="selectVanempExport" style="width:100% !important" id="selectVanempExport"
+                        class="selectVanempExport" placeholder="Select Employee Name">
+                        <option disabled selected value=''>Select Employee Name</option>
+                        {{# each vanUserList}}
+                        <option value="{{_id}}">{{profile.firstName}} {{profile.lastName}}
+                        </option>
+                        {{/each}}
+                      </select>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label for="Employee ">From Date <span class="asteric_red">*</span> </label>
                       <input type="text" autocomplete="off" class="form-control datepicker date validation startDate"
                         data-date-autoclose="true" onkeydown="event.preventDefault()" id="my-datepicker"
                         data-provide="datepicker" data-date-format="dd-mm-yyyy" placeholder="From Date "
@@ -371,12 +408,17 @@ justify-content: center;background: #f1f1f1;">
                   </tr>
                   <tr>
                     <td>
-                      <label for="firstName">To Date </label>
+                      <label for="firstName">To Date <span class="asteric_red">*</span> </label>
                       <input type="text" autocomplete="off" class="form-control datepicker date validation endDate"
                         data-date-autoclose="true" onkeydown="event.preventDefault()" id="my-datepicker" disabled='true'
                         data-provide="datepicker" data-date-format="dd-mm-yyyy" placeholder="To Date " name="endDate"
                         required />
                       <span id="endDateSpan"></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-center">
+                      <span id="emptyDataSpan"></span>
                     </td>
                   </tr>
                 </tbody>

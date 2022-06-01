@@ -1,5 +1,5 @@
 /**
- * @author Nithin
+ * @author Visakh
  */
 
 import {TempSerialNo} from "../tempSerialNo";
@@ -8,7 +8,7 @@ import {publishPagination} from 'meteor/kurounin:pagination';
 
 Meteor.startup(() => { 
 
-  TempSerialNo._ensureIndex({ uuid: 1}, { unique: true}); 
+  TempSerialNo.createIndex({ uuid: 1}, { unique: true}); 
   publishPagination(TempSerialNo);
 
 });

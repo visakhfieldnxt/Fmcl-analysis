@@ -26,7 +26,7 @@ Template.collectionReport.onCreated(function () {
     filters: {
       branch: { $in: managerBranch },
     }, sort: { createdAt: -1 },
-    perPage: 20
+    perPage: 25
   });
 })
 
@@ -55,7 +55,23 @@ Template.collectionReport.helpers({
   optionsHelper: () => {
     return globalOptionsHelper(orderCollectionName);
   },
-
+  /**
+ * 
+ * @param {*} index 
+ * @returns get row index
+ */
+  indexCountGet: (index) => {
+    let res = Template.instance().pagination;
+    if (res) {
+      let pageValue = res.settings.keys.page;
+      if (pageValue !== undefined && pageValue > 1) {
+        return (25 * (pageValue - 1)) + index + 1;
+      }
+      else {
+        return index + 1;
+      }
+    }
+  },
   /**
    * TODO: Complete JS doc
    * @returns {{collection: *, acceptEmpty: boolean, substitute: string, eventType: string}}
@@ -81,7 +97,10 @@ Template.collectionReport.helpers({
   isReady: function () {
     return Template.instance().pagination.ready();
   },
-
+  currencyGet: () => {
+    let currencyValues = Session.get("currencyValues");
+    return currencyValues;
+  },
   /**
    * TODO: Complete JS doc
    * @returns {Meteor.Pagination}
@@ -292,7 +311,7 @@ Template.collectionReport.events({
     let chequeAmount = $('#detailChequeAmount');
     let createdBy = $('#detailCreatedBy');
     let detailCollectionId = $('#detailCollectionId');
-
+    let currencyValues = Session.get("currencyValues");
     $('#orderDetailPage').modal();
     Meteor.call('collectionDueToday.id', id, (collectionError, collectionResult) => {
       if (!collectionError) {
@@ -315,7 +334,7 @@ Template.collectionReport.events({
         }
         $(date).html(moment(collection.date).format("DD-MM-YYYY hh:mm:ss A"));
         let cashAmt = Number(collection.invoicePayment.sumApplied).toFixed(6);
-        $(cashAmount).html('<b>ZMW</b>' + ' ' + cashAmt.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
+        $(cashAmount).html(`<b>${currencyValues}</b>` + ' ' + cashAmt.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
         $(chequeAmount).html(collection.chequeSum);
         $(createdBy).html(collection.createdBy);
         template.cashArrays.set(collection.cashInfo);

@@ -1,6 +1,8 @@
 /**
  * @author Visakh
  */
+
+
 Template.login_view.onCreated(function() {
   Blaze._allowJavascriptUrls();
   });

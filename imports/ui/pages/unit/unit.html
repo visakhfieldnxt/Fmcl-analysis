@@ -1,20 +1,20 @@
 <template name="unit">
-   {{#if userCan 'unitView'}}
+  {{#if userCan 'masterDataView'}}
   <section class="content-header">
-    <h1>Units
-      <small>Listing All Units</small>
+    <h1>Unit
+      <small>Listing All Unit</small>
     </h1>
     <ol class="breadcrumb">
       <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
-      <li class="active">Units</li>
+      <li class="active">Unit</li>
     </ol>
   </section>
   <section class="content">
 
     <div class="row">
       <div style="float: right;">
+        {{#if userCan 'masterDataCreate'}}
         <button class="btn btn-primary btn-flat" id="fileUploadunit">Upload</button>
-        {{#if userCan 'unitCreate'}}
         <button class="btn btn-primary btn-flat" id="ic-create-unit-button">Create Unit</button>
         {{/if}}
         <button class="btn btn-primary btn-flat" id="filterSearch"><i class="fa fa-search"> </i>&nbsp; Search</button>
@@ -24,42 +24,35 @@
     <div class="row" id="filterDisplay" style="display:none">
       <div class="box box-default box-solid">
         <div class="box-header with-border bg-aqua">
-          <h3 class="box-title"  style="color: black;">Unit Filter</h3><button type="button" id="removeSearch"
-            style="color: black; background-color: transparent; border-color:transparent" class="pull-right"><i
-              class="fa fa-close" style="color: black;"></i></button>
+          <h3 class="box-title">Unit Filter</h3><button type="button" id="removeSearch"
+            style="color: white; background-color: transparent; border-color:transparent" class="pull-right"><i
+              class="fa fa-close"></i></button>
         </div>
         <div class="box-body no-padding">
           <form class="unitFilter">
             <div class="row">
 
-              <!-- <div class="col-sm-4" style="padding: 10px 10px 10px 10px;">
-                <label for="unit">Unit Code</label>
+              <div class="col-sm-4" style="padding: 10px 10px 10px 10px;">
+                <label for="branch">Item Name <span class="asteric_red">*</span></label>
+                <select class="unitEntrySelection" style="width:100%;" name="unitEntrySelection"
+                  id="unitEntrySelection">
+                  <option disabled selected value=''>Select Item</option>
+                  {{# each itemsList}}
+                  <option value="{{ugpCode}}">{{itemNam}}</option>
+                  {{/each}}
+                </select>
+              </div>
+
+              <div class="col-sm-4" style="padding: 10px 10px 10px 10px;">
+                <label for="branch">Unit<span class="asteric_red">*</span></label>
                 <select class="unitCodeSelection" style="width:100%;" name="unitCodeSelection" id="unitCodeSelection">
-                  <option disabled selected value=''>Select Unit Code</option>
-                  {{# each unitLists}}
-                  <option value="{{unitCode}}">{{unitCode}}</option>
+                  <option disabled selected value=''>Select Unit</option>
+                  {{# each unitsLists}}
+                  <option value="{{uomCode}}">{{uomCode}}</option>
                   {{/each}}
                 </select>
-              </div>
-              <div class="col-sm-4" style="padding: 10px 10px 10px 10px;">
-                <label for="unit">Unit Name</label>
-                <select class="unitNameSelection" style="width:100%;" name="unitNameSelection" id="unitNameSelection">
-                  <option disabled selected value=''>Select Unit Name</option>
-                  {{# each unitLists}}
-                  <option value="{{unitName}}">{{unitName}}</option>
-                  {{/each}}
-                </select>
-              </div> -->
-              <div class="col-sm-4" style="padding: 10px 10px 10px 10px;">
-                <label for="product">Product Name</label>
-                <select class="productNameSelection" style="width:100%;" name="productNameSelection"
-                  id="productNameSelection">
-                  <option disabled selected value=''>Select Product Name</option>
-                  {{# each productLists}}
-                  <option value="{{_id}}">{{productName}}</option>
-                  {{/each}}
-                </select>
-              </div>
+              </div> 
+
               <div class="row" style="float: right">
                 <button type="submit" name="filter" class="btn btn-primary">Filter</button>
                 <button type="button" name="reset" class="btn btn-info reset">Reset Filter</button>
@@ -72,10 +65,11 @@
     </div>
 
     <div class="row">
-      <!-- {{#if isReady}}
+      {{#if isReady}}
       {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
       onClick=clickEvent}}
-      {{/if}} -->
+      {{/if}}
+
       <div class="nav-tabs-custom taskHeader" id="taskHeader">
         <ul class="nav nav-tabs taskHeaderList" id="taskHeaderList">
           <li class="active paginationFilterValue activeFilter activeHeaders" id="activeFilter"><a href=""
@@ -86,43 +80,42 @@
         </ul>
         <div class="tab-content" style="padding : 0px !important">
           <div class="box box-default box-solid">
-            <!-- <div class="box-header with-border bg-aqua">
-              <h3 class="box-title">Units</h3>
-            </div> -->
+            <div class="box-header with-border bg-aqua">
+              <h3 class="box-title">Branch</h3>
+            </div>
             {{#if isReady}}
             <div class="box-body no-padding table-responsive">
               <table class="table table-striped generic">
                 <tbody>
                   <tr>
-                    <th class="sorted-column text-center">Unit Code</th>
-                    <th class="text-center sorted-column">Unit Name</th>
-                    <th class="text-center sorted-column">Product</th>
+                    <th class="text-center pl-20 sorted-column" id="name">Uom Code</th>
+                    <th class="sorted-column text-center">Uom Entry</th>
+                    <th class="text-center pl-20 sorted-column" id="name">Item Name</th>
+                    <th class="sorted-column text-center">Base Quantity</th>
                     <th class="text-center sorted-column"> </th>
                   </tr>
                   {{#each unitList}}
                   <tr>
-                    <td class="text-center sorted-column " width="15%">{{unitCode}}</td>
-                    <td class="text-center sorted-column" width="15%">{{unitName}}</td>
-                    <td class="text-center sorted-column productIdVal_{{product}}" width="30%"
-                      style="word-wrap:break-word;">
-                      {{getProductName product}}</td>
+                    <td class="text-center pl-20 sorted-column" id="name">{{uomCode}}</td>
+                    <td class="text-center sorted-column">{{uomEntry}}</td>
+                    <td class="text-center sorted-column" id="name">{{itemNameGet ugpCode}}</td>
+                    <td class="text-center sorted-column">{{baseQty}}</td>
                     <td class="text-center" width="25%">
-                      <input type="hidden" id="unitName_{{_id}}" value="{{unitName}}">
-                       {{#if userCan 'unitUpdate'}}
-                      <a href="javascript:void(0)" class="edit" title="Click to edit {{unitName}}" id="{{_id}}">
+                      {{#if userCan 'masterDataUpdate'}}
+                      <input type="hidden" id="bPLName_{{_id}}" value="{{bPLName}}">
+                      <a href="javascript:void(0)" class="edit" title="Click to edit {{bPLName}}" id="{{_id}}">
                         <button class="pd-20 btn btn-primary"><i class="fa fa-pencil"></i></button>
-                      </a> {{/if}}
-
-                      &nbsp;
-                      {{#if userCan 'unitDelete'}}
-                      {{#if activeHelper active}}
-                      <a href="javascript:void(0)" class="deactivate" title="Click to inactivate {{unitName}}"
+                      </a> &nbsp;
+                      {{/if}}
+                      {{#if userCan 'masterDataDelete'}}
+                      {{#if activeHelper disabled}}
+                      <a href="javascript:void(0)" class="deactivate" title="Click to inactivate {{uomCode}}"
                         id="{{_id}}">
                         <button class="pd-20 btn btn-danger"><i class="fa fa-close"></i></button>
                       </a>&nbsp;
                       {{/if}}
-                      {{#if inactiveHelper active}}
-                      <a href="javascript:void(0)" class="activate" title="Click to activate {{unitName}}" id="{{_id}}">
+                      {{#if inactiveHelper disabled}}
+                      <a href="javascript:void(0)" class="activate" title="Click to activate {{uomCode}}" id="{{_id}}">
                         <button class="pd-20 btn btn-success"><i class="fa fa-check"></i></button>
                       </a> &nbsp;
                       {{/if}}
@@ -146,11 +139,11 @@
           </div>
         </div>
       </div>
-
       {{#if isReady}}
       {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
       onClick=clickEvent}}
       {{/if}}
+
     </div>
     {{#if isReady}}
     <div id="bodySpin">
@@ -166,15 +159,22 @@
       {{/with}}
     </div>
     {{/if}}
-    <div id="bodySpinLoaders" style=" width: 100%;position: 
-    fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+
+    {{#if printLoadBody}}
+    <div id="bodySpin" style=" width: 100%;position: 
+          fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
       {{#with bodyLoader}}
       <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
-justify-content: center;background: #f1f1f1;">
+      justify-content: center;background: #f1f1f1;">
         <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
       </div>
       {{/with}}
     </div>
+    {{else}}
+    <div id="bodySpin">
+    </div>
+    {{/if}}
+
   </section>
 
   <div class="ic-create-unit-modal">
@@ -182,6 +182,8 @@ justify-content: center;background: #f1f1f1;">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
+            <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span></button> -->
             <h4 class="modal-title">Create Unit</h4>
           </div>
           <div class="modal-body">
@@ -237,6 +239,7 @@ justify-content: center;background: #f1f1f1;">
     </div>
   </div>
 
+
   <div class="modal fade in" id="unitDelConfirmation">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -255,8 +258,7 @@ justify-content: center;background: #f1f1f1;">
         </div>
         <div class="modal-footer">
           <button id="unitRemove" class="btn btn-danger">Yes please!</button>
-          <button type="button" class="btn btn-default" data-dismiss="modal" id="unitClose">Not
-            now</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal" id="unitClose">Not now</button>
         </div>
       </div>
     </div>
@@ -280,8 +282,7 @@ justify-content: center;background: #f1f1f1;">
         </div>
         <div class="modal-footer">
           <button id="unitActivate" class="btn btn-success">Yes please!</button>
-          <button type="button" class="btn btn-default" data-dismiss="modal" id="unitClose">Not
-            now</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal" id="unitClose">Not now</button>
         </div>
       </div>
     </div>
@@ -290,6 +291,7 @@ justify-content: center;background: #f1f1f1;">
   <div class="modal fade in" id="unitEditPage">
     <div class="modal-dialog">
       <form class="updateunit" autocomplete="off">
+
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -298,56 +300,54 @@ justify-content: center;background: #f1f1f1;">
           </div>
           <div class="modal-body">
             <div class="box box-default box-solid">
-              <!-- <div class="box-header with-border bg-aqua">
+              <div class="box-header with-border bg-aqua">
                 <h3 class="box-title">Unit Details</h3>
-              </div> -->
+              </div>
               <table style="width:100%;">
                 <tr>
-                  <td>
-                    <div class="form-group has-feedback">
-                      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
-                        <label for="lastName">Unit Code <span class="asteric_red">*</span></label>
-                        <input type="text" disabled class="form-control validation" placeholder="Unit Code"
-                          id="unitCodeEdits" name="unitCodeEdits" required>
-                      </div>
-                      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
-                        <label for="lastName">Unit Name <span class="asteric_red">*</span></label>
-                        <input type="text" class="form-control validation" placeholder="Unit Name" id="unitNameEdits"
-                          name="unitNameEdits" required>
-                      </div>
+                  <div class="form-group has-feedback">
+                    <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                      <label for="cardName">Item<span class="asteric_red">*</span></label>
+                      <select class="itemCodeEdits" style="width:100%;" name="itemCodeEdits" id="itemCodeEdits"
+                        required>
+                        <option value='' disabled selected='selected'>Select Item </option>
+                        {{# each itemsList}}
+                        <option value="{{ugpCode}}"> {{itemNam}}</option>
+                        {{/each}}
+                      </select>
                     </div>
-                  </td>
+                    <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                      <label for="lastName">Uom Code<span class="asteric_red">*</span></label>
+                      <input type="text" class="form-control validation" placeholder="Uom Code" id="uomCodeEdits"
+                        name="uomCodeEdits" required>
+                    </div>
+                  </div>
                 </tr>
                 <tr>
-                  <td>
-                    <div class="form-group has-feedback">
-                      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
-                        <label for="lastName">Select Product <span class="asteric_red">*</span></label>
-                        <select class="selectProductEdit" required style="width:100%;" name="selectProductEdit"
-                          id="selectProductEdit">
-                          <option selected='selected' value="" disabled>Select Product</option>
-                          {{# each getProductListEdit}}
-                          <option value="{{_id}}">{{productName}}</option>
-                          {{/each}}
-                        </select>
-                      </div>
-                      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
-                        <label for="lastName">Base Quantity <span class="asteric_red">*</span></label>
-                        <input type="text" class="form-control validation" placeholder="Base Quantity" id="baseQtyEdit"
-                          name="baseQtyEdit" required>
-                      </div>
+                  <div class="form-group has-feedback">
+                    <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                      <label for="lastName">Uom Entry<span class="asteric_red">*</span></label>
+                      <input type="text" class="form-control validation" placeholder="Uom Entry" id="uomEntryEdits"
+                        name="uomEntryEdits" required>
                     </div>
-                  </td>
+                    <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                      <label for="lastName">Base Quantity<span class="asteric_red">*</span></label>
+                      <input type="number" min="1" class="form-control validation" placeholder="Base Quantity"
+                        id="baseQtyEdits" name="baseQtyEdits" required>
+                    </div>
+                  </div>
                 </tr>
                 <input type="hidden" class="id" name="id">
+                <input type="hidden" class="hiddenemail" name="hiddenemail">
+                <input type="hidden" class="isDeleted" name="isDeleted">
               </table>
             </div>
             {{#if printLoad}}
             <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
-            absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+          absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
               {{#with printLoaderImage}}
               <div class="loader-lg" style="width: 100%;height: 100%;display: 
-              flex; align-items: center;justify-content: center;background: #fff;">
+            flex; align-items: center;justify-content: center;background: #fff;">
                 <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
               </div>
               {{/with}}
@@ -377,35 +377,35 @@ justify-content: center;background: #f1f1f1;">
         </div>
         <div class="modal-body">
           <div class="box box-default box-solid">
-            <!-- <div class="box-header with-border bg-aqua">
+            <div class="box-header with-border bg-aqua">
               <h3 class="box-title">Unit Details</h3>
-            </div> -->
+            </div>
             <table style="width:100%;" class="table table-striped">
               <tbody>
                 <tr class="table-border">
                   <td width="50%">
-                    <label for="Employee ">Unit Code</label>
-                    <div id="detailunitCode" style="word-wrap:break-word;"></div>
-                  </td>
-                  <td width="50%">
                     <label for="firstName">Unit Name </label>
-                    <div id="detailunitName" style="word-wrap:break-word;"></div>
+                    <div id="detailUnitName"></div>
+                  </td>
+                  <td width="50%">
+                    <label for="Employee ">Unit Code</label>
+                    <div id="detailUnitCode"></div>
                   </td>
                 </tr>
                 <tr class="table-border">
                   <td width="50%">
-                    <label for="firstName">Product Name</label>
-                    <div id="detailProduct" style="word-wrap:break-word;"></div>
+                    <label for="firstName">Base Quantity </label>
+                    <div id="detailBaseQty"></div>
                   </td>
                   <td width="50%">
-                    <label for="Employee ">Base Quantity</label>
-                    <div id="detailBaseQty" style="word-wrap:break-word;"></div>
+                    <label for="Employee ">Item Name</label>
+                    <div id="detailUgpCode"></div>
                   </td>
                 </tr>
                 <tr class="table-border">
                   <td width="50%">
-                    <label for="Employee ">Status</label>
-                    <div id="detailStatus" style="word-wrap:break-word;"></div>
+                    <label for="firstName">Status</label>
+                    <div id="detailStatus"></div>
                   </td>
                   <td width="50%">
                   </td>
@@ -415,10 +415,10 @@ justify-content: center;background: #f1f1f1;">
           </div>
           {{#if printLoad}}
           <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
-          absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+        absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
             {{#with printLoaderImage}}
             <div class="loader-lg" style="width: 100%;height: 100%;display: 
-            flex; align-items: center;justify-content: center;background: #fff;">
+          flex; align-items: center;justify-content: center;background: #fff;">
               <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
             </div>
             {{/with}}

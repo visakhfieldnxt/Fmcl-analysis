@@ -1,9 +1,9 @@
 /**
- * @author Nithin
+ * @author Visakh
  */
 
 import './stockTransfer.html';
-import './createTransfer.html';
+import './create.html';
 import './utility';
 import './stockTransfer';
-import './createTransfer'; 
+import './create';

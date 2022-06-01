@@ -1,9 +1,10 @@
 /**
  * @author Visakh
  */
-// import { Customer } from '../../../api/customer/customer'; 
-// import { Order } from '../../../api/order/order';
-// import { Item } from '../../../api/item/item';
+import { Customer } from '../../../api/customer/customer';
+import { Invoice } from '../../../api/invoice/invoice';
+import { Order } from '../../../api/order/order';
+import { Item } from '../../../api/item/item';
 
 
 
@@ -11,8 +12,16 @@ Template.sales_dashboard.onCreated(function () {
 
   const self = this;
   self.autorun(() => {
+    // self.subscribe('user.list');
+    // self.subscribe('customerDashbord.list');
+    // self.subscribe('invoiceDashboardSales.list');
+    // self.subscribe('orderDashboard.list');
 
   });
+  // Meteor.subscribe('customerDashbord.list');
+  // Meteor.subscribe('invoiceDashboardSales.list');
+  // Meteor.subscribe('orderDashboard.list');
+  // Meteor.subscribe("itemFiltered.list");
   this.todaysOrder = new ReactiveVar();
   this.todayQuotation = new ReactiveVar();
   this.approvedOrders = new ReactiveVar();
@@ -22,7 +31,6 @@ Template.sales_dashboard.onCreated(function () {
   this.onHoldQuotation = new ReactiveVar();
   this.rejectedQuotation = new ReactiveVar();
   this.dueToday = new ReactiveVar();
-  this.verticalData = new ReactiveVar();
 
 });
 Template.sales_dashboard.onRendered(function () {
@@ -50,55 +58,53 @@ Template.sales_dashboard.onRendered(function () {
   //   });
   // },500);
 
-  let fromDate = moment(new Date()).format('YYYY-MM-01 00:00:00.0');
-  let toDate = moment(new Date()).format('YYYY-MM-DD 00:00:00.0');
-  Meteor.call('order.orderCount', Meteor.userId(), fromDate, toDate, (err, res) => {
+
+  Meteor.call('order.orderCount', (err, res) => {
     if (!err) {
       this.todaysOrder.set(res);
     }
   });
-  Meteor.call('creditSales.cashCount', Meteor.userId(), fromDate, toDate, (err, res) => {
+  Meteor.call('salesQuotation.salesQuotationCount', (err, res) => {
     if (!err) {
       this.todayQuotation.set(res);
     }
   });
-  Meteor.call('creditSales.creditCount', Meteor.userId(), fromDate, toDate, (err, res) => {
+  Meteor.call('order.orderApprovedCount', (err, res) => {
     if (!err) {
       this.approvedOrders.set(res);
     }
   });
 
-  Meteor.call('creditSales.currentOutstanding', Meteor.userId(), fromDate, toDate, (err, res) => {
+  Meteor.call('salesQuotation.salesQuotationApprovedCount', (err, res) => {
     if (!err) {
       this.approvedQuotations.set(res);
     }
   });
 
-  Meteor.call('order.orderApproved', Meteor.userId(), fromDate, toDate, (err, res) => {
+  Meteor.call('order.orderonHoldCount', (err, res) => {
     if (!err) {
       this.onHoldOrder.set(res);
     }
   });
 
-  Meteor.call('order.orderRejected', Meteor.userId(), fromDate, toDate, (err, res) => {
+  Meteor.call('order.orderRejectCount', (err, res) => {
     if (!err) {
       this.rejectedOrder.set(res);
     }
   });
-  Meteor.call('order.orderOnHold', Meteor.userId(), fromDate, toDate, (err, res) => {
+  Meteor.call('salesQuotation.salesQuotationonholdCount', (err, res) => {
     if (!err) {
       this.onHoldQuotation.set(res);
     }
   });
-  Meteor.call('creditSale.approvedCurrent', Meteor.userId(), fromDate, toDate, (err, res) => {
+  Meteor.call('salesQuotation.salesQuotationRejectCount', (err, res) => {
     if (!err) {
       this.rejectedQuotation.set(res);
     }
   });
-  Meteor.call('outlet.outletDataByMonth', Meteor.userId(), fromDate, toDate, (err, res) => {
+  Meteor.call('collectionDueTodayUser.dueToday', (err, res) => {
     if (!err) {
-      this.verticalData.set(res);
-
+      this.dueToday.set(res);
     }
   });
 
@@ -122,6 +128,10 @@ Template.sales_dashboard.helpers({
     let numb = 12000;
     return numb.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     // return total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  },
+  currencyGet: () => {
+    let currencyValues = Session.get("currencyValues");
+    return currencyValues;
   },
   'collectionTodays': () => {
     let amount = 0;
@@ -157,7 +167,7 @@ Template.sales_dashboard.helpers({
 */
 
   'todaysQuotations': () => {
-    let result = 0;
+    let result=0;
     let res = Template.instance().todayQuotation.get();
     if (res !== undefined) {
       result = res.toString();
@@ -168,8 +178,8 @@ Template.sales_dashboard.helpers({
   * for getting approved orders
   */
 
-  'creditSales': () => {
-    let result = 0;
+  'approvedOrders': () => {
+    let result=0;
     let res = Template.instance().approvedOrders.get();
     if (res !== undefined) {
       result = res.toString();
@@ -180,11 +190,11 @@ Template.sales_dashboard.helpers({
 * for getting approved quotation
 */
 
-  'martketOutstanding': () => {
-    let result = 0;
+  'approvedQuotations': () => {
+    let result=0;
     let res = Template.instance().approvedQuotations.get();
     if (res !== undefined) {
-      result = Number(res).toFixed(2);
+      result = res.toString();
     }
     return result;
   },
@@ -192,8 +202,8 @@ Template.sales_dashboard.helpers({
 * for getting onhold orders
 */
 
-  'orderApproved': () => {
-    let result = 0;
+  'onHoldOrder': () => {
+    let result=0;
     let res = Template.instance().onHoldOrder.get();
     if (res !== undefined) {
       result = res.toString();
@@ -205,7 +215,7 @@ Template.sales_dashboard.helpers({
 */
 
   'rejectedOrder': () => {
-    let result = 0;
+    let result=0;
     let res = Template.instance().rejectedOrder.get();
     if (res !== undefined) {
       result = res.toString();
@@ -217,10 +227,11 @@ Template.sales_dashboard.helpers({
  */
 
   'onHoldQuotation': () => {
-    let result = 0;
+    let result =0;
     let res = Template.instance().onHoldQuotation.get();
-    if (res !== undefined) {
-      result = res.toString();
+    if(res !== undefined)
+    {
+      result =res.toString();
     }
     return result;
   },
@@ -229,39 +240,13 @@ Template.sales_dashboard.helpers({
  */
 
   'rejectedQuotation': () => {
-    let result = 0;
+    let result=0;
     let res = Template.instance().rejectedQuotation.get();
-    if (res !== undefined) {
-      result = res.toString();
+    if(res !== undefined)
+    {
+      result =res.toString();
     }
     return result;
-  },
-  verticalData: () => {
-    let verticalData = Template.instance().verticalData.get();
-    if (verticalData) {
-      let approvedData = verticalData.filter(x => x.approvalStatus == 'Approved');
-      let pendingData = verticalData.filter(x => x.approvalStatus == 'Pending');
-      let onHoldData = verticalData.filter(x => x.approvalStatus == 'On Hold');
-      let rejectData = verticalData.filter(x => x.approvalStatus == 'Rejected');
-      new Morris.Donut({
-        element: 'doughnut-chart',
-        resize: true,
-        colors: ['#007bff', '#ffc107', '#ff4040', '#16ca00'],
-        data: [
-          { label: 'Pending', value: pendingData.length },
-          { label: 'Rejected', value: rejectData.length },
-          { label: 'On Hold', value: onHoldData.length },
-          { label: 'Approved', value: approvedData.length }
-        ],
-        hideHover: 'auto'
-      }).on('click', function (i, row) {
-      });
-
-
-      $('#outletDataDisplay').css('display', 'block');
-      // $('#doughnut-chart').css('height', '250px');
-      $('#refreshvert').css('display', 'none');
-    }
   },
 
 
@@ -350,23 +335,23 @@ Template.sales_dashboard.helpers({
   }
 });
 Template.sales_dashboard.events({
-  // 'click .outstanding': function (event, template) {
-  //   FlowRouter.redirect("/outstanding/list");
-  // },
-  // 'click .dueOutstanding': () => {
-  //   FlowRouter.redirect("/collectionDueDashboard/list");
+  'click .outstanding': function (event, template) {
+    FlowRouter.redirect("/outstanding/list");
+  },
+  'click .dueOutstanding': () => {
+    FlowRouter.redirect("/collectionDueDashboard/list");
 
-  // },
-  // 'click .stockUnavailability': () => {
-  //   FlowRouter.redirect("/stockUnavailability/list");
+  },
+  'click .stockUnavailability': () => {
+    FlowRouter.redirect("/stockUnavailability/list");
 
-  // },
-  // 'click .orderRejectC': () => {
-  //   FlowRouter.redirect("/rejectedOrder/list");
+  },
+  'click .orderRejectC': () => {
+    FlowRouter.redirect("/rejectedOrder/list");
 
-  // },
-  // 'click .orderNotDelivered': () => {
-  //   FlowRouter.redirect("/billDispatchedNotDelivered/list");
+  },
+  'click .orderNotDelivered': () => {
+    FlowRouter.redirect("/billDispatchedNotDelivered/list");
 
-  // },
+  },
 });

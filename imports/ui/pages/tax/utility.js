@@ -1,47 +1,56 @@
-createOrUpdateTax = (target,tid) => {
-  let code = target.taxCode;
-  let name = target.taxName;
-  let percentage = target.taxPrec;
-  // let active = target.taxstatus;
-  let taxname = target.taxnameid;
+/**
+ * @author Visakh
+ */
 
-  return Meteor.call('tax.create', code.value,name.value,percentage.value,taxname.value, (error, result) => {
-      if (error) {
-        $('#taxErrorModal').find('.modal-body').text(error.reason);
-        $('#taxErrorModal').modal();
-       
-      }
-      else {
-        $('#taxCode').val('');
-        $('#taxName').val('');
-        $('#taxPrec').val('');
-        $('#tax-create').modal('hide');
-        $('#taxSuccessModal').find('.modal-body').text('Tax has been created successfully');
-        $('#taxSuccessModal').modal();
-        
-      }
-    });
+/**
+ * TODO: Complete JS doc
+ * @param target
+ * @param id
+ */
+createOrUpdatetax = (target, category) => {
+
+  let taxName = target.taxNames;
+  let taxCode = target.taxCodes;
+  let taxRate = target.taxRates;
+
+  return Meteor.call('tax.create', taxName.value, taxCode.value, taxRate.value, category, (error, result) => {
+    if (error) {
+      $('#taxErrorModal').find('.modal-body').text(error.reason);
+      $('#taxErrorModal').modal();
+    }
+    else {
+      $('#ic-create-tax').modal('hide');
+      $("#taxAdd")[0].reset();
+      $('#taxSuccessModal').find('.modal-body').text('Tax has been registered successfully');
+      $('#taxSuccessModal').modal();
+    }
+  });
 },
-updateTax = (target) => {
-  let code = target.taxCode1;
-  let name = target.taxName1;
-  let percentage = target.taxPrec1;
-  let taxname = target.taxnameid1;
+  /**
+ * TODO: Complete JS doc
+ * @param target
+ */
+  updatetaxlist = (target, category) => {
 
-  return Meteor.call('tax.update', code.value,name.value,percentage.value,taxname.value, (error, result) => {
+    let taxName = target.taxNameEdits;
+    let taxCode = target.taxCodeEdits;
+    let taxRate = target.taxRateEdits;
+
+    let id = target.id;
+
+    return Meteor.call('tax.update', id.value, taxName.value, taxCode.value, taxRate.value, category, (error, result) => {
       if (error) {
         $('#taxErrorModal').find('.modal-body').text(error.reason);
         $('#taxErrorModal').modal();
-       
       }
       else {
-        $('#taxCode1').val('');
-        $('#taxName1').val('');
-        $('#taxPrec1').val('');
-        $('#tax-create').modal('hide');
+        $('.updatetax').each(function () {
+          this.reset();
+        });
+        $('#taxEditPage').modal('hide');
         $('#taxSuccessModal').find('.modal-body').text('Tax has been updated successfully');
         $('#taxSuccessModal').modal();
-        
       }
     });
-}
+  }
+

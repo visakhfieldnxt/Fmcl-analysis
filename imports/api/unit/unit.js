@@ -1,6 +1,6 @@
 /**
- * @author Nithin
+ * @author Visakh
  */
 
- unitCollectionName = 'unit';
+unitCollectionName = 'unit';
 export let Unit = new Mongo.Collection(unitCollectionName);

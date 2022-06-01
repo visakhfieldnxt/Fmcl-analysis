@@ -1,5 +1,5 @@
 <template name="branch">
-  {{#if userCan 'branchView'}}
+  {{#if userCan 'masterDataView'}}
   <section class="content-header">
     <h1>Branch
       <small>Listing All Branch</small>
@@ -12,8 +12,9 @@
   <section class="content">
 
     <div class="row">
-      <div style="float: right;"> 
-        {{#if userCan 'branchCreate'}}
+      <div style="float: right;">
+        {{#if userCan 'masterDataCreate'}}
+        <button class="btn btn-primary btn-flat" id="fileUploadbranch">Upload</button>
         <button class="btn btn-primary btn-flat" id="ic-create-branch-button">Create Branch</button>
         {{/if}}
         <button class="btn btn-primary btn-flat" id="filterSearch"><i class="fa fa-search"> </i>&nbsp; Search</button>
@@ -23,9 +24,9 @@
     <div class="row" id="filterDisplay" style="display:none">
       <div class="box box-default box-solid">
         <div class="box-header with-border bg-aqua">
-          <h3 class="box-title"  style="color: black;">Branch Filter</h3><button type="button" id="removeSearch"
+          <h3 class="box-title">Branch Filter</h3><button type="button" id="removeSearch"
             style="color: white; background-color: transparent; border-color:transparent" class="pull-right"><i
-              class="fa fa-close"  style="color: black;"></i></button>
+              class="fa fa-close"></i></button>
         </div>
         <div class="box-body no-padding">
           <form class="branchFilter">
@@ -35,9 +36,9 @@
                 <label for="branch">Branch Code</label>
                 <select class="branchCodeSelection" style="width:100%;" name="branchCodeSelection"
                   id="branchCodeSelection">
-                  <option  selected value=''>Select Branch Code</option>
+                  <option disabled selected value=''>Select Branch Code</option>
                   {{# each branchLists}}
-                  <option value="{{branchCode}}">{{branchCode}}</option>
+                  <option value="{{bPLId}}">{{bPLId}}</option>
                   {{/each}}
                 </select>
               </div>
@@ -45,9 +46,9 @@
                 <label for="branch">Branch Name</label>
                 <select class="branchNameSelection" style="width:100%;" name="branchNameSelection"
                   id="branchNameSelection">
-                  <option selected value=''>Select Branch Name</option>
+                  <option disabled selected value=''>Select Branch Name</option>
                   {{# each branchLists}}
-                  <option value="{{branchName}}">{{branchName}}</option>
+                  <option value="{{bPLName}}">{{bPLName}}</option>
                   {{/each}}
                 </select>
               </div>
@@ -63,10 +64,10 @@
     </div>
 
     <div class="row">
-      <!-- {{#if isReady}}
+      {{#if isReady}}
       {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
       onClick=clickEvent}}
-      {{/if}} -->
+      {{/if}}
       <div class="nav-tabs-custom taskHeader" id="taskHeader">
         <ul class="nav nav-tabs taskHeaderList" id="taskHeaderList">
           <li class="active paginationFilterValue activeFilter activeHeaders" id="activeFilter"><a href=""
@@ -77,39 +78,42 @@
         </ul>
         <div class="tab-content" style="padding : 0px !important">
           <div class="box box-default box-solid">
-            <!-- <div class="box-header with-border bg-aqua">
+            <div class="box-header with-border bg-aqua">
               <h3 class="box-title">Branch</h3>
-            </div> -->
+            </div>
             {{#if isReady}}
             <div class="box-body no-padding table-responsive">
               <table class="table table-striped generic">
                 <tbody>
                   <tr>
-                    <th class="sorted-column text-center">Branch Code</th>
-                    <th class="text-center sorted-column">Branch Name</th> 
+                    <th class=" sorted-column text-center" style="">Branch Code</th>
+                    <th class="text-center sorted-column" id="name" style="">Branch Name</th>
+                    <th class="text-center sorted-column ">Address</th>
+                    <th class="text-center sorted-column">Street Number</th>
                     <th class="text-center sorted-column"> </th>
                   </tr>
                   {{#each branchList}}
                   <tr>
-                    <td class="text-center sorted-column ">{{branchCode}}</td>
-                    <td class="text-center sorted-column">{{branchName}}</td> 
-                    <td class="text-center" width="25%"> 
-                      <input type="hidden" id="branchName_{{_id}}" value="{{branchName}}">
-                      {{#if userCan 'branchUpdate'}}
-                      <a href="javascript:void(0)" class="edit" title="Click to edit {{branchName}}" id="{{_id}}">
+                    <td class="text-center sorted-column ">{{bPLId}}</td>
+                    <td class="text-center sorted-column" id="name" style="">{{bPLName}}</td> 
+                    <td class="text-center">{{address}}</td>
+                    <td class="text-center">{{streetNo}}</td>
+                    <td class="text-center" width="25%">
+                      {{#if userCan 'masterDataUpdate'}}
+                      <input type="hidden" id="bPLName_{{_id}}" value="{{bPLName}}">
+                      <a href="javascript:void(0)" class="edit" title="Click to edit {{bPLName}}" id="{{_id}}">
                         <button class="pd-20 btn btn-primary"><i class="fa fa-pencil"></i></button>
                       </a> &nbsp;
                       {{/if}}
-                      {{#if userCan 'branchDelete'}}
-                      {{#if activeHelper active}}
-                      <a href="javascript:void(0)" class="deactivate" title="Click to inactivate {{branchName}}"
+                      {{#if userCan 'masterDataDelete'}}
+                      {{#if activeHelper disabled}}
+                      <a href="javascript:void(0)" class="deactivate" title="Click to inactivate {{bPLName}}"
                         id="{{_id}}">
                         <button class="pd-20 btn btn-danger"><i class="fa fa-close"></i></button>
                       </a>&nbsp;
                       {{/if}}
-                      {{#if inactiveHelper active}}
-                      <a href="javascript:void(0)" class="activate" title="Click to activate {{branchName}}"
-                        id="{{_id}}">
+                      {{#if inactiveHelper disabled}}
+                      <a href="javascript:void(0)" class="activate" title="Click to activate {{bPLName}}" id="{{_id}}">
                         <button class="pd-20 btn btn-success"><i class="fa fa-check"></i></button>
                       </a> &nbsp;
                       {{/if}}
@@ -161,6 +165,8 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
+            <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span></button> -->
             <h4 class="modal-title">Create Branch</h4>
           </div>
           <div class="modal-body">
@@ -277,30 +283,93 @@
           </div>
           <div class="modal-body">
             <div class="box box-default box-solid">
-              <!-- <div class="box-header with-border bg-aqua">
+              <div class="box-header with-border bg-aqua">
                 <h3 class="box-title">Branch Details</h3>
-              </div> -->
+              </div>
               <table style="width:100%;">
                 <tr>
                   <td>
+                    <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                      <label for="lastName">Branch Code<span class="asteric_red">*</span></label>
+                      <input type="text" disabled class="form-control validation" placeholder="Branch Code" id="branchCodeEdits"
+                        name="branchCodeEdits" required>
+                    </div>
                     <div class="form-group has-feedback">
                       <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
-                        <label for="lastName">Branch Code <span class="asteric_red">*</span></label>
-                        <input type="text"  class="form-control validation" placeholder="Branch Code"
-                          id="branchCodeEdits" name="branchCodeEdits" required>
-                      </div>
-                      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
-                        <label for="lastName">Branch Name <span class="asteric_red">*</span></label>
+                        <label for="lastName">Branch Name<span class="asteric_red">*</span></label>
                         <input type="text" class="form-control validation" placeholder="Branch Name"
                           id="branchNameEdits" name="branchNameEdits" required>
                       </div>
                     </div>
                   </td>
                 </tr>
+                <tr>
+                  <div class="form-group has-feedback">
+                    <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                      <label for="cardName">Default Customer<span class="asteric_red">*</span></label>
+                      <select class="selectCustomerEditS" style="width:100%;" name="customer" id="selectCustomerEditS"
+                        required>
+                        <option value='' disabled selected='selected'>Select Customer</option>
+                        {{# each customersList}}
+                        <option value="{{cardCode}}">{{cardName}}</option>
+                        {{/each}}
+                      </select>
+                    </div>
+                    <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                      <label for="cardName">Default Vendor<span class="asteric_red">*</span></label>
+                      <select class="selectSupplierEditS" style="width:100%;" name="selectSupplierEditS"
+                        id="selectSupplierEditS" required>
+                        <option value='' disabled selected='selected'>Select Vendor</option>
+                        {{# each suppliersList}}
+                        <option value="{{cardCode}}">{{cardName}}</option>
+                        {{/each}}
+                      </select>
+                    </div>
+                  </div>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="form-group has-feedback">
+                      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                        <label for="branch">Default Warehouse<span class="asteric_red">*</span></label>
+                        <select class="wareHouseSelectionEdits" style="width:100%;" name="wareHouseSelectionEdits"
+                          id="wareHouseSelectionEdits" required>
+                          <option value='' disabled selected='selected'>Select Warehouse</option>
+                          {{# each wareHouseLists}}
+                          <option value="{{whsCode}}">{{whsCode}} / {{whsName}}</option>
+                          {{/each}}
+                        </select>
+                      </div>
+                      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                        <label for="lastName">Payment Clear Act<span class="asteric_red">*</span></label>
+                        <input type="text" class="form-control validation" placeholder="Payment Clear Act"
+                          id="paymentClearActEdits" name="paymentClearActEdits" required>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="form-group has-feedback">
+                      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                        <label for="lastName">Address<span class="asteric_red">*</span></label>
+                        <input type="text" class="form-control validation" placeholder="Address" id="addressEdits"
+                          name="addressEdits" required>
+                      </div>
+                      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                        <label for="lastName">Street No<span class="asteric_red">*</span></label>
+                        <input type="text" class="form-control validation" placeholder="Street No" id="streetEdits"
+                          name="streetEdits" required>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
                 <input type="hidden" class="id" name="id">
+                <input type="hidden" class="hiddenemail" name="hiddenemail">
+                <input type="hidden" class="isDeleted" name="isDeleted">
               </table>
             </div>
-            {{#if printLoad}}
+            {{#if printLoad}} 
             <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
             absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
               {{#with printLoaderImage}}
@@ -335,9 +404,9 @@
         </div>
         <div class="modal-body">
           <div class="box box-default box-solid">
-            <!-- <div class="box-header with-border bg-aqua">
+            <div class="box-header with-border bg-aqua">
               <h3 class="box-title">Branch Details</h3>
-            </div> -->
+            </div>
             <table style="width:100%;" class="table table-striped">
               <tbody>
                 <tr class="table-border">
@@ -352,6 +421,36 @@
                 </tr>
                 <tr class="table-border">
                   <td width="50%">
+                    <label for="firstName">Address</label>
+                    <div id="detailAddress"></div>
+                  </td>
+                  <td width="50%">
+                    <label for="Employee ">Street Number</label>
+                    <div id="detailStreet"></div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="Employee ">Default Warehouse</label>
+                    <div id="detailDefaultWarehouse"></div>
+                  </td>
+                  <td width="50%">
+                    <label for="Employee ">Default Customer </label>
+                    <div id="detailDefaultCustomerCode"></div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="Employee ">Default Supplier </label>
+                    <div id="detailDefaultSupplierCode"></div>
+                  </td>
+                  <td width="50%">
+                    <label for="Employee ">Payment Clear Act</label>
+                    <div id="detailPaymentClearAct"></div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td width="50%">
                     <label for="Employee ">Status</label>
                     <div id="detailStatus"></div>
                   </td>
@@ -361,7 +460,7 @@
               </tbody>
             </table>
           </div>
-          {{#if printLoad}}
+          {{#if printLoad}} 
           <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
           absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
             {{#with printLoaderImage}}

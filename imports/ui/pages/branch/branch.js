@@ -12,20 +12,24 @@ Template.branch.onCreated(function () {
 
   });
   this.branchNameArray = new ReactiveVar();
+  this.cardCodeList = new ReactiveVar();
+  this.wareHouseList = new ReactiveVar();
+  this.supplierList = new ReactiveVar();
   this.modalLoader = new ReactiveVar();
   this.fileName = new ReactiveVar();
+  this.branchDetailCardCode = new ReactiveVar();
+  this.branchDetailSupplierCode = new ReactiveVar();
+  this.branchDetailWareHouse = new ReactiveVar();
   this.pagination = new Meteor.Pagination(Branch, {
     filters: {
-      active: "Y",
+      disabled: "N"
     },
     sort: { createdAt: -1 },
-    fields: {
-      branchCode: 1,
-      branchName: 1,
-      active: 1
-    },
     perPage: 20
   });
+  this.cardCodeList.set('');
+  this.wareHouseList.set('');
+  this.supplierList.set('');
 });
 
 Template.branch.onRendered(function () {
@@ -46,13 +50,63 @@ Template.branch.onRendered(function () {
   }
   /**
     * TODO: Complete JS doc
-    * for filter
     */
   Meteor.call('branch.branchList', (branchError, branchResult) => {
     if (!branchError) {
       this.branchNameArray.set(branchResult);
     }
   });
+  /**
+     * TODO:Complete Js doc
+     * Getting user branch list
+     */
+  Meteor.call('customer.cardCodeGet', (err, res) => {
+    if (!err) {
+      this.cardCodeList.set(res);
+    }
+  });
+  /**
+     * TODO:Complete Js doc
+     * Getting user branch list
+     */
+  Meteor.call('wareHouse.nameList', (err, res) => {
+    if (!err) {
+      this.wareHouseList.set(res);
+    }
+  });
+  /**
+   * TODO:Complete Js doc
+   * Getting user branch list
+   */
+  Meteor.call('customer.supplierCodeGet', (err, res) => {
+    if (!err) {
+      this.supplierList.set(res);
+    }
+  });
+
+
+  $('.selectCustomerEditS').select2({
+    placeholder: "Select Customer",
+    tokenSeparators: [','],
+    allowClear: true,
+    dropdownParent: $(".selectCustomerEditS").parent(),
+  });
+  $('.selectSupplierEditS').select2({
+    placeholder: "Select Vendor",
+    tokenSeparators: [','],
+    allowClear: true,
+    dropdownParent: $(".selectSupplierEditS").parent(),
+  });
+  /**
+   * TODO: Complete JS doc
+   */
+  $('.wareHouseSelectionEdits').select2({
+    placeholder: "Select Warehouse",
+    tokenSeparators: [','],
+    allowClear: true,
+    dropdownParent: $(".wareHouseSelectionEdits").parent(),
+  });
+
   /**
    * TODO: Complete JS doc
    */
@@ -62,6 +116,7 @@ Template.branch.onRendered(function () {
     allowClear: true,
     dropdownParent: $(".branchNameSelection").parent(),
   });
+
   /**
    * TODO: Complete JS doc
    */
@@ -108,18 +163,7 @@ Template.branch.helpers({
       return false;
     }
   },
-  /**
-   * get status values
-   * @param {*} status 
-   */
-  getActiveStatus: (status) => {
-    if (status === 'Y') {
-      return 'Active';
-    }
-    else {
-      return 'Inactive';
-    }
-  },
+
   /**
    * TODO: Complete JS doc
    * @returns {{collection: *, acceptEmpty: boolean, substitute: string, eventType: string}}
@@ -167,6 +211,7 @@ Template.branch.helpers({
    * @returns {rolelist}
    */
   branchLists: function () {
+
     return Template.instance().branchNameArray.get();
   },
   /**
@@ -175,7 +220,7 @@ Template.branch.helpers({
      */
   activeHelper: function (active) {
     let activeCheck = active;
-    if (activeCheck === "Y") {
+    if (activeCheck === "N") {
       return true;
     }
     else {
@@ -188,7 +233,7 @@ Template.branch.helpers({
    */
   inactiveHelper: function (active) {
     let activeCheck = active;
-    if (activeCheck === "N") {
+    if (activeCheck === "Y") {
       return true;
     }
     else {
@@ -201,9 +246,57 @@ Template.branch.helpers({
   date: function () {
     return new Date();
   },
+  /**
+   * TODO:COmplete Js doc
+   * Getting specific customers base on branch
+   */
+  customersList: function () {
+    let branchVal = Template.instance().branchDetailCardCode.get();
+    if (branchVal) {
+      Meteor.setTimeout(function () {
+        if (branchVal) {
+          $('#selectCustomerEditS').val(branchVal).trigger('change');
+        }
+      }, 200);
+    }
+    return Template.instance().cardCodeList.get();
+
+  },
+  /**
+  * TODO:COmplete Js doc
+  * Getting specific customers base on branch
+  */
+  suppliersList: function () {
+    let branchVal = Template.instance().branchDetailSupplierCode.get();
+    if (branchVal) {
+      Meteor.setTimeout(function () {
+        if (branchVal) {
+          $('#selectSupplierEditS').val(branchVal).trigger('change');
+        }
+      }, 200);
+    }
+    return Template.instance().supplierList.get();
+  },
+  /**
+  * TODO: Complete JS doc
+  * @returns {rolelist}
+  */
+  wareHouseLists: function () {
+    let branchVal = Template.instance().branchDetailWareHouse.get();
+    if (branchVal) {
+      Meteor.setTimeout(function () {
+        if (branchVal) {
+          $('#wareHouseSelectionEdits').val(branchVal).trigger('change');
+        }
+      }, 200);
+    }
+    return Template.instance().wareHouseList.get();
+  },
+
 });
 
 Template.branch.events({
+
   /**
    * TODO: Complete JS doc
    * @param event
@@ -212,10 +305,11 @@ Template.branch.events({
     event.preventDefault();
     let branchCode = event.target.branchCodeSelection.value;
     let branchName = event.target.branchNameSelection.value;
+
     if (branchCode && branchName === '') {
       Template.instance().pagination.settings.set('filters',
         {
-          branchCode: branchCode,
+          bPLId: branchCode,
         }
       );
       $('.taskHeaderList').css('display', 'none');
@@ -223,7 +317,7 @@ Template.branch.events({
     else if (branchName && branchCode === '') {
       Template.instance().pagination.settings.set('filters',
         {
-          branchName: branchName,
+          bPLName: branchName
         }
       );
       $('.taskHeaderList').css('display', 'none');
@@ -231,8 +325,8 @@ Template.branch.events({
     else if (branchCode && branchName) {
       Template.instance().pagination.settings.set('filters',
         {
-          branchCode: branchCode,
-          branchName: branchName,
+          bPLId: branchCode,
+          bPLName: branchName
         }
       );
       $('.taskHeaderList').css('display', 'none');
@@ -248,12 +342,13 @@ Template.branch.events({
    */
   'click .reset': () => {
     Template.instance().pagination.settings.set('filters', {
-      active: "Y",
+      disabled: "N"
     });
     $('form :input').val("");
     $("#branchCodeSelection").val('').trigger('change');
     $("#branchNameSelection").val('').trigger('change');
     $('.taskHeaderList').css('display', 'inline');
+
     let element = document.getElementById("inactiveFilter");
     element.classList.remove("active");
     let elements = document.getElementById("activeFilter");
@@ -280,8 +375,8 @@ Template.branch.events({
     let confirmedUuid = $('#confirmedUuid');
     $('#branchDelConfirmation').modal();
     let _id = event.currentTarget.attributes.id.value;
-    let branchname = $('#branchName_' + _id).val();
-    $(header).html('Confirm Deactivation Of ' + $.trim(branchname));
+    let branchname = $('#bPLName_' + _id).val();
+    $(header).html('Confirm Deletion Of ' + $.trim(branchname));
     $(branchName).html(branchname);
     $(branchNameDup).html(branchname);
     $(confirmedUuid).val(_id);
@@ -318,7 +413,7 @@ Template.branch.events({
     let confirmedUuid = $('#confirmedUuids');
     $('#branchActiveConfirmation').modal();
     let _id = event.currentTarget.attributes.id.value;
-    let branchname = $('#branchName_' + _id).val();
+    let branchname = $('#bPLName_' + _id).val();
     $(header).html('Confirm Activation Of ' + $.trim(branchname));
     $(branchName).html(branchname);
     $(branchNameDup).html(branchname);
@@ -353,15 +448,35 @@ Template.branch.events({
     $('#branchEditPage').modal();
     template.modalLoader.set(true);
     let _id = event.currentTarget.attributes.id.value;
-    Meteor.call('branch.id', _id, (err, res) => {
+    template.branchDetailCardCode.set('');
+    template.branchDetailSupplierCode.set('');
+    template.branchDetailWareHouse.set('');
+    $('#wareHouseSelectionEdits').val('').trigger('change');
+    $('#selectSupplierEditS').val('').trigger('change');
+    $('#selectCustomerEditS').val('').trigger('change');
+    Meteor.call('branch.branch_id', _id, (err, res) => {
       let branchDetail = res;
-      let header = $('#categoryH');
+      let header = $('#categoryH'); 
       $('div.hint').hide();
       template.modalLoader.set(false);
       let branchDetailId = _id;
+      let branchDetailBranchName = branchDetail.bPLName;
+      let branchDetailbranchCode = branchDetail.bPLId;
+      let branchDetailPaymentClearAct = branchDetail.pmtClrAct;
+      let branchDetailAddress = branchDetail.address;
+      let branchDetailStreet = branchDetail.streetNo;
+      let branchDetailCardCode = branchDetail.dflCust;
+      let branchDetailSupplierCode = branchDetail.dflVendor;
+      let branchDetailWareHouse = branchDetail.dflWhs;
+      template.branchDetailCardCode.set(branchDetailCardCode);
+      template.branchDetailSupplierCode.set(branchDetailSupplierCode);
+      template.branchDetailWareHouse.set(branchDetailWareHouse);
       $(".id").val(branchDetailId);
-      $("#branchNameEdits").val(branchDetail.branchName);
-      $("#branchCodeEdits").val(branchDetail.branchCode);
+      $("#branchNameEdits").val(branchDetailBranchName);
+      $("#branchCodeEdits").val(branchDetailbranchCode);
+      $("#paymentClearActEdits").val(branchDetailPaymentClearAct);
+      $("#addressEdits").val(branchDetailAddress);
+      $("#streetEdits").val(branchDetailStreet); 
       $(header).html('Update Branch');
     });
   },
@@ -371,8 +486,22 @@ Template.branch.events({
    */
   'submit .updatebranch': (event) => {
     event.preventDefault();
-    let loginUserVerticals = Session.get("loginUserVerticals");
-    updatebranchlist(event.target, loginUserVerticals);
+
+    let customerCode = '';
+    let supplierCode = '';
+    let wareHouse = '';
+
+    $('#selectCustomerEditS').find(':selected').each(function () {
+      customerCode = $(this).val();
+    });
+    $('#selectSupplierEditS').find(':selected').each(function () {
+      supplierCode = $(this).val();
+    });
+    $('#wareHouseSelectionEdits').find(':selected').each(function () {
+      wareHouse = $(this).val();
+    });
+
+    updatebranchlist(event.target, customerCode, supplierCode, wareHouse);
   },
   /**
    * TODO: Complete JS doc
@@ -382,6 +511,9 @@ Template.branch.events({
       this.reset();
     });
     template.modalLoader.set(false);
+    $('#wareHouseSelectionEdits').val('').trigger('change');
+    $('#selectSupplierEditS').val('').trigger('change');
+    $('#selectCustomerEditS').val('').trigger('change');
 
   },
   /**
@@ -395,23 +527,36 @@ Template.branch.events({
     let header = $('#branchH');
     let branchName = $('#detailBranchName');
     let branchCode = $('#detailBranchCode');
+    let address = $('#detailAddress');
+    let street = $('#detailStreet');
+    let wareHouse = $('#detailDefaultWarehouse');
+    let customerCode = $('#detailDefaultCustomerCode');
+    let supplierCode = $('#detailDefaultSupplierCode');
+    let paymentClearAct = $('#detailPaymentClearAct');
     let status = $('#detailStatus');
     $('#branchDetailPage').modal();
-    Meteor.call('branch.id', id, (branchError, branchResult) => {
+    Meteor.call('branch.branchDetailsGet', id, (branchError, branchResult) => {
       if (!branchError) {
         template.modalLoader.set(false);
-        $(header).html('Details of ' + $.trim(branchResult.branchName));
-        if (branchResult.active === "Y") {
+        let branch = branchResult.branchRes;
+        $(header).html('Details of ' + $.trim(branch.bPLName));
+        if (branch.disabled === "N") {
           $(status).html("Active");
         }
-        else if (branchResult.active === "N") {
+        else if (branch.disabled === "Y") {
           $(status).html("Inactive");
         }
         else {
           $(status).html("");
         }
-        $(branchName).html(branchResult.branchName);
-        $(branchCode).html(branchResult.branchCode);
+        $(branchName).html(branch.bPLName);
+        $(branchCode).html(branch.bPLId);
+        $(address).html(branch.address);
+        $(street).html(branch.streetNo);
+        $(wareHouse).html(branchResult.whsName);
+        $(customerCode).html(branchResult.dflCustName);
+        $(supplierCode).html(branchResult.dflVenderName);
+        $(paymentClearAct).html(branch.pmtClrAct);
       }
     });
 
@@ -420,13 +565,8 @@ Template.branch.events({
   /**
 * TODO: Complete JS doc
 */
-  'click #filterSearch': (event, template) => {
+  'click #filterSearch': () => {
     document.getElementById('filterDisplay').style.display = "block";
-    Meteor.call('branch.branchList', (branchError, branchResult) => {
-      if (!branchError) {
-        template.branchNameArray.set(branchResult);
-      }
-    });
   },
   /**
 * TODO: Complete JS doc
@@ -435,9 +575,9 @@ Template.branch.events({
     document.getElementById('filterDisplay').style.display = "none";
   },
   /**
-     * TODO: Complete JS doc
-     * @param event
-     */
+           * TODO: Complete JS doc
+           * @param event
+           */
   'click #fileUploadbranch': (event, template) => {
     event.preventDefault();
     $("#uploadbranch").each(function () {
@@ -453,11 +593,17 @@ Template.branch.events({
     event.preventDefault();
     //Reference the FileUpload element.
     let fileUpload = document.getElementById("uploadbranchFile");
+    let warehouseArray = Template.instance().wareHouseList.get();
+    let customerArray = Template.instance().cardCodeList.get();
+    let supplierList = Template.instance().supplierList.get();
     let myFile = $('.uploadbranchFile').prop('files')[0];
     let fileType = myFile["type"];
     console.log("fileType", fileType);
     if (myFile.type === 'application/vnd.ms-excel' || myFile.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
 
+      //Validate whether File is valid Excel file.
+      // let regex = /^([a-zA-Z0-9\s_\\.\-:])+(.xls|.xlsx)$/;
+      // if (regex.test(fileUpload.value.toLowerCase())) {
       if (fileUpload !== null && fileUpload !== '' && fileUpload !== undefined) {
         if (typeof (FileReader) != "undefined") {
           let reader = new FileReader();
@@ -520,14 +666,48 @@ Template.branch.events({
       let excelRows = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[firstSheet]);
       if (excelRows !== undefined && excelRows.length > 0) {
         //Add the data rows from Excel file.
-        for (let i = 0; i < excelRows.length; i++) {
-          let branchCode = excelRows[i].BranchCode;
-          let branchName = excelRows[i].BranchName;
-          if (branchCode !== undefined && branchCode !== '' &&
-            branchName !== undefined && branchName !== '') {
-            branchArray.push({
-              branchCode: branchCode.toString(), branchName: branchName,
-            });
+        for (let i = 0; i < excelRows.length; i++) { 
+          let bPLId = excelRows[i].BranchCode;
+          let bPLName = excelRows[i].BranchName;
+          let dflWhs = excelRows[i].DefaultWarehouse;
+          let address = excelRows[i].Address;
+          let pmtClrAct = excelRows[i].PaymentClearAct;
+          let dflCust = excelRows[i].Customer;
+          let dflVendor = excelRows[i].Supplier;
+          let streetNo = excelRows[i].StreetNo;
+
+          if (bPLId !== undefined && bPLId !== '' &&
+            bPLName !== undefined && bPLName !== '' &&
+            dflWhs !== undefined && dflWhs !== '' &&
+            address !== undefined && address !== '' &&
+            pmtClrAct !== undefined && pmtClrAct !== '' &&
+            dflCust !== undefined && dflCust !== '' &&
+            dflVendor !== undefined && dflVendor !== '' &&
+            streetNo !== undefined && streetNo !== '') {
+            // get warehouse code
+            let whsCode = '';
+            let wareHouseRes = warehouseArray.find(x => x.whsName === dflWhs)
+            if (wareHouseRes) {
+              whsCode = wareHouseRes.whsCode;
+            }
+            // get defult cust code
+            let customerCodes = '';
+            let custRes = customerArray.find(x => x.cardName === dflCust)
+            if (custRes) {
+              customerCodes = custRes.cardCode;
+            }
+            // get defult vendor code
+            let supplierCodes = '';
+            let supres = supplierList.find(x => x.cardName === dflVendor)
+            if (supres) {
+              supplierCodes = supres.cardCode;
+            }
+            if (whsCode !== '' && customerCodes !== '' && supplierCodes !== '') {
+              branchArray.push({
+                bPLId: bPLId.toString(), bPLName: bPLName, dflWhs: whsCode, address: address,
+                pmtClrAct: pmtClrAct.toString(), dflCust: customerCodes, dflVendor: supplierCodes, streetNo: streetNo,
+              });
+            }
           }
         }
       }
@@ -587,11 +767,18 @@ Template.branch.events({
   'click #downloadbranch': (event, template) => {
     event.preventDefault();
     let data = [{
-      bPLId: '', bPLName: '',
+      bPLId: '', bPLName: '', dflWhs: '', address: '',
+      pmtClrAct: '', dflCust: '', dflVendor: '', streetNo: '',
     }];
     dataCSV = data.map(element => ({
       'BranchCode': '',
       'BranchName': '',
+      'DefaultWarehouse': '',
+      'Address': '',
+      'PaymentClearAct': '',
+      'Customer': '',
+      'Supplier': '',
+      'StreetNo': '',
     }))
     let excel = Papa.unparse(dataCSV);
     let blob = new Blob([excel], { type: "text/xls;charset=utf-8" });
@@ -616,7 +803,7 @@ Template.branch.events({
   'click .activeFilter': (event, template) => {
     event.preventDefault();
     Template.instance().pagination.settings.set('filters', {
-      active: "Y",
+      disabled: "N", 
     });
   },
   /**
@@ -626,7 +813,7 @@ Template.branch.events({
   'click .inactiveFilter': (event, template) => {
     event.preventDefault();
     Template.instance().pagination.settings.set('filters', {
-      active: "N",
+      disabled: "Y", 
     });
   },
 

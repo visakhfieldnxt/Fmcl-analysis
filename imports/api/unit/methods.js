@@ -1,331 +1,247 @@
 /**
- * @author Nithin
+ * @author Visakh
  */
-import { Unit } from './unit';
-import { Product } from '../products/products';
-import { Stock } from '../stock/stock';
-import { allUsers } from '../user/user';
-import { Price } from '../price/price';
-import { SdPriceType } from "../sdPriceType/sdPriceType";
-import { WareHouseStock } from '../wareHouseStock/wareHouseStock';
+import { Unit } from "./unit";
+import { Item } from './../../api/item/item';
+import { Config } from "../config/config";
+// import {unitDataGet_Url} from '../../startup/client/sapUrls';
 
 Meteor.methods({
-
   /**
-   * create unit
-   * @param unitName
-   * @param unitCode
-   * @returns 
-   */
-  'unit.create': (unitName, unitCode, product, baseQuantity, vertical) => {
-    let unitRes = Unit.insert({
-      unitCode: unitCode,
-      unitName: unitName,
-      product: product,
-      baseQuantity: baseQuantity,
-      vertical: vertical,
-      active: 'Y',
-      uuid: Random.id(),
-      createdBy: Meteor.userId(),
-      createdAt: new Date(),
-    });
-
-    if (unitRes) {
-      return unitRes;
+   * TODO:Complete JS doc
+   * @param itemCode
+*/
+  'unit.itemCode': (itemCode) => {
+    if (itemCode) {
+      let itemUgcode = Item.findOne({ itemCode: itemCode }).ugpCode;
+      return Unit.find({ ugpCode: itemUgcode }).fetch();
     }
   },
   /**
-   * update unit
-   * @param {*} id 
-   * @param {*} unitName 
-   * @param {*} unitCode 
-   * @returns 
+   * TODO: Complete Js doc
    */
-  'unit.update': (id, unitName, unitCode, product, baseQuantity, vertical) => {
-    return Unit.update({ _id: id }, {
-      $set:
-      {
-        unitCode: unitCode,
-        unitName: unitName,
-        product: product,
-        vertical: vertical,
-        baseQuantity: baseQuantity,
-        updatedBy: Meteor.userId(),
-        updatedAt: new Date(),
-      }
-    });
+  'unit.unitEntryS': (itemCode, uomEntry) => {
+    if (itemCode) {
+      let itemUgcode = Item.findOne({ itemCode: itemCode }).ugpCode;
+      return Unit.find({ ugpCode: itemUgcode, uomEntry }).fetch();
+    }
+  },
+
+  /**
+     * TODO:Complete JS doc
+     * @param uomCode
+     * @param ugpCode
+  */
+  'unit.uomCodeUgpCode': (uomCode, itemCode) => {
+    let itemUgpCode = Item.findOne({ itemCode: itemCode }).ugpCode;
+    return Unit.findOne({ uomCode: uomCode, ugpCode: itemUgpCode });
   },
   /**
-   * get unit details using id
-   * @param {*} id 
-   * @returns 
+  * TODO:Complete JS doc
+  * @param uomCode
+  */
+  'unit.uomCode': (uomCode) => {
+    return Unit.findOne({ uomCode: uomCode });
+  },
+  /**
+   * TODO:Complete Js doc
+   * To get data by uomEntry
    */
-  'unit.id': (id) => {
-    return Unit.findOne({ _id: id }, { fields: { unitName: 1, unitCode: 1, active: 1, product: 1, baseQuantity: 1 } });
+  'unit.uomEntry': (uomEntry, ugpCode) => {
+    // console.log(uomEntry, ugpCode);
+    return Unit.findOne({ uomCode: uomEntry, ugpCode: ugpCode });
 
+  },
+  'unit.uomEntryGet': (ugpCode, uomCode) => {
+    return Unit.findOne({ ugpCode: ugpCode, uomCode: uomCode });
+  },
+  'unit.ugpCodeuomEntry': (uomEntry, ugpCode) => {
+    return Unit.findOne({ uomEntry: uomEntry, ugpCode: ugpCode });
 
   },
   /**
-   * fetching unit full details 
-   * @returns 
+   * TODO:COmplete Js doc
+   * Getting unit detail with itemcode & ugpcode
    */
+  'unit.itemUgp': (uomEntry, ugpCode) => {
+    return Unit.find({ uomEntry: uomEntry, ugpCode: ugpCode }).fetch();
+
+  },
+  /**
+ * TODO:Complete JS doc
+ * Fetching Batch List using 
+ * @param itemCode
+*/
   'unit.unitList': () => {
-    return Unit.find({}, { fields: { unitName: 1, unitCode: 1 } }, { sort: { unitName: 1 } }).fetch();
+    return Unit.find({}, { fields: { uomCode: 1, uomEntry: 1, ugpCode: 1 } }).fetch();
+  },
+  'unit.dataSync': () => {
+    let base_url = Config.findOne({
+      name: 'base_url'
+    }).value;
+    let dbId = Config.findOne({
+      name: 'dbId'
+    }).value;
+    let url = base_url + unitDataGet_Url;
+    let dataArray = {
+      dbId: dbId
+    };
+    let options = {
+      data: dataArray,
+      headers: {
+        'content-type': 'application/json'
+      }
+    };
+    HTTP.call("POST", url, options, (err, result) => {
+      if (err) {
+        return err;
+      } else {
+        let itemGrpResult = result.data.data;
+        for (let i = 0; i < itemGrpResult.length; i++) {
+
+          let ItCFind = Unit.find({
+            ugpCode: itemGrpResult[i].UgpCode, uomCode: itemGrpResult[i].UomCode
+          }).fetch();
+          if (ItCFind.length === 0) {
+            Unit.insert({
+
+              ugpCode: itemGrpResult[i].UgpCode,
+              uomCode: itemGrpResult[i].UomCode,
+              baseQty: itemGrpResult[i].BaseQty,
+              uomEntry: itemGrpResult[i].UomEntry,
+              wghtFactor: itemGrpResult[i].WghtFactor,
+              createdAt: new Date(),
+              uuid: Random.id()
+            });
+          } else {
+            Unit.update(ItCFind[0]._id, {
+              $set: {
+                ugpCode: itemGrpResult[i].UgpCode,
+                uomCode: itemGrpResult[i].UomCode,
+                baseQty: itemGrpResult[i].BaseQty,
+                uomEntry: itemGrpResult[i].UomEntry,
+                wghtFactor: itemGrpResult[i].WghtFactor,
+                updatedAt: new Date()
+              }
+            });
+          }
+          console.log("++i", i);
+
+        }
+      }
+    });
   },
   /**
-   * activate unit
-   * @param {*} id  
-   * @returns 
-   */
-  'unit.active': (id) => {
+* TODO: Complete JS doc
+* 
+*/
+  'unit.create': (uomCode, baseQty, uomEntry, ugpCode,) => {
+    let unitId = Unit.insert({
+      ugpCode: ugpCode,
+      uomCode: uomCode,
+      baseQty: baseQty,
+      uomEntry: uomEntry,
+      disabled: "N",
+      createdBy: Meteor.userId(),
+      createdByWeb: true,
+      uuid: Random.id(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+    return unitId;
+  },
+
+  /**
+  * TODO: Complete JS doc
+  * 
+  */
+  'unit.update': (id, uomCode, baseQty, uomEntry, ugpCode) => {
     return Unit.update({ _id: id }, {
       $set:
       {
-        active: 'Y',
+        ugpCode: ugpCode,
+        uomCode: uomCode,
+        baseQty: baseQty,
+        uomEntry: uomEntry,
         updatedBy: Meteor.userId(),
         updatedAt: new Date(),
       }
     });
   },
-
-  /**
- * deactivate unit
- * @param {*} id  
- * @returns 
- */
   'unit.inactive': (id) => {
     return Unit.update({ _id: id }, {
       $set:
       {
-        active: 'N',
+        disabled: "Y",
         updatedBy: Meteor.userId(),
         updatedAt: new Date(),
       }
     });
   },
-
-  /**
- * get unit details using id
- * @param {*} id 
- * @returns 
- */
-  'unit.idDataGet': (id) => {
-    let unitRes = Unit.findOne({ _id: id }, { fields: { unitName: 1, unitCode: 1, active: 1, product: 1, baseQuantity: 1 } });
-    let productName = '';
-    if (unitRes) {
-      let productRes = Product.findOne({ _id: unitRes.product });
-      if (productRes) {
-        productName = productRes.productName;
+  'unit.active': (id) => {
+    return Unit.update({ _id: id }, {
+      $set:
+      {
+        disabled: "N",
+        updatedBy: Meteor.userId(),
+        updatedAt: new Date(),
       }
-      return { unitRes: unitRes, productName: productName };
-    }
+    });
+  },
+  'unit.unit_id': (id) => {
+    return Unit.findOne({ _id: id });
   },
   /**
-   * 
-   * @param {*} product 
-   * get units based on products
-   */
-  'unit.unitCodeGet': (product) => {
-    return Unit.find({ product: product, active: "Y" }, { fields: { unitName: 1, baseQuantity: 1 } }).fetch();
-  },
-  /**
-* get pricetype name based on id
-* @param {*} id 
-*/
-  'unit.idName': (id) => {
-    let res = Unit.findOne({ _id: id }, { fields: { unitName: 1 } });
-    if (res) {
-      return res.unitName;
-    }
-  },
-
-  /**
+  * TODO: Complete JS doc
   * 
-  * @param {*} unitArray  
-  * @returns excel upload
   */
-  'unit.createUpload': (unitArray, vertical) => {
-    for (let i = 0; i < unitArray.length; i++) {
-      let unitRes = Unit.find({ unitName: unitArray[i].unitName.trim(), product: unitArray[i].product }).fetch();
-      if (unitRes.length === 0) {
-        Unit.insert({
-          unitCode: unitArray[i].unitCode,
-          unitName: unitArray[i].unitName,
-          product: unitArray[i].product,
-          baseQuantity: unitArray[i].baseQuantity,
-          vertical: vertical,
-          active: 'Y',
-          uuid: Random.id(),
-          excelUpload: true,
-          createdBy: Meteor.userId(),
-          createdAt: new Date(),
-        });
-      }
-      else {
-        Unit.update({ _id: unitRes[0]._id }, {
-          $set:
-          {
-            unitName: unitArray[i].unitName,
-            product: unitArray[i].product,
-            baseQuantity: unitArray[i].baseQuantity,
-            vertical: vertical,
-            excelUpload: true,
-            updatedBy: Meteor.userId(),
+  'unit.createUpload': (unitArray) => {
+    if (unitArray !== undefined && unitArray !== []) {
+      for (let a = 0; a < unitArray.length; a++) {
+        let unitDetails = Unit.find({
+          ugpCode: unitArray[a].ugpCode,
+          uomCode: unitArray[a].uomCode
+        }).fetch();
+        if (unitDetails.length === 0) {
+          Unit.insert({
+            ugpCode: unitArray[a].ugpCode,
+            uomCode: unitArray[a].uomCode,
+            baseQty: unitArray[a].baseQty,
+            uomEntry: unitArray[a].uomEntry,
+            disabled: "N",
+            createdBy: Meteor.userId(),
+            createdByWeb: true,
+            uuid: Random.id(),
+            createdAt: new Date(),
             updatedAt: new Date(),
-          }
-        });
+          });
+        }
+        else {
+          Unit.update({
+            ugpCode: unitArray[a].ugpCode,
+            uomCode: unitArray[a].uomCode
+          }, {
+            $set: {
+              ugpCode: unitArray[a].ugpCode,
+              uomCode: unitArray[a].uomCode,
+              baseQty: unitArray[a].baseQty,
+              uomEntry: unitArray[a].uomEntry,
+              updatedBy: Meteor.userId(),
+              updatedAt: new Date(),
+            }
+          });
+        }
       }
     }
   },
-  /**
-  * 
-  * @param {*} product 
-  * get units based on products
-  */
-  'unit.baseQtyGet': (product, unit, vertical, subDistributor) => {
-    let unitRes = Unit.findOne({ product: product, _id: unit, active: "Y" }, { fields: { unitName: 1, baseQuantity: 1 } });
-    let stockRes = Stock.findOne({ product: product, vertical: vertical, subDistributor: subDistributor });
-    let productBaseUnit = Product.findOne({ _id: product });
-    let baseUnit = '';
-    if (productBaseUnit) {
-      if (productBaseUnit.basicUnit !== undefined) {
-        let unitVal = Unit.findOne({ _id: productBaseUnit.basicUnit });
-        if (unitVal) {
-          baseUnit = unitVal.unitName;
-        }
-      }
+
+  'unit.dataGet': (id) => {
+    let unitRes = Unit.findOne({ _id: id });
+    let itemName = '';
+    let itemResult = Item.findOne({ ugpCode: unitRes.ugpCode });
+    if (itemResult) {
+      itemName = itemResult.itemNam;
     }
-
-    return { unitRes: unitRes, stockRes: stockRes, baseUnit: baseUnit }
-  },
-
-  /**
-* 
-* @param {*} product 
-* get units based on products
-*/
-  'unit.priceCal': (product, unit, vertical, user, channelval) => {
-    let sdDetails = allUsers.findOne({ _id: user });
-    if (sdDetails) {
-      let productPrice = '0.00';
-      let unitRes = Unit.findOne({ product: product, _id: unit, active: "Y" }, { fields: { unitName: 1, baseQuantity: 1 } });
-      let stockRes = WareHouseStock.findOne({
-        product: product, vertical: vertical,
-        subDistributor: sdDetails.subDistributor, employeeId: user
-      });
-      let productBaseUnit = Product.findOne({ _id: product });
-      // console.log("channelval", channelval);
-      let sdPriceTypeRes = SdPriceType.findOne({ subDistributor: sdDetails.subDistributor, vertical: vertical });
-      // console.log("sdPriceTypeRes", sdPriceTypeRes);
-      if (sdPriceTypeRes) {
-        let priceVal = Price.findOne({ priceType: sdPriceTypeRes.priceType, product: product, unit: unit },
-          { fields: { priceOmr: 1, priceVsr: 1, priceWs: 1 } });
-        if (priceVal) {
-          if (channelval === 'VSR') {
-            productPrice = priceVal.priceVsr;
-          }
-          else if (channelval === 'OMR') {
-            productPrice = priceVal.priceOmr;
-          }
-          else if (channelval === 'WS') {
-            productPrice = priceVal.priceWs;
-          }
-        }
-      }
-      let baseUnit = '';
-      if (productBaseUnit) {
-        if (productBaseUnit.basicUnit !== undefined) {
-          let unitVal = Unit.findOne({ _id: productBaseUnit.basicUnit });
-          if (unitVal) {
-            baseUnit = unitVal.unitName;
-          }
-        }
-      }
-      return {
-        unitRes: unitRes, stockRes: stockRes,
-        baseUnit: baseUnit, productPrice: productPrice
-      };
-    }
-  },
-
-
-  /**
-* 
-* @param {*} product 
-* get units based on products
-*/
-  'unit.priceCalEdit': (product, unit, vertical, user, sdUser) => {
-    let sdDetails = allUsers.findOne({ _id: user });
-    if (sdDetails) {
-      let productPrice = '0.00';
-      let unitRes = Unit.findOne({ product: product, _id: unit, active: "Y" }, { fields: { unitName: 1, baseQuantity: 1 } });
-      let stockRes = WareHouseStock.findOne({
-        product: product, vertical: vertical,
-        subDistributor: user, employeeId: sdUser
-      });
-      let productBaseUnit = Product.findOne({ _id: product });
-      let channelval = '';
-      let userRes = allUsers.findOne({ _id: sdUser });
-      if (userRes) {
-        let roleRes = Meteor.roles.findOne({ _id: userRes.roles[0] });
-        if (roleRes) {
-          let vsrCheck = roleRes.permissions.includes('vsrView');
-          if (vsrCheck === true) {
-            channelval = 'VSR'
-          }
-          let omrCheck = roleRes.permissions.includes('omrView');
-          if (omrCheck === true) {
-            channelval = 'OMR';
-          }
-          let wsCheck = roleRes.permissions.includes('wseView');
-          if (wsCheck === true) {
-            channelval = 'WS';
-          }
-        }
-      }
-      let sdPriceTypeRes = SdPriceType.findOne({ subDistributor: user, vertical: vertical });
-      if (sdPriceTypeRes) {
-        let priceVal = Price.findOne({ priceType: sdPriceTypeRes.priceType, product: product, unit: unit },
-          { fields: { priceOmr: 1, priceVsr: 1, priceWs: 1 } });
-        if (priceVal) {
-          if (channelval === 'VSR') {
-            productPrice = priceVal.priceVsr;
-          }
-          else if (channelval === 'OMR') {
-            productPrice = priceVal.priceOmr;
-          }
-          else if (channelval === 'WS') {
-            productPrice = priceVal.priceWs;
-          }
-        }
-      }
-      let baseUnit = '';
-      if (productBaseUnit) {
-        if (productBaseUnit.basicUnit !== undefined) {
-          let unitVal = Unit.findOne({ _id: productBaseUnit.basicUnit });
-          if (unitVal) {
-            baseUnit = unitVal.unitName;
-          }
-        }
-      }
-      return {
-        unitRes: unitRes, stockRes: stockRes,
-        baseUnit: baseUnit, productPrice: productPrice
-      };
-    }
-  },
-
- /**
-  * return unit name based on product
-  *  */ 
-  'unit.productUnitList': (productId) => {
-    let unitArray = [];
-    let unitRes = Unit.find({ product: productId,active:"Y" }, { fields: { unitName: 1 } }).fetch();
-    if (unitRes.length > 0) {
-      for (let i = 0; i < unitRes.length; i++) {
-        unitArray.push(unitRes[i].unitName);
-      }
-    }
-    return unitArray.toString();
+    return { unitRes: unitRes, itemName: itemName }
   },
 });

@@ -7,5 +7,5 @@ import './systemConfig';
 import './create.html';
 import './create';
 import './utility';
-// import './posInvoiceReport.html';
-// import './posInvoiceReport';
+import './posInvoiceReport.html';
+import './posInvoiceReport';

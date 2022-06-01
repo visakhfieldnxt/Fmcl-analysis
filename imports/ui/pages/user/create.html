@@ -1,139 +1,187 @@
-<template name="user_create"> 
+<template name="user_create">
+  {{#with userName}}
+ 
   <form class="userAdd" autocomplete="off" id="userAdd">
-    <div class="box box-default box-solid">
-      <!-- <div class="box-header with-border bg-aqua">
-        <h3 class="box-title">User Details</h3>
-      </div> -->
-      <table style="width:100%;" class="table table-striped">
-        <tr>
-          <div class="form-group has-feedback">
+      <div class="box box-default box-solid">
+          <div class="box-header with-border bg-aqua">
+            <h3 class="box-title">{{user}} Details</h3>
+          </div>
+    <table style="width:100%;" class="table table-striped">
+        <tr>  <div class="form-group has-feedback" >
             <div class="col-sm-6" style="padding: 10px 10px 20px 10px;">
               <label for="empCode">EMP Code </label>
-              <input type="text" id="empCodes" class="form-control validation" placeholder="Enter Employee Code"
+              <input type="text" id="empCodes" class="form-control validation" placeholder="Enter employee code . ."
                 name="empCodes" required>
-
+             
             </div>
             <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
-              <label for="firstName">First Name <span class="asteric_red">*</span> </label>
-              <input type="text" class="form-control validation" placeholder="Enter First Name" name="firstName"
-                required>
-            </div>
-
+                <label for="firstName">First Name <span class="asteric_red">*</span> </label>
+                <input type="text" class="form-control validation" placeholder="Enter first name . ." name="firstName" required>
+              </div>
+           
           </div>
         </tr>
-        <tr>
-          <td>
-            <div class="form-group has-feedback">
+      <tr><td>
+    <div class="form-group has-feedback">
+        
+      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+        <label for="lastName">Last Name</label>
+        <input type="text" class="form-control novalidation" placeholder=" Enter last name . ." name="lastName">
+      </div>
+      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+          <label for="gender" style="margin-right: 5px;">Gender<span class="asteric_red">*</span></label><br>
+  
+          <input type="radio" name="gender" value="Male" style="margin-right: 5px;" required> Male
+          <input type="radio" name="gender" value="Female" style="margin-right: 5px;margin-left:5px;" required> Female
+          <input type="radio" name="gender" value="Other" style="margin-right: 5px;margin-left:5px;" required> Other
+        </div>
+    </div>
+  </td>
+  </tr>
+  <tr><td>
+    <div class="form-group has-feedback" >
+    
+      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+          <label for="dateOfBirth">Select SAP Employee<span class="asteric_red">*</span></label>
+          
+          <select class="sapEmployee" style="width:100%;" name="sapEmployee" multiple id="sapEmployee" >
+            {{# each employeeList}}
+            <option value="{{slpCode}}">{{slpName}}</option>
+            {{/each}}
+         </select>
+         <span id="rolesArrayspan"></span>
+        </div>
+    </div>
+  </td>
+  </tr>
+<tr><td>
+    <div class="form-group has-feedback" >
+       
+      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+        {{#with date}}
+        <label for="dateOfBirth">Date Of Birth<span class="asteric_red">*</span></label>
+        <input type="text" class="form-control datepicker date validation" onkeydown="event.preventDefault()" id="my-datepickers"
+          data-provide="datepicker" data-date-autoclose= "true" data-date-format="dd/mm/yyyy" data-date-end-date="{{date}}" placeholder="Select date of birth . . " name="dateOfBirth"
+          required />
+          {{/with}}
+      </div>
+      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+          <label for="dateOfBirth">Select Roles<span class="asteric_red">*</span></label>
+          
+          <select class=" selectDropdown" style="width:100%;"  multiple="multiple" name="roleName" id="roleSelection" >
+            {{# each rolesList}}          
+           <option value="{{_id}}">{{name}}</option>
+          {{/each}}
+         </select>
+         <span id="rolesArrayspan"></span>
+        </div>
+    </div>
+  </td>
+  </tr>
+  <tr><td>
+      <div class="form-group has-feedback" >
+          
+       
+        <!-- <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+          <label for="designation">Select Designation<span class="asteric_red">*</span></label>
+          
+          <select name="designationName" id="designationSelection" required>
+              <option disabled="disabled" selected="selected"> Select designation</option> 
+            {{#each designations_list}}          
+            <option value="{{uuid}}">{{name}}</option>
+           {{/each}}
+          </select>
+        </div> -->
+        <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+          <label for="username">Contact No.<span class="asteric_red">*</span></label>
+          <input type="tel" pattern="[0-9]{10}" class="form-control validation" placeholder="Enter Contact No. . ." name="contactNo" required>
+        </div>
+        <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+            <label for="dateOfBirth">Supervisor<span class="asteric_red">*</span></label>
+       
+            <select class="userSelected" style="width:100%;"   name="supervisor" id="userSelect" required>
+                <option disabled='disabled' selected='selected'>Select Supervisor</option>
+              {{# each userList}}          
+             <option value="{{_id}}">{{profile.firstName}} {{profile.lastName}}</option>
+            {{/each}}
+           </select>
+          </div>
 
-              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
-                <label for="lastName">Last Name</label>
-                <input type="text" class="form-control novalidation" placeholder=" Enter last name . ." name="lastName">
-              </div>
-              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
-                <label for="gender" style="margin-right: 5px;">Gender<span class="asteric_red">*</span></label><br>
+      </div>
+    </td>
+    </tr>
+    <tr>
+      <td>
+    <div class="form-group has-feedback">
+      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+        <label for="Email">Email Id<span class="asteric_red">*</span></label>
+        <input type="email" class="form-control validation" id="email" placeholder="Enter email Id . ." name="email"
+          pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" title="Please enter a vaild email address eg: example@example.com"
+          required>
+        <span id="emailspan"> </span>
+      </div>
+      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+        <label for="username">Username<span class="asteric_red">*</span></label>
+        <input type="text" id="usernameValue" class="form-control validation" placeholder="Enter username . ." name="username" required>
+      </div>
 
-                <input type="radio" name="gender" value="Male" style="margin-right: 5px;" required> Male
-                <input type="radio" name="gender" value="Female" style="margin-right: 5px;margin-left:5px;" required>
-                Female
-                <input type="radio" name="gender" value="Other" style="margin-right: 5px;margin-left:5px;" required>
-                Other
-              </div>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <div class="form-group has-feedback">
+    </div>
+  </td>
+  </tr>
+  <tr>
+    <td>
+    <div class="form-group has-feedback" style="">           
 
-              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
-                {{#with date}}
-                <label for="dateOfBirth">Date Of Birth<span class="asteric_red">*</span></label>
-                <input type="text" class="form-control datepicker date validation" onkeydown="event.preventDefault()"
-                  id="my-datepickers" data-provide="datepicker" data-date-autoclose="true" data-date-format="dd/mm/yyyy"
-                  data-date-end-date="{{date}}" placeholder="Select date of birth . . " name="dateOfBirth" required />
-                {{/with}}
-              </div>
-              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
-                <label for="dateOfBirth">Select Role<span class="asteric_red">*</span></label>
-                <select class="selectDropdown" style="width:100%;" name="roleName" id="roleSelection">
-                  <option value="">Select Role</option>
-                  {{# each rolesList}}
-                  <option value="{{_id}}">{{name}}</option>
-                  {{/each}}
-                </select>
-                <span id="rolesArrayspan"></span>
-              </div>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <div class="form-group has-feedback"> 
-              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
-                <label for="username">Contact No </label>
-                <input type="tel" pattern="[0-9]{10}" class="form-control validation"
-                  placeholder="Enter Contact No. . ." name="contactNo">
-              </div>
-              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
-                <label for="Email">Email Id<span class="asteric_red">*</span></label>
-                <input type="email" class="form-control validation" id="email" placeholder="Enter email Id . ."
-                  name="email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$"
-                  title="Please enter a vaild email address eg: example@example.com" required>
-                <span id="emailspan"> </span>
-              </div>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <div class="form-group has-feedback"> 
-              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
-                <label for="branch">Vertical <span class="asteric_red">*</span></label>
-                <select class="verticalSelection" style="width:100%;" name="verticalSelection"
-                  id="verticalSelection" required>
-                  <option value="">Select Vertical</option>
-                  {{# each verticalList}}
-                  <option value="{{_id}}">{{verticalName}}</option>
-                  {{/each}}
-                </select>
-              </div>
-              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
-                <label for="username">Username <span class="asteric_red">*</span></label>
-                <input type="text" id="usernameValue" class="form-control validation" placeholder="Enter username . ."
-                  name="username" required>
-              </div>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <div class="form-group has-feedback" > 
-              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
-                <label for="password">Password<span class="asteric_red">*</span></label>
-                <input type="password" class="form-control validation" placeholder="Enter password . ." id="password"
-                  name="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" style="padding-right: 0"
-                  autocomplete="off" required>
-                <span toggle="#password" style="position: absolute;top:36px;right: 21px;"
-                  class=" fa fa-fw fa-eye-slash field-icon toggle-password"></span>
-                <span id="passwordspan"></span>
-                <div class="hint">
-                  Password must be at least 8 characters long and should contain at least a number and an uppercase
-                  letter
-                </div>
-              </div>
-              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
-                <label for="confirmPassword">Confirm Password<span class="asteric_red">*</span></label>
-                <input type="password" id="confirmPassword" class="form-control validation"
-                  pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" placeholder="Retype password . ." autocomplete="off"
-                  name="confirmPassword" required>
-                <span id="confirmPasswordspan"></span>
-              </div> 
-            </div>
-          </td>
-        </tr> 
-      </table>
-    </div> 
-    <button type="submit" id="updateUser" class="btn btn-primary  pull-right">Save User</button>
-    <button type="button" class="btn btn-default closeUser" data-dismiss="modal">Close</button>
-  </form> 
+      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+        <label for="branch">Branch<span class="asteric_red">*</span></label>
+   
+       <select class="branchSelection" style="width:100%;"  multiple="multiple" name="branchs" id="userBranches" >
+        {{# each branchList}}          
+       <option value="{{bPLId}}">{{bPLName}}</option>
+      {{/each}}
+     </select>
+      </div>
+      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+        <label for="branch">Default Branch<span class="asteric_red">*</span></label>
+   
+        <select class="selectDefaultBrnch" style="width:100%;"   name="defBrnch" id="defaultBranch" required>
+          {{# each dbranchList}}          
+         <option value="{{bPLId}}">{{bPLName}}</option>
+        {{/each}}
+       </select>
+     
+      </div>
+      
+    </div>
+    </td>
+  </tr>
+   <tr>
+     <td> <div class="form-group has-feedback">
+      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+        <label for="password">Password<span class="asteric_red">*</span></label>
+        <input type="password" class="form-control validation" placeholder="Enter password . ." id="password" name="password"
+          pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" style="padding-right: 0" autocomplete="off" required>
+        <span toggle="#password" style="position: absolute;top:36px;right: 21px;" class=" fa fa-fw fa-eye-slash field-icon toggle-password"></span>
+        <span id="passwordspan"></span>
+        <div class="hint">
+          Password must be at least 8 characters long and should contain at least a number and an uppercase letter
+        </div>
+      </div>
+      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+        <label for="confirmPassword">Confirm Password<span class="asteric_red">*</span></label>
+        <input type="password" id="confirmPassword" class="form-control validation" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+          placeholder="Retype password . ." autocomplete="off" name="confirmPassword" required>
+        <span id="confirmPasswordspan"></span>
+      </div>
+
+    </div>
+  </td>
+  </tr>
+  </table>
+</div>
+    
+      <button type="submit" id="updateUser" class="btn btn-primary  pull-right">Save {{user}}</button>
+      <button type="button" class="btn btn-default closeUser" data-dismiss="modal" >Close</button>
+  </form>
+  {{/with}}
 </template>

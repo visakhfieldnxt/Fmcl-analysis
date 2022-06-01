@@ -1,25 +1,83 @@
 <template name="branch_create">
-  {{#if userCan 'branchCreate'}}
   <form class="branchAdd" autocomplete="off" id="branchAdd">
     <div class="box box-default box-solid">
       <div class="box-header with-border bg-aqua">
-        <!-- <h3 class="box-title">Branch Details</h3> -->
+        <h3 class="box-title">Branch Details</h3>
         <button type="button" class="close closebranch" id="closeUserBranch" data-dismiss="modal" aria-label="Close">
           <span style="margin-top: -65px;margin-left: -5px;position: absolute;" aria-hidden="true">×</span></button>
       </div>
       <table style="width:100%;" class="table table-striped">
         <tr>
           <td>
+            <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+              <label for="lastName">Branch Code<span class="asteric_red">*</span></label>
+              <input type="text" class="form-control validation" placeholder="Branch Code" id="branchCodes"
+                name="branchCodes" required>
+            </div>
             <div class="form-group has-feedback">
               <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
-                <label for="lastName">Branch Code <span class="asteric_red">*</span></label>
-                <input type="text" class="form-control validation" placeholder="Branch Code" id="branchCodes"
-                  name="branchCodes" required>
-              </div>
-              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
-                <label for="lastName">Branch Name <span class="asteric_red">*</span></label>
+                <label for="lastName">Branch Name<span class="asteric_red">*</span></label>
                 <input type="text" class="form-control validation" placeholder="Branch Name" id="branchNames"
                   name="branchNames" required>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <div class="form-group has-feedback">
+            <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+              <label for="cardName">Default Customer<span class="asteric_red">*</span></label>
+              <select class="selectCustomerS" style="width:100%;" name="customer" id="selectCustomerS" required>
+                <option value='' disabled selected='selected'>Select Customer</option>
+                {{# each customersList}}
+                <option value="{{cardCode}}">{{cardName}}</option>
+                {{/each}}
+              </select>
+            </div>
+            <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+              <label for="cardName">Default Vendor<span class="asteric_red">*</span></label>
+              <select class="selectSupplierS" style="width:100%;" name="selectSupplierS" id="selectSupplierS" required>
+                <option value='' disabled selected='selected'>Select Vendor</option>
+                {{# each suppliersList}}
+                <option value="{{cardCode}}">{{cardName}}</option>
+                {{/each}}
+              </select>
+            </div>
+          </div>
+        </tr>
+        <tr>
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="branch">Default WareHouse<span class="asteric_red">*</span></label>
+                <select class="wareHouseSelection" style="width:100%;" name="wareHouseSelection" id="wareHouseSelection"
+                  required>
+                  <option value='' disabled selected='selected'>Select Warehouse</option>
+                  {{# each wareHousesList}}
+                  <option value="{{whsCode}}">{{whsCode}} / {{whsName}}</option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="lastName">Payment Clear Act<span class="asteric_red">*</span></label>
+                <input type="text" class="form-control validation" placeholder="Payment Clear Act" id="paymentClearActs"
+                  name="paymentClearActs" required>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="lastName">Address<span class="asteric_red">*</span></label>
+                <input type="text" class="form-control validation" placeholder="Address" id="addresses" name="addresses"
+                  required>
+              </div>
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="lastName">Street No<span class="asteric_red">*</span></label>
+                <input type="text" class="form-control validation" placeholder="Street No" id="streets" name="streets"
+                  required>
               </div>
             </div>
           </td>
@@ -30,5 +88,4 @@
       Branch</button>
     <button type="button" class="btn btn-default closebranch" data-dismiss="modal">Close</button>
   </form>
-  {{/if}}
 </template>

@@ -8,244 +8,172 @@ Template.superAdminDashboard.onCreated(function () {
   const self = this;
   self.autorun(() => {
   });
-  this.verticalData = new ReactiveVar();
-  this.sdData = new ReactiveVar();
-  this.regionData = new ReactiveVar();
-  this.outletData = new ReactiveVar();
-  this.pricipalData = new ReactiveVar();
-  
 });
-let verticalRes = [];
-let verticalTotalRes = [];
 Template.superAdminDashboard.onRendered(function () {
-  if (Meteor.userId()) {
-    let fromDate = moment(new Date()).format('YYYY-MM-01 00:00:00.0');
-    let toDate = moment(new Date()).format('YYYY-MM-DD 00:00:00.0');
-    Meteor.call('creditSale.verticalwiseSaleDashboardMD', fromDate, toDate, (err, res) => {
-      if (!err) {
-        console.log("res", res);
-        verticalRes = res.label;
-        verticalTotalRes = res.value;
-        this.verticalData.set(res);
+  let currencyValues = Session.get("currencyValues");
+  $('.selectCustomerName').select2({
+    placeholder: "Select Customer Name",
+    tokenSeparators: [','],
+    allowClear: true
+  });
+  /**
+   * line chart
+   */
 
+  let today = moment(new Date()).format("YYYY-MM-DD 00:00:00.0");
+  let toDay = new Date(today);
+  let nextDay = new Date(toDay);
+
+  let date1 = moment(nextDay).format('DD-MM-YYYY');
+  let date2 = moment(new Date(toDay).setDate(new Date(toDay).getDate() - 1)).format('DD-MM-YYYY');
+  let date3 = moment(new Date(toDay).setDate(new Date(toDay).getDate() - 2)).format('DD-MM-YYYY');
+  let date4 = moment(new Date(toDay).setDate(new Date(toDay).getDate() - 3)).format('DD-MM-YYYY');
+  let date5 = moment(new Date(toDay).setDate(new Date(toDay).getDate() - 4)).format('DD-MM-YYYY');
+
+
+  new Chart(document.getElementById("line-chart"), {
+    type: 'line',
+    data: {
+      labels: [`${date1}`, `${date2}`, `${date3}`, `${date4}`, `${date5}`],
+      datasets: [{
+        data: [86, 114, 106, 106, 107],
+        label: "Supa Oil",
+        borderColor: "#28a745",
+        fill: false
+      }, {
+        data: [282, 350, 411, 502, 635],
+        label: "North Safety",
+        borderColor: "#f95d6a",
+        fill: false
+      },
+        //  {
+        //   data: [168, 170, 178, 190, 203],
+        //   label: "North Safety",
+        //   borderColor: "#3cba9f",
+        //   fill: false
+        // }, {
+        //   data: [40, 20, 10, 16, 24],
+        //   label: "Supa Oil",
+        //   borderColor: "#e8c3b9",
+        //   fill: false
+        // }, {
+        //   data: [6, 3, 2, 2, 7],
+        //   label: "Comaco",
+        //   borderColor: "#c45850",
+        //   fill: false
+        // }
+      ]
+    },
+    options: {
+      title: {
+        display: true,
+        text: 'Manufacturers Summary (Last 5 Days)'
       }
-    });
-    Meteor.call('creditSale.subDwiseSaleDashMD', fromDate, toDate, (err, res) => {
-      if (!err) {
-        this.sdData.set(res);
+    }
+  });
+
+
+  /**
+   * bar chart
+   */
+
+
+  new Chart(document.getElementById("bar-chart-grouped"), {
+    type: 'bar',
+    data: {
+      labels: ["GM TRADING SERVICE", "REVIN ZAMBIA LIMITED", "CENTRAL BAKERY", "COASTAL IMPORT & EXPORT", "METALCAST INDUSTRIES"],
+      datasets: [
+        {
+          label: "Opening Stock",
+          backgroundColor: "#003f5c",
+          data: [500, 600, 700, 800, 1000]
+        },
+        {
+          label: "Sold Stock",
+          backgroundColor: "#ffa600",
+          data: [150, 200, 300, 300, 600]
+        },
+        {
+          label: "Closing Stock",
+          backgroundColor: "#ff6361",
+          data: [350, 400, 400, 500, 400]
+        },
+      ]
+    },
+    options: {
+      title: {
+        display: true,
+        text: 'Stock Summary'
       }
-    });
-    Meteor.call('creditSale.reginWiseDashMD', fromDate, toDate, (err, res) => {
-      if (!err) {
-        this.regionData.set(res);
+    }
+
+  });
+  /**
+   * doughnut chart
+   */
+  new Chart(document.getElementById("doughnut-chart"), {
+    type: 'doughnut',
+    data: {
+      labels: ["GM TRADING SERVICE", "REVIN ZAMBIA LIMITED", "CENTRAL BAKERY", "COASTAL IMPORT & EXPORT"],
+      datasets: [
+        {
+          label: `Customer Transactions (in ${currencyValues})`,
+          backgroundColor: ["#17a2b8", "#6610f2", "#28a745", "red"],
+          data: [5000.120, 1000.230, 700.420, 4000.481]
+        }
+      ],
+    },
+    options: {
+      // title: {
+      //   display: true,
+      //   text: 'Customer Transactions (in ZMW)',
+      // },
+      label: {
+        position: 'bottom'
       }
-    });
-    Meteor.call('outlet.totalOutletsDashMD',  (err, res) => {
-      if (!err) {
-        this.outletData.set(res);
-      }
-    });
-    Meteor.call('principal.wisesalesMD',fromDate, toDate,  (err, res) => {
-      if (!err) {
-        this.pricipalData.set(res);
-      }
-    });
-  }
+      // onClick: function (event, item) {
+      //   console.log("event", event);
+      //   console.log("item", item[0]._index);
+      //   if (item[0]._index === 0) {
+      //     $("#salesOrderModal").modal();
+      //   } else if (item[0]._index === 1) {
+      //     $("#salesQuotationModal").modal();
+      //   } else if (item[0]._index === 2) {
+      //     $("#arInvoiceModal").modal();
+      //   } else if (item[0]._index === 3) {
+      //     $("#crInvoiceModal").modal();
+      //   }
+      // }
+    }
+  });
+
 
 });
 
 Template.superAdminDashboard.helpers({
-  verticalData: () => {
-    let verticalData = Template.instance().verticalData.get();
-    if (verticalData) {
-      new Morris.Donut({
-        element: 'doughnut-chart',
-        resize: true,
-        colors: ['#007bff', '#ffc107', '#ff4040', '#16ca00'],
-        data: verticalData,
-        hideHover: 'auto'
-      }).on('click', function (i, row) {
-      });
 
-
-      $('#outletDataDisplay').css('display', 'block');
-      // $('#doughnut-chart').css('height', '250px');
-      $('#refreshvert').css('display', 'none');
-    }
-  },
-  sdWiseSales: () => {
-    let sdData = Template.instance().sdData.get();
-    if (sdData) {
-      new Chart(document.getElementById("bar-chart-grouped"), {
-        type: 'bar',
-        data: {
-          labels: sdData.label,
-          datasets: [
-            {
-              label: "Current Monthly Sales",
-              data: sdData.value,
-              backgroundColor: [
-                'rgb(255, 99, 132)',
-                'rgb(255, 159, 64)',
-                'rgb(255, 205, 86)',
-                'rgb(75, 192, 192)',
-                'rgb(54, 162, 235)',
-                'rgb(153, 102, 255)',
-                'rgb(201, 203, 207)'
-              ],
-              borderColor: [
-                'rgb(255, 99, 132)',
-                'rgb(255, 159, 64)',
-                'rgb(255, 205, 86)',
-                'rgb(75, 192, 192)',
-                'rgb(54, 162, 235)',
-                'rgb(153, 102, 255)',
-                'rgb(201, 203, 207)'
-              ],
-              borderWidth: 1
-            },
-
-          ]
-        },
-        // options: {
-        //   title: {
-        //     display: true,
-        //     text: 'Stock Summary'
-        //   }
-        // }
-
-      });
-      $('#refreshvsd').css('display', 'none');
-    }
-
-  },
-  regionSales: () => {
-    let regionData = Template.instance().regionData.get();
-    if (regionData) {
-      new Chart(document.getElementById("line-chart"), {
-        type: 'line',
-        data: {
-          labels: regionData.label,
-          datasets: [{
-            data: regionData.value,
-            label: "Current Month Sales",
-            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-            borderColor: regionData.color,
-            fill: true
-          },
-
-          ]
-        },
-        // options: {
-        //   title: {
-        //     display: true,
-        //     text: 'Manufacturers Summary (Last 5 Days)'
-        //   }
-        // }
-      });
-      $('#refreshvregion').css('display', 'none');
-    }
-
-  },
-  outletWise: () => {
-    let outletData = Template.instance().outletData.get();
-    if (outletData) {
-      new Chart(document.getElementById("polarAreaChart"), {
-        type: 'polarArea',
-        data: {
-          labels: outletData.label,
-          datasets: [{
-            label: 'Total Outlets',
-            data: outletData.value,
-            backgroundColor: 
-            [
-              '#EA7369',
-              '#1CD4D4',
-              '#7D3AC0',
-              '#C02323',
-              '#1AC9E7'
-            ]
-          }]        
-        
-        },
-
-        // options: {
-        //   title: {
-        //     display: true,
-        //     text: 'Stock Summary'
-        //   }
-        // }
-
-      });
-      $('#refreshvoutlet').css('display', 'none');
-
-    }
-  },
-  principalWiseSales: () => {
-    let sdData = Template.instance().sdData.get();
-    if (sdData) {
-      new Chart(document.getElementById("principal-grouped"), {
-        type: 'bar',
-        data: {
-          labels: sdData.label,
-          datasets: [
-            {
-              label: "Current Monthly Sales",
-              data: sdData.value,
-              backgroundColor: [
-                'rgb(255, 99, 132)',
-                'rgb(255, 159, 64)',
-                'rgb(255, 205, 86)',
-                'rgb(75, 192, 192)',
-                'rgb(54, 162, 235)',
-                'rgb(153, 102, 255)',
-                'rgb(201, 203, 207)'
-              ],
-              borderColor: [
-                'rgb(255, 99, 132)',
-                'rgb(255, 159, 64)',
-                'rgb(255, 205, 86)',
-                'rgb(75, 192, 192)',
-                'rgb(54, 162, 235)',
-                'rgb(153, 102, 255)',
-                'rgb(201, 203, 207)'
-              ],
-              borderWidth: 1
-            },
-
-          ]
-        },
-        // options: {
-        //   title: {
-        //     display: true,
-        //     text: 'Stock Summary'
-        //   }
-        // }
-
-      });
-      $('#refreshvsd').css('display', 'none');
-    }
-
-  },
   dateVal: () => {
     return moment(new Date()).format('DD-MM-YYYY');
   },
-
-  // date1Value: () => {
-  //   return moment(new Date()).format('DD-MM-YYYY');
-  // },
-  // date2Value: () => {
-  //   return moment(new Date(toDay).setDate(new Date(toDay).getDate() - 1)).format('DD-MM-YYYY');
-  // },
-  // date3Value: () => {
-  //   return moment(new Date(toDay).setDate(new Date(toDay).getDate() - 2)).format('DD-MM-YYYY');
-  // },
-  // date4Value: () => {
-  //   return moment(new Date(toDay).setDate(new Date(toDay).getDate() - 3)).format('DD-MM-YYYY');
-  // },
-  // date5Value: () => {
-  //   return moment(new Date(toDay).setDate(new Date(toDay).getDate() - 4)).format('DD-MM-YYYY');
-  // },
+  currencyGet: () => {
+    let currencyValues = Session.get("currencyValues");
+    return currencyValues;
+  },
+  date1Value: () => {
+    return moment(new Date()).format('DD-MM-YYYY');
+  },
+  date2Value: () => {
+    return moment(new Date(toDay).setDate(new Date(toDay).getDate() - 1)).format('DD-MM-YYYY');
+  },
+  date3Value: () => {
+    return moment(new Date(toDay).setDate(new Date(toDay).getDate() - 2)).format('DD-MM-YYYY');
+  },
+  date4Value: () => {
+    return moment(new Date(toDay).setDate(new Date(toDay).getDate() - 3)).format('DD-MM-YYYY');
+  },
+  date5Value: () => {
+    return moment(new Date(toDay).setDate(new Date(toDay).getDate() - 4)).format('DD-MM-YYYY');
+  },
 });
 Template.superAdminDashboard.events({
 
@@ -269,10 +197,7 @@ Template.superAdminDashboard.events({
     $('#fromDates').val('');
     $('#toDates').val('');
     $("#filterTransactionModalTwo").modal();
-  },'click #removeSearch': () => {
-    document.getElementById('filterDisplay').style.display = "none";
   }
-
 });
 
 

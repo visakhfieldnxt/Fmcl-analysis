@@ -75,7 +75,10 @@ Template.orderHistory.helpers({
   optionsHelper: () => {
     return globalOptionsHelper(orderCollectionName);
   },
-
+  currencyGet: () => {
+    let currencyValues = Session.get("currencyValues");
+    return currencyValues;
+  },
   /**
    * TODO: Complete JS doc
    * @returns {{collection: *, acceptEmpty: boolean, substitute: string, eventType: string}}

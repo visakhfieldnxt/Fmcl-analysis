@@ -1,6 +1,6 @@
 /**
- * @author Nithin
+ * @author Visakh
  */
 
-import './stockTransferReport.html';  
-import './stockTransferReport'; 
+import './stockTransferReport.html';
+import './stockTransferReport';

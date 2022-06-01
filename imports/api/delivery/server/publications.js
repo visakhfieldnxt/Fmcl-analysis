@@ -9,8 +9,12 @@ Meteor.startup(() => {
 /**
  * TODO: Complete JS 
  */
-  Delivery._ensureIndex({    uuid: 1  }, {    unique: true  });
-  Delivery._ensureIndex({ createdAt: 1 }, { unique: false });
+Delivery.createIndex({    uuid: 1  }, {    unique: true  });
+Delivery.createIndex({    docEntry: 1  }, {    unique: false  });
+Delivery.createIndex({    docStatus: 1  }, {    unique: false  });
+Delivery.createIndex({    cardCode: 1  }, {    unique: false  });
+Delivery.createIndex({    address: 1  }, {    unique: false  });
+Delivery.createIndex({    docType: 1  }, {    unique: false  });
   publishPagination(Delivery);
   
 });

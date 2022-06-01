@@ -4,13 +4,19 @@
 
 /**
  * TODO: Complete JS doc
- * @param target 
+ * @param target
+ * @param id
  */
-createOrUpdatebranch = (target,loginUserVerticals) => { 
+createOrUpdatebranch = (target, customerCode, supplierCode, wareHouse) => {
+
   let branchName = target.branchNames;
-  let branchCode = target.branchCodes; 
-  return Meteor.call('branch.create', branchName.value, branchCode.value,loginUserVerticals,
-    (error, result) => {
+  let branchCode = target.branchCodes;
+  let address = target.addresses;
+  let street = target.streets;
+  let paymentClearAct = target.paymentClearActs;
+
+  return Meteor.call('branch.create', branchName.value, branchCode.value,
+    customerCode, supplierCode, wareHouse, address.value, street.value, paymentClearAct.value, (error, result) => {
       if (error) {
         $('#branchErrorModal').find('.modal-body').text(error.reason);
         $('#branchErrorModal').modal();
@@ -29,12 +35,17 @@ createOrUpdatebranch = (target,loginUserVerticals) => {
  * TODO: Complete JS doc
  * @param target
  */
-  updatebranchlist = (target,loginUserVerticals) => { 
+  updatebranchlist = (target, customerCode, supplierCode, wareHouse) => {
+
     let branchName = target.branchNameEdits;
-    let branchCode = target.branchCodeEdits; 
+    let branchCode = target.branchCodeEdits;
+    let address = target.addressEdits;
+    let street = target.streetEdits;
+    let paymentClearAct = target.paymentClearActEdits;
     let id = target.id;
-    return Meteor.call('branch.update', id.value, branchName.value, branchCode.value,loginUserVerticals,
-      (error, result) => {
+
+    return Meteor.call('branch.update', id.value, branchName.value, branchCode.value,
+      customerCode, supplierCode, wareHouse, address.value, street.value, paymentClearAct.value, (error, result) => {
         if (error) {
           $('#branchErrorModal').find('.modal-body').text(error.reason);
           $('#branchErrorModal').modal();

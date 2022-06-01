@@ -10,7 +10,7 @@ Meteor.startup(() => {
   /**
  * TODO: Complete JS doc
  */
-Notification._ensureIndex({ user: 1 }, { unique: false });
+Notification.createIndex({ uuid: 1 }, { unique: true });
   publishPagination(Notification);
 
 });

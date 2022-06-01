@@ -1,400 +1,357 @@
 /**
- * @author Nithin
+ * @author Visakh
  */
+
 import { StockTransfer } from './stockTransfer';
-import { WareHouseStock } from '../wareHouseStock/wareHouseStock';
-import { Stock } from '../stock/stock';
-import { TempSerialNo } from "../tempSerialNo/tempSerialNo";
-import { Verticals } from '../verticals/verticals';
-import { allUsers } from '../user/user';
-import { StockTransferIssued } from '../stockTransferIssued/stockTransferIssued';
-import { StockSummary } from '../stockSummary/stockSummary';
-import moment from 'moment';
-import { Unit } from '../unit/unit';
+import { WareHouse } from '../../api/wareHouse/wareHouse';
 import { Notification } from '../notification/notification';
+import { Config } from '../config/config';
+import { allUsers } from '../user/user';
+import { Branch } from '../branch/branch';
+import { StockTransferSerialNo } from '../stockTransferSerialNo/stockTransferSerialNo';
+// import {stockTransferPost_Url} from '../../startup/client/sapUrls';
+
+let call = true;
+let count = 0;
 Meteor.methods({
-    /**
-    * create stock
-    * @param {*} vertical 
-    * @param {*} productArray 
-    */
-    'stockTransfer.create': (productArray, empId, vertical) => {
 
-        let temporaryId = '';
+  /**
+   * TODO: Complete JS doc
+   * @param customer
+   * @param dueDate
+   * @param itemArray
+   * @param branch
+   * @param employee
+   * @param beforeDiscount
+   * @param afterDiscount
+   * @param GST
+   * @param grandTotal
+   */
+  'stockTransfer.create': (dueDate, itemArray, wareHouseFrom, wareHouseTo, employee, remark_stock, branchs, weight) => {
+    let wareHouseFromName = WareHouse.findOne({ whsCode: wareHouseFrom }).whsName;
+    let wareHouseToName = WareHouse.findOne({ whsCode: wareHouseTo }).whsName;
+    let branchName = Branch.findOne({ bPLId: branchs }).bPLName;
+    let salesmanName = allUsers.findOne({ _id: Meteor.userId() }).profile.firstName;
+    let totalQty = 0;
+    let itemsQty = itemArray;
+    for (let i = 0; i < itemsQty.length; i++) {
+      totalQty += Number(itemsQty[i].quantity);
+    }
+    let tempVal = StockTransferSerialNo.findOne({
+      bPLId: branchs
+    }, { sort: { $natural: -1 } });
+    if (!tempVal) {
+      temporaryId = "STRQ/" + branchName.slice(0, 3).toUpperCase() + "/1";
+    } else {
+      temporaryId = "STRQ/" + branchName.slice(0, 3).toUpperCase() + "/" + parseInt(tempVal.serial + 1);
+    }
+    if (!tempVal) {
+      StockTransferSerialNo.insert({
+        serial: 1,
+        bPLId: branchs,
+        uuid: Random.id(),
+        createdAt: new Date()
+      });
+    } else {
+      StockTransferSerialNo.insert({
+        serial: parseInt(tempVal.serial + 1),
+        bPLId: branchs,
+        uuid: Random.id(),
+        createdAt: new Date()
+      });
+    }
+    let stockId = StockTransfer.insert({
+      employeeId: employee,
+      userId: Meteor.userId(),
+      dueDueDate: dueDate,
+      docDate: new Date(),
+      branchName: branchName,
+      branch: branchs,
+      wareHouseFrom: wareHouseFrom,
+      wareHouseFromName: wareHouseFromName,
+      wareHouseTo: wareHouseTo,
+      wareHouseToName: wareHouseToName,
+      itemLines: itemArray,
+      remark_stock: remark_stock,
+      salesmanName: salesmanName,
+      stockStatus: 'Pending',
+      totalQty: totalQty.toString(),
+      weight: weight,
+      totalItem: itemsQty.length.toString(),
+      stockId: '',
+      tempId: temporaryId,
+      flag: true,
+      stock_webId: 'stock_' + Random.id(),
+      uuid: Random.id(),
+      createdAt: new Date()
+    });
 
-        // generate temp code
-        let tempVal = TempSerialNo.findOne({
-            stocktransfer: true,
-        }, { sort: { $natural: -1 } });
-        if (!tempVal) {
-            temporaryId = "ST/" + "FMC" + "/1";
-        } else {
-            temporaryId = "ST/" + "FMC" + "/" + parseInt(tempVal.serial + 1);
-        }
-        if (!tempVal) {
-            TempSerialNo.insert({
-                serial: 1,
-                stocktransfer: true,
-                uuid: Random.id(),
-                createdAt: new Date()
+    return stockId;
+  },
+  /**
+  * TODO: Complete JS doc
+  * @param customer
+  * @param dueDate
+  * @param itemArray
+  * @param branch
+  * @param employee
+  * @param beforeDiscount
+  * @param afterDiscount
+  * @param GST
+  * @param grandTotal
+  */
+  'stockTransfer.approval': (id, status, remark) => {
+    let stockId = StockTransfer.findOne({ _id: id });
+    let approvedByName = allUsers.findOne({ _id: Meteor.userId() }).profile.firstName;
+    if (id) {
+      if (stockId !== false) {
+        call = true;
+        count = 0;
+        aPICall()
+      }
+
+    }
+
+    function aPICall() {
+      if (call === true) {
+        let base_url = Config.findOne({
+          name: 'base_url'
+        }).value;
+        let dbId = Config.findOne({
+          name: 'dbId'
+        }).value;
+        let url = base_url + stockTransferPost_Url;
+        let dataArray = {
+          dbId: dbId,
+          dueDate: moment(stockId.dueDueDate).format('YYYYMMDD'),
+          docDate: moment(stockId.docDate).format('YYYYMMDD'),
+          fromWarehouse: stockId.wareHouseTo,
+          toWarehouse: stockId.wareHouseFrom,
+          itemLines: stockId.itemLines,
+          stock_webId: stockId.stock_webId,
+        };
+        let options = {
+          data: dataArray,
+          headers: {
+            'content-type': 'application/json'
+          }
+        };
+        // console.log("dataArray:", dataArray);
+        HTTP.call("POST", url, options, (err, result) => {
+          if (err) {
+            // console.log("err", err);
+            // if (count < 3) {
+            //   count = count + 1;
+            //   aPICall();
+            // }
+            Notification.insert({
+              userId: Meteor.userId(),
+              message: err.response,
+              uuid: Random.id()
             });
-        } else {
-            TempSerialNo.update({ _id: tempVal._id }, {
-                $set: {
-                    serial: parseInt(tempVal.serial + 1),
-                    updatedAt: new Date()
-                }
+          } else {
+
+            call = false;
+
+            return StockTransfer.update({
+              _id: id
+            }, {
+              $set: {
+                stockId: result.data.RefNo,
+                docEntry: result.data.DocEntry,
+                stockStatus: status,
+                oRRemark: remark,
+                flag: false,
+                approvedBy: Meteor.userId(),
+                approvedByName: approvedByName,
+                approvedByDate: new Date(),
+                updatedBy: Meteor.userId(),
+                updatedAt: new Date()
+              }
             });
-        }
-        NotificationStkTrnsfrFun(empId);
-        let transferResult = StockTransfer.insert({
-            subDistributor: Meteor.userId(),
-            sdUser: empId,
-            status: "Pending",
-            temporaryId: temporaryId,
-            transferDate: moment(new Date()).format('DD-MM-YYYY'),
-            transferDateIso: new Date(),
-            uuid: Random.id(),
-            createdBy: Meteor.userId(),
-            createdAt: new Date(),
+          }
         });
-        if (transferResult) {
-            // warehouseStockUpdates(productArray, empId, Meteor.userId());
-            stockTarnsferIssuedCreateFn(transferResult, Meteor.userId(), empId, temporaryId, productArray, vertical);
-            // stockTarnsferSummaryCreateFn(transferResult, Meteor.userId(), empId, temporaryId, productArray, vertical);
-            reduceStock(productArray, Meteor.userId(), vertical);
+      }
+    }
+    return id;
+  },
+  'stockTransfer.editORUpdate': (id, itemArray, weight) => {
+    let totalQty = 0;
+    let itemsQty = itemArray;
+    for (let i = 0; i < itemsQty.length; i++) {
+      totalQty += Number(itemsQty[i].quantity);
+    }
+    return StockTransfer.update({
+      _id: id
+    }, {
+      $set: {
+        itemLines: itemArray,
+        weight: weight,
+        totalQty: totalQty.toString(),
+        totalItem: itemsQty.length.toString(),
+        stockId: '',
+        uuid: Random.id(),
+        updatedAt: new Date()
+      }
+    });
+  },
+  /**
+   * TODO:Complete JS doc
+   */
+  'stockTransfer.updates': (id, status, remark) => {
+    let updatedByName = allUsers.findOne({ _id: Meteor.userId() }).profile.firstName;
+    //
+    if (status === 'Rejected') {
+      return StockTransfer.update({
+        _id: id
+      }, {
+        $set: {
+          stockStatus: status,
+          oRRemark: remark,
+          flag: true,
+          updatedBy: Meteor.userId(),
+          updatedAt: new Date(),
+          rejectedByName: updatedByName,
+          rejectedDate: new Date(),
         }
+      });
+    }
+    else if (status === 'OnHold') {
+      return StockTransfer.update({
+        _id: id
+      }, {
+        $set: {
+          stockStatus: status,
+          oRRemark: remark,
+          flag: true,
+          updatedBy: Meteor.userId(),
+          updatedAt: new Date(),
+          onHoldByName: updatedByName,
+          onHoldDate: new Date()
+        }
+      });
+    }
+    //
+  },
 
-    },
-    /**
+  /**
+  * TODO: Complete Js doc
+  * Fetching full details with id
+  */
+  'stockTransfer.id': (id) => {
+    return StockTransfer.findOne({ _id: id });
+  },
+   /**
+     * TODO:Complete Js doc
+     * Open Print Slip Count
      * 
-     * @param {*} id 
-     * @returns get stock transfer details
      */
-    'stockTransfer.id': (id) => {
-        let transferRes = StockTransfer.findOne({ _id: id });
-        let verticalName = '';
-        let empNameVal = '';
-        let subDistributorName = '';
-        let stockItems = [];
-        if (transferRes) {
-            let verticalRes = Verticals.findOne({ _id: transferRes.vertical });
-            if (verticalRes) {
-                verticalName = verticalRes.verticalName;
-            }
-            let userRes = allUsers.findOne({ _id: transferRes.sdUser });
-            if (userRes) {
-                empNameVal = `${userRes.profile.firstName} ${userRes.profile.lastName}`;
-            }
-
-            let userRes1 = allUsers.findOne({ _id: transferRes.subDistributor });
-            if (userRes1) {
-                subDistributorName = `${userRes1.profile.firstName} ${userRes1.profile.lastName}`;
-            }
-            stockItems = StockTransferIssued.find({ transferId: transferRes._id },
-                { fields: { product: 1, unit: 1, stock: 1, quantity: 1, vertical: 1 } }).fetch();
-        }
-        return {
-            transferRes: transferRes, verticalName: verticalName,
-            empNameVal: empNameVal, stockItems: stockItems, subDistributorName: subDistributorName
-        }
-    },
-    /**
-     * get unique id based on sd */
-    'stockTransfer.idList': (id) => {
-        return StockTransfer.find({ subDistributor: id }, { fields: { temporaryId: 1 } }).fetch();
-    },
-    /**
-   * get unique id based on sd */
-    'stockTransfer.SdList': (id) => {
-        let userRes = allUsers.findOne({ _id: id });
-        if (userRes) {
-            return StockTransfer.find({ subDistributor: userRes.subDistributor, status: "Pending" }, { fields: { temporaryId: 1 } }).fetch();
-        }
-    },
-    /**
-     * 
-     * @param {*} id 
-     * @param {*} productArray 
-     */
-    'stockTransfer.acceptStock': (id, productArray, sdUser, stockEdited) => {
-        let stockTransferDetails = StockTransfer.findOne({ _id: id });
-
-        if (stockTransferDetails) {
-            notificationAcptStk(stockTransferDetails.subDistributor);
-            if (stockEdited === true) {
-                notificationEditStk(stockTransferDetails.subDistributor);
-            }
-            let stockRes = StockTransfer.update({
-                _id: id,
-            }, {
-                $set:
-                {
-                    status: 'Accepted',
-                    acceptedDate: new Date(),
-                    acceptedBy: id,
-                    updatedAt: new Date(),
-                }
-            });
-            if (stockRes) {
-                updateStockTransferIssuedss(sdUser, id, productArray);
-                stockTarnsferSummaryCreateFn(stockTransferDetails.subDistributor, Meteor.userId(), productArray);
-                warehouseStockUpdates(productArray, sdUser, stockTransferDetails.subDistributor);
-            }
-        }
-    },
-    /**
-     * 
-     * @param {*} subDistributor 
-     * @param {*} sdUser 
-     * @param {*} fromDate 
-     * @param {*} toDate 
-     * data for export
-     */
-    'stockTransfer.exportData': (subDistributor, sdUser, fromDate, toDate) => {
-        let stockRes = [];
-        let resultArray = [];
-        if (sdUser !== undefined && sdUser !== '') {
-            stockRes = StockTransfer.find({
-                subDistributor: subDistributor,
-                sdUser: sdUser,
-                createdAt: { $gte: fromDate, $lt: toDate }
-            }, {
-                fields: {
-                    subDistributor: 1, sdUser: 1, status: 1, temporaryId: 1, transferDate: 1
-                }
-            }).fetch();
-        }
-        else {
-            stockRes = StockTransfer.find({
-                subDistributor: subDistributor,
-                createdAt: { $gte: fromDate, $lt: toDate }
-            }, {
-                fields: {
-                    subDistributor: 1, sdUser: 1, status: 1,
-                    temporaryId: 1, transferDate: 1, vertical: 1
-                }
-            }).fetch();
-        }
-        if (stockRes.length > 0) {
-            let verticalRes = '';
-            for (let i = 0; i < stockRes.length; i++) {
-                let itemRes = StockTransferIssued.find({ transferId: stockRes[i]._id }, {
-                    fields: {
-                        transferId: 1, temporaryId: 1, subDistributor: 1, sdUser: 1, acceptedQuantity: 1,
-                        product: 1, unit: 1, quantity: 1, stock: 1, vertical: 1, transferDate: 1
-                    }
-                }).fetch()
-                if (itemRes.length > 0) {
-                    verticalRes = itemRes[0].vertical;
-                }
-                resultArray.push({
-                    stockRes: stockRes[i],
-                    itemRes: itemRes,
-                    verticalRes: verticalRes,
-
-                })
-            }
-        }
-        return resultArray;
-    },
-
-});
-
-//  update warehouse stock
-
-function warehouseStockUpdates(productArray, empId, subDistributor) {
-    for (let i = 0; i < productArray.length; i++) {
-        let baseQty = 0;
-        let unitRes = Unit.findOne({ _id: productArray[i].unit });
-        if (unitRes) {
-            baseQty = Number(unitRes.baseQuantity);
-        }
-        let warehouseRes = WareHouseStock.find({
-            employeeId: empId,
-            subDistributor: subDistributor, product: productArray[i].product, vertical: productArray[i].vertical
-        }).fetch();
-        if (warehouseRes.length === 0) {
-            let stockVal = Number(productArray[i].quantity) * baseQty;
-            WareHouseStock.insert({
-                employeeId: empId,
-                subDistributor: subDistributor,
-                vertical: productArray[i].vertical,
-                product: productArray[i].product,
-                stock: stockVal.toString(),
-                uuid: Random.id(),
-                createdAt: new Date(),
-            });
-        }
-        else {
-            let actualStock = Number(warehouseRes[0].stock);
-            let transferStock = Number(productArray[i].quantity) * baseQty;
-            let balanceStock = Number(actualStock + transferStock);
-            WareHouseStock.update({ _id: warehouseRes[0]._id }, {
-                $set: {
-                    stock: balanceStock.toString(),
-                    updatedAt: new Date(),
-                    updatedBy: subDistributor
-                }
-            });
-        }
-    }
-}
-
-// function for reduce sd manager stock
-
-function reduceStock(productArray, user, vertical) {
-    for (let i = 0; i < productArray.length; i++) {
-        if (productArray[i].stockUpdated === true) {
-            let stockRes = Stock.findOne({
-                subDistributor: user, vertical: vertical,
-                product: productArray[i].product
-            });
-            if (stockRes) {
-                let actualStock = Number(stockRes.stock);
-                let transferStock = Number(productArray[i].transferStockVal);
-                let balanceStock = Number(actualStock - transferStock);
-                Stock.update({ _id: stockRes._id }, {
-                    $set: {
-                        stock: balanceStock.toString(),
-                        updatedAt: new Date(),
-                        updatedBy: user
-                    }
-                });
-            }
-        }
-    }
-}
-
-/**
- * 
- * @param {*} transferResult 
- * @param {*} subDistributor 
- * @param {*} empId 
- * @param {*} temporaryId 
- * @param {*} productArray 
- * create issued items collection
- */
-function stockTarnsferIssuedCreateFn(transferResult, subDistributor, empId, temporaryId, productArray, vertical) {
-    for (let i = 0; i < productArray.length; i++) {
-        if (productArray[i].stockUpdated === true) {
-            StockTransferIssued.insert({
-                transferId: transferResult,
-                temporaryId: temporaryId,
-                subDistributor: subDistributor,
-                sdUser: empId,
-                product: productArray[i].product,
-                unit: productArray[i].transferUnit,
-                quantity: productArray[i].transferStock,
-                stock: productArray[i].transferStockVal,
-                vertical: vertical,
-                status: "Pending",
-                transferDate: moment(new Date).format('DD-MM-YYYY'),
-                transferDateIso: new Date(),
-                uuid: Random.id()
-            });
-        }
-    }
-}
-function stockTarnsferSummaryCreateFn(subDistributor, empId, productArray) {
-    for (let i = 0; i < productArray.length; i++) {
-        let listofData = StockSummary.findOne({ subDistributor: subDistributor, employeeId: empId, product: productArray[i].product, date: productArray[i].transferDate });
-        if (listofData) {
-            let opstock = Number(productArray[i].stock) + Number(listofData.openingStock);
-            let clstock = Number(productArray[i].stock) + Number(listofData.openingStock) - Number(listofData.soldStock);
-            StockSummary.update({
-                _id: listofData._id
-            }, {
-                employeeId: listofData.employeeId,
-                subDistributor: listofData.subDistributor,
-                product: listofData.product,
-                date: listofData.date,
-                openingStock: opstock,
-                closingStock: clstock,
-                soldStock: listofData.soldStock,
-                closingStock: Number(productArray[i].stock),
-                createdAt: listofData.createdAt,
-                updatedAt: new Date(),
-            });
-        } else {
-            StockSummary.insert({
-                employeeId: empId,
-                subDistributor: subDistributor,
-                product: productArray[i].product,
-                date: moment(new Date).format('DD-MM-YYYY'),
-                openingStock: Number(productArray[i].stock),
-                soldStock: 0,
-                closingStock: Number(productArray[i].stock),
-                createdAt: new Date(),
-            });
-        }
-    }
-}
-
-function updateStockTransferIssuedss(id, transferId, productArray) {
-    for (let i = 0; i < productArray.length; i++) {
-        let remarksRes = ''
-        if (productArray[i].remarks !== undefined) {
-            remarksRes = productArray[i].remarks;
-        }
-        StockTransferIssued.update({
-            transferId: transferId, product: productArray[i].product,
-            unit: productArray[i].unit, vertical: productArray[i].vertical
+    'stockTransfer.printSlipCheck': (id) => {
+      let user = allUsers.findOne({ _id: Meteor.userId() }).profile.firstName;
+      let order = StockTransfer.findOne({ _id: id });
+      if (order.printSlipCount === undefined) {
+        StockTransfer.update({
+          _id: id
         }, {
-            $set:
-            {
-                acceptedQuantity: productArray[i].quantity,
-                remarks: remarksRes,
-                acceptedDate: new Date(),
-                updatedBy: id,
-                updatedAt: new Date(),
+          $set: {
+            printSlipType: "Duplicate",
+            printSlipTimeFirst: new Date(),
+            printSlipByFirst: Meteor.userId(),
+            printSlipByFirstName: user,
+            printSlipCount: 0
+          }
+        });
+      } else {
+        let printC = order.printSlipCount + 1;
+        if (printC === 1) {
+          StockTransfer.update({
+            _id: id
+          }, {
+            $set: {
+              printSlipType: "Triplicate",
+              printSlipTimeSecond: new Date(),
+              printSlipBySecond: Meteor.userId(),
+              printSlipBySecondName: user,
+              printSlipCount: 1
             }
-        });
-    }
-}
-
-// For Notification for Stock Acceptance
-function notificationAcptStk(subd) {
-    let notData = Notification.findOne({ type: "Stock Acceptance", user: subd });
-    if (notData) {
-        let countData = Number(notData.count + 1);
-        return Notification.update({ type: "Stock Acceptance", user: subd }, { $set: { count: countData } })
+          });
+        }
+        else if (printC >= 2) {
+          StockTransfer.update({
+            _id: id
+          }, {
+            $set: {
+              printSlipType: "Copy",
+              printSlipTimeThird: new Date(),
+              printSlipByThird: Meteor.userId(),
+              printSlipByThirdName: user,
+              printSlipCount: 2
+            }
+          });
+        }
+      }
+    },
+  /**
+     * TODO:Complete Js doc
+     * Open Print Count
+     * 
+     */
+  'stockTransfer.printCheck': (id) => {
+    let user = allUsers.findOne({ _id: Meteor.userId() }).profile.firstName;
+    let order = StockTransfer.findOne({ _id: id });
+    if (order.printCount === undefined) {
+      StockTransfer.update({
+        _id: id
+      }, {
+        $set: {
+          printType: "Duplicate",
+          printTimeFirst: new Date(),
+          printByFirst: Meteor.userId(),
+          printByFirstName: user,
+          printCount: 0
+        }
+      });
     } else {
-        return Notification.insert({
-            user: subd,
-            type: "Stock Acceptance",
-            count: 1,
-            createdAt: new Date()
+      let printC = order.printCount + 1;
+      if (printC === 1) {
+        StockTransfer.update({
+          _id: id
+        }, {
+          $set: {
+            printType: "Triplicate",
+            printTimeSecond: new Date(),
+            printBySecond: Meteor.userId(),
+            printBySecondName: user,
+            printCount: 1
+          }
         });
-    }
-}
-// For Notification for Stock Edit
-function notificationEditStk(subd) {
-    let notData = Notification.findOne({ type: "Stock Edited", user: subd });
-    if (notData) {
-        let countData = Number(notData.count + 1);
-        return Notification.update({ type: "Stock Edited", user: subd }, { $set: { count: countData } })
-    } else {
-        return Notification.insert({
-            user: subd,
-            type: "Stock Edited",
-            count: 1,
-            createdAt: new Date()
+      }
+      else if (printC >= 2) {
+        StockTransfer.update({
+          _id: id
+        }, {
+          $set: {
+            printType: "Copy",
+            printTimeThird: new Date(),
+            printByThird: Meteor.userId(),
+            printByThirdName: user,
+            printCount: 2
+          }
         });
+      }
     }
-}
-// For Notification for Stock Transfer
-function NotificationStkTrnsfrFun(subd) {
-    let notData = Notification.findOne({ type: "New Stock", user: subd });
-    if (notData) {
-        let countData = Number(notData.count + 1);
-        return Notification.update({ type: "New Stock", user: subd }, { $set: { count: countData } })
-    } else {
-        return Notification.insert({
-            user: subd,
-            type: "New Stock",
-            count: 1,
-            createdAt: new Date()
-        });
-    }
-}
+  },
+  'stockTransfer.delete': (uuid) => {
+    let updatedByName = allUsers.findOne({ _id: Meteor.userId() }).profile.firstName;
+    return StockTransfer.update({
+      uuid: uuid
+    }, {
+      $set: {
+        stockStatus: "Cancelled",
+        updatedBy: Meteor.userId(),
+        cancelledByName: updatedByName,
+        updatedAt: new Date(),
+      }
+    });
+  },
+});

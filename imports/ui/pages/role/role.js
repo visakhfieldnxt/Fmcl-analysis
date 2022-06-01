@@ -1,5 +1,5 @@
 /**
- * @author Nithin
+ * @author Visakh
  */
 import { Meteor } from 'meteor/meteor'
 import { roles } from "../../../api/role/role";
@@ -11,33 +11,27 @@ Template.role_list.onCreated(function () {
 
 
   });
-  this.orderByDateExport = new ReactiveVar();
-  this.userTransactionsExport = new ReactiveVar();
+  this.userDetails = new ReactiveVar()
+
   this.pagination = new Meteor.Pagination(roles, {
     filters: { 'isDeleted': false },
     sort: { 'name': 1 },
-    fields: {
-      name: 1,
-      description: 1
-    },
     perPage: 20
   });
 
 });
 Template.role_list.onRendered(function () {
-  $('#bodySpinLoaders').css('display', 'block');
+  Meteor.call('user.userList', (roleError, roleResult) => {
+    if (!roleError) {
+      this.userDetails.set(roleResult);
+    }
+  });
   $('.homeURLUpdate').select2({
     placeholder: "Select Home Page",
     tokenSeparators: [','],
     allowClear: true,
     dropdownParent: $(".homeURLUpdate").parent(),
 
-  });
-  $('.rolesUnderEdit').select2({
-    placeholder: "Select Value",
-    tokenSeparators: [','],
-    allowClear: true,
-    dropdownParent: $(".rolesUnderEdit").parent(),
   });
   $(".defultRole").select2({
     placeholder: "Select Default Role",
@@ -84,22 +78,13 @@ Template.role_list.helpers({
   templatePagination: function () {
     return Template.instance().pagination;
   },
-  orderByDateExport: () => {
-    return Template.instance().orderByDateExport.get();
-  },
 
-  userTransExport: () => {
-    return Template.instance().userTransactionsExport.get();
-  },
   /**
    * TODO: Complete JS doc
     @returns {}
    */
   roles: function () {
-    let result = Template.instance().pagination.getPage();
-    if (result.length === 0) {
-      $('#bodySpinLoaders').css('display', 'none');
-    }
+
     return Template.instance().pagination.getPage();
   },
 
@@ -125,24 +110,19 @@ Template.role_list.helpers({
  * @param role_id
  */
   totalUsers: function (role_id) {
-    let promiseVal = new Promise((resolve, reject) => {
-      Meteor.call("user.idRoleCount", role_id, (error, result) => {
-        if (!error) {
-          resolve(result);
-        } else {
-          reject(error);
+    let count = 0;
+    let userDetails = Template.instance().userDetails.get();
+    if (userDetails) {
+
+      for (var i = 0; i < userDetails.length; i++) {
+
+        if ($.inArray(role_id, userDetails[i].roles) !== -1) {
+
+          count = count + 1;
         }
-      });
-    });
-    promiseVal.then((result) => {
-      $('.totalUsers_' + role_id).html(result);
-      $('#bodySpinLoaders').css('display', 'none');
+      }
+      return count;
     }
-    ).catch((error) => {
-      $('.totalUsers_' + role_id).html('');
-      $('#bodySpinLoaders').css('display', 'none');
-    }
-    );
   }
 });
 
@@ -209,105 +189,14 @@ Template.role_list.events({
       $("#historycheckView").prop('checked', false);
     }
   },
-
   /**
-* TODO: Complete JS doc
+* TODO:Complete JS doc
 */
-  'click #sdUserApprovechecks': () => {
-    if ($("#sdUserApprovechecks").prop("checked") === true) {
-      $("#sdUserApprovecheckView").prop('checked', true);
+  'click #bpAdminchecks': () => {
+    if ($("#bpAdminchecks").prop("checked") === true) {
+      $(".bpAdminSelect").prop('checked', true);
     } else {
-      $("#sdUserApprovecheckView").prop('checked', false);
-    }
-  },
-  /**
-    * TODO: Complete JS doc
-    */
-  'click #superAdminchecks': () => {
-    if ($("#superAdminchecks").prop("checked") === true) {
-      $("#superAdmincheckView").prop('checked', true);
-    } else {
-      $("#superAdmincheckView").prop('checked', false);
-    }
-  },
-
-  /**
-  * TODO: Complete JS doc
-  */
-  'click #businessHeadchecks': () => {
-    if ($("#businessHeadchecks").prop("checked") === true) {
-      $("#businessHeadcheckView").prop('checked', true);
-    } else {
-      $("#businessHeadcheckView").prop('checked', false);
-    }
-  },
-
-  /**
-* TODO: Complete JS doc
-*/
-  'click #bdmchecks': () => {
-    if ($("#bdmchecks").prop("checked") === true) {
-      $("#bdmcheckView").prop('checked', true);
-    } else {
-      $("#bdmcheckView").prop('checked', false);
-    }
-  }, 'click #bhchecks': () => {
-    if ($("#bhchecks").prop("checked") === true) {
-      $("#bhcheckView").prop('checked', true);
-    } else {
-      $("#bhcheckView").prop('checked', false);
-    }
-  },
-  /**
-* TODO: Complete JS doc
-*/
-  'click #coordinatorchecks': () => {
-    if ($("#coordinatorchecks").prop("checked") === true) {
-      $("#coordinatorcheckView").prop('checked', true);
-    } else {
-      $("#coordinatorcheckView").prop('checked', false);
-    }
-  },
-
-  /**
-* TODO: Complete JS doc
-*/
-  'click #sdchecks': () => {
-    if ($("#sdchecks").prop("checked") === true) {
-      $("#sdcheckView").prop('checked', true);
-    } else {
-      $("#sdcheckView").prop('checked', false);
-    }
-  },
-
-  /**
-* TODO: Complete JS doc
-*/
-  'click #vsrchecks': () => {
-    if ($("#vsrchecks").prop("checked") === true) {
-      $("#vsrcheckView").prop('checked', true);
-    } else {
-      $("#vsrcheckView").prop('checked', false);
-    }
-  },
-  /**
-* TODO: Complete JS doc
-*/
-  'click #omrchecks': () => {
-    if ($("#omrchecks").prop("checked") === true) {
-      $("#omrcheckView").prop('checked', true);
-    } else {
-      $("#omrcheckView").prop('checked', false);
-    }
-  },
-  /**
-* TODO: Complete JS doc
-*/
-  'click #wsechecks': () => {
-    if ($("#wsechecks").prop("checked") === true) {
-      $("#wsecheckView").prop('checked', true);
-    } else {
-      $("#wsecheckView").prop('checked', false);
+      $(".bpAdminSelect").prop('checked', false);
     }
   },
   /**
@@ -321,104 +210,13 @@ Template.role_list.events({
     }
   },
   /**
-   * TODO: Complete JS doc
-   */
-  'click #stockTransferchecks': () => {
-    if ($("#stockTransferchecks").prop("checked") === true) {
-      $("#stockTransfercheckView").prop('checked', true);
+     * TODO: Complete JS doc
+     */
+  'click #reportOwnchecks': () => {
+    if ($("#reportOwnchecks").prop("checked") === true) {
+      $("#reportOwncheckView").prop('checked', true);
     } else {
-      $("#stockTransfercheckView").prop('checked', false);
-    }
-  },
-  /**
-   * TODO: Complete JS doc
-   */
-  'click #stockListchecks': () => {
-    if ($("#stockListchecks").prop("checked") === true) {
-      $("#stockListcheckView").prop('checked', true);
-    } else {
-      $("#stockListcheckView").prop('checked', false);
-    }
-  },
-
-  /**
-* TODO: Complete JS doc
-*/
-  'click #outletsApprovechecks': () => {
-    if ($("#outletsApprovechecks").prop("checked") === true) {
-      $("#outletsApprovecheckView").prop('checked', true);
-    } else {
-      $("#outletsApprovecheckView").prop('checked', false);
-    }
-  },
-  /**
-* TODO: Complete JS doc
-*/
-  'click #routeAssignchecks': () => {
-    if ($("#routeAssignchecks").prop("checked") === true) {
-      $("#routeAssigncheckView").prop('checked', true);
-    } else {
-      $("#routeAssigncheckView").prop('checked', false);
-    }
-  },
-  /**
-* TODO: Complete JS doc
-*/
-  'click #attendancechecks': () => {
-    if ($("#attendancechecks").prop("checked") === true) {
-      $("#attendancecheckView").prop('checked', true);
-    } else {
-      $("#attendancecheckView").prop('checked', false);
-    }
-  },
-  /**
-* TODO: Complete JS doc
-*/
-  'click #stockAcceptchecks': () => {
-    if ($("#stockAcceptchecks").prop("checked") === true) {
-      $("#stockAcceptcheckView").prop('checked', true);
-    } else {
-      $("#stockAcceptcheckView").prop('checked', false);
-    }
-  },
-  /**
-* TODO: Complete JS doc
-*/
-  'click #stockReportchecks': () => {
-    if ($("#stockReportchecks").prop("checked") === true) {
-      $("#stockReportcheckView").prop('checked', true);
-    } else {
-      $("#stockReportcheckView").prop('checked', false);
-    }
-  },
-  /**
-* TODO: Complete JS doc
-*/
-  'click #outletTrackerchecks': () => {
-    if ($("#outletTrackerchecks").prop("checked") === true) {
-      $("#outletTrackercheckView").prop('checked', true);
-    } else {
-      $("#outletTrackercheckView").prop('checked', false);
-    }
-  },
-  /**
-* TODO: Complete JS doc
-*/
-  'click #stockReturnchecks': () => {
-    if ($("#stockReturnchecks").prop("checked") === true) {
-      $("#stockReturncheckView").prop('checked', true);
-    } else {
-      $("#stockReturncheckView").prop('checked', false);
-    }
-  },
-  /**
-* TODO: Complete JS doc
-*/
-  'click #stockSummarychecks': () => {
-    if ($("#stockSummarychecks").prop("checked") === true) {
-      $("#stockSummarycheckView").prop('checked', true);
-    } else {
-      $("#stockSummarycheckView").prop('checked', false);
+      $("#reportOwncheckView").prop('checked', false);
     }
   },
   /**
@@ -438,234 +236,6 @@ Template.role_list.events({
       $("#userscheckDelete").prop('checked', false);
     }
   },
-
-  /**
- * TODO: Complete JS doc
- */
-
-  'click #masterDatachecks': () => {
-    if ($("#masterDatachecks").prop("checked") === true) {
-      $("#masterDatacheckView").prop('checked', true);
-      $("#masterDatacheckCreate").prop('checked', true);
-      $("#masterDatacheckUpdate").prop('checked', true);
-      $("#masterDatacheckDelete").prop('checked', true);
-    } else {
-      $("#masterDatacheckView").prop('checked', false);
-      $("#masterDatacheckCreate").prop('checked', false);
-      $("#masterDatacheckUpdate").prop('checked', false);
-      $("#masterDatacheckDelete").prop('checked', false);
-    }
-  },
-
-  /**
-* TODO: Complete JS doc
-*/
-
-  'click #routechecks': () => {
-    if ($("#routechecks").prop("checked") === true) {
-      $("#routecheckView").prop('checked', true);
-      $("#routecheckCreate").prop('checked', true);
-      $("#routecheckUpdate").prop('checked', true);
-      $("#routecheckDelete").prop('checked', true);
-    } else {
-      $("#routecheckView").prop('checked', false);
-      $("#routecheckCreate").prop('checked', false);
-      $("#routecheckUpdate").prop('checked', false);
-      $("#routecheckDelete").prop('checked', false);
-    }
-  },
-  /**
-* TODO: Complete JS doc
-*/
-
-  'click #verticalschecks': () => {
-    if ($("#verticalschecks").prop("checked") === true) {
-      $("#verticalscheckView").prop('checked', true);
-      $("#verticalscheckCreate").prop('checked', true);
-      $("#verticalscheckUpdate").prop('checked', true);
-      $("#verticalscheckDelete").prop('checked', true);
-    } else {
-      $("#verticalscheckView").prop('checked', false);
-      $("#verticalscheckCreate").prop('checked', false);
-      $("#verticalscheckUpdate").prop('checked', false);
-      $("#verticalscheckDelete").prop('checked', false);
-    }
-  },
-  /**
-* TODO: Complete JS doc
-*/
-
-  'click #sdMasterchecks': () => {
-    if ($("#sdMasterchecks").prop("checked") === true) {
-      $("#sdMastercheckView").prop('checked', true);
-      $("#sdMastercheckCreate").prop('checked', true);
-      $("#sdMastercheckUpdate").prop('checked', true);
-      $("#sdMastercheckDelete").prop('checked', true);
-    } else {
-      $("#sdMastercheckView").prop('checked', false);
-      $("#sdMastercheckCreate").prop('checked', false);
-      $("#sdMastercheckUpdate").prop('checked', false);
-      $("#sdMastercheckDelete").prop('checked', false);
-    }
-  },
-  /**
-* TODO: Complete JS doc
-*/
-
-  'click #outletschecks': () => {
-    if ($("#outletschecks").prop("checked") === true) {
-      $("#outletscheckView").prop('checked', true);
-      $("#outletscheckCreate").prop('checked', true);
-      $("#outletscheckUpdate").prop('checked', true);
-      $("#outletscheckDelete").prop('checked', true);
-    } else {
-      $("#outletscheckView").prop('checked', false);
-      $("#outletscheckCreate").prop('checked', false);
-      $("#outletscheckUpdate").prop('checked', false);
-      $("#outletscheckDelete").prop('checked', false);
-    }
-  },
-
-  /**
-* TODO: Complete JS doc
-*/
-
-  'click #sdOutletschecks': () => {
-    if ($("#sdOutletschecks").prop("checked") === true) {
-      $("#sdOutletscheckView").prop('checked', true);
-      $("#sdOutletscheckCreate").prop('checked', true);
-      $("#sdOutletscheckUpdate").prop('checked', true);
-      $("#sdOutletscheckDelete").prop('checked', true);
-    } else {
-      $("#sdOutletscheckView").prop('checked', false);
-      $("#sdOutletscheckCreate").prop('checked', false);
-      $("#sdOutletscheckUpdate").prop('checked', false);
-      $("#sdOutletscheckDelete").prop('checked', false);
-    }
-  },
-  /**
-* TODO: Complete JS doc
-*/
-
-  'click #cashSaleschecks': () => {
-    if ($("#cashSaleschecks").prop("checked") === true) {
-      $("#cashSalescheckView").prop('checked', true);
-      $("#cashSalescheckCreate").prop('checked', true);
-      $("#cashSalescheckUpdate").prop('checked', true);
-      $("#cashSalescheckDelete").prop('checked', true);
-    } else {
-      $("#cashSalescheckView").prop('checked', false);
-      $("#cashSalescheckCreate").prop('checked', false);
-      $("#cashSalescheckUpdate").prop('checked', false);
-      $("#cashSalescheckDelete").prop('checked', false);
-    }
-  },
-
-  /**
-* TODO: Complete JS doc
-*/
-
-  'click #creditSalechecks': () => {
-    if ($("#creditSalechecks").prop("checked") === true) {
-      $("#creditSalecheckView").prop('checked', true);
-      $("#creditSalecheckCreate").prop('checked', true);
-      $("#creditSalecheckUpdate").prop('checked', true);
-      $("#creditSalecheckDelete").prop('checked', true);
-    } else {
-      $("#creditSalecheckView").prop('checked', false);
-      $("#creditSalecheckCreate").prop('checked', false);
-      $("#creditSalecheckUpdate").prop('checked', false);
-      $("#creditSalecheckDelete").prop('checked', false);
-    }
-  },
-  /**
-* TODO: Complete JS doc
-*/
-
-  'click #brandchecks': () => {
-    if ($("#brandchecks").prop("checked") === true) {
-      $("#brandcheckView").prop('checked', true);
-      $("#brandcheckCreate").prop('checked', true);
-      $("#brandcheckUpdate").prop('checked', true);
-      $("#brandcheckDelete").prop('checked', true);
-    } else {
-      $("#brandcheckView").prop('checked', false);
-      $("#brandcheckCreate").prop('checked', false);
-      $("#brandcheckUpdate").prop('checked', false);
-      $("#brandcheckDelete").prop('checked', false);
-    }
-  },
-  /**
-* TODO: Complete JS doc
-*/
-
-  'click #categorychecks': () => {
-    if ($("#categorychecks").prop("checked") === true) {
-      $("#categorycheckView").prop('checked', true);
-      $("#categorycheckCreate").prop('checked', true);
-      $("#categorycheckUpdate").prop('checked', true);
-      $("#categorycheckDelete").prop('checked', true);
-    } else {
-      $("#categorycheckView").prop('checked', false);
-      $("#categorycheckCreate").prop('checked', false);
-      $("#categorycheckUpdate").prop('checked', false);
-      $("#categorycheckDelete").prop('checked', false);
-    }
-  },
-  'click #sdUserStockHistory1check': () => {
-    if ($("#sdUserStockHistory1check").prop("checked") === true) {
-      $("#sdUserStockHistory1checking").prop('checked', true);
-    } else {
-      $("#sdUserStockHistory1checking").prop('checked', false);
-    }
-  },
-  'click #sdUserStockSummary1check': () => {
-    if ($("#sdUserStockSummary1check").prop("checked") === true) {
-      $("#sdUserStockSummary1checking").prop('checked', true);
-    } else {
-      $("#sdUserStockSummary1checking").prop('checked', false);
-    }
-  },
-  'click #verticalSaleReport1check': () => {
-    if ($("#verticalSaleReport1check").prop("checked") === true) {
-      $("#verticalSaleReport1checking").prop('checked', true);
-    } else {
-      $("#verticalSaleReport1checking").prop('checked', false);
-    }
-  },
-  'click #sdReports1check': () => {
-    if ($("#sdReports1check").prop("checked") === true) {
-      $("#sdReports1checking").prop('checked', true);
-    } else {
-      $("#sdReports1checking").prop('checked', false);
-    }
-  },
-  'click #bdmReports1check': () => {
-    if ($("#bdmReports1check").prop("checked") === true) {
-      $("#bdmReports1checking").prop('checked', true);
-    } else {
-      $("#bdmReports1checking").prop('checked', false);
-    }
-  }, 'click #bhReports1check': () => {
-    if ($("#bhReports1check").prop("checked") === true) {
-      $("#bhReports1checking").prop('checked', true);
-    } else {
-      $("#bhReports1checking").prop('checked', false);
-    }
-  },
-  /**
-* TODO:Complete JS doc
-*/
-  'click #cashSalesRepEditcheck': () => {
-    if ($("#cashSalesRepEditcheck").prop("checked") === true) {
-      $("#cashSalesRepEditchecking").prop('checked', true);
-
-    } else {
-      $("#cashSalesRepEditchecking").prop('checked', false);
-
-    }
-  },
-
   /**
    * TODO: Complete JS doc
    */
@@ -682,7 +252,39 @@ Template.role_list.events({
       $("#vanSaleUserscheckDelete").prop('checked', false);
     }
   },
+  /**
+ * TODO: Complete JS doc
+ */
+  'click #routechecks': () => {
+    if ($("#routechecks").prop("checked") === true) {
+      $("#routecheckView").prop('checked', true);
+      $("#routecheckCreate").prop('checked', true);
+      $("#routecheckUpdate").prop('checked', true);
+      $("#routecheckDelete").prop('checked', true);
+    } else {
+      $("#routecheckView").prop('checked', false);
+      $("#routecheckCreate").prop('checked', false);
+      $("#routecheckUpdate").prop('checked', false);
+      $("#routecheckDelete").prop('checked', false);
+    }
+  },
 
+  /**
+* TODO: Complete JS doc
+*/
+  'click #masterDatachecks': () => {
+    if ($("#masterDatachecks").prop("checked") === true) {
+      $("#masterDatacheckView").prop('checked', true);
+      $("#masterDatacheckCreate").prop('checked', true);
+      $("#masterDatacheckUpdate").prop('checked', true);
+      $("#masterDatacheckDelete").prop('checked', true);
+    } else {
+      $("#masterDatacheckView").prop('checked', false);
+      $("#masterDatacheckCreate").prop('checked', false);
+      $("#masterDatacheckUpdate").prop('checked', false);
+      $("#masterDatacheckDelete").prop('checked', false);
+    }
+  },
 
   /**
     * TODO: Complete JS doc
@@ -700,7 +302,63 @@ Template.role_list.events({
       $("#rolecheckDelete").prop('checked', false);
     }
   },
-
+  /**
+    * TODO: Complete JS doc
+    */
+  'click #designationchecks': () => {
+    if ($("#designationchecks").prop("checked") === true) {
+      $("#designationcheckView").prop('checked', true);
+      $("#designationcheckUpdate").prop('checked', true);
+      $("#designationcheckCreate").prop('checked', true);
+      $("#designationcheckDelete").prop('checked', true);
+    } else {
+      $("#designationcheckView").prop('checked', false);
+      $("#designationcheckUpdate").prop('checked', false);
+      $("#designationcheckCreate").prop('checked', false);
+      $("#designationcheckDelete").prop('checked', false);
+    }
+  },
+  'click #branchTransferchecks': () => {
+    if ($("#branchTransferchecks").prop("checked") === true) {
+      $("#branchTransfercheckView").prop('checked', true);
+      $("#branchTransfercheckCreate").prop('checked', true);
+    } else {
+      $("#branchTransfercheckView").prop('checked', false);
+      $("#branchTransfercheckCreate").prop('checked', false);
+    }
+  },
+  'click #activitychecks': () => {
+    if ($("#activitychecks").prop("checked") === true) {
+      $("#activitycheckView").prop('checked', true);
+      $("#activitycheckCreate").prop('checked', true);
+    } else {
+      $("#activitycheckView").prop('checked', false);
+      $("#activitycheckCreate").prop('checked', false);
+    }
+  },
+  'click #branchTransferApprovechecks': () => {
+    if ($("#branchTransferApprovechecks").prop("checked") === true) {
+      $("#branchTransfercheckApproveView").prop('checked', true);
+    } else {
+      $("#branchTransfercheckApproveView").prop('checked', false);
+    }
+  },
+  /**
+  * TODO: Complete JS doc
+  */
+  'click #leadchecks': () => {
+    if ($("#leadchecks").prop("checked") === true) {
+      $("#leadcheckView").prop('checked', true);
+      $("#leadcheckUpdate").prop('checked', true);
+      $("#leadcheckCreate").prop('checked', true);
+      $("#leadcheckDelete").prop('checked', true);
+    } else {
+      $("#leadcheckView").prop('checked', false);
+      $("#leadcheckUpdate").prop('checked', false);
+      $("#leadcheckCreate").prop('checked', false);
+      $("#leadcheckDelete").prop('checked', false);
+    }
+  },
   /**
 * TODO:Complete JS doc
 */
@@ -712,6 +370,16 @@ Template.role_list.events({
     }
   },
 
+  /**
+* TODO:Complete JS doc
+*/
+  'click #poschecks': () => {
+    if ($("#poschecks").prop("checked") === true) {
+      $("#posView").prop('checked', true);
+    } else {
+      $("#posView").prop('checked', false);
+    }
+  },
 
   /**
    * TODO: Complete JS doc
@@ -746,214 +414,660 @@ Template.role_list.events({
       $("#ordercheckCreate").prop('checked', false);
       $("#ordercheckView").prop('checked', false);
     }
-  }, /**
-* TODO: Complete JS doc
+  },
+  /**
+* TODO:Complete JS doc
 */
-  'click #branchchecks': () => {
-    if ($("#branchchecks").prop("checked") === true) {
-      $("#branchcheckView").prop('checked', true);
-      $("#branchcheckCreate").prop('checked', true);
-      $("#branchcheckUpdate").prop('checked', true);
-      $("#branchcheckDelete").prop('checked', true);
+  'click #orderSeniorchecks': () => {
+    if ($("#orderSeniorchecks").prop("checked") === true) {
+      $("#orderSeniorcheckCreate").prop('checked', true);
+      $("#orderSeniorcheckView").prop('checked', true);
     } else {
-      $("#branchcheckView").prop('checked', false);
-      $("#branchcheckCreate").prop('checked', false);
-      $("#branchcheckUpdate").prop('checked', false);
-      $("#branchcheckDelete").prop('checked', false);
+      $("#orderSeniorcheckCreate").prop('checked', false);
+      $("#orderSeniorcheckView").prop('checked', false);
     }
   },
-
   /**
- * TODO: Complete JS doc
+ * TODO:Complete JS doc
  */
-  'click #locationchecks': () => {
-    if ($("#locationchecks").prop("checked") === true) {
-      $("#locationcheckView").prop('checked', true);
-      $("#locationcheckCreate").prop('checked', true);
-      $("#locationcheckUpdate").prop('checked', true);
-      $("#locationcheckDelete").prop('checked', true);
+  'click #salesReturnchecks': () => {
+    if ($("#salesReturnchecks").prop("checked") === true) {
+      $("#salesReturncheckCreate").prop('checked', true);
+      $("#salesReturncheckView").prop('checked', true);
     } else {
-      $("#locationcheckView").prop('checked', false);
-      $("#locationcheckCreate").prop('checked', false);
-      $("#locationcheckUpdate").prop('checked', false);
-      $("#locationcheckDelete").prop('checked', false);
+      $("#salesReturncheckCreate").prop('checked', false);
+      $("#salesReturncheckView").prop('checked', false);
     }
   },
 
   /**
-  * TODO: Complete JS doc
+  * TODO:Complete JS doc
   */
-  'click #priceTypechecks': () => {
-    if ($("#priceTypechecks").prop("checked") === true) {
-      $("#priceTypecheckView").prop('checked', true);
-      $("#priceTypecheckCreate").prop('checked', true);
-      $("#priceTypecheckUpdate").prop('checked', true);
-      $("#priceTypecheckDelete").prop('checked', true);
+  'click #stockTransferRequestchecks': () => {
+    if ($("#stockTransferRequestchecks").prop("checked") === true) {
+      $("#stockTransferRequestcheckCreate").prop('checked', true);
+      $("#stockTransferRequestcheckView").prop('checked', true);
     } else {
-      $("#priceTypecheckView").prop('checked', false);
-      $("#priceTypecheckCreate").prop('checked', false);
-      $("#priceTypecheckUpdate").prop('checked', false);
-      $("#priceTypecheckDelete").prop('checked', false);
+      $("#stockTransferRequestcheckCreate").prop('checked', false);
+      $("#stockTransferRequestcheckView").prop('checked', false);
     }
   },
 
   /**
-  * TODO: Complete JS doc
-  */
-  'click #productchecks': () => {
-    if ($("#productchecks").prop("checked") === true) {
-      $("#productcheckView").prop('checked', true);
-      $("#productcheckCreate").prop('checked', true);
-      $("#productcheckUpdate").prop('checked', true);
-      $("#productcheckDelete").prop('checked', true);
-    } else {
-      $("#productcheckView").prop('checked', false);
-      $("#productcheckCreate").prop('checked', false);
-      $("#productcheckUpdate").prop('checked', false);
-      $("#productcheckDelete").prop('checked', false);
-    }
-  },
-
-  /**
-  * TODO: Complete JS doc
-  */
-  'click #unitchecks': () => {
-    if ($("#unitchecks").prop("checked") === true) {
-      $("#unitcheckView").prop('checked', true);
-      $("#unitcheckCreate").prop('checked', true);
-      $("#unitcheckUpdate").prop('checked', true);
-      $("#unitcheckDelete").prop('checked', true);
-    } else {
-      $("#unitcheckView").prop('checked', false);
-      $("#unitcheckCreate").prop('checked', false);
-      $("#unitcheckUpdate").prop('checked', false);
-      $("#unitcheckDelete").prop('checked', false);
-    }
-  },
-  /**
-  * TODO: Complete JS doc
-  */
-  'click #pricechecks': () => {
-    if ($("#pricechecks").prop("checked") === true) {
-      $("#pricecheckView").prop('checked', true);
-      $("#pricecheckCreate").prop('checked', true);
-      $("#pricecheckUpdate").prop('checked', true);
-      $("#pricecheckDelete").prop('checked', true);
-    } else {
-      $("#pricecheckView").prop('checked', false);
-      $("#pricecheckCreate").prop('checked', false);
-      $("#pricecheckUpdate").prop('checked', false);
-      $("#pricecheckDelete").prop('checked', false);
-    }
-  },
-
-  /**
-  * TODO: Complete JS doc
-  */
-  'click #taxchecks': () => {
-    if ($("#taxchecks").prop("checked") === true) {
-      $("#taxcheckView").prop('checked', true);
-      $("#taxcheckCreate").prop('checked', true);
-      $("#taxcheckUpdate").prop('checked', true);
-      $("#taxcheckDelete").prop('checked', true);
-    } else {
-      $("#taxcheckView").prop('checked', false);
-      $("#taxcheckCreate").prop('checked', false);
-      $("#taxcheckUpdate").prop('checked', false);
-      $("#taxcheckDelete").prop('checked', false);
-    }
-  },
-  /**
-* TODO: Complete JS doc
+* TODO:Complete JS doc
 */
-  'click #SdPriceListchecks': () => {
-    if ($("#SdPriceListchecks").prop("checked") === true) {
-      $("#SdPriceListcheckView").prop('checked', true);
-
+  'click #deliverycheck1': () => {
+    if ($("#deliverycheck1").prop("checked") === true) {
+      $(".deliverySelections1").prop('checked', true);
+      $("#deliverycheckUpdate").prop('checked', true);
     } else {
-      $("#SdPriceListcheckView").prop('checked', false);
-
+      $(".deliverySelections1").prop('checked', false);
+      $("#deliverycheckUpdate").prop('checked', false);
     }
   },
   /**
-* TODO: Complete JS doc
-*/
-  'click #deliveryListchecks': () => {
-    if ($("#deliveryListchecks").prop("checked") === true) {
-      $("#deliveryListcheckView").prop('checked', true);
-      $("#deliveryListcheckUpdate").prop('checked', true);
-
+   * TODO: Complete JS doc
+   */
+  'click #dispatchcheck1': () => {
+    if ($("#dispatchcheck1").prop("checked") === true) {
+      $(".dispatchSelections1").prop('checked', true);
+      $("#dispatchcheckUpdate").prop('checked', true);
     } else {
-      $("#deliveryListcheckView").prop('checked', false);
-      $("#deliveryListcheckUpdate").prop('checked', false);
-
+      $(".dispatchSelections1").prop('checked', false);
+      $("#dispatchcheckUpdate").prop('checked', false);
     }
   },
-  /**
- * TODO: Complete JS doc
- */
-  'click #collectionListchecks': () => {
-    if ($("#collectionListchecks").prop("checked") === true) {
-      $("#collectionListcheckView").prop('checked', true);
-      $("#collectionListcheckUpdate").prop('checked', true);
 
-    } else {
-      $("#collectionListcheckView").prop('checked', false);
-      $("#collectionListcheckUpdate").prop('checked', false);
-
-    }
-  },
   /**
   * TODO: Complete JS doc
   */
-  'click #administrationchecks': () => {
-    if ($("#administrationchecks").prop("checked") === true) {
-      $("#administrationcheckView").prop('checked', true);
+  'click #dispatchRejectchecks': () => {
+    if ($("#dispatchRejectchecks").prop("checked") === true) {
+      $("#dispatchRejectView").prop('checked', true);
     } else {
-      $("#administrationcheckView").prop('checked', false);
+      $("#dispatchRejectView").prop('checked', false);
     }
   },
   /**
-* TODO: Complete JS doc
-*/
-  'click #orderApListchecks': () => {
-    if ($("#orderApListchecks").prop("checked") === true) {
-      $("#orderApListcheckView").prop('checked', true);
-
+  * TODO:Complete JS doc
+  */
+  'click #collectionDueTodaychecks': () => {
+    if ($("#collectionDueTodaychecks").prop("checked") === true) {
+      $(".collectionDueTodaySelect").prop('checked', true);
     } else {
-      $("#orderApListcheckView").prop('checked', false);
-
+      $(".collectionDueTodaySelect").prop('checked', false);
     }
   },
   /**
-* TODO: Complete JS doc
-*/
+   * TODO:Complete JS doc
+   */
+  'click #creditInvoicechecks': () => {
+    if ($("#creditInvoicechecks").prop("checked") === true) {
+      $(".creditInvoiceSelect").prop('checked', true);
+    } else {
+      $(".creditInvoiceSelect").prop('checked', false);
+    }
+  },
+  /**
+   * TODO:Complete JS doc
+   */
+  'click #creditNotechecks': () => {
+    if ($("#creditNotechecks").prop("checked") === true) {
+      $(".creditNoteSelect").prop('checked', true);
+    } else {
+      $(".creditNoteSelect").prop('checked', false);
+    }
+  },
+  /**
+   * TODO:Complete JS doc
+   */
+  'click #arInvoicePaymentchecks': () => {
+    if ($("#arInvoicePaymentchecks").prop("checked") === true) {
+      $(".arInvoicePaymentSelect").prop('checked', true);
+    } else {
+      $(".arInvoicePaymentSelect").prop('checked', false);
+    }
+  },
+  /**
+   * TODO:Complete JS doc
+   */
+  'click #arInvoiceSeniorPaymentchecks': () => {
+    if ($("#arInvoiceSeniorPaymentchecks").prop("checked") === true) {
+      $(".arInvoiceSeniorPaymentSelect").prop('checked', true);
+    } else {
+      $(".arInvoiceSeniorPaymentSelect").prop('checked', false);
+    }
+  },
+  /**
+   * TODO:Complete JS doc
+   */
+  'click #salesQuotationchecks': () => {
+    if ($("#salesQuotationchecks").prop("checked") === true) {
+      $(".salesQuotationSelect").prop('checked', true);
+    } else {
+      $(".salesQuotationSelect").prop('checked', false);
+    }
+  },
+  /**
+   * TODO:Complete JS doc
+   */
+  'click #salesQuotationSeniorchecks': () => {
+    if ($("#salesQuotationSeniorchecks").prop("checked") === true) {
+      $(".salesQuotationSeniorSelect").prop('checked', true);
+    } else {
+      $(".salesQuotationSeniorSelect").prop('checked', false);
+    }
+  },
+  /**
+   * TODO:Complete JS doc
+   */
+  'click #invoicechecks': () => {
+    if ($("#invoicechecks").prop("checked") === true) {
+      $(".invoiceSelect").prop('checked', true);
+    } else {
+      $(".invoiceSelect").prop('checked', false);
+    }
+  },
+  /**
+   * TODO:Complete JS doc
+   */
+  'click #deliveryBoychecks': () => {
+    if ($("#deliveryBoychecks").prop("checked") === true) {
+      $(".deliveryBoySelect").prop('checked', true);
+    } else {
+      $(".deliveryBoySelect").prop('checked', false);
+    }
+  },
+  /**
+   * TODO:Complete JS doc
+   */
+  'click #orderApprovechecks': () => {
+    if ($("#orderApprovechecks").prop("checked") === true) {
+      $(".orderApproveSelect").prop('checked', true);
+    } else {
+      $(".orderApproveSelect").prop('checked', false);
+    }
+  },
+  /**
+   * TODO:Complete JS doc
+   */
+  'click #quotationApprovechecks': () => {
+    if ($("#quotationApprovechecks").prop("checked") === true) {
+      $(".quotationApproveSelect").prop('checked', true);
+    } else {
+      $(".quotationApproveSelect").prop('checked', false);
+    }
+  },
+  /**
+   * TODO:Complete JS doc
+   */
+  'click #salesReturnApprovechecks': () => {
+    if ($("#salesReturnApprovechecks").prop("checked") === true) {
+      $(".salesReturnApproveSelect").prop('checked', true);
+    } else {
+      $(".salesReturnApproveSelect").prop('checked', false);
+    }
+  },
+  /**
+   * TODO:Complete JS doc
+   */
+  'click #stockTransferApprovechecks': () => {
+    if ($("#stockTransferApprovechecks").prop("checked") === true) {
+      $(".stockTransferApproveSelect").prop('checked', true);
+    } else {
+      $(".stockTransferApproveSelect").prop('checked', false);
+    }
+  },
+  /**
+   * TODO:Complete JS doc
+   */
+  'click #creditNoteApprovechecks': () => {
+    if ($("#creditNoteApprovechecks").prop("checked") === true) {
+      $(".creditNoteApproveSelect").prop('checked', true);
+    } else {
+      $(".creditNoteApproveSelect").prop('checked', false);
+    }
+  },
+  /**
+   * TODO:Complete JS doc
+   */
+  'click #creditInvoiceApprovechecks': () => {
+    if ($("#creditInvoiceApprovechecks").prop("checked") === true) {
+      $(".creditInvoiceApproveSelect").prop('checked', true);
+    } else {
+      $(".creditInvoiceApproveSelect").prop('checked', false);
+    }
+  },
+  /**
+  * TODO:Complete JS doc
+  */
+  'click #pickListchecks': () => {
+    if ($("#pickListchecks").prop("checked") === true) {
+      $(".pickListSelect").prop('checked', true);
+    } else {
+      $(".pickListSelect").prop('checked', false);
+    }
+  },
+  /**
+  * TODO:Complete JS doc
+  */
   'click #orderReportchecks': () => {
     if ($("#orderReportchecks").prop("checked") === true) {
-      $("#orderReportcheckView").prop('checked', true);
-
+      $(".orderReportSelect").prop('checked', true);
     } else {
-      $("#orderReportcheckView").prop('checked', false);
-
+      $(".orderReportSelect").prop('checked', false);
     }
   },
   /**
     * TODO:Complete JS doc
     */
-  'change .orderReportselect': () => {
-    if ($(".orderReportselect").length === $(".orderReportselect:checked").length)
-      $("#orderReportchecks").prop('checked', true);
-    else
-      $("#orderReportchecks").prop('checked', false);
+  'click #salesQuotationReportchecks': () => {
+    if ($("#salesQuotationReportchecks").prop("checked") === true) {
+      $(".salesQuotationReportSelect").prop('checked', true);
+    } else {
+      $(".salesQuotationReportSelect").prop('checked', false);
+    }
   },
   /**
-    * TODO: Complete JS doc
+    * TODO:Complete JS doc
     */
-  'change .sdUserApproveSelect': () => {
-    if ($(".sdUserApproveSelect").length === $(".sdUserApproveSelect:checked").length)
-      $("#sdUserApprovechecks").prop('checked', true);
-    else
-      $("#sdUserApprovechecks").prop('checked', false);
+  'click #arInvoiceReportchecks': () => {
+    if ($("#arInvoiceReportchecks").prop("checked") === true) {
+      $(".arInvoiceReportSelect").prop('checked', true);
+    } else {
+      $(".arInvoiceReportSelect").prop('checked', false);
+    }
+  },
+  /**
+    * TODO:Complete JS doc
+    */
+  'click #posReportchecks': () => {
+    if ($("#posReportchecks").prop("checked") === true) {
+      $(".posReportSelect").prop('checked', true);
+    } else {
+      $(".posReportSelect").prop('checked', false);
+    }
+  },
+  /**
+  * TODO:Complete JS doc
+  */
+  'click #locationchecks': () => {
+    if ($("#locationchecks").prop("checked") === true) {
+      $(".locationSelect").prop('checked', true);
+    } else {
+      $(".locationSelect").prop('checked', false);
+    }
+  },
+  /**
+* TODO:Complete JS doc
+*/
+  'click #pendingArInvoicechecks': () => {
+    if ($("#pendingArInvoicechecks").prop("checked") === true) {
+      $(".pendingArInvoiceSelect").prop('checked', true);
+    } else {
+      $(".pendingArInvoiceSelect").prop('checked', false);
+    }
+  },
+  /**
+* TODO:Complete JS doc
+*/
+  'click #pendingPosInvoicechecks': () => {
+    if ($("#pendingPosInvoicechecks").prop("checked") === true) {
+      $(".pendingPosInvoiceSelect").prop('checked', true);
+    } else {
+      $(".pendingPosInvoiceSelect").prop('checked', false);
+    }
+  },
+  /**
+* TODO:Complete JS doc
+*/
+  'click #attendancechecks': () => {
+    if ($("#attendancechecks").prop("checked") === true) {
+      $(".attendanceSelect").prop('checked', true);
+    } else {
+      $(".attendanceSelect").prop('checked', false);
+    }
+  },
+  /**
+* TODO:Complete JS doc
+*/
+  'click #routeApprovechecks': () => {
+    if ($("#routeApprovechecks").prop("checked") === true) {
+      $(".routeApproveSelect").prop('checked', true);
+    } else {
+      $(".routeApproveSelect").prop('checked', false);
+    }
+  },
+  /**
+* TODO:Complete JS doc
+*/
+  'click #salesSummaryReports': () => {
+    if ($("#salesSummaryReports").prop("checked") === true) {
+      $(".salesSummaryReportSelect").prop('checked', true);
+    } else {
+      $(".salesSummaryReportSelect").prop('checked', false);
+    }
+  },
+  /**
+* TODO:Complete JS doc
+*/
+  'click #salesSummaryReportchecks': () => {
+    if ($("#salesSummaryReportchecks").prop("checked") === true) {
+      $(".salesSummaryReportSelect").prop('checked', true);
+    } else {
+      $(".salesSummaryReportSelect").prop('checked', false);
+    }
+  },
+  /**
+* TODO:Complete JS doc
+*/
+  'click #stockSummaryReportchecks': () => {
+    if ($("#stockSummaryReportchecks").prop("checked") === true) {
+      $(".stockSummaryReportSelect").prop('checked', true);
+    } else {
+      $(".stockSummaryReportSelect").prop('checked', false);
+    }
+  },
+
+  /**
+* TODO:Complete JS doc
+*/
+  'click #noSalesReportchecks': () => {
+    if ($("#noSalesReportchecks").prop("checked") === true) {
+      $(".noSalesReportSelect").prop('checked', true);
+    } else {
+      $(".noSalesReportSelect").prop('checked', false);
+    }
+  },
+
+  /**
+* TODO:Complete JS doc
+*/
+  'click #targetOutletReportchecks': () => {
+    if ($("#targetOutletReportchecks").prop("checked") === true) {
+      $(".targetOutletReportSelect").prop('checked', true);
+    } else {
+      $(".targetOutletReportSelect").prop('checked', false);
+    }
+  },
+
+  /**
+* TODO:Complete JS doc
+*/
+  'click #callRateReportchecks': () => {
+    if ($("#callRateReportchecks").prop("checked") === true) {
+      $(".callRateReportSelect").prop('checked', true);
+    } else {
+      $(".callRateReportSelect").prop('checked', false);
+    }
+  },
+  /**
+* TODO:Complete JS doc
+*/
+  'click #strikeRateReportchecks': () => {
+    if ($("#strikeRateReportchecks").prop("checked") === true) {
+      $(".strikeRateReportSelect").prop('checked', true);
+    } else {
+      $(".strikeRateReportSelect").prop('checked', false);
+    }
+  },
+
+  /**
+* TODO:Complete JS doc
+*/
+  'click #priceUpdatechecks': () => {
+    if ($("#priceUpdatechecks").prop("checked") === true) {
+      $(".priceUpdateSelect").prop('checked', true);
+    } else {
+      $(".priceUpdateSelect").prop('checked', false);
+    }
+  },
+  /**
+* TODO:Complete JS doc
+*/
+  'click #cxoDashboardchecks': () => {
+    if ($("#cxoDashboardchecks").prop("checked") === true) {
+      $(".cxoDashboardSelect").prop('checked', true);
+    } else {
+      $(".cxoDashboardSelect").prop('checked', false);
+    }
+  },
+  /**
+* TODO:Complete JS doc
+*/
+  'click #itemWiseReportchecks': () => {
+    if ($("#itemWiseReportchecks").prop("checked") === true) {
+      $(".itemWiseReportSelect").prop('checked', true);
+    } else {
+      $(".itemWiseReportSelect").prop('checked', false);
+    }
+  },
+  /**
+* TODO:Complete JS doc
+*/
+  'click #routeWiseReportchecks': () => {
+    if ($("#routeWiseReportchecks").prop("checked") === true) {
+      $(".routeWiseReportSelect").prop('checked', true);
+    } else {
+      $(".routeWiseReportSelect").prop('checked', false);
+    }
+  },
+  /**
+* TODO:Complete JS doc
+*/
+  'click #numericalDistributonReportchecks': () => {
+    if ($("#numericalDistributonReportchecks").prop("checked") === true) {
+      $(".numericalDistributonReportSelect").prop('checked', true);
+    } else {
+      $(".numericalDistributonReportSelect").prop('checked', false);
+    }
+  },
+  /**
+* TODO:Complete JS doc
+*/
+  'click #whsStockReportchecks': () => {
+    if ($("#whsStockReportchecks").prop("checked") === true) {
+      $(".whsStockReportSelect").prop('checked', true);
+    } else {
+      $(".whsStockReportSelect").prop('checked', false);
+    }
+  },
+  /**
+* TODO:Complete JS doc
+*/
+  'click #weightageDistributionReportchecks': () => {
+    if ($("#weightageDistributionReportchecks").prop("checked") === true) {
+      $(".weightageDistributionReportSelect").prop('checked', true);
+    } else {
+      $(".weightageDistributionReportSelect").prop('checked', false);
+    }
+  },
+  /**
+* TODO:Complete JS doc
+*/
+  'click #coverageDistributionReportchecks': () => {
+    if ($("#coverageDistributionReportchecks").prop("checked") === true) {
+      $(".coverageDistributionReportSelect").prop('checked', true);
+    } else {
+      $(".coverageDistributionReportSelect").prop('checked', false);
+    }
+  },
+  /**
+* TODO:Complete JS doc
+*/
+  'click #priceTypeEditchecks': () => {
+    if ($("#priceTypeEditchecks").prop("checked") === true) {
+      $(".priceTypeEditSelect").prop('checked', true);
+    } else {
+      $(".priceTypeEditSelect").prop('checked', false);
+    }
+  },
+  /**
+* TODO:Complete JS doc
+*/
+  'click #expenseListchecks': () => {
+    if ($("#expenseListchecks").prop("checked") === true) {
+      $(".expenseListSelect").prop('checked', true);
+    } else {
+      $(".expenseListSelect").prop('checked', false);
+    }
+  },
+  /**
+* TODO:Complete JS doc
+*/
+  'click #vansaleReportchecks': () => {
+    if ($("#vansaleReportchecks").prop("checked") === true) {
+      $(".vansaleReportSelect").prop('checked', true);
+    } else {
+      $(".vansaleReportSelect").prop('checked', false);
+    }
+  },
+  /**
+* TODO:Complete JS doc
+*/
+  'click #skippedCustomerReportchecks': () => {
+    if ($("#skippedCustomerReportchecks").prop("checked") === true) {
+      $(".skippedCustomerReportSelect").prop('checked', true);
+    } else {
+      $(".skippedCustomerReportSelect").prop('checked', false);
+    }
+  },
+  /**
+  * TODO:Complete JS doc
+  */
+  'click #routechecks': () => {
+    if ($("#routechecks").prop("checked") === true) {
+      $(".routeSelect").prop('checked', true);
+    } else {
+      $(".routeSelect").prop('checked', false);
+    }
+  },
+
+  /**
+* TODO:Complete JS doc
+*/
+  'click #masterDatachecks': () => {
+    if ($("#masterDatachecks").prop("checked") === true) {
+      $(".masterDataSelect").prop('checked', true);
+    } else {
+      $(".masterDataSelect").prop('checked', false);
+    }
+  },
+
+
+  /**
+    * TODO:Complete JS doc
+    */
+  'click #creditInvoiceReportchecks': () => {
+    if ($("#creditInvoiceReportchecks").prop("checked") === true) {
+      $(".creditInvoiceReportSelect").prop('checked', true);
+    } else {
+      $(".creditInvoiceReportSelect").prop('checked', false);
+    }
+  },
+  /**
+    * TODO:Complete JS doc
+    */
+  'click #salesReturnReportchecks': () => {
+    if ($("#salesReturnReportchecks").prop("checked") === true) {
+      $(".salesReturnReportSelect").prop('checked', true);
+    } else {
+      $(".salesReturnReportSelect").prop('checked', false);
+    }
+  },
+  /**
+    * TODO:Complete JS doc
+    */
+  'click #creditNoteReportchecks': () => {
+    if ($("#creditNoteReportchecks").prop("checked") === true) {
+      $(".creditNoteReportSelect").prop('checked', true);
+    } else {
+      $(".creditNoteReportSelect").prop('checked', false);
+    }
+  },
+  /**
+    * TODO:Complete JS doc
+    */
+  'click #branchTransferReportchecks': () => {
+    if ($("#branchTransferReportchecks").prop("checked") === true) {
+      $(".branchTransferReportSelect").prop('checked', true);
+    } else {
+      $(".branchTransferReportSelect").prop('checked', false);
+    }
+  },
+  /**
+  * TODO:Complete JS doc
+  */
+  'click #collectionReportchecks': () => {
+    if ($("#collectionReportchecks").prop("checked") === true) {
+      $(".collectionReportSelect").prop('checked', true);
+    } else {
+      $(".collectionReportSelect").prop('checked', false);
+    }
+  },
+  /**
+  * TODO:Complete JS doc
+  */
+  'click #stockTransferReportchecks': () => {
+    if ($("#stockTransferReportchecks").prop("checked") === true) {
+      $(".stockTransferReportSelect").prop('checked', true);
+    } else {
+      $(".stockTransferReportSelect").prop('checked', false);
+    }
+  },
+  /**
+ * TODO:Complete JS doc
+ */
+  'click #invoiceReportchecks': () => {
+    if ($("#invoiceReportchecks").prop("checked") === true) {
+      $(".invoiceReportSelect").prop('checked', true);
+    } else {
+      $(".invoiceReportSelect").prop('checked', false);
+    }
+  },
+
+  /**
+* TODO:Complete JS doc
+*/
+  'click #deliveryReportchecks': () => {
+    if ($("#deliveryReportchecks").prop("checked") === true) {
+      $(".deliveryReportSelect").prop('checked', true);
+    } else {
+      $(".deliveryReportSelect").prop('checked', false);
+    }
+  },
+
+  /**
+* TODO:Complete JS doc
+*/
+  'click #purchasePrintchecks': () => {
+    if ($("#purchasePrintchecks").prop("checked") === true) {
+      $(".purchasePrintSelect").prop('checked', true);
+    } else {
+      $(".purchasePrintSelect").prop('checked', false);
+    }
+  },
+
+  /**
+* TODO:Complete JS doc
+*/
+  'click #activitySeniorchecks': () => {
+    if ($("#activitySeniorchecks").prop("checked") === true) {
+      $(".activitySeniorSelect").prop('checked', true);
+    } else {
+      $(".activitySeniorSelect").prop('checked', false);
+    }
+  },
+
+  /**
+* TODO:Complete JS doc
+*/
+  'click #accountantchecks': () => {
+    if ($("#accountantchecks").prop("checked") === true) {
+      $(".accountantSelect").prop('checked', true);
+    } else {
+      $(".accountantSelect").prop('checked', false);
+    }
   },
 
 
@@ -967,87 +1081,6 @@ Template.role_list.events({
       $("#historychecks").prop('checked', false);
   },
   /**
- * TODO: Complete JS doc
- */
-  'change .superAdminSelect': () => {
-    if ($(".superAdminSelect").length === $(".superAdminSelect:checked").length)
-      $("#superAdminchecks").prop('checked', true);
-    else
-      $("#superAdminchecks").prop('checked', false);
-  },
-
-  /**
-* TODO: Complete JS doc
-*/
-  'change .businessHeadSelect': () => {
-    if ($(".businessHeadSelect").length === $(".businessHeadSelect:checked").length)
-      $("#businessHeadchecks").prop('checked', true);
-    else
-      $("#businessHeadchecks").prop('checked', false);
-  },
-
-  /**
-* TODO: Complete JS doc
-*/
-  'change .bdmSelect': () => {
-    if ($(".bdmSelect").length === $(".bdmSelect:checked").length)
-      $("#bdmchecks").prop('checked', true);
-    else
-      $("#bdmchecks").prop('checked', false);
-  }, 'change .bhSelect': () => {
-    if ($(".bhSelect").length === $(".bhSelect:checked").length)
-      $("#bhchecks").prop('checked', true);
-    else
-      $("#bhchecks").prop('checked', false);
-  },
-  /**
-* TODO: Complete JS doc
-*/
-  'change .coordinatorSelect': () => {
-    if ($(".coordinatorSelect").length === $(".coordinatorSelect:checked").length)
-      $("#coordinatorchecks").prop('checked', true);
-    else
-      $("#coordinatorchecks").prop('checked', false);
-  },
-
-  /**
-* TODO: Complete JS doc
-*/
-  'change .sdSelect': () => {
-    if ($(".sdSelect").length === $(".sdSelect:checked").length)
-      $("#sdchecks").prop('checked', true);
-    else
-      $("#sdchecks").prop('checked', false);
-  },
-
-  /**
-* TODO: Complete JS doc
-*/
-  'change .vsrSelect': () => {
-    if ($(".vsrSelect").length === $(".vsrSelect:checked").length)
-      $("#vsrchecks").prop('checked', true);
-    else
-      $("#vsrchecks").prop('checked', false);
-  },
-  /**
-* TODO: Complete JS doc
-*/
-  'change .omrSelect': () => {
-    if ($(".omrSelect").length === $(".omrSelect:checked").length)
-      $("#omrchecks").prop('checked', true);
-    else
-      $("#omrchecks").prop('checked', false);
-  },
-  /**
-* TODO: Complete JS doc
-*/
-  'change .wseSelect': () => {
-    if ($(".wseSelect").length === $(".wseSelect:checked").length)
-      $("#wsechecks").prop('checked', true);
-    else
-      $("#wsechecks").prop('checked', false);
-  },
-  /**
    * TODO: Complete JS doc
    */
   'change .reportSelect': () => {
@@ -1055,99 +1088,6 @@ Template.role_list.events({
       $("#reportchecks").prop('checked', true);
     else
       $("#reportchecks").prop('checked', false);
-  },
-  /**
- * TODO: Complete JS doc
- */
-  'change .stockTransferSelect': () => {
-    if ($(".stockTransferSelect").length === $(".stockTransferSelect:checked").length)
-      $("#stockTransferchecks").prop('checked', true);
-    else
-      $("#stockTransferchecks").prop('checked', false);
-  },
-  /**
- * TODO: Complete JS doc
- */
-  'change .stockListSelect': () => {
-    if ($(".stockListSelect").length === $(".stockListSelect:checked").length)
-      $("#stockListchecks").prop('checked', true);
-    else
-      $("#stockListchecks").prop('checked', false);
-  },
-  /**
-* TODO: Complete JS doc
-*/
-  'change .outletsApproveSelect': () => {
-    if ($(".outletsApproveSelect").length === $(".outletsApproveSelect:checked").length)
-      $("#outletsApprovechecks").prop('checked', true);
-    else
-      $("#outletsApprovechecks").prop('checked', false);
-  },
-
-  /**
-* TODO: Complete JS doc
-*/
-  'change .routeAssignSelect': () => {
-    if ($(".routeAssignSelect").length === $(".routeAssignSelect:checked").length)
-      $("#routeAssignchecks").prop('checked', true);
-    else
-      $("#routeAssignchecks").prop('checked', false);
-  },
-  /**
-* TODO: Complete JS doc
-*/
-  'change .attendanceSelect': () => {
-    if ($(".attendanceSelect").length === $(".attendanceSelect:checked").length)
-      $("#attendancechecks").prop('checked', true);
-    else
-      $("#attendancechecks").prop('checked', false);
-  },
-
-  /**
-* TODO: Complete JS doc
-*/
-  'change .stockAcceptSelect': () => {
-    if ($(".stockAcceptSelect").length === $(".stockAcceptSelect:checked").length)
-      $("#stockAcceptchecks").prop('checked', true);
-    else
-      $("#stockAcceptchecks").prop('checked', false);
-  },
-  /**
-* TODO: Complete JS doc
-*/
-  'change .stockReportSelect': () => {
-    if ($(".stockReportSelect").length === $(".stockReportSelect:checked").length)
-      $("#stockReportchecks").prop('checked', true);
-    else
-      $("#stockReportchecks").prop('checked', false);
-  },
-
-  /**
-* TODO: Complete JS doc
-*/
-  'change .outletTrackerSelect': () => {
-    if ($(".outletTrackerSelect").length === $(".outletTrackerSelect:checked").length)
-      $("#outletTrackerchecks").prop('checked', true);
-    else
-      $("#outletTrackerchecks").prop('checked', false);
-  },
-  /**
-* TODO: Complete JS doc
-*/
-  'change .stockReturnSelect': () => {
-    if ($(".stockReturnSelect").length === $(".stockReturnSelect:checked").length)
-      $("#stockReturnchecks").prop('checked', true);
-    else
-      $("#stockReturnchecks").prop('checked', false);
-  },
-  /**
-* TODO: Complete JS doc
-*/
-  'change .stockSummarySelect': () => {
-    if ($(".stockSummarySelect").length === $(".stockSummarySelect:checked").length)
-      $("#stockSummarychecks").prop('checked', true);
-    else
-      $("#stockSummarychecks").prop('checked', false);
   },
   /**
    * TODO: Complete JS doc
@@ -1167,6 +1107,17 @@ Template.role_list.events({
     else
       $("#sdashboardchecks").prop('checked', false);
   },
+
+  /**
+  * TODO:Comlete JS doc
+  */
+  'change .posSelect': () => {
+    if ($(".posSelect").length === $(".posSelect:checked").length)
+      $("#poschecks").prop('checked', true);
+    else
+      $("#poschecks").prop('checked', false);
+  },
+
   /**
    * TODO: Complete JS doc
    */
@@ -1186,6 +1137,7 @@ Template.role_list.events({
     else
       $("#superAdmindashboardchecks").prop('checked', false);
   },
+
   /**
   * TODO:Comlete JS doc
   */
@@ -1195,7 +1147,60 @@ Template.role_list.events({
     else
       $("#orderchecks").prop('checked', false);
   },
-
+  /**
+  * TODO:Comlete JS doc
+  */
+  'change .orderSeniorSelect': () => {
+    if ($(".orderSeniorSelect").length === $(".orderSeniorSelect:checked").length)
+      $("#orderSeniorchecks").prop('checked', true);
+    else
+      $("#orderSeniorchecks").prop('checked', false);
+  },
+  /**
+   * TODO:Comlete JS doc
+   */
+  'change .salesReturnSelect': () => {
+    if ($(".salesReturnSelect").length === $(".salesReturnSelect:checked").length)
+      $("#salesReturnchecks").prop('checked', true);
+    else
+      $("#salesReturnchecks").prop('checked', false);
+  },
+  /**
+   * TODO:Comlete JS doc
+   */
+  'change .stockTransferRequestSelect': () => {
+    if ($(".stockTransferRequestSelect").length === $(".stockTransferRequestSelect:checked").length)
+      $("#stockTransferRequestchecks").prop('checked', true);
+    else
+      $("#stockTransferRequestchecks").prop('checked', false);
+  },
+  /**
+  * TODO:Comlete JS doc
+  */
+  'change .deliverySelections1': () => {
+    if ($(".deliverySelections1").length === $(".deliverySelections1:checked").length)
+      $("#deliverycheck1").prop('checked', true);
+    else
+      $("#deliverycheck1").prop('checked', false);
+  },
+  /**
+  * TODO:Comlete JS doc
+  */
+  'change .dispatchSelections1': () => {
+    if ($(".dispatchSelections1").length === $(".dispatchSelections1:checked").length)
+      $("#dispatchcheck1").prop('checked', true);
+    else
+      $("#dispatchcheck1").prop('checked', false);
+  },
+  /**
+   * TODO: Complete JS doc
+   */
+  'change .dispatchRejectSelect': () => {
+    if ($(".dispatchRejectSelect").length === $(".dispatchRejectSelect:checked").length)
+      $("#dispatchRejectchecks").prop('checked', true);
+    else
+      $("#dispatchRejectchecks").prop('checked', false);
+  },
   /**
  * TODO:Complete JS doc
  */
@@ -1204,99 +1209,6 @@ Template.role_list.events({
       $("#userschecks").prop('checked', true);
     else
       $("#userschecks").prop('checked', false);
-  },
-
-  /**
-* TODO:Complete JS doc
-*/
-  'change .masterDataSelect': () => {
-    if ($(".masterDataSelect").length === $(".masterDataSelect:checked").length)
-      $("#masterDatachecks").prop('checked', true);
-    else
-      $("#masterDatachecks").prop('checked', false);
-  },
-
-  /**
-* TODO:Complete JS doc
-*/
-  'change .routeSelect': () => {
-    if ($(".routeSelect").length === $(".routeSelect:checked").length)
-      $("#routechecks").prop('checked', true);
-    else
-      $("#routechecks").prop('checked', false);
-  },
-
-  /**
-* TODO:Complete JS doc
-*/
-  'change .verticalsSelect': () => {
-    if ($(".verticalsSelect").length === $(".verticalsSelect:checked").length)
-      $("#verticalschecks").prop('checked', true);
-    else
-      $("#verticalschecks").prop('checked', false);
-  },
-  /**
-* TODO:Complete JS doc
-*/
-  'change .sdMasterSelect': () => {
-    if ($(".sdMasterSelect").length === $(".sdMasterSelect:checked").length)
-      $("#sdMasterchecks").prop('checked', true);
-    else
-      $("#sdMasterchecks").prop('checked', false);
-  },
-  /**
-* TODO:Complete JS doc
-*/
-  'change .outletsSelect': () => {
-    if ($(".outletsSelect").length === $(".outletsSelect:checked").length)
-      $("#outletschecks").prop('checked', true);
-    else
-      $("#outletschecks").prop('checked', false);
-  },
-  /**
-* TODO:Complete JS doc
-*/
-  'change .sdOutletsSelect': () => {
-    if ($(".sdOutletsSelect").length === $(".sdOutletsSelect:checked").length)
-      $("#sdOutletschecks").prop('checked', true);
-    else
-      $("#sdOutletschecks").prop('checked', false);
-  },
-  /**
-* TODO:Complete JS doc
-*/
-  'change .cashSalesSelect': () => {
-    if ($(".cashSalesSelect").length === $(".cashSalesSelect:checked").length)
-      $("#cashSaleschecks").prop('checked', true);
-    else
-      $("#cashSaleschecks").prop('checked', false);
-  },
-  /**
-* TODO:Complete JS doc
-*/
-  'change .creditSaleSelect': () => {
-    if ($(".creditSaleSelect").length === $(".creditSaleSelect:checked").length)
-      $("#creditSalechecks").prop('checked', true);
-    else
-      $("#creditSalechecks").prop('checked', false);
-  },
-  /**
-* TODO:Complete JS doc
-*/
-  'change .brandSelect': () => {
-    if ($(".brandSelect").length === $(".brandSelect:checked").length)
-      $("#brandchecks").prop('checked', true);
-    else
-      $("#brandchecks").prop('checked', false);
-  },
-  /**
-* TODO:Complete JS doc
-*/
-  'change .categorySelect': () => {
-    if ($(".categorySelect").length === $(".categorySelect:checked").length)
-      $("#categorychecks").prop('checked', true);
-    else
-      $("#categorychecks").prop('checked', false);
   },
   /**
   * TODO:Complete JS doc
@@ -1316,7 +1228,571 @@ Template.role_list.events({
     else
       $("#rolechecks").prop('checked', false);
   },
+  /**
+* TODO:Comlete JS doc
+*/
+  'change .designationSelect': () => {
+    if ($(".designationSelect").length === $(".designationSelect:checked").length)
+      $("#designationchecks").prop('checked', true);
+    else
+      $("#designationchecks").prop('checked', false);
+  },
+  /**
+* TODO:Comlete JS doc
+*/
+  'change .bpAdminSelect': () => {
+    if ($(".bpAdminSelect").length === $(".bpAdminSelect:checked").length)
+      $("#bpAdminchecks").prop('checked', true);
+    else
+      $("#bpAdminchecks").prop('checked', false);
+  },
 
+  'change .branchTransferSelect': () => {
+    if ($(".branchTransferSelect").length === $(".branchTransferSelect:checked").length)
+      $("#branchTransferchecks").prop('checked', true);
+    else
+      $("#branchTransferchecks").prop('checked', false);
+  },
+
+  'change .activitySelect': () => {
+    if ($(".activitySelect").length === $(".activitySelect:checked").length)
+      $("#activitychecks").prop('checked', true);
+    else
+      $("#activitychecks").prop('checked', false);
+  },
+
+  'change .branchTransferApproveSelect': () => {
+    if ($(".branchTransferApproveSelect").length === $(".branchTransferApproveSelect:checked").length)
+      $("#branchTransferApprovechecks").prop('checked', true);
+    else
+      $("#branchTransferApprovechecks").prop('checked', false);
+  },
+  /**
+* TODO:Comlete JS doc
+*/
+  'change .leadSelect': () => {
+    if ($(".leadSelect").length === $(".leadSelect:checked").length)
+      $("#leadchecks").prop('checked', true);
+    else
+      $("#leadchecks").prop('checked', false);
+  },
+  /**
+   * TODO:Comlete JS doc
+   */
+  'change .collectionDueTodaySelect': () => {
+    if ($(".collectionDueTodaySelect").length === $(".collectionDueTodaySelect:checked").length)
+      $("#collectionDueTodaychecks").prop('checked', true);
+    else
+      $("#collectionDueTodaychecks").prop('checked', false);
+  },
+  /**
+   * TODO:Comlete JS doc
+   */
+  'change .creditInvoiceSelect': () => {
+    if ($(".creditInvoiceSelect").length === $(".creditInvoiceSelect:checked").length)
+      $("#creditInvoicechecks").prop('checked', true);
+    else
+      $("#creditInvoicechecks").prop('checked', false);
+  },
+  /**
+   * TODO:Comlete JS doc
+   */
+  'change .creditNoteSelect': () => {
+    if ($(".creditNoteSelect").length === $(".creditNoteSelect:checked").length)
+      $("#creditNotechecks").prop('checked', true);
+    else
+      $("#creditNotechecks").prop('checked', false);
+  },
+  /**
+   * TODO:Comlete JS doc
+   */
+  'change .arInvoicePaymentSelect': () => {
+    if ($(".arInvoicePaymentSelect").length === $(".arInvoicePaymentSelect:checked").length)
+      $("#arInvoicePaymentchecks").prop('checked', true);
+    else
+      $("#arInvoicePaymentchecks").prop('checked', false);
+  },
+  /**
+   * TODO:Comlete JS doc
+   */
+  'change .arInvoiceSeniorPaymentSelect': () => {
+    if ($(".arInvoiceSeniorPaymentSelect").length === $(".arInvoiceSeniorPaymentSelect:checked").length)
+      $("#arInvoiceSeniorPaymentchecks").prop('checked', true);
+    else
+      $("#arInvoiceSeniorPaymentchecks").prop('checked', false);
+  },
+  /**
+   * TODO:Comlete JS doc
+   */
+  'change .salesQuotationSelect': () => {
+    if ($(".salesQuotationSelect").length === $(".salesQuotationSelect:checked").length)
+      $("#salesQuotationchecks").prop('checked', true);
+    else
+      $("#salesQuotationchecks").prop('checked', false);
+  },
+  /**
+   * TODO:Comlete JS doc
+   */
+  'change .salesQuotationSeniorSelect': () => {
+    if ($(".salesQuotationSeniorSelect").length === $(".salesQuotationSeniorSelect:checked").length)
+      $("#salesQuotationSeniorchecks").prop('checked', true);
+    else
+      $("#salesQuotationSeniorchecks").prop('checked', false);
+  },
+  /**
+   * TODO:Comlete JS doc
+   */
+  'change .orderApproveSelect': () => {
+    if ($(".orderApproveSelect").length === $(".orderApproveSelect:checked").length)
+      $("#orderApprovechecks").prop('checked', true);
+    else
+      $("#orderApprovechecks").prop('checked', false);
+  },
+  /**
+   * TODO:Comlete JS doc
+   */
+  'change .invoiceSelect': () => {
+    if ($(".invoiceSelect").length === $(".invoiceSelect:checked").length)
+      $("#invoicechecks").prop('checked', true);
+    else
+      $("#invoicechecks").prop('checked', false);
+  },
+  /**
+  * TODO:Comlete JS doc
+  */
+  'change .deliveryBoySelect': () => {
+    if ($(".deliveryBoySelect").length === $(".deliveryBoySelect:checked").length)
+      $("#deliveryBoychecks").prop('checked', true);
+    else
+      $("#deliveryBoychecks").prop('checked', false);
+  },
+  /**
+   * TODO:Comlete JS doc
+   */
+  'change .quotationApproveSelect': () => {
+    if ($(".quotationApproveSelect").length === $(".quotationApproveSelect:checked").length)
+      $("#quotationApprovechecks").prop('checked', true);
+    else
+      $("#quotationApprovechecks").prop('checked', false);
+  },
+  /**
+   * TODO:Comlete JS doc
+   */
+  'change .salesReturnApproveSelect': () => {
+    if ($(".salesReturnApproveSelect").length === $(".salesReturnApproveSelect:checked").length)
+      $("#salesReturnApprovechecks").prop('checked', true);
+    else
+      $("#salesReturnApprovechecks").prop('checked', false);
+  },
+  /**
+   * TODO:Comlete JS doc
+   */
+  'change .stockTransferApproveSelect': () => {
+    if ($(".stockTransferApproveSelect").length === $(".stockTransferApproveSelect:checked").length)
+      $("#stockTransferApprovechecks").prop('checked', true);
+    else
+      $("#stockTransferApprovechecks").prop('checked', false);
+  },
+  /**
+   * TODO:Comlete JS doc
+   */
+  'change .creditNoteApproveSelect': () => {
+    if ($(".creditNoteApproveSelect").length === $(".creditNoteApproveSelect:checked").length)
+      $("#creditNoteApprovechecks").prop('checked', true);
+    else
+      $("#creditNoteApprovechecks").prop('checked', false);
+  },
+  /**
+  * TODO:Comlete JS doc
+  */
+  'change .creditInvoiceApproveSelect': () => {
+    if ($(".creditInvoiceApproveSelect").length === $(".creditInvoiceApproveSelect:checked").length)
+      $("#creditInvoiceApprovechecks").prop('checked', true);
+    else
+      $("#creditInvoiceApprovechecks").prop('checked', false);
+  },
+  /**
+   * TODO:Comlete JS doc
+   */
+  'change .pickListSelect': () => {
+    if ($(".pickListSelect").length === $(".pickListSelect:checked").length)
+      $("#pickListchecks").prop('checked', true);
+    else
+      $("#pickListchecks").prop('checked', false);
+  },
+  /**
+  * TODO:Comlete JS doc
+  */
+  'change .orderReportSelect': () => {
+    if ($(".orderReportSelect").length === $(".orderReportSelect:checked").length)
+      $("#orderReportchecks").prop('checked', true);
+    else
+      $("#orderReportchecks").prop('checked', false);
+  },
+  /**
+  * TODO:Comlete JS doc
+  */
+  'change .salesQuotationReportSelect': () => {
+    if ($(".salesQuotationReportSelect").length === $(".salesQuotationReportSelect:checked").length)
+      $("#salesQuotationReportchecks").prop('checked', true);
+    else
+      $("#salesQuotationReportchecks").prop('checked', false);
+  },
+  /**
+  * TODO:Comlete JS doc
+  */
+  'change .arInvoiceReportSelect': () => {
+    if ($(".arInvoiceReportSelect").length === $(".arInvoiceReportSelect:checked").length)
+      $("#arInvoiceReportchecks").prop('checked', true);
+    else
+      $("#arInvoiceReportchecks").prop('checked', false);
+  },
+  /**
+  * TODO:Comlete JS doc
+  */
+  'change .posReportSelect': () => {
+    if ($(".posReportSelect").length === $(".posReportSelect:checked").length)
+      $("#posReportchecks").prop('checked', true);
+    else
+      $("#posReportchecks").prop('checked', false);
+  },
+  /**
+ * TODO:Comlete JS doc
+ */
+  'change .locationSelect': () => {
+    if ($(".locationSelect").length === $(".locationSelect:checked").length)
+      $("#locationchecks").prop('checked', true);
+    else
+      $("#locationchecks").prop('checked', false);
+  },
+  /**
+* TODO:Comlete JS doc
+*/
+  'change .pendingArInvoiceSelect': () => {
+    if ($(".pendingArInvoiceSelect").length === $(".pendingArInvoiceSelect:checked").length)
+      $("#pendingArInvoicechecks").prop('checked', true);
+    else
+      $("#pendingArInvoicechecks").prop('checked', false);
+  },
+
+  /**
+* TODO:Comlete JS doc
+*/
+  'change .pendingPosInvoiceSelect': () => {
+    if ($(".pendingPosInvoiceSelect").length === $(".pendingPosInvoiceSelect:checked").length)
+      $("#pendingPosInvoicechecks").prop('checked', true);
+    else
+      $("#pendingPosInvoicechecks").prop('checked', false);
+  },
+  /**
+* TODO:Comlete JS doc
+*/
+  'change .attendanceSelect': () => {
+    if ($(".attendanceSelect").length === $(".attendanceSelect:checked").length)
+      $("#attendancechecks").prop('checked', true);
+    else
+      $("#attendancechecks").prop('checked', false);
+  },
+  /**
+* TODO:Comlete JS doc
+*/
+  'change .routeApproveSelect': () => {
+    if ($(".routeApproveSelect").length === $(".routeApproveSelect:checked").length)
+      $("#routeApprovechecks").prop('checked', true);
+    else
+      $("#routeApprovechecks").prop('checked', false);
+  },
+  /**
+* TODO:Comlete JS doc
+*/
+  'change .salesSummaryReportSelect': () => {
+    if ($(".salesSummaryReportSelect").length === $(".salesSummaryReportSelect:checked").length)
+      $("#salesSummaryReportchecks").prop('checked', true);
+    else
+      $("#salesSummaryReportchecks").prop('checked', false);
+  },
+  /**
+* TODO:Comlete JS doc
+*/
+  'change .stockSummaryReportSelect': () => {
+    if ($(".stockSummaryReportSelect").length === $(".stockSummaryReportSelect:checked").length)
+      $("#stockSummaryReportchecks").prop('checked', true);
+    else
+      $("#stockSummaryReportchecks").prop('checked', false);
+  },
+
+  /**
+* TODO:Comlete JS doc
+*/
+  'change .noSalesReportSelect': () => {
+    if ($(".noSalesReportSelect").length === $(".noSalesReportSelect:checked").length)
+      $("#noSalesReportchecks").prop('checked', true);
+    else
+      $("#noSalesReportchecks").prop('checked', false);
+  },
+
+  /**
+* TODO:Comlete JS doc
+*/
+  'change .targetOutletReportSelect': () => {
+    if ($(".targetOutletReportSelect").length === $(".targetOutletReportSelect:checked").length)
+      $("#targetOutletReportchecks").prop('checked', true);
+    else
+      $("#targetOutletReportchecks").prop('checked', false);
+  },
+
+  /**
+* TODO:Comlete JS doc
+*/
+  'change .callRateReportSelect': () => {
+    if ($(".callRateReportSelect").length === $(".callRateReportSelect:checked").length)
+      $("#callRateReportchecks").prop('checked', true);
+    else
+      $("#callRateReportchecks").prop('checked', false);
+  },
+
+  /**
+* TODO:Comlete JS doc
+*/
+  'change .strikeRateReportSelect': () => {
+    if ($(".strikeRateReportSelect").length === $(".strikeRateReportSelect:checked").length)
+      $("#strikeRateReportchecks").prop('checked', true);
+    else
+      $("#strikeRateReportchecks").prop('checked', false);
+  },
+
+  /**
+* TODO:Comlete JS doc
+*/
+  'change .priceUpdateSelect': () => {
+    if ($(".priceUpdateSelect").length === $(".priceUpdateSelect:checked").length)
+      $("#priceUpdatechecks").prop('checked', true);
+    else
+      $("#priceUpdatechecks").prop('checked', false);
+  },
+  /**
+* TODO:Comlete JS doc
+*/
+  'change .cxoDashboardSelect': () => {
+    if ($(".cxoDashboardSelect").length === $(".cxoDashboardSelect:checked").length)
+      $("#cxoDashboardchecks").prop('checked', true);
+    else
+      $("#cxoDashboardchecks").prop('checked', false);
+  },
+  /**
+* TODO:Comlete JS doc
+*/
+  'change .itemWiseReportSelect': () => {
+    if ($(".itemWiseReportSelect").length === $(".itemWiseReportSelect:checked").length)
+      $("#itemWiseReportchecks").prop('checked', true);
+    else
+      $("#itemWiseReportchecks").prop('checked', false);
+  },
+  /**
+* TODO:Comlete JS doc
+*/
+  'change .routeWiseReportSelect': () => {
+    if ($(".routeWiseReportSelect").length === $(".routeWiseReportSelect:checked").length)
+      $("#routeWiseReportchecks").prop('checked', true);
+    else
+      $("#routeWiseReportchecks").prop('checked', false);
+  },
+  /**
+* TODO:Comlete JS doc
+*/
+  'change .numericalDistributonReportSelect': () => {
+    if ($(".numericalDistributonReportSelect").length === $(".numericalDistributonReportSelect:checked").length)
+      $("#numericalDistributonReportchecks").prop('checked', true);
+    else
+      $("#numericalDistributonReportchecks").prop('checked', false);
+  },
+  /**
+* TODO:Comlete JS doc
+*/
+  'change .whsStockReportSelect': () => {
+    if ($(".whsStockReportSelect").length === $(".whsStockReportSelect:checked").length)
+      $("#whsStockReportchecks").prop('checked', true);
+    else
+      $("#whsStockReportchecks").prop('checked', false);
+  },
+  /**
+* TODO:Comlete JS doc
+*/
+  'change .weightageDistributionReportSelect': () => {
+    if ($(".weightageDistributionReportSelect").length === $(".weightageDistributionReportSelect:checked").length)
+      $("#weightageDistributionReportchecks").prop('checked', true);
+    else
+      $("#weightageDistributionReportchecks").prop('checked', false);
+  },
+  /**
+* TODO:Comlete JS doc
+*/
+  'change .coverageDistributionReportSelect': () => {
+    if ($(".coverageDistributionReportSelect").length === $(".coverageDistributionReportSelect:checked").length)
+      $("#coverageDistributionReportchecks").prop('checked', true);
+    else
+      $("#coverageDistributionReportchecks").prop('checked', false);
+  },
+  /**
+* TODO:Comlete JS doc
+*/
+  'change .priceTypeEditSelect': () => {
+    if ($(".priceTypeEditSelect").length === $(".priceTypeEditSelect:checked").length)
+      $("#priceTypeEditchecks").prop('checked', true);
+    else
+      $("#priceTypeEditchecks").prop('checked', false);
+  },
+  /**
+* TODO:Comlete JS doc
+*/
+  'change .expenseListSelect': () => {
+    if ($(".expenseListSelect").length === $(".expenseListSelect:checked").length)
+      $("#expenseListchecks").prop('checked', true);
+    else
+      $("#expenseListchecks").prop('checked', false);
+  },
+  /**
+* TODO:Comlete JS doc
+*/
+  'change .vansaleReportSelect': () => {
+    if ($(".vansaleReportSelect").length === $(".vansaleReportSelect:checked").length)
+      $("#vansaleReportchecks").prop('checked', true);
+    else
+      $("#vansaleReportchecks").prop('checked', false);
+  },
+  /**
+* TODO:Comlete JS doc
+*/
+  'change .skippedCustomerReportSelect': () => {
+    if ($(".skippedCustomerReportSelect").length === $(".skippedCustomerReportSelect:checked").length)
+      $("#skippedCustomerReportchecks").prop('checked', true);
+    else
+      $("#skippedCustomerReportchecks").prop('checked', false);
+  },
+  /**
+* TODO:Comlete JS doc
+*/
+  'change .routeSelect': () => {
+    if ($(".routeSelect").length === $(".routeSelect:checked").length)
+      $("#routechecks").prop('checked', true);
+    else
+      $("#routechecks").prop('checked', false);
+  },
+
+  /**
+* TODO:Comlete JS doc
+*/
+  'change .masterDataSelect': () => {
+    if ($(".masterDataSelect").length === $(".masterDataSelect:checked").length)
+      $("#masterDatachecks").prop('checked', true);
+    else
+      $("#masterDatachecks").prop('checked', false);
+  },
+
+
+  /**
+  * TODO:Comlete JS doc
+  */
+  'change .creditInvoiceReportSelect': () => {
+    if ($(".creditInvoiceReportSelect").length === $(".creditInvoiceReportSelect:checked").length)
+      $("#creditInvoiceReportchecks").prop('checked', true);
+    else
+      $("#creditInvoiceReportchecks").prop('checked', false);
+  },
+  /**
+ * TODO:Comlete JS doc
+ */
+  'change .salesReturnReportSelect': () => {
+    if ($(".salesReturnReportSelect").length === $(".salesReturnReportSelect:checked").length)
+      $("#salesReturnReportchecks").prop('checked', true);
+    else
+      $("#salesReturnReportchecks").prop('checked', false);
+  },
+  /**
+   * TODO:Comlete JS doc
+   */
+  'change .creditNoteReportSelect': () => {
+    if ($(".creditNoteReportSelect").length === $(".creditNoteReportSelect:checked").length)
+      $("#creditNoteReportchecks").prop('checked', true);
+    else
+      $("#creditNoteReportchecks").prop('checked', false);
+  },
+  /**
+  * TODO:Comlete JS doc
+  */
+  'change .branchTransferReportSelect': () => {
+    if ($(".branchTransferReportSelect").length === $(".branchTransferReportSelect:checked").length)
+      $("#branchTransferReportchecks").prop('checked', true);
+    else
+      $("#branchTransferReportchecks").prop('checked', false);
+  },
+  /**
+   * TODO:Comlete JS doc
+   */
+  'change .collectionReportSelect': () => {
+    if ($(".collectionReportSelect").length === $(".collectionReportSelect:checked").length)
+      $("#collectionReportchecks").prop('checked', true);
+    else
+      $("#collectionReportchecks").prop('checked', false);
+  },
+  /**
+  * TODO:Comlete JS doc
+  */
+  'change .stockTransferReportSelect': () => {
+    if ($(".stockTransferReportSelect").length === $(".stockTransferReportSelect:checked").length)
+      $("#stockTransferReportchecks").prop('checked', true);
+    else
+      $("#stockTransferReportchecks").prop('checked', false);
+  },
+  /**
+ * TODO:Comlete JS doc
+ */
+  'change .invoiceReportSelect': () => {
+    if ($(".invoiceReportSelect").length === $(".invoiceReportSelect:checked").length)
+      $("#invoiceReportchecks").prop('checked', true);
+    else
+      $("#invoiceReportchecks").prop('checked', false);
+  },
+
+  /**
+* TODO:Comlete JS doc
+*/
+  'change .deliveryReportSelect': () => {
+    if ($(".deliveryReportSelect").length === $(".deliveryReportSelect:checked").length)
+      $("#deliveryReportchecks").prop('checked', true);
+    else
+      $("#deliveryReportchecks").prop('checked', false);
+  },
+
+  /**
+* TODO:Comlete JS doc
+*/
+  'change .purchasePrintSelect': () => {
+    if ($(".purchasePrintSelect").length === $(".purchasePrintSelect:checked").length)
+      $("#purchasePrintchecks").prop('checked', true);
+    else
+      $("#purchasePrintchecks").prop('checked', false);
+  },
+
+  /**
+* TODO:Comlete JS doc
+*/
+  'change .activitySeniorSelect': () => {
+    if ($(".activitySeniorSelect").length === $(".activitySeniorSelect:checked").length)
+      $("#activitySeniorchecks").prop('checked', true);
+    else
+      $("#activitySeniorchecks").prop('checked', false);
+  },
+
+  /**
+* TODO:Comlete JS doc
+*/
+  'change .accountantSelect': () => {
+    if ($(".accountantSelect").length === $(".accountantSelect:checked").length)
+      $("#accountantchecks").prop('checked', true);
+    else
+      $("#accountantchecks").prop('checked', false);
+  },
   /**
    * TODO: Complete JS doc
    */
@@ -1324,190 +1800,7 @@ Template.role_list.events({
     Template.instance().pagination.settings.set('filters', { isDeleted: false });
     $('form :input').val("");
   },
-  /**
-    * TODO: Complete JS doc
-    */
-  'change .branchelect': () => {
-    if ($(".branchelect").length === $(".branchelect:checked").length)
-      $("#branchchecks").prop('checked', true);
-    else
-      $("#branchchecks").prop('checked', false);
-  },
 
-  /**
-    * TODO: Complete JS doc
-    */
-  'change .locationelect': () => {
-    if ($(".locationelect").length === $(".locationelect:checked").length)
-      $("#locationchecks").prop('checked', true);
-    else
-      $("#locationchecks").prop('checked', false);
-  },
-
-  /**
-    * TODO: Complete JS doc
-    */
-  'change .priceTypeelect': () => {
-    if ($(".priceTypeelect").length === $(".priceTypeelect:checked").length)
-      $("#priceTypechecks").prop('checked', true);
-    else
-      $("#priceTypechecks").prop('checked', false);
-  },
-
-  /**
-      * TODO: Complete JS doc
-      */
-  'change .productelect': () => {
-    if ($(".productelect").length === $(".productelect:checked").length)
-      $("#productchecks").prop('checked', true);
-    else
-      $("#productchecks").prop('checked', false);
-  },
-
-  /**
-      * TODO: Complete JS doc
-      */
-  'change .unitelect': () => {
-    if ($(".unitelect").length === $(".unitelect:checked").length)
-      $("#unitchecks").prop('checked', true);
-    else
-      $("#unitchecks").prop('checked', false);
-  },
-
-  /**
-      * TODO: Complete JS doc
-      */
-  'change .priceelect': () => {
-    if ($(".priceelect").length === $(".priceelect:checked").length)
-      $("#pricechecks").prop('checked', true);
-    else
-      $("#pricechecks").prop('checked', false);
-  },
-  /**
-      * TODO: Complete JS doc
-      */
-  'change .taxelect': () => {
-    if ($(".taxelect").length === $(".taxelect:checked").length)
-      $("#taxchecks").prop('checked', true);
-    else
-      $("#taxchecks").prop('checked', false);
-  },
-
-  /**
-      * TODO: Complete JS doc
-      */
-  'change .SdPriceListelect': () => {
-    if ($(".SdPriceListselect").length === $(".SdPriceListselect:checked").length)
-      $("#SdPriceListchecks").prop('checked', true);
-    else
-      $("#SdPriceListchecks").prop('checked', false);
-  },
-  /**
-      * TODO: Complete JS doc
-      */
-  'change .administrationselect': () => {
-    if ($(".administrationselect").length === $(".administrationselect:checked").length)
-      $("#administrationchecks").prop('checked', true);
-    else
-      $("#administrationchecks").prop('checked', false);
-  },
-  /**
-      * TODO: Complete JS doc
-      */
-  'change .SdPriceListselect': () => {
-    if ($(".SdPriceListselect").length === $(".SdPriceListselect:checked").length)
-      $("#SdPriceListchecks").prop('checked', true);
-    else
-      $("#SdPriceListchecks").prop('checked', false);
-  },
-
-  /**
-      * TODO: Complete JS doc
-      */
-  'change .collectionListelect': () => {
-    if ($(".collectionListselect").length === $(".collectionListselect:checked").length)
-      $("#collectionListchecks").prop('checked', true);
-    else
-      $("#collectionListchecks").prop('checked', false);
-  },
-  /**
-      * TODO: Complete JS doc
-      */
-  'change .deliveryListelect': () => {
-    if ($(".deliveryListselect").length === $(".deliveryListselect:checked").length)
-      $("#deliveryListchecks").prop('checked', true);
-    else
-      $("#deliveryListchecks").prop('checked', false);
-  },
-  /**
-    * TODO: Complete JS doc
-    */
-  'change .orderApListelect': () => {
-    if ($(".orderApListselect").length === $(".orderApListselect:checked").length)
-      $("#orderApListchecks").prop('checked', true);
-    else
-      $("#orderApListchecks").prop('checked', false);
-  },
-  /**
-  * TODO:Complete JS doc
-  */
-  'change .cashSalesRepEdittSelections': () => {
-    if ($(".cashSalesRepEdittSelections").length === $(".cashSalesRepEdittSelections:checked").length)
-      $("#cashSalesRepEdittcheck").prop('checked', true);
-    else
-      $("#cashSalesRepEdittcheck").prop('checked', false);
-  },
-  'click #creditSaleReportchecks': () => {
-    if ($("#creditSaleReportchecks").prop("checked") === true) {
-      $("#creditSaleReportcheckView").prop('checked', true);
-    } else {
-      $("#creditSaleReportcheckView").prop('checked', false);
-    }
-  }
-  ,
-  'change .creditSaleReportselect': () => {
-    if ($(".creditSaleReportselect").length === $(".creditSaleReportselect:checked").length)
-      $("#creditSaleReportchecks").prop('checked', true);
-    else
-      $("#creditSaleReportchecks").prop('checked', false);
-  },
-  'change .sdUserStockHistory1Selections': () => {
-    if ($(".sdUserStockHistory1Selections").length === $(".sdUserStockHistory1Selections:checked").length)
-      $("#sdUserStockHistory1check").prop('checked', true);
-    else
-      $("#sdUserStockHistory1check").prop('checked', false);
-  },
-  'change .sdUserStockSummary1Selections': () => {
-    if ($(".sdUserStockSummary1Selections").length === $(".sdUserStockSummary1Selections:checked").length)
-      $("#sdUserStockSummary1check").prop('checked', true);
-    else
-      $("#sdUserStockSummary1check").prop('checked', false);
-  },
-  'change .verticalSaleReport1Selections': () => {
-    if ($(".verticalSaleReport1Selections").length === $(".verticalSaleReport1Selections:checked").length)
-      $("#verticalSaleReport1check").prop('checked', true);
-    else
-      $("#verticalSaleReport1check").prop('checked', false);
-  }
-  ,
-  'change .sdReports1Selections': () => {
-    if ($(".sdReports1Selections").length === $(".sdReports1Selections:checked").length)
-      $("#sdReports1check").prop('checked', true);
-    else
-      $("#sdReports1check").prop('checked', false);
-  },
-  'change .bdmReports1Selections': () => {
-    if ($(".bdmReports1Selections").length === $(".bdmReports1Selections:checked").length)
-      $("#bdmReports1check").prop('checked', true);
-    else
-      $("#bdmReports1check").prop('checked', false);
-  },
-  'change .bhReports1Selections': () => {
-    if ($(".bhReports1Selections").length === $(".bhReports1Selections:checked").length)
-      $("#bhReports1check").prop('checked', true);
-    else
-      $("#bhReports1check").prop('checked', false);
-  },
   /**
     * TODO: Complete JS doc
     * @param event
@@ -1525,17 +1818,9 @@ Template.role_list.events({
       let roleDetailDescription = roleDetail.description;
       let roleDetailHomePage = roleDetail.homePage;
       let roleDetailPermissions = roleDetail.permissions;
-      let rolesUderVal = roleDetail.rolesUnder;
-      let superAdminView = roleDetailPermissions.includes("superAdminView");
-      let businessHeadView = roleDetailPermissions.includes("businessHeadView");
-      let bdmView = roleDetailPermissions.includes("bdmView");
-      let coordinatorView = roleDetailPermissions.includes("coordinatorView");
-      let sdView = roleDetailPermissions.includes("sdView");
-      let vsrView = roleDetailPermissions.includes("vsrView");
-      let omrView = roleDetailPermissions.includes("omrView");
-      let wseView = roleDetailPermissions.includes("wseView");
       let historyView = roleDetailPermissions.includes("historyView");
       let reportView = roleDetailPermissions.includes("reportView");
+      let reportOwnView = roleDetailPermissions.includes("reportOwnView");
       let userView = roleDetailPermissions.includes("userView");
       let userUpdate = roleDetailPermissions.includes("userUpdate");
       let userDelete = roleDetailPermissions.includes("userDelete");
@@ -1548,152 +1833,111 @@ Template.role_list.events({
       let roleCreate = roleDetailPermissions.includes("roleCreate");
       let roleUpdate = roleDetailPermissions.includes("roleUpdate");
       let roleDelete = roleDetailPermissions.includes("roleDelete");
+      let designationView = roleDetailPermissions.includes("designationView");
+      let designationCreate = roleDetailPermissions.includes("designationCreate");
+      let designationUpdate = roleDetailPermissions.includes("designationUpdate");
+      let designationDelete = roleDetailPermissions.includes("designationDelete");
+      let branchTransferView = roleDetailPermissions.includes("branchTransferView");
+      let branchTransferCreate = roleDetailPermissions.includes("branchTransferCreate");
+      let branchTransferApproveView = roleDetailPermissions.includes("branchTransferApproveView");
+      let activityView = roleDetailPermissions.includes("activityView");
+      let activityCreate = roleDetailPermissions.includes("activityCreate");
+      let leadView = roleDetailPermissions.includes("leadView");
+      let leadCreate = roleDetailPermissions.includes("leadCreate");
+      let leadUpdate = roleDetailPermissions.includes("leadUpdate");
+      let leadDelete = roleDetailPermissions.includes("leadDelete");
       let salesDashboard = roleDetailPermissions.includes("salesDashboard");
+      let salepos = roleDetailPermissions.includes("salepos");
+      let dispatchRejectView = roleDetailPermissions.includes("dispatchRejectView");
       let adminDashboard = roleDetailPermissions.includes("adminDashboard");
       let superAdminDashboard = roleDetailPermissions.includes("superAdminDashboard");
       let orderView = roleDetailPermissions.includes("orderView");
       let orderCreate = roleDetailPermissions.includes("orderCreate");
-      let sdUserApproveView = roleDetailPermissions.includes("sdUserApproveView");
-      let stockTransferView = roleDetailPermissions.includes("stockTransferView");
-      let stockListView = roleDetailPermissions.includes("stockListView");
+      let orderSeniorView = roleDetailPermissions.includes("orderSeniorView");
+      let orderSeniorCreate = roleDetailPermissions.includes("orderSeniorCreate");
+      let salesReturnView = roleDetailPermissions.includes("salesReturnView");
+      let salesReturnCreate = roleDetailPermissions.includes("salesReturnCreate");
+      let stockTransferRequestView = roleDetailPermissions.includes("stockTransferRequestView");
+      let stockTransferRequestCreate = roleDetailPermissions.includes("stockTransferRequestCreate");
+      let deliveryView = roleDetailPermissions.includes("deliveryView");
+      let deliveryUpdate = roleDetailPermissions.includes("deliveryUpdate");
+      let dispatchView = roleDetailPermissions.includes("dispatchView");
+      let dispatchUpdate = roleDetailPermissions.includes("dispatchUpdate");
+      let collectionDueTodayView = roleDetailPermissions.includes("collectionDueToday");
+      let collectionDueTodayCreate = roleDetailPermissions.includes("createCollectionDueToday");
+      let creditInvoiceView = roleDetailPermissions.includes("creditInvoiceView");
+      let creditInvoiceCreate = roleDetailPermissions.includes("creditInvoiceCreate");
+      let creditNoteView = roleDetailPermissions.includes("creditNoteView");
+      let creditNoteCreate = roleDetailPermissions.includes("creditNoteCreate");
+      let arInvoicePaymentView = roleDetailPermissions.includes("arInvoicePaymentView");
+      let arInvoicePaymentCreate = roleDetailPermissions.includes("arInvoicePaymentCreate");
+      let arInvoiceSeniorPaymentView = roleDetailPermissions.includes("arInvoiceSeniorPaymentView");
+      let arInvoiceSeniorPaymentCreate = roleDetailPermissions.includes("arInvoiceSeniorPaymentCreate");
+      let salesQuotationView = roleDetailPermissions.includes("salesQuotationView");
+      let salesQuotationCreate = roleDetailPermissions.includes("salesQuotationCreate");
+      let salesQuotationSeniorView = roleDetailPermissions.includes("salesQuotationSeniorView");
+      let salesQuotationSeniorCreate = roleDetailPermissions.includes("salesQuotationSeniorCreate");
+      let invoiceView = roleDetailPermissions.includes("invoiceView");
+      let deliveryBoyView = roleDetailPermissions.includes("deliveryBoyView");
+      let orderApproveView = roleDetailPermissions.includes("orderApproveView");
+      let quotationApproveView = roleDetailPermissions.includes("quotationApproveView");
+      let salesReturnApproveView = roleDetailPermissions.includes("salesReturnApproveView");
+      let stockTransferApproveView = roleDetailPermissions.includes("stockTransferApproveView");
+      let creditNoteApproveView = roleDetailPermissions.includes("creditNoteApproveView");
+      let creditInvoiceApproveView = roleDetailPermissions.includes("creditInvoiceApproveView");
+      let pickListView = roleDetailPermissions.includes("pickListView");
+      let orderReportView = roleDetailPermissions.includes("orderReportView");
+      let salesQuotationReportView = roleDetailPermissions.includes("salesQuotationReportView");
+      let arInvoiceReportView = roleDetailPermissions.includes("arInvoiceReportView");
+      let posReportView = roleDetailPermissions.includes("posReportView");
+      let locationView = roleDetailPermissions.includes("locationView");
+      let pendingArInvoiceView = roleDetailPermissions.includes("pendingArInvoiceView");
+      let pendingPosInvoiceView = roleDetailPermissions.includes("pendingPosInvoiceView");
+      let attendanceView = roleDetailPermissions.includes("attendanceView");
+      let creditInvoiceReportView = roleDetailPermissions.includes("creditInvoiceReportView");
+      let salesReturnReportView = roleDetailPermissions.includes("salesReturnReportView");
+      let creditNoteReportView = roleDetailPermissions.includes("creditNoteReportView");
+      let branchTransferReportView = roleDetailPermissions.includes("branchTransferReportView");
+      let collectionReportView = roleDetailPermissions.includes("collectionReportView");
+      let stockTransferReportView = roleDetailPermissions.includes("stockTransferReportView");
+      let invoiceReportView = roleDetailPermissions.includes("invoiceReportView");
+      let deliveryReportView = roleDetailPermissions.includes("deliveryReportView");
+      let purchasePrintView = roleDetailPermissions.includes("purchasePrintView");
+      let activitySeniorView = roleDetailPermissions.includes("activitySeniorView");
+      let accountantView = roleDetailPermissions.includes("accountantView");
+      let bpAdminView = roleDetailPermissions.includes("bpAdminView");
+      let routeView = roleDetailPermissions.includes("routeView");
+      let routeUpdate = roleDetailPermissions.includes("routeUpdate");
+      let routeDelete = roleDetailPermissions.includes("routeDelete");
+      let routeCreate = roleDetailPermissions.includes("routeCreate");
+      let routeApproveView = roleDetailPermissions.includes("routeApproveView");
+      let salesSummaryReportView = roleDetailPermissions.includes("salesSummaryReportView");
+      let stockSummaryReportView = roleDetailPermissions.includes("stockSummaryReportView");
+      let skippedCustomerReportView = roleDetailPermissions.includes("skippedCustomerReportView");
+      let noSalesReportView = roleDetailPermissions.includes("noSalesReportView");
+      let targetOutletReportView = roleDetailPermissions.includes("targetOutletReportView");
+      let callRateReportView = roleDetailPermissions.includes("callRateReportView");
+      let strikeRateReportView = roleDetailPermissions.includes("strikeRateReportView");
+      let priceUpdateView = roleDetailPermissions.includes("priceUpdateView");
+      let vansaleReportView = roleDetailPermissions.includes("vansaleReportView");
+      let cxoDashboardView = roleDetailPermissions.includes("cxoDashboardView");
+      let itemWiseReportView = roleDetailPermissions.includes("itemWiseReportView");
+      let routeWiseReportView = roleDetailPermissions.includes("routeWiseReportView");
+      let numericalDistributonReportView = roleDetailPermissions.includes("numericalDistributonReportView");
+      let whsStockReportView = roleDetailPermissions.includes("whsStockReportView");
+      let weightageDistributionReportView = roleDetailPermissions.includes("weightageDistributionReportView");
+      let coverageDistributionReportView = roleDetailPermissions.includes("coverageDistributionReportView");
+      let priceTypeEditView = roleDetailPermissions.includes("priceTypeEditView");
+      let expenseListView = roleDetailPermissions.includes("expenseListView");
 
       let masterDataView = roleDetailPermissions.includes("masterDataView");
       let masterDataUpdate = roleDetailPermissions.includes("masterDataUpdate");
       let masterDataDelete = roleDetailPermissions.includes("masterDataDelete");
       let masterDataCreate = roleDetailPermissions.includes("masterDataCreate");
-      let outletsApproveView = roleDetailPermissions.includes("outletsApproveView");
-      let routeAssignView = roleDetailPermissions.includes("routeAssignView");
-      let attendanceView = roleDetailPermissions.includes("attendanceView");
-      let stockAcceptView = roleDetailPermissions.includes("stockAcceptView");
-      let routeView = roleDetailPermissions.includes("routeView");
-      let routeUpdate = roleDetailPermissions.includes("routeUpdate");
-      let routeDelete = roleDetailPermissions.includes("routeDelete");
-      let routeCreate = roleDetailPermissions.includes("routeCreate");
-      let stockReportView = roleDetailPermissions.includes("stockReportView");
-      let outletTrackerView = roleDetailPermissions.includes("outletTrackerView");
-      let stockReturnView = roleDetailPermissions.includes("stockReturnView");
-      let stockSummaryView = roleDetailPermissions.includes("stockSummaryView");
-      let verticalsView = roleDetailPermissions.includes("verticalsView");
-      let verticalsUpdate = roleDetailPermissions.includes("verticalsUpdate");
-      let verticalsDelete = roleDetailPermissions.includes("verticalsDelete");
-      let verticalsCreate = roleDetailPermissions.includes("verticalsCreate");
-
-      let outletsView = roleDetailPermissions.includes("outletsView");
-      let outletsUpdate = roleDetailPermissions.includes("outletsUpdate");
-      let outletsDelete = roleDetailPermissions.includes("outletsDelete");
-      let outletsCreate = roleDetailPermissions.includes("outletsCreate");
-
-
-      let sdOutletsView = roleDetailPermissions.includes("sdOutletsView");
-      let sdOutletsUpdate = roleDetailPermissions.includes("sdOutletsUpdate");
-      let sdOutletsDelete = roleDetailPermissions.includes("sdOutletsDelete");
-      let sdOutletsCreate = roleDetailPermissions.includes("sdOutletsCreate");
-
-      let cashSalesView = roleDetailPermissions.includes("cashSalesView");
-      let cashSalesUpdate = roleDetailPermissions.includes("cashSalesUpdate");
-      let cashSalesDelete = roleDetailPermissions.includes("cashSalesDelete");
-      let cashSalesCreate = roleDetailPermissions.includes("cashSalesCreate");
-
-      let creditSaleView = roleDetailPermissions.includes("creditSaleView");
-      let creditSaleUpdate = roleDetailPermissions.includes("creditSaleUpdate");
-      let creditSaleDelete = roleDetailPermissions.includes("creditSaleDelete");
-      let creditSaleCreate = roleDetailPermissions.includes("creditSaleCreate");
-
-      let brandView = roleDetailPermissions.includes("brandView");
-      let brandUpdate = roleDetailPermissions.includes("brandUpdate");
-      let brandDelete = roleDetailPermissions.includes("brandDelete");
-      let brandCreate = roleDetailPermissions.includes("brandCreate");
-
-      let categoryView = roleDetailPermissions.includes("categoryView");
-      let categoryUpdate = roleDetailPermissions.includes("categoryUpdate");
-      let categoryDelete = roleDetailPermissions.includes("categoryDelete");
-      let categoryCreate = roleDetailPermissions.includes("categoryCreate");
-
-      let sdMasterView = roleDetailPermissions.includes("sdMasterView");
-      let sdMasterUpdate = roleDetailPermissions.includes("sdMasterUpdate");
-      let sdMasterDelete = roleDetailPermissions.includes("sdMasterDelete");
-      let sdMasterCreate = roleDetailPermissions.includes("sdMasterCreate");
-
-      // code 22062021
-      let branchView = roleDetailPermissions.includes("branchView");
-      let branchCreate = roleDetailPermissions.includes("branchCreate");
-      let branchUpdate = roleDetailPermissions.includes("branchUpdate");
-      let branchDelete = roleDetailPermissions.includes("branchDelete");
-      let locationView = roleDetailPermissions.includes("locationView");
-      let locationCreate = roleDetailPermissions.includes("locationCreate");
-      let locationUpdate = roleDetailPermissions.includes("locationUpdate");
-      let locationDelete = roleDetailPermissions.includes("locationDelete");
-      let priceTypeView = roleDetailPermissions.includes("priceTypeView");
-      let priceTypeCreate = roleDetailPermissions.includes("priceTypeCreate");
-      let priceTypeUpdate = roleDetailPermissions.includes("priceTypeUpdate");
-      let priceTypeDelete = roleDetailPermissions.includes("priceTypeDelete");
-      let productView = roleDetailPermissions.includes("productView");
-      let productCreate = roleDetailPermissions.includes("productCreate");
-      let productUpdate = roleDetailPermissions.includes("productUpdate");
-      let productDelete = roleDetailPermissions.includes("productDelete");
-      let unitView = roleDetailPermissions.includes("unitView");
-      let unitCreate = roleDetailPermissions.includes("unitCreate");
-      let unitUpdate = roleDetailPermissions.includes("unitUpdate");
-      let unitDelete = roleDetailPermissions.includes("unitDelete");
-      let priceView = roleDetailPermissions.includes("priceView");
-      let priceCreate = roleDetailPermissions.includes("priceCreate");
-      let priceUpdate = roleDetailPermissions.includes("priceUpdate");
-      let priceDelete = roleDetailPermissions.includes("priceDelete");
-      let taxView = roleDetailPermissions.includes("taxView");
-      let taxCreate = roleDetailPermissions.includes("taxCreate");
-      let taxUpdate = roleDetailPermissions.includes("taxUpdate");
-      let taxDelete = roleDetailPermissions.includes("taxDelete");
-      let administrationView = roleDetailPermissions.includes("administrationView");
-      let sdPriceListView = roleDetailPermissions.includes("sdPriceListView");
-      // code 22062021
-      let deliveryListView = roleDetailPermissions.includes("deliveryListView");
-      let deliveryUpdate = roleDetailPermissions.includes("deliveryUpdate");
-
-      let collectionListView = roleDetailPermissions.includes("collectionListView");
-      let collectionUpdate = roleDetailPermissions.includes("collectionUpdate");
-      let orderApprove = roleDetailPermissions.includes("orderApprove");
-
-      let cashSalesReportView = roleDetailPermissions.includes("cashSalesReportView");
-
-      let orderReport = roleDetailPermissions.includes("orderReport");
-      let creditSaleReport = roleDetailPermissions.includes("creditSaleReport");
-      let sdUserStockHistoryView = roleDetailPermissions.includes("sdUserStockHistoryView");
-      let sdUserStockSummaryView = roleDetailPermissions.includes("sdUserStockSummaryView");
-      let verticalSaleReportview = roleDetailPermissions.includes("verticalSaleReportview");
-
-      let sdReportsView = roleDetailPermissions.includes("sdReportsView");
-      let bdmReportsView = roleDetailPermissions.includes("bdmReportsView");
-      let bhReportsView = roleDetailPermissions.includes("bhReportsView");
-
       $("#roleDetailName").val(roleDetailName);
       $("#roleDetailId").val(_id);
       $("#roleDetailDescription").val(roleDetailDescription);
       $("#homeURLUpdate").val(roleDetailHomePage).trigger('change');
-      $("#rolesUnderEdit").val(rolesUderVal).trigger('change');
-
-      if (superAdminView === true) { $("#superAdmincheckView").prop('checked', true); }
-      else { $("#superAdmincheckView").prop('checked', false); };
-
-      if (businessHeadView === true) { $("#businessHeadcheckView").prop('checked', true); }
-      else { $("#businessHeadcheckView").prop('checked', false); };
-
-      if (bdmView === true) { $("#bdmcheckView").prop('checked', true); }
-      else { $("#bdmcheckView").prop('checked', false); };
-
-      if (coordinatorView === true) { $("#coordinatorcheckView").prop('checked', true); }
-      else { $("#coordinatorcheckView").prop('checked', false); };
-
-      if (sdView === true) { $("#sdcheckView").prop('checked', true); }
-      else { $("#sdcheckView").prop('checked', false); };
-
-      if (vsrView === true) { $("#vsrcheckView").prop('checked', true); }
-      else { $("#vsrcheckView").prop('checked', false); };
-
-      if (omrView === true) { $("#omrcheckView").prop('checked', true); }
-      else { $("#omrcheckView").prop('checked', false); };
-
-      if (wseView === true) { $("#wsecheckView").prop('checked', true); }
-      else { $("#wsecheckView").prop('checked', false); };
 
       if (historyView === true) { $("#historycheckView").prop('checked', true); }
       else { $("#historycheckView").prop('checked', false); };
@@ -1701,38 +1945,8 @@ Template.role_list.events({
       if (reportView === true) { $("#reportcheckView").prop('checked', true); }
       else { $("#reportcheckView").prop('checked', false); };
 
-      if (stockTransferView === true) { $("#stockTransfercheckView").prop('checked', true); }
-      else { $("#stockTransfercheckView").prop('checked', false); };
-
-      if (stockListView === true) { $("#stockListcheckView").prop('checked', true); }
-      else { $("#stockListcheckView").prop('checked', false); };
-
-      if (attendanceView === true) { $("#attendancecheckView").prop('checked', true); }
-      else { $("#attendancecheckView").prop('checked', false); };
-
-      if (stockAcceptView === true) { $("#stockAcceptcheckView").prop('checked', true); }
-      else { $("#stockAcceptcheckView").prop('checked', false); };
-
-      if (stockReportView === true) { $("#stockReportcheckView").prop('checked', true); }
-      else { $("#stockReportcheckView").prop('checked', false); };
-
-      if (outletTrackerView === true) { $("#outletTrackercheckView").prop('checked', true); }
-      else { $("#outletTrackercheckView").prop('checked', false); };
-
-      if (stockReturnView === true) { $("#stockReturncheckView").prop('checked', true); }
-      else { $("#stockReturncheckView").prop('checked', false); };
-
-      if (stockSummaryView === true) { $("#stockSummarycheckView").prop('checked', true); }
-      else { $("#stockSummarycheckView").prop('checked', false); };
-
-      if (outletsApproveView === true) { $("#outletsApprovecheckView").prop('checked', true); }
-      else { $("#outletsApprovecheckView").prop('checked', false); };
-
-      if (routeAssignView === true) { $("#routeAssigncheckView").prop('checked', true); }
-      else { $("#routeAssigncheckView").prop('checked', false); };
-
-      if (sdUserApproveView === true) { $("#sdUserApprovecheckView").prop('checked', true); }
-      else { $("#sdUserApprovecheckView").prop('checked', false); };
+      if (reportOwnView === true) { $("#reportOwncheckView").prop('checked', true); }
+      else { $("#reportOwncheckView").prop('checked', false); };
 
       if (userView === true) { $("#userscheckView").prop('checked', true); }
       else { $("#userscheckView").prop('checked', false) };
@@ -1743,105 +1957,6 @@ Template.role_list.events({
       else { $("#userscheckDelete").prop('checked', false); };
       if (userCreate === true) { $("#userscheckCreate").prop('checked', true); }
       else { $("#userscheckCreate").prop('checked', false); };
-
-      if (masterDataView === true) { $("#masterDatacheckView").prop('checked', true); }
-      else { $("#masterDatacheckView").prop('checked', false) };
-      if (masterDataUpdate === true) { $("#masterDatacheckUpdate").prop('checked', true); }
-      else { $("#masterDatacheckUpdate").prop('checked', false); };
-
-      if (masterDataDelete === true) { $("#masterDatacheckDelete").prop('checked', true); }
-      else { $("#masterDatacheckDelete").prop('checked', false); };
-      if (masterDataCreate === true) { $("#masterDatacheckCreate").prop('checked', true); }
-      else { $("#masterDatacheckCreate").prop('checked', false); };
-
-      if (routeView === true) { $("#routecheckView").prop('checked', true); }
-      else { $("#routecheckView").prop('checked', false) };
-      if (routeUpdate === true) { $("#routecheckUpdate").prop('checked', true); }
-      else { $("#routecheckUpdate").prop('checked', false); };
-
-      if (routeDelete === true) { $("#routecheckDelete").prop('checked', true); }
-      else { $("#routecheckDelete").prop('checked', false); };
-      if (routeCreate === true) { $("#routecheckCreate").prop('checked', true); }
-      else { $("#routecheckCreate").prop('checked', false); };
-
-      if (verticalsView === true) { $("#verticalscheckView").prop('checked', true); }
-      else { $("#verticalscheckView").prop('checked', false) };
-      if (verticalsUpdate === true) { $("#verticalscheckUpdate").prop('checked', true); }
-      else { $("#verticalscheckUpdate").prop('checked', false); };
-
-      if (verticalsDelete === true) { $("#verticalscheckDelete").prop('checked', true); }
-      else { $("#verticalscheckDelete").prop('checked', false); };
-      if (verticalsCreate === true) { $("#verticalscheckCreate").prop('checked', true); }
-      else { $("#verticalscheckCreate").prop('checked', false); };
-
-      if (outletsView === true) { $("#outletscheckView").prop('checked', true); }
-      else { $("#outletscheckView").prop('checked', false) };
-      if (outletsUpdate === true) { $("#outletscheckUpdate").prop('checked', true); }
-      else { $("#outletscheckUpdate").prop('checked', false); };
-      if (outletsDelete === true) { $("#outletscheckDelete").prop('checked', true); }
-      else { $("#outletscheckDelete").prop('checked', false); };
-      if (outletsCreate === true) { $("#outletscheckCreate").prop('checked', true); }
-      else { $("#outletscheckCreate").prop('checked', false); };
-
-      if (sdOutletsView === true) { $("#sdOutletscheckView").prop('checked', true); }
-      else { $("#sdOutletscheckView").prop('checked', false) };
-      if (sdOutletsUpdate === true) { $("#sdOutletscheckUpdate").prop('checked', true); }
-      else { $("#sdOutletscheckUpdate").prop('checked', false); };
-      if (sdOutletsDelete === true) { $("#sdOutletscheckDelete").prop('checked', true); }
-      else { $("#sdOutletscheckDelete").prop('checked', false); };
-      if (sdOutletsCreate === true) { $("#sdOutletscheckCreate").prop('checked', true); }
-      else { $("#sdOutletscheckCreate").prop('checked', false); };
-
-      if (cashSalesView === true) { $("#cashSalescheckView").prop('checked', true); }
-      else { $("#cashSalescheckView").prop('checked', false) };
-      if (cashSalesUpdate === true) { $("#cashSalescheckUpdate").prop('checked', true); }
-      else { $("#cashSalescheckUpdate").prop('checked', false); };
-      if (cashSalesDelete === true) { $("#cashSalescheckDelete").prop('checked', true); }
-      else { $("#cashSalescheckDelete").prop('checked', false); };
-      if (cashSalesCreate === true) { $("#cashSalescheckCreate").prop('checked', true); }
-      else { $("#cashSalescheckCreate").prop('checked', false); };
-
-
-      if (creditSaleView === true) { $("#creditSalecheckView").prop('checked', true); }
-      else { $("#creditSalecheckView").prop('checked', false) };
-      if (creditSaleUpdate === true) { $("#creditSalecheckUpdate").prop('checked', true); }
-      else { $("#creditSalecheckUpdate").prop('checked', false); };
-      if (creditSaleDelete === true) { $("#creditSalecheckDelete").prop('checked', true); }
-      else { $("#creditSalecheckDelete").prop('checked', false); };
-      if (creditSaleCreate === true) { $("#creditSalecheckCreate").prop('checked', true); }
-      else { $("#creditSalecheckCreate").prop('checked', false); };
-
-      if (brandView === true) { $("#brandcheckView").prop('checked', true); }
-      else { $("#brandcheckView").prop('checked', false) };
-      if (brandUpdate === true) { $("#brandcheckUpdate").prop('checked', true); }
-      else { $("#brandcheckUpdate").prop('checked', false); };
-      if (brandDelete === true) { $("#brandcheckDelete").prop('checked', true); }
-      else { $("#brandcheckDelete").prop('checked', false); };
-      if (brandCreate === true) { $("#brandcheckCreate").prop('checked', true); }
-      else { $("#brandcheckCreate").prop('checked', false); };
-
-      if (categoryView === true) { $("#categorycheckView").prop('checked', true); }
-      else { $("#categorycheckView").prop('checked', false) };
-      if (categoryUpdate === true) { $("#categorycheckUpdate").prop('checked', true); }
-      else { $("#categorycheckUpdate").prop('checked', false); };
-      if (categoryDelete === true) { $("#categorycheckDelete").prop('checked', true); }
-      else { $("#categorycheckDelete").prop('checked', false); };
-      if (categoryCreate === true) { $("#categorycheckCreate").prop('checked', true); }
-      else { $("#categorycheckCreate").prop('checked', false); };
-
-
-      if (cashSalesReportView === true) { $("#cashSalesRepEditchecking").prop('checked', true); }
-      else { $("#cashSalesRepEditchecking").prop('checked', false) };
-
-      if (sdMasterView === true) { $("#sdMastercheckView").prop('checked', true); }
-      else { $("#sdMastercheckView").prop('checked', false) };
-      if (sdMasterUpdate === true) { $("#sdMastercheckUpdate").prop('checked', true); }
-      else { $("#sdMastercheckUpdate").prop('checked', false); };
-
-      if (sdMasterDelete === true) { $("#sdMastercheckDelete").prop('checked', true); }
-      else { $("#sdMastercheckDelete").prop('checked', false); };
-      if (sdMasterCreate === true) { $("#sdMastercheckCreate").prop('checked', true); }
-      else { $("#sdMastercheckCreate").prop('checked', false); };
 
       if (vanSaleUserView === true) { $("#vanSaleUserscheckView").prop('checked', true); }
       else { $("#vanSaleUserscheckView").prop('checked', false) };
@@ -1862,13 +1977,79 @@ Template.role_list.events({
       if (roleDelete === true) { $("#rolecheckDelete").prop('checked', true); }
       else { $("#rolecheckDelete").prop('checked', false); };
 
+      if (designationCreate === true) { $("#designationcheckCreate").prop('checked', true); }
+      else { $("#designationcheckCreate").prop('checked', false); };
+      if (designationView === true) { $("#designationcheckView").prop('checked', true); }
+      else { $("#designationcheckView").prop('checked', false); };
+      if (designationUpdate === true) { $("#designationcheckUpdate").prop('checked', true); }
+      else { $("#designationcheckUpdate").prop('checked', false); };
+      if (designationDelete === true) { $("#designationcheckDelete").prop('checked', true); }
+      else { $("#designationcheckDelete").prop('checked', false); };
+
+      if (branchTransferCreate === true) { $("#branchTransfercheckCreate").prop('checked', true); }
+      else { $("#branchTransfercheckCreate").prop('checked', false); };
+      if (branchTransferView === true) { $("#branchTransfercheckView").prop('checked', true); }
+      else { $("#branchTransfercheckView").prop('checked', false); };
+
+
+
+      if (activityCreate === true) { $("#activitycheckCreate").prop('checked', true); }
+      else { $("#activitycheckCreate").prop('checked', false); };
+      if (activityView === true) { $("#activitycheckView").prop('checked', true); }
+      else { $("#activitycheckView").prop('checked', false); };
+
+      if (branchTransferApproveView === true) { $("#branchTransfercheckApproveView").prop('checked', true); }
+      else { $("#branchTransfercheckApproveView").prop('checked', false); };
+
+      if (leadCreate === true) { $("#leadcheckCreate").prop('checked', true); }
+      else { $("#leadcheckCreate").prop('checked', false); };
+      if (leadView === true) { $("#leadcheckView").prop('checked', true); }
+      else { $("#leadcheckView").prop('checked', false); };
+      if (leadUpdate === true) { $("#leadcheckUpdate").prop('checked', true); }
+      else { $("#leadcheckUpdate").prop('checked', false); };
+      if (leadDelete === true) { $("#leadcheckDelete").prop('checked', true); }
+      else { $("#leadcheckDelete").prop('checked', false); };
+
       if (orderView === true) { $("#ordercheckView").prop('checked', true); }
       else { $("#ordercheckView").prop('checked', false); };
       if (orderCreate === true) { $("#ordercheckCreate").prop('checked', true); }
       else { $("#ordercheckCreate").prop('checked', false); };
 
+      if (orderSeniorView === true) { $("#orderSeniorcheckView").prop('checked', true); }
+      else { $("#orderSeniorcheckView").prop('checked', false); };
+      if (orderSeniorCreate === true) { $("#orderSeniorcheckCreate").prop('checked', true); }
+      else { $("#orderSeniorcheckCreate").prop('checked', false); };
+
+      if (salesReturnView === true) { $("#salesReturncheckView").prop('checked', true); }
+      else { $("#salesReturncheckView").prop('checked', false); };
+      if (salesReturnCreate === true) { $("#salesReturncheckCreate").prop('checked', true); }
+      else { $("#salesReturncheckCreate").prop('checked', false); };
+
+      if (stockTransferRequestView === true) { $("#stockTransferRequestcheckView").prop('checked', true); }
+      else { $("#stockTransferRequestcheckView").prop('checked', false); };
+      if (stockTransferRequestCreate === true) { $("#stockTransferRequestcheckCreate").prop('checked', true); }
+      else { $("#stockTransferRequestcheckCreate").prop('checked', false); };
+
       if (salesDashboard === true) { $("#sdashboardView").prop('checked', true); }
       else { $("#sdashboardView").prop('checked', false); };
+
+      if (salepos === true) { $("#posView").prop('checked', true); }
+      else { $("#posView").prop('checked', false); };
+
+
+
+      if (dispatchRejectView === true) { $("#dispatchRejectView").prop('checked', true); }
+      else { $("#dispatchRejectView").prop('checked', false); };
+
+      if (deliveryView === true) { $("#deliverycheckView").prop('checked', true); }
+      else { $("#deliverycheckView").prop('checked', false); };
+      if (deliveryUpdate === true) { $("#deliverycheckUpdate").prop('checked', true); }
+      else { $("#deliverycheckUpdate").prop('checked', false); };
+
+      if (dispatchView === true) { $("#dispatchcheckView").prop('checked', true); }
+      else { $("#dispatchcheckView").prop('checked', false); };
+      if (dispatchUpdate === true) { $("#dispatchcheckUpdate").prop('checked', true); }
+      else { $("#dispatchcheckUpdate").prop('checked', false); };
 
       if (adminDashboard === true) { $("#adashboardView").prop('checked', true); }
       else { $("#adashboardView").prop('checked', false); };
@@ -1876,283 +2057,266 @@ Template.role_list.events({
       if (superAdminDashboard === true) { $("#superAdmindashboardView").prop('checked', true); }
       else { $("#superAdmindashboardView").prop('checked', false); };
 
-      // code 22062021
+      if (collectionDueTodayCreate === true) { $("#collectionDueTodayCreate").prop('checked', true); }
+      else { $("#collectionDueTodayCreate").prop('checked', false); };
+      if (collectionDueTodayView === true) { $("#collectionDueTodayView").prop('checked', true); }
+      else { $("#collectionDueTodayView").prop('checked', false); };
 
-      if (branchView === true) { $("#branchcheckView").prop('checked', true); }
-      else { $("#branchcheckView").prop('checked', false); };
-      if (branchCreate === true) { $("#branchcheckCreate").prop('checked', true); }
-      else { $("#branchcheckCreate").prop('checked', false); };
-      if (branchUpdate === true) { $("#branchcheckUpdate").prop('checked', true); }
-      else { $("#branchcheckUpdate").prop('checked', false); };
-      if (branchDelete === true) { $("#branchcheckDelete").prop('checked', true); }
-      else { $("#branchcheckDelete").prop('checked', false); };
+      if (creditInvoiceCreate === true) { $("#creditInvoiceCreate").prop('checked', true); }
+      else { $("#creditInvoiceCreate").prop('checked', false); };
+      if (creditInvoiceView === true) { $("#creditInvoiceView").prop('checked', true); }
+      else { $("#creditInvoiceView").prop('checked', false); };
 
-      if (locationView === true) { $("#locationcheckView").prop('checked', true); }
-      else { $("#locationcheckView").prop('checked', false); };
-      if (locationCreate === true) { $("#locationcheckCreate").prop('checked', true); }
-      else { $("#locationcheckCreate").prop('checked', false); };
-      if (locationUpdate === true) { $("#locationcheckUpdate").prop('checked', true); }
-      else { $("#locationcheckUpdate").prop('checked', false); };
-      if (locationDelete === true) { $("#locationcheckDelete").prop('checked', true); }
-      else { $("#locationcheckDelete").prop('checked', false); };
+      if (creditNoteCreate === true) { $("#creditNoteCreate").prop('checked', true); }
+      else { $("#creditNoteCreate").prop('checked', false); };
+      if (creditNoteView === true) { $("#creditNoteView").prop('checked', true); }
+      else { $("#creditNoteView").prop('checked', false); };
 
-      if (priceTypeView === true) { $("#priceTypecheckView").prop('checked', true); }
-      else { $("#priceTypecheckView").prop('checked', false); };
-      if (priceTypeCreate === true) { $("#priceTypecheckCreate").prop('checked', true); }
-      else { $("#priceTypecheckCreate").prop('checked', false); };
-      if (priceTypeUpdate === true) { $("#priceTypecheckUpdate").prop('checked', true); }
-      else { $("#priceTypecheckUpdate").prop('checked', false); };
-      if (priceTypeDelete === true) { $("#priceTypecheckDelete").prop('checked', true); }
-      else { $("#priceTypecheckDelete").prop('checked', false); };
+      if (arInvoicePaymentCreate === true) { $("#arInvoicePaymentCreate").prop('checked', true); }
+      else { $("#arInvoicePaymentCreate").prop('checked', false); };
+      if (arInvoicePaymentView === true) { $("#arInvoicePaymentView").prop('checked', true); }
+      else { $("#arInvoicePaymentView").prop('checked', false); };
 
-      if (productView === true) { $("#productcheckView").prop('checked', true); }
-      else { $("#productcheckView").prop('checked', false); };
-      if (productCreate === true) { $("#productcheckCreate").prop('checked', true); }
-      else { $("#productcheckCreate").prop('checked', false); };
-      if (productUpdate === true) { $("#productcheckUpdate").prop('checked', true); }
-      else { $("#productcheckUpdate").prop('checked', false); };
-      if (productDelete === true) { $("#productcheckDelete").prop('checked', true); }
-      else { $("#productcheckDelete").prop('checked', false); };
+      if (arInvoiceSeniorPaymentCreate === true) { $("#arInvoiceSeniorPaymentCreate").prop('checked', true); }
+      else { $("#arInvoiceSeniorPaymentCreate").prop('checked', false); };
+      if (arInvoiceSeniorPaymentView === true) { $("#arInvoiceSeniorPaymentView").prop('checked', true); }
+      else { $("#arInvoiceSeniorPaymentView").prop('checked', false); };
 
-      if (unitView === true) { $("#unitcheckView").prop('checked', true); }
-      else { $("#unitcheckView").prop('checked', false); };
-      if (unitCreate === true) { $("#unitcheckCreate").prop('checked', true); }
-      else { $("#unitcheckCreate").prop('checked', false); };
-      if (unitUpdate === true) { $("#unitcheckUpdate").prop('checked', true); }
-      else { $("#unitcheckUpdate").prop('checked', false); };
-      if (unitDelete === true) { $("#unitcheckDelete").prop('checked', true); }
-      else { $("#unitcheckDelete").prop('checked', false); };
+      if (salesQuotationCreate === true) { $("#salesQuotationCreate").prop('checked', true); }
+      else { $("#salesQuotationCreate").prop('checked', false); };
+      if (salesQuotationView === true) { $("#salesQuotationView").prop('checked', true); }
+      else { $("#salesQuotationView").prop('checked', false); };
 
-      if (priceView === true) { $("#pricecheckView").prop('checked', true); }
-      else { $("#pricecheckView").prop('checked', false); };
-      if (priceCreate === true) { $("#pricecheckCreate").prop('checked', true); }
-      else { $("#pricecheckCreate").prop('checked', false); };
-      if (priceUpdate === true) { $("#pricecheckUpdate").prop('checked', true); }
-      else { $("#pricecheckUpdate").prop('checked', false); };
-      if (priceDelete === true) { $("#pricecheckDelete").prop('checked', true); }
-      else { $("#pricecheckDelete").prop('checked', false); };
+      if (salesQuotationSeniorCreate === true) { $("#salesQuotationSeniorCreate").prop('checked', true); }
+      else { $("#salesQuotationSeniorCreate").prop('checked', false); };
+      if (salesQuotationSeniorView === true) { $("#salesQuotationSeniorView").prop('checked', true); }
+      else { $("#salesQuotationSeniorView").prop('checked', false); };
 
-      if (taxView === true) { $("#taxcheckView").prop('checked', true); }
-      else { $("#taxcheckView").prop('checked', false); };
-      if (taxCreate === true) { $("#taxcheckCreate").prop('checked', true); }
-      else { $("#taxcheckCreate").prop('checked', false); };
-      if (taxUpdate === true) { $("#taxcheckUpdate").prop('checked', true); }
-      else { $("#taxcheckUpdate").prop('checked', false); };
-      if (taxDelete === true) { $("#taxcheckDelete").prop('checked', true); }
-      else { $("#taxcheckDelete").prop('checked', false); };
+      if (invoiceView === true) { $("#invoiceView").prop('checked', true); }
+      else { $("#invoiceView").prop('checked', false); };
 
-      if (administrationView === true) { $("#administrationcheckView").prop('checked', true); }
-      else { $("#administrationcheckView").prop('checked', false); };
+      if (deliveryBoyView === true) { $("#deliveryBoyView").prop('checked', true); }
+      else { $("#deliveryBoyView").prop('checked', false); };
 
-      if (sdPriceListView === true) { $("#SdPriceListcheckView").prop('checked', true); }
-      else { $("#SdPriceListcheckView").prop('checked', false); };
+      if (orderApproveView === true) { $("#orderApproveView").prop('checked', true); }
+      else { $("#orderApproveView").prop('checked', false); };
 
-      // code 22062021
-      if (deliveryListView === true) { $("#deliveryListcheckView").prop('checked', true); }
-      else { $("#deliveryListcheckView").prop('checked', false); };
-      if (deliveryUpdate === true) { $("#deliveryListcheckUpdate").prop('checked', true); }
-      else { $("#deliveryListcheckUpdate").prop('checked', false); };
+      if (quotationApproveView === true) { $("#quotationApproveView").prop('checked', true); }
+      else { $("#quotationApproveView").prop('checked', false); };
 
-      if (collectionListView === true) { $("#collectionListcheckView").prop('checked', true); }
-      else { $("#collectionListcheckView").prop('checked', false); };
-      if (collectionUpdate === true) { $("#collectionListcheckUpdate").prop('checked', true); }
-      else { $("#collectionListcheckUpdate").prop('checked', false); };
+      if (salesReturnApproveView === true) { $("#salesReturnApproveView").prop('checked', true); }
+      else { $("#salesReturnApproveView").prop('checked', false); };
 
-      if (orderApprove === true) { $("#orderApListcheckView").prop('checked', true); }
-      else { $("#orderApListcheckView").prop('checked', false); };
+      if (stockTransferApproveView === true) { $("#stockTransferApproveView").prop('checked', true); }
+      else { $("#stockTransferApproveView").prop('checked', false); };
 
-      if (orderReport === true) { $("#orderReportcheckView").prop('checked', true); }
-      else { $("#orderReportcheckView").prop('checked', false); };
+      if (creditNoteApproveView === true) { $("#creditNoteApproveView").prop('checked', true); }
+      else { $("#creditNoteApproveView").prop('checked', false); };
+
+      if (creditInvoiceApproveView === true) { $("#creditInvoiceApproveView").prop('checked', true); }
+      else { $("#creditInvoiceApproveView").prop('checked', false); };
+
+      if (pickListView === true) { $("#pickListView").prop('checked', true); }
+      else { $("#pickListView").prop('checked', false); };
+
+      if (orderReportView === true) { $("#orderReportView").prop('checked', true); }
+      else { $("#orderReportView").prop('checked', false); };
+
+      if (salesQuotationReportView === true) { $("#salesQuotationReportView").prop('checked', true); }
+      else { $("#salesQuotationReportView").prop('checked', false); };
+
+      if (arInvoiceReportView === true) { $("#arInvoiceReportView").prop('checked', true); }
+      else { $("#arInvoiceReportView").prop('checked', false); };
+
+      if (posReportView === true) { $("#posReportView").prop('checked', true); }
+      else { $("#posReportView").prop('checked', false); };
+
+      if (locationView === true) { $("#locationView").prop('checked', true); }
+      else { $("#locationView").prop('checked', false); };
+
+      if (pendingArInvoiceView === true) { $("#pendingArInvoiceView").prop('checked', true); }
+      else { $("#pendingArInvoiceView").prop('checked', false); };
 
 
-      if (creditSaleReport === true) { $("#creditSaleReportcheckView").prop('checked', true); }
-      else { $("#creditSaleReportcheckView").prop('checked', false); };
+      if (pendingPosInvoiceView === true) { $("#pendingPosInvoiceView").prop('checked', true); }
+      else { $("#pendingPosInvoiceView").prop('checked', false); };
 
-      if (sdUserStockHistoryView === true) { $("#sdUserStockHistory1checking").prop('checked', true); }
-      else { $("#sdUserStockHistory1checking").prop('checked', false); };
 
-      if (sdUserStockSummaryView === true) { $("#sdUserStockSummary1checking").prop('checked', true); }
-      else { $("#sdUserStockSummary1checking").prop('checked', false); };
+      if (attendanceView === true) { $("#attendanceView").prop('checked', true); }
+      else { $("#attendanceView").prop('checked', false); };
 
-      if (verticalSaleReportview === true) { $("#verticalSaleReport1checking").prop('checked', true); }
-      else { $("#verticalSaleReport1checking").prop('checked', false); };
+      if (creditInvoiceReportView === true) { $("#creditInvoiceReportView").prop('checked', true); }
+      else { $("#creditInvoiceReportView").prop('checked', false); };
 
-      if (sdReportsView === true) { $("#sdReports1checking").prop('checked', true); }
-      else { $("#sdReports1checking").prop('checked', false); };
+      if (salesReturnReportView === true) { $("#salesReturnReportView").prop('checked', true); }
+      else { $("#salesReturnReportView").prop('checked', false); };
 
-      if (bdmReportsView === true) { $("#bdmReports1checking").prop('checked', true); }
-      else { $("#bdmReports1checking").prop('checked', false); };
+      if (creditNoteReportView === true) { $("#creditNoteReportView").prop('checked', true); }
+      else { $("#creditNoteReportView").prop('checked', false); };
 
-      if (bhReportsView === true) { $("#bhReports1checking").prop('checked', true); }
-      else { $("#bhReports1checking").prop('checked', false); };
+      if (branchTransferReportView === true) { $("#branchTransferReportView").prop('checked', true); }
+      else { $("#branchTransferReportView").prop('checked', false); };
 
+      if (collectionReportView === true) { $("#collectionReportView").prop('checked', true); }
+      else { $("#collectionReportView").prop('checked', false); };
+
+      if (stockTransferReportView === true) { $("#stockTransferReportView").prop('checked', true); }
+      else { $("#stockTransferReportView").prop('checked', false); };
+
+      if (invoiceReportView === true) { $("#invoiceReportView").prop('checked', true); }
+      else { $("#invoiceReportView").prop('checked', false); };
+      if (deliveryReportView === true) { $("#deliveryReportView").prop('checked', true); }
+      else { $("#deliveryReportView").prop('checked', false); };
+
+      if (purchasePrintView === true) { $("#purchasePrintView").prop('checked', true); }
+      else { $("#purchasePrintView").prop('checked', false); };
+
+      if (activitySeniorView === true) { $("#activitySeniorView").prop('checked', true); }
+      else { $("#activitySeniorView").prop('checked', false); };
+
+      if (accountantView === true) { $("#accountantView").prop('checked', true); }
+      else { $("#accountantView").prop('checked', false); };
+      if (bpAdminView === true) { $("#bpAdminView").prop('checked', true); }
+      else { $("#bpAdminView").prop('checked', false); };
+
+
+      if (routeView === true) { $("#routecheckView").prop('checked', true); }
+      else { $("#routecheckView").prop('checked', false) };
+      if (routeUpdate === true) { $("#routecheckUpdate").prop('checked', true); }
+      else { $("#routecheckUpdate").prop('checked', false); };
+
+      if (routeDelete === true) { $("#routecheckDelete").prop('checked', true); }
+      else { $("#routecheckDelete").prop('checked', false); };
+      if (routeCreate === true) { $("#routecheckCreate").prop('checked', true); }
+      else { $("#routecheckCreate").prop('checked', false); };
+
+      if (masterDataView === true) { $("#masterDatacheckView").prop('checked', true); }
+      else { $("#masterDatacheckView").prop('checked', false) };
+      if (masterDataUpdate === true) { $("#masterDatacheckUpdate").prop('checked', true); }
+      else { $("#masterDatacheckUpdate").prop('checked', false); };
+
+      if (masterDataDelete === true) { $("#masterDatacheckDelete").prop('checked', true); }
+      else { $("#masterDatacheckDelete").prop('checked', false); };
+      if (masterDataCreate === true) { $("#masterDatacheckCreate").prop('checked', true); }
+      else { $("#masterDatacheckCreate").prop('checked', false); };
+
+      if (routeApproveView === true) { $("#routeApproveView").prop('checked', true); }
+      else { $("#routeApproveView").prop('checked', false); };
+
+      if (salesSummaryReportView === true) { $("#salesSummaryReportView").prop('checked', true); }
+      else { $("#salesSummaryReportView").prop('checked', false); };
+
+      if (stockSummaryReportView === true) { $("#stockSummaryReportView").prop('checked', true); }
+      else { $("#stockSummaryReportView").prop('checked', false); };
+
+      if (skippedCustomerReportView === true) { $("#skippedCustomerReportView").prop('checked', true); }
+      else { $("#skippedCustomerReportView").prop('checked', false); };
+
+      if (noSalesReportView === true) { $("#noSalesReportView").prop('checked', true); }
+      else { $("#noSalesReportView").prop('checked', false); };
+
+      if (targetOutletReportView === true) { $("#targetOutletReportView").prop('checked', true); }
+      else { $("#targetOutletReportView").prop('checked', false); };
+
+      if (callRateReportView === true) { $("#callRateReportView").prop('checked', true); }
+      else { $("#callRateReportView").prop('checked', false); };
+
+      if (strikeRateReportView === true) { $("#strikeRateReportView").prop('checked', true); }
+      else { $("#strikeRateReportView").prop('checked', false); };
+
+      if (priceUpdateView === true) { $("#priceUpdateView").prop('checked', true); }
+      else { $("#priceUpdateView").prop('checked', false); };
+
+      if (vansaleReportView === true) { $("#vansaleReportView").prop('checked', true); }
+      else { $("#vansaleReportView").prop('checked', false); };
+
+      if (cxoDashboardView === true) { $("#cxoDashboardView").prop('checked', true); }
+      else { $("#cxoDashboardView").prop('checked', false); };
+
+      if (itemWiseReportView === true) { $("#itemWiseReportView").prop('checked', true); }
+      else { $("#itemWiseReportView").prop('checked', false); };
+
+      if (routeWiseReportView === true) { $("#routeWiseReportView").prop('checked', true); }
+      else { $("#routeWiseReportView").prop('checked', false); };
+
+      if (numericalDistributonReportView === true) { $("#numericalDistributonReportView").prop('checked', true); }
+      else { $("#numericalDistributonReportView").prop('checked', false); };
+
+      if (whsStockReportView === true) { $("#whsStockReportView").prop('checked', true); }
+      else { $("#whsStockReportView").prop('checked', false); };
+
+      if (weightageDistributionReportView === true) { $("#weightageDistributionReportView").prop('checked', true); }
+      else { $("#weightageDistributionReportView").prop('checked', false); };
+
+      if (coverageDistributionReportView === true) { $("#coverageDistributionReportView").prop('checked', true); }
+      else { $("#coverageDistributionReportView").prop('checked', false); };
+
+      if (priceTypeEditView === true) { $("#priceTypeEditView").prop('checked', true); }
+      else { $("#priceTypeEditView").prop('checked', false); };
+
+      if (expenseListView === true) { $("#expenseListView").prop('checked', true); }
+      else { $("#expenseListView").prop('checked', false); };
 
       if ($(".historySelect").length === $(".historySelect:checked").length)
         $("#historychecks").prop('checked', true);
       else
         $("#historychecks").prop('checked', false);
 
-      if ($(".sdUserApproveSelect").length === $(".sdUserApproveSelect:checked").length)
-        $("#sdUserApprovechecks").prop('checked', true);
-      else
-        $("#sdUserApprovechecks").prop('checked', false);
-
-      if ($(".superAdminSelect").length === $(".superAdminSelect:checked").length)
-        $("#superAdminchecks").prop('checked', true);
-      else
-        $("#superAdminchecks").prop('checked', false);
-
-      if ($(".businessHeadSelect").length === $(".businessHeadSelect:checked").length)
-        $("#businessHeadchecks").prop('checked', true);
-      else
-        $("#businessHeadchecks").prop('checked', false);
-
-      if ($(".bdmSelect").length === $(".bdmSelect:checked").length)
-        $("#bdmchecks").prop('checked', true);
-      else
-        $("#bdmchecks").prop('checked', false);
-
-      if ($(".coordinatorSelect").length === $(".coordinatorSelect:checked").length)
-        $("#coordinatorchecks").prop('checked', true);
-      else
-        $("#coordinatorchecks").prop('checked', false);
-
-      if ($(".sdSelect").length === $(".sdSelect:checked").length)
-        $("#sdchecks").prop('checked', true);
-      else
-        $("#sdchecks").prop('checked', false);
-
-      if ($(".vsrSelect").length === $(".vsrSelect:checked").length)
-        $("#vsrchecks").prop('checked', true);
-      else
-        $("#vsrchecks").prop('checked', false);
-
-      if ($(".omrSelect").length === $(".omrSelect:checked").length)
-        $("#omrchecks").prop('checked', true);
-      else
-        $("#omrchecks").prop('checked', false);
-
-      if ($(".wseSelect").length === $(".wseSelect:checked").length)
-        $("#wsechecks").prop('checked', true);
-      else
-        $("#wsechecks").prop('checked', false);
-
       if ($(".reportSelect").length === $(".reportSelect:checked").length)
         $("#reportchecks").prop('checked', true);
       else
         $("#reportchecks").prop('checked', false);
 
-      if ($(".stockTransferSelect").length === $(".stockTransferSelect:checked").length)
-        $("#stockTransferchecks").prop('checked', true);
+      if ($(".reportOwnSelect").length === $(".reportOwnSelect:checked").length)
+        $("#reportOwnchecks").prop('checked', true);
       else
-        $("#stockTransferchecks").prop('checked', false);
+        $("#reportOwnchecks").prop('checked', false);
 
-
-      if ($(".stockListSelect").length === $(".stockListSelect:checked").length)
-        $("#stockListchecks").prop('checked', true);
+      if ($(".designationSelect").length === $(".designationSelect:checked").length)
+        $("#designationchecks").prop('checked', true);
       else
-        $("#stockListchecks").prop('checked', false);
+        $("#designationchecks").prop('checked', false);
 
-
-      if ($(".outletsApproveSelect").length === $(".outletsApproveSelect:checked").length)
-        $("#outletsApprovechecks").prop('checked', true);
+      if ($(".branchTransferSelect").length === $(".branchTransferSelect:checked").length)
+        $("#branchTransferchecks").prop('checked', true);
       else
-        $("#outletsApprovechecks").prop('checked', false);
+        $("#branchTransferchecks").prop('checked', false);
 
-      if ($(".routeAssignSelect").length === $(".routeAssignSelect:checked").length)
-        $("#routeAssignchecks").prop('checked', true);
+      if ($(".activitySelect").length === $(".activitySelect:checked").length)
+        $("#activitychecks").prop('checked', true);
       else
-        $("#routeAssignchecks").prop('checked', false);
+        $("#activitychecks").prop('checked', false);
 
-      if ($(".attendanceSelect").length === $(".attendanceSelect:checked").length)
-        $("#attendancechecks").prop('checked', true);
+      if ($(".branchTransferApproveSelect").length === $(".branchTransferApproveSelect:checked").length)
+        $("#branchTransferApprovechecks").prop('checked', true);
       else
-        $("#attendancechecks").prop('checked', false);
+        $("#branchTransferApprovechecks").prop('checked', false);
 
-      if ($(".stockAcceptSelect").length === $(".stockAcceptSelect:checked").length)
-        $("#stockAcceptchecks").prop('checked', true);
+      if ($(".leadSelect").length === $(".leadSelect:checked").length)
+        $("#leadchecks").prop('checked', true);
       else
-        $("#stockAcceptchecks").prop('checked', false);
-
-      if ($(".stockReportSelect").length === $(".stockReportSelect:checked").length)
-        $("#stockReportchecks").prop('checked', true);
-      else
-        $("#stockReportchecks").prop('checked', false);
-
-      if ($(".outletTrackerSelect").length === $(".outletTrackerSelect:checked").length)
-        $("#outletTrackerchecks").prop('checked', true);
-      else
-        $("#outletTrackerchecks").prop('checked', false);
-
-      if ($(".stockReturnSelect").length === $(".stockReturnSelect:checked").length)
-        $("#stockReturnchecks").prop('checked', true);
-      else
-        $("#stockReturnchecks").prop('checked', false);
-
-      if ($(".stockSummarySelect").length === $(".stockSummarySelect:checked").length)
-        $("#stockSummarychecks").prop('checked', true);
-      else
-        $("#stockSummarychecks").prop('checked', false);
+        $("#leadchecks").prop('checked', false);
 
       if ($(".userSelect").length === $(".userSelect:checked").length)
         $("#userschecks").prop('checked', true);
       else
         $("#userschecks").prop('checked', false);
 
-      if ($(".masterDataSelect").length === $(".masterDataSelect:checked").length)
-        $("#masterDatachecks").prop('checked', true);
+      if ($(".vanSaleUsersSelect").length === $(".vanSaleUsersSelect:checked").length)
+        $("#vanSaleUserschecks").prop('checked', true);
       else
-        $("#masterDatachecks").prop('checked', false);
+        $("#vanSaleUserschecks").prop('checked', false);
 
       if ($(".routeSelect").length === $(".routeSelect:checked").length)
         $("#routechecks").prop('checked', true);
       else
         $("#routechecks").prop('checked', false);
 
-      if ($(".verticalsSelect").length === $(".verticalsSelect:checked").length)
-        $("#verticalschecks").prop('checked', true);
+      if ($(".masterDataSelect").length === $(".masterDataSelect:checked").length)
+        $("#masterDatachecks").prop('checked', true);
       else
-        $("#verticalschecks").prop('checked', false);
+        $("#masterDatachecks").prop('checked', false);
 
-      if ($(".sdMasterSelect").length === $(".sdMasterSelect:checked").length)
-        $("#sdMasterchecks").prop('checked', true);
-      else
-        $("#sdMasterchecks").prop('checked', false);
-
-      if ($(".outletsSelect").length === $(".outletsSelect:checked").length)
-        $("#outletschecks").prop('checked', true);
-      else
-        $("#outletschecks").prop('checked', false);
-
-      if ($(".sdOutletsSelect").length === $(".sdOutletsSelect:checked").length)
-        $("#sdOutletschecks").prop('checked', true);
-      else
-        $("#sdOutletschecks").prop('checked', false);
-
-      if ($(".cashSalesSelect").length === $(".cashSalesSelect:checked").length)
-        $("#cashSaleschecks").prop('checked', true);
-      else
-        $("#cashSaleschecks").prop('checked', false);
-
-      if ($(".creditSaleSelect").length === $(".creditSaleSelect:checked").length)
-        $("#creditSalechecks").prop('checked', true);
-      else
-        $("#creditSalechecks").prop('checked', false);
-
-      if ($(".brandSelect").length === $(".brandSelect:checked").length)
-        $("#brandchecks").prop('checked', true);
-      else
-        $("#brandchecks").prop('checked', false);
-
-      if ($(".categorySelect").length === $(".categorySelect:checked").length)
-        $("#categorychecks").prop('checked', true);
-      else
-        $("#categorychecks").prop('checked', false);
-
-      if ($(".vanSaleUsersSelect").length === $(".vanSaleUsersSelect:checked").length)
-        $("#vanSaleUserschecks").prop('checked', true);
-      else
-        $("#vanSaleUserschecks").prop('checked', false);
 
       if ($(".roleSelect").length === $(".roleSelect:checked").length)
         $("#rolechecks").prop('checked', true);
@@ -2162,6 +2326,12 @@ Template.role_list.events({
         $("#sdashboardchecks").prop('checked', true);
       else
         $("#sdashboardchecks").prop('checked', false);
+
+      if ($(".posSelect").length === $(".posSelect:checked").length)
+        $("#poschecks").prop('checked', true);
+      else
+        $("#poschecks").prop('checked', false);
+
 
       if ($(".adashboardSelect").length === $(".adashboardSelect:checked").length)
         $("#adashboardchecks").prop('checked', true);
@@ -2177,113 +2347,263 @@ Template.role_list.events({
         $("#orderchecks").prop('checked', true);
       else
         $("#orderchecks").prop('checked', false);
-      // code 22062021
-      if ($(".branchelect").length === $(".branchelect:checked").length)
-        $("#branchchecks").prop('checked', true);
-      else
-        $("#branchchecks").prop('checked', false);
-      if ($(".locationelect").length === $(".locationelect:checked").length)
-        $("#locationchecks").prop('checked', true);
-      else
-        $("#locationchecks").prop('checked', false);
-      if ($(".priceTypeelect").length === $(".priceTypeelect:checked").length)
-        $("#priceTypechecks").prop('checked', true);
-      else
-        $("#priceTypechecks").prop('checked', false);
 
-      if ($(".productelect").length === $(".productelect:checked").length)
-        $("#productchecks").prop('checked', true);
+      if ($(".orderSeniorSelect").length === $(".orderSeniorSelect:checked").length)
+        $("#orderSeniorchecks").prop('checked', true);
       else
-        $("#productchecks").prop('checked', false);
-      if ($(".unitelect").length === $(".unitelect:checked").length)
-        $("#unitchecks").prop('checked', true);
-      else
-        $("#unitchecks").prop('checked', false);
-      if ($(".priceelect").length === $(".priceelect:checked").length)
-        $("#pricechecks").prop('checked', true);
-      else
-        $("#pricechecks").prop('checked', false);
+        $("#orderSeniorchecks").prop('checked', false);
 
-      if ($(".taxelect").length === $(".taxelect:checked").length)
-        $("#taxchecks").prop('checked', true);
+      if ($(".salesReturnSelect").length === $(".salesReturnSelect:checked").length)
+        $("#salesReturnchecks").prop('checked', true);
       else
-        $("#taxchecks").prop('checked', false);
+        $("#salesReturnchecks").prop('checked', false);
 
-      if ($(".administrationselect").length === $(".administrationselect:checked").length)
-        $("#administrationchecks").prop('checked', true);
+      if ($(".stockTransferRequestSelect").length === $(".stockTransferRequestSelect:checked").length)
+        $("#stockTransferRequestchecks").prop('checked', true);
       else
-        $("#administrationchecks").prop('checked', false);
+        $("#stockTransferRequestchecks").prop('checked', false);
 
-      if ($(".SdPriceListselect").length === $(".SdPriceListselect:checked").length)
-        $("#SdPriceListchecks").prop('checked', true);
+      if ($(".deliverySelections1").length === $(".deliverySelections1:checked").length)
+        $("#deliverycheck1").prop('checked', true);
       else
-        $("#SdPriceListchecks").prop('checked', false);
+        $("#deliverycheck1").prop('checked', false);
 
-      if ($(".deliveryListselect").length === $(".deliveryListselect:checked").length)
-        $("#deliveryListchecks").prop('checked', true);
+      if ($(".dispatchSelections1").length === $(".dispatchSelections1:checked").length)
+        $("#dispatchcheck1").prop('checked', true);
       else
-        $("#deliveryListchecks").prop('checked', false);
+        $("#dispatchcheck1").prop('checked', false);
 
-      if ($(".collectionListselect").length === $(".collectionListselect:checked").length)
-        $("#collectionListchecks").prop('checked', true);
+      if ($(".dispatchRejectSelect").length === $(".dispatchRejectSelect:checked").length)
+        $("#dispatchRejectchecks").prop('checked', true);
       else
-        $("#collectionListchecks").prop('checked', false);
+        $("#dispatchRejectchecks").prop('checked', false);
 
-      if ($(".orderApListselect").length === $(".orderApListselect:checked").length)
-        $("#orderApListchecks").prop('checked', true);
-      else
-        $("#orderApListchecks").prop('checked', false);
+      if ($(".collectionDueTodaySelect").length === $(".collectionDueTodaySelect:checked").length)
+        $("#collectionDueTodaychecks").prop('checked', true);
+      else $("#collectionDueTodaychecks").prop('checked', false);
 
-      if ($(".cashSalesRepEditSelections").length === $(".cashSalesRepEditSelections:checked").length)
-        $("#cashSalesRepEditcheck").prop('checked', true);
-      else
-        $("#cashSalesRepEditcheck").prop('checked', false);
+      if ($(".creditInvoiceSelect").length === $(".creditInvoiceSelect:checked").length)
+        $("#creditInvoicechecks").prop('checked', true);
+      else $("#creditInvoicechecks").prop('checked', false);
 
-      if ($(".orderReportselect").length === $(".orderReportselect:checked").length)
+      if ($(".creditNoteSelect").length === $(".creditNoteSelect:checked").length)
+        $("#creditNotechecks").prop('checked', true);
+      else $("#creditNotechecks").prop('checked', false);
+
+      if ($(".arInvoicePaymentSelect").length === $(".arInvoicePaymentSelect:checked").length)
+        $("#arInvoicePaymentchecks").prop('checked', true);
+      else $("#arInvoicePaymentchecks").prop('checked', false);
+
+      if ($(".arInvoiceSeniorPaymentSelect").length === $(".arInvoiceSeniorPaymentSelect:checked").length)
+        $("#arInvoiceSeniorPaymentchecks").prop('checked', true);
+      else $("#arInvoiceSeniorPaymentchecks").prop('checked', false);
+
+      if ($(".salesQuotationSelect").length === $(".salesQuotationSelect:checked").length)
+        $("#salesQuotationchecks").prop('checked', true);
+      else $("#salesQuotationchecks").prop('checked', false);
+
+      if ($(".salesQuotationSeniorSelect").length === $(".salesQuotationSeniorSelect:checked").length)
+        $("#salesQuotationSeniorchecks").prop('checked', true);
+      else $("#salesQuotationSeniorchecks").prop('checked', false);
+
+      if ($(".invoiceSelect").length === $(".invoiceSelect:checked").length)
+        $("#invoicechecks").prop('checked', true);
+      else $("#invoicechecks").prop('checked', false);
+
+      if ($(".deliveryBoySelect").length === $(".deliveryBoySelect:checked").length)
+        $("#deliveryBoychecks").prop('checked', true);
+      else $("#deliveryBoychecks").prop('checked', false);
+
+
+      if ($(".orderApproveSelect").length === $(".orderApproveSelect:checked").length)
+        $("#orderApprovechecks").prop('checked', true);
+      else $("#orderApprovechecks").prop('checked', false);
+
+      if ($(".quotationApproveSelect").length === $(".quotationApproveSelect:checked").length)
+        $("#quotationApprovechecks").prop('checked', true);
+      else $("#quotationApprovechecks").prop('checked', false);
+
+      if ($(".salesReturnApproveSelect").length === $(".salesReturnApproveSelect:checked").length)
+        $("#salesReturnApprovechecks").prop('checked', true);
+      else $("#salesReturnApprovechecks").prop('checked', false);
+
+      if ($(".stockTransferApproveSelect").length === $(".stockTransferApproveSelect:checked").length)
+        $("#stockTransferApprovechecks").prop('checked', true);
+      else $("#stockTransferApprovechecks").prop('checked', false);
+
+      if ($(".creditNoteApproveSelect").length === $(".creditNoteApproveSelect:checked").length)
+        $("#creditNoteApprovechecks").prop('checked', true);
+      else $("#creditNoteApprovechecks").prop('checked', false);
+
+      if ($(".creditInvoiceApproveSelect").length === $(".creditInvoiceApproveSelect:checked").length)
+        $("#creditInvoiceApprovechecks").prop('checked', true);
+      else $("#creditInvoiceApprovechecks").prop('checked', false);
+
+      if ($(".pickListSelect").length === $(".pickListSelect:checked").length)
+        $("#pickListchecks").prop('checked', true);
+      else $("#pickListchecks").prop('checked', false);
+
+      if ($(".orderReportSelect").length === $(".orderReportSelect:checked").length)
         $("#orderReportchecks").prop('checked', true);
-      else
-        $("#orderReportchecks").prop('checked', false);
+      else $("#orderReportchecks").prop('checked', false);
+
+      if ($(".salesQuotationReportSelect").length === $(".salesQuotationReportSelect:checked").length)
+        $("#salesQuotationReportchecks").prop('checked', true);
+      else $("#salesQuotationReportchecks").prop('checked', false);
+
+      if ($(".arInvoiceReportSelect").length === $(".arInvoiceReportSelect:checked").length)
+        $("#arInvoiceReportchecks").prop('checked', true);
+      else $("#arInvoiceReportchecks").prop('checked', false);
+
+      if ($(".posReportSelect").length === $(".posReportSelect:checked").length)
+        $("#posReportchecks").prop('checked', true);
+      else $("#posReportchecks").prop('checked', false);
+
+      if ($(".locationSelect").length === $(".locationSelect:checked").length)
+        $("#locationchecks").prop('checked', true);
+      else $("#locationchecks").prop('checked', false);
+
+      if ($(".pendingArInvoiceSelect").length === $(".pendingArInvoiceSelect:checked").length)
+        $("#pendingArInvoicechecks").prop('checked', true);
+      else $("#pendingArInvoicechecks").prop('checked', false);
+
+      if ($(".pendingPosInvoiceSelect").length === $(".pendingPosInvoiceSelect:checked").length)
+        $("#pendingPosInvoicechecks").prop('checked', true);
+      else $("#pendingPosInvoicechecks").prop('checked', false);
 
 
-      if ($(".creditSaleReportselect").length === $(".creditSaleReportselect:checked").length)
-        $("#creditSaleReportchecks").prop('checked', true);
-      else
-        $("#creditSaleReportchecks").prop('checked', false);
+      if ($(".attendanceSelect").length === $(".attendanceSelect:checked").length)
+        $("#attendancechecks").prop('checked', true);
+      else $("#attendancechecks").prop('checked', false);
 
-      if ($(".sdUserStockHistory1Selections").length === $(".sdUserStockHistory1Selections:checked").length)
-        $("#sdUserStockHistory1check").prop('checked', true);
-      else
-        $("#sdUserStockHistory1check").prop('checked', false);
+      if ($(".routeApproveSelect").length === $(".routeApproveSelect:checked").length)
+        $("#routeApprovechecks").prop('checked', true);
+      else $("#routeApprovechecks").prop('checked', false);
 
-      if ($(".sdUserStockSummary1Selections").length === $(".sdUserStockSummary1Selections:checked").length)
-        $("#sdUserStockSummary1check").prop('checked', true);
-      else
-        $("#sdUserStockSummary1check").prop('checked', false);
+      if ($(".salesSummaryReportSelect").length === $(".salesSummaryReportSelect:checked").length)
+        $("#salesSummaryReportchecks").prop('checked', true);
+      else $("#salesSummaryReportchecks").prop('checked', false);
 
-      if ($(".verticalSaleReport1Selections").length === $(".verticalSaleReport1Selections:checked").length)
-        $("#verticalSaleReport1check").prop('checked', true);
-      else
-        $("#verticalSaleReport1check").prop('checked', false);
+      if ($(".stockSummaryReportSelect").length === $(".stockSummaryReportSelect:checked").length)
+        $("#stockSummaryReportchecks").prop('checked', true);
+      else $("#stockSummaryReportchecks").prop('checked', false);
+
+      if ($(".noSalesReportSelect").length === $(".noSalesReportSelect:checked").length)
+        $("#noSalesReportchecks").prop('checked', true);
+      else $("#noSalesReportchecks").prop('checked', false);
+
+      if ($(".targetOutletReportSelect").length === $(".targetOutletReportSelect:checked").length)
+        $("#targetOutletReportchecks").prop('checked', true);
+      else $("#targetOutletReportchecks").prop('checked', false);
+
+      if ($(".callRateReportSelect").length === $(".callRateReportSelect:checked").length)
+        $("#callRateReportchecks").prop('checked', true);
+      else $("#callRateReportchecks").prop('checked', false);
+
+      if ($(".strikeRateReportSelect").length === $(".strikeRateReportSelect:checked").length)
+        $("#strikeRateReportchecks").prop('checked', true);
+      else $("#strikeRateReportchecks").prop('checked', false);
+
+      if ($(".priceUpdateSelect").length === $(".priceUpdateSelect:checked").length)
+        $("#priceUpdatechecks").prop('checked', true);
+      else $("#priceUpdatechecks").prop('checked', false);
+
+      if ($(".cxoDashboardSelect").length === $(".cxoDashboardSelect:checked").length)
+        $("#cxoDashboardchecks").prop('checked', true);
+      else $("#cxoDashboardchecks").prop('checked', false);
+
+      if ($(".itemWiseReportSelect").length === $(".itemWiseReportSelect:checked").length)
+        $("#itemWiseReportchecks").prop('checked', true);
+      else $("#itemWiseReportchecks").prop('checked', false);
 
 
-      if ($(".sdReports1Selections").length === $(".sdReports1Selections:checked").length)
-        $("#sdReports1check").prop('checked', true);
-      else
-        $("#sdReports1check").prop('checked', false);
+      if ($(".routeWiseReportSelect").length === $(".routeWiseReportSelect:checked").length)
+        $("#routeWiseReportchecks").prop('checked', true);
+      else $("#routeWiseReportchecks").prop('checked', false);
 
-      if ($(".bdmReports1Selections").length === $(".bdmReports1Selections:checked").length)
-        $("#bdmReports1check").prop('checked', true);
-      else
-        $("#bdmReports1check").prop('checked', false);
+      if ($(".numericalDistributonReportSelect").length === $(".numericalDistributonReportSelect:checked").length)
+        $("#numericalDistributonReportchecks").prop('checked', true);
+      else $("#numericalDistributonReportchecks").prop('checked', false);
+
+      if ($(".whsStockReportSelect").length === $(".whsStockReportSelect:checked").length)
+        $("#whsStockReportchecks").prop('checked', true);
+      else $("#whsStockReportchecks").prop('checked', false);
+
+      if ($(".weightageDistributionReportSelect").length === $(".weightageDistributionReportSelect:checked").length)
+        $("#weightageDistributionReportchecks").prop('checked', true);
+      else $("#weightageDistributionReportchecks").prop('checked', false);
+
+      if ($(".coverageDistributionReportSelect").length === $(".coverageDistributionReportSelect:checked").length)
+        $("#coverageDistributionReportchecks").prop('checked', true);
+      else $("#coverageDistributionReportchecks").prop('checked', false);
+
+      if ($(".priceTypeEditSelect").length === $(".priceTypeEditSelect:checked").length)
+        $("#priceTypeEditchecks").prop('checked', true);
+      else $("#priceTypeEditchecks").prop('checked', false);
+
+      if ($(".expenseListSelect").length === $(".expenseListSelect:checked").length)
+        $("#expenseListchecks").prop('checked', true);
+      else $("#expenseListchecks").prop('checked', false);
+
+      if ($(".vansaleReportSelect").length === $(".vansaleReportSelect:checked").length)
+        $("#vansaleReportchecks").prop('checked', true);
+      else $("#vansaleReportchecks").prop('checked', false);
+
+      if ($(".skippedCustomerReportSelect").length === $(".skippedCustomerReportSelect:checked").length)
+        $("#skippedCustomerReportchecks").prop('checked', true);
+      else $("#skippedCustomerReportchecks").prop('checked', false);
+
+      if ($(".routeSelect").length === $(".routeSelect:checked").length)
+        $("#routechecks").prop('checked', true);
+      else $("#routechecks").prop('checked', false);
 
 
-      if ($(".bhReports1Selections").length === $(".bhReports1Selections:checked").length)
-        $("#bhReports1check").prop('checked', true);
-      else
-        $("#bhReports1check").prop('checked', false);
+      if ($(".creditInvoiceReportSelect").length === $(".creditInvoiceReportSelect:checked").length)
+        $("#creditInvoiceReportchecks").prop('checked', true);
+      else $("#creditInvoiceReportchecks").prop('checked', false);
 
+      if ($(".salesReturnReportSelect").length === $(".salesReturnReportSelect:checked").length)
+        $("#salesReturnReportchecks").prop('checked', true);
+      else $("#salesReturnReportchecks").prop('checked', false);
 
-      // code 22062021
+      if ($(".creditNoteReportSelect").length === $(".creditNoteReportSelect:checked").length)
+        $("#creditNoteReportchecks").prop('checked', true);
+      else $("#creditNoteReportchecks").prop('checked', false);
+
+      if ($(".branchTransferReportSelect").length === $(".branchTransferReportSelect:checked").length)
+        $("#branchTransferReportchecks").prop('checked', true);
+      else $("#branchTransferReportchecks").prop('checked', false);
+
+      if ($(".collectionReportSelect").length === $(".collectionReportSelect:checked").length)
+        $("#collectionReportchecks").prop('checked', true);
+      else $("#collectionReportchecks").prop('checked', false);
+
+      if ($(".stockTransferReportSelect").length === $(".stockTransferReportSelect:checked").length)
+        $("#stockTransferReportchecks").prop('checked', true);
+      else $("#stockTransferReportchecks").prop('checked', false);
+
+      if ($(".invoiceReportSelect").length === $(".invoiceReportSelect:checked").length)
+        $("#invoiceReportchecks").prop('checked', true);
+      else $("#invoiceReportchecks").prop('checked', false);
+      if ($(".deliveryReportSelect").length === $(".deliveryReportSelect:checked").length)
+        $("#deliveryReportchecks").prop('checked', true);
+      else $("#deliveryReportchecks").prop('checked', false);
+
+      if ($(".purchasePrintSelect").length === $(".purchasePrintSelect:checked").length)
+        $("#purchasePrintchecks").prop('checked', true);
+      else $("#purchasePrintchecks").prop('checked', false);
+
+      if ($(".activitySeniorSelect").length === $(".activitySeniorSelect:checked").length)
+        $("#activitySeniorchecks").prop('checked', true);
+      else $("#activitySeniorchecks").prop('checked', false);
+
+      if ($(".accountantSelect").length === $(".accountantSelect:checked").length)
+        $("#accountantchecks").prop('checked', true);
+      else $("#accountantchecks").prop('checked', false);
+
+      if ($(".bpAdminSelect").length === $(".bpAdminSelect:checked").length)
+        $("#bpAdminchecks").prop('checked', true);
+      else $("#bpAdminchecks").prop('checked', false);
     });
   },
 
@@ -2292,9 +2612,13 @@ Template.role_list.events({
        * @param event
        */
   'submit .role-update': (event) => {
+
+
     event.preventDefault();
+
+
     updateRole(event.target);
-    $('#ic-edit').modal('hide');
+
   },
   /**
     * TODO: Complete JS doc
@@ -2314,7 +2638,6 @@ Template.role_list.events({
     });
     $('#duplicateName').val('');
     $('#duplicateName').attr('placeholder', 'Please enter new role');
-
   },
   /**
 * TODO: Complete JS doc
@@ -2451,115 +2774,5 @@ Template.role_list.events({
 */
   'click #removeSearch': () => {
     document.getElementById('filterDisplay').style.display = "none";
-  },
-
-
-  /**
-  * TODO:Complete JS doc
-  */
-  'click #exportButtons': (event, template) => {
-    event.preventDefault();
-    $('#activeUserId').html('');
-    $('#inActiveUserId').html('');
-    Meteor.call('roles.getUserExport', (err, res) => {
-      if (!err) {
-        if (res.length > 0) {
-          template.orderByDateExport.set(res[0].userListArray);
-          $('#activeUserId').html(res[0].activeUser);
-          $('#inActiveUserId').html(res[0].inActiveUser);
-          $("#exportButtons").prop('disabled', true);
-          Meteor.setTimeout(() => {
-            let uri = 'data:application/vnd.ms-excel;base64,',
-              templates = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>',
-              base64 = function (s) {
-                return window.btoa(unescape(encodeURIComponent(s)))
-              },
-              format = function (s, c) {
-                return s.replace(/{(\w+)}/g, function (m, p) {
-                  return c[p];
-                });
-              }
-            let toExcel = document.getElementById("exportTodayOrder").innerHTML;
-            let ctx = {
-              worksheet: name || 'Excel',
-              table: toExcel
-            };
-            //return a promise that resolves with a File instance
-            function urltoFile(url, filename, mimeType) {
-              return (fetch(url)
-                .then(function (res) { return res.arrayBuffer(); })
-                .then(function (buf) { return new File([buf], filename, { type: mimeType }); })
-              );
-            };
-
-            //Usage example:
-            urltoFile(uri + base64(format(templates, ctx)), 'hello.xls', 'text/csv')
-              .then(function (file) {
-
-                saveAs(file, "User Details(" + moment(new Date()).format("DD-MM-YYYY") + ").xls");
-              });
-            $("#exportButtons").prop('disabled', false);
-          }, 5000);
-        }
-      }
-      else {
-        template.orderByDateExport.set('');
-        toastr["error"]('No Records Found');
-        $('#activeUserId').html('');
-        $('#inActiveUserId').html('');
-      }
-    });
-  },
-
-  /**
-* TODO:Complete JS doc
-*/
-  'click #exportButtons2': (event, template) => {
-    event.preventDefault();
-    template.userTransactionsExport.set('');
-    Meteor.call('roles.getTransactionDetails', (err, res) => {
-      if (!err) {
-        if (res.length > 0) {
-          template.userTransactionsExport.set(res);
-          $("#exportButtons2").prop('disabled', true);
-          Meteor.setTimeout(() => {
-            let uri = 'data:application/vnd.ms-excel;base64,',
-              templates = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>',
-              base64 = function (s) {
-                return window.btoa(unescape(encodeURIComponent(s)))
-              },
-              format = function (s, c) {
-                return s.replace(/{(\w+)}/g, function (m, p) {
-                  return c[p];
-                });
-              }
-            let toExcel = document.getElementById("exportTodayOrder1").innerHTML;
-            let ctx = {
-              worksheet: name || 'Excel',
-              table: toExcel
-            };
-            //return a promise that resolves with a File instance
-            function urltoFile(url, filename, mimeType) {
-              return (fetch(url)
-                .then(function (res) { return res.arrayBuffer(); })
-                .then(function (buf) { return new File([buf], filename, { type: mimeType }); })
-              );
-            };
-
-            //Usage example:
-            urltoFile(uri + base64(format(templates, ctx)), 'hello.xls', 'text/csv')
-              .then(function (file) {
-
-                saveAs(file, "User Transaction Details(" + moment(new Date()).format("DD-MM-YYYY") + ").xls");
-              });
-            $("#exportButtons2").prop('disabled', false);
-          }, 5000);
-        }
-      }
-      else {
-        template.userTransactionsExport.set('');
-        toastr["error"]('No Records Found');
-      }
-    });
   }
 });

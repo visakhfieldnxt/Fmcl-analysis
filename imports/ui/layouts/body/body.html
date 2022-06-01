@@ -1,18 +1,51 @@
 <template name="main">
+  <script src="/assets/vendor/libs/jquery/jquery.js"></script>
+  <script src="/assets/vendor/libs/popper/popper.js"></script>
+  <script src="/assets/vendor/js/bootstrap.js"></script>
+  <script src="/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+  <script src="/assets/vendor/libs/apex-charts/apexcharts.js"></script> 
+  <script src="/assets/vendor/js/menu.js"></script>
+  <script src="/assets/js/main.js"></script>
+  <script src="/assets/js/dashboards-analytics.js"></script>
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
   {{#if currentUser}}
-  <div class="wrapper">
-    {{> header}}
-    {{> menu}}
-    <div class="content-wrapper">
-      {{> Template.dynamic template=name}}
+  <script src="/assets/vendor/libs/jquery/jquery.js"></script>
+  <script src="/assets/vendor/libs/popper/popper.js"></script>
+  <script src="/assets/vendor/js/bootstrap.js"></script> 
+  <script src="/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+  <script src="/assets/vendor/libs/apex-charts/apexcharts.js"></script>
+  <script src="/assets/js/main.js"></script>
+  <script src="/assets/js/dashboards-analytics.js"></script>
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+  <div class="layout-wrapper layout-content-navbar wrapper">
+    <div class="layout-container">
+      {{> menu}}
+      <div class="layout-page">
+        {{> header}}
+        {{> Template.dynamic template=name}}
+        {{> footer}}
+      </div>
+      <div class="content-backdrop fade"></div>
+      <div class="layout-overlay layout-menu-toggle"></div>
     </div>
-    {{> footer}}
   </div>
   {{else}}
-  <div class="wrapper">
-    {{> Template.dynamic template=name}}
-    <div class="login_footer">
-      {{> footer }}
+  <script src="/assets/vendor/libs/jquery/jquery.js"></script>
+  <script src="/assets/vendor/libs/popper/popper.js"></script>
+  <script src="/assets/vendor/js/bootstrap.js"></script> 
+  <script src="/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+  <script src="/assets/vendor/libs/apex-charts/apexcharts.js"></script>
+  <script src="/assets/js/main.js"></script>
+  <script src="/assets/js/dashboards-analytics.js"></script>
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+  <div class="layout-wrapper layout-content-navbar wrapper">
+    <div class="layout-container">
+      <div class="layout-page">
+        {{> Template.dynamic template=name}}
+        <div class="login_footer">
+          {{> footer }}
+        </div>
+      </div>
     </div>
   </div>
   {{/if}}
@@ -27,10 +60,10 @@
     {{#with connectionLoad}}
     <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
       justify-content: center;background: #F8F8F6;">
-      <img src="{{connectionLoaderImg}}" class="mainLoaders" style="width: 450px;"></div>
+      <img src="{{connectionLoaderImg}}" class="mainLoaders" style="width: 450px;">
+    </div>
     {{/with}}
   </div>
   {{/if}}
   {{/if}}
-
 </template>

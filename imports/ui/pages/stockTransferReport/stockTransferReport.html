@@ -1,74 +1,54 @@
 <template name="stockTransferReport">
+  {{#if userCan 'stockTransferReportView'}}
   <section class="content-header">
-    <h1>Stock Transfer Report List
-      <small>Listing All Stock Transfer Report</small>
+    <h1> Stock Transfer Report
+      <small>Listing All Stock Transfer Report </small>
     </h1>
     <ol class="breadcrumb">
       <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
-      <li class="active">Stock Transfer Report List</li>
+      <li class="active"> Stock Transfer Report </li>
     </ol>
   </section>
+
   <section class="content">
 
     <div class="row">
       <div style="float: right;">
-        <button type="button" title="Export Data" class="btn btn-primary btn-flat export">Export</button>
-        <button class="btn btn-primary btn-flat" id="filterSearch"><i class="fa fa-search"> </i>&nbsp; Search</button>
+        <form class="exportToday">
+          <button type="submit" title="Export Today's Order" id="exportButtons"
+            class="btn btn-primary btn-flat">Export</button>
+          <button type="button" title="Search" class="btn btn-primary btn-flat" id="filterSearch"><i
+              class="fa fa-search"> </i>&nbsp; Search</button>
+        </form>
       </div>
     </div>
     <div class="row" id="filterDisplay" style="display:none">
       <div class="box box-default box-solid">
         <div class="box-header with-border bg-aqua">
-          <h3 class="box-title" style="color: black;">Stock Transfer Filter</h3><button type="button" id="removeSearch"
+          <h3 class="box-title">{{user}} Filter</h3><button type="button" id="removeSearch"
             style="color: white; background-color: transparent; border-color:transparent" class="pull-right"><i
-              class="fa fa-close" style="color: black;"></i></button>
+              class="fa fa-close"></i></button>
         </div>
         <div class="box-body no-padding">
-          <form class="stockFilter">
+          <form class="salesReturn-filter">
             <div class="row">
-              <div class="col-sm-3" style="padding: 10px 10px 10px 10px;">
-                <label for="stock">Stock Transfer Id</label>
-                <select class="stocktransferIdval" style="width:100%;" name="stocktransferIdval"
-                  id="stocktransferIdval">
-                  <option disabled selected value=''>Select Stock Transfer Id</option>
-                  {{# each stocktransferIdList}}
-                  <option value="{{temporaryId}}">{{temporaryId}}</option>
-                  {{/each}}
-                </select>
-              </div>
-              <div class="col-sm-3" style="padding: 10px 10px 10px 10px;">
-                <label for="stock">Employee</label>
-                <select class="employeeId" style="width:100%;" name="employeeId" id="employeeId">
-                  <option disabled selected value=''>Select Employee</option>
-                  {{# each employeeListSd}}
-                  <option value="{{_id}}">{{profile.firstName}}</option>
-                  {{/each}}
-                </select>
-              </div>
-              <div class="col-sm-3" style="padding: 10px 10px 10px 10px;">
+              <div class="col-md-3 col-sx-12 col-sm-12">
                 <label for="EmailId">From Date</label>
                 <input type="text" autocomplete="off" class="form-control datepicker date validation"
                   data-date-autoclose="true" onkeydown="event.preventDefault()" id="fromDate" data-provide="datepicker"
                   data-date-format="dd-mm-yyyy" placeholder="From Date " name="fromDate" />
               </div>
-              <div class="col-sm-3" style="padding: 10px 10px 10px 10px;">
+              <div class="col-md-3 col-sx-12 col-sm-12">
                 <label for="EmailId">To Date</label>
                 <input type="text" autocomplete="off" class="form-control datepicker date validation"
                   data-date-autoclose="true" onkeydown="event.preventDefault()" id="toDate" data-provide="datepicker"
                   data-date-format="dd-mm-yyyy" placeholder="To Date " name="toDate" />
               </div>
-              <!-- <div class="col-sm-4" style="padding: 10px 10px 10px 10px;">
-                <label for="stock">Vertical</label>
-                <select class="selectVerticalId" style="width:100%;" name="selectVerticalId" id="selectVerticalId">
-                  <option disabled selected value=''>Select Vertical</option>
-                  {{# each getVertical}}
-                  <option value="{{_id}}">{{verticalName}}</option>
-                  {{/each}}
-                </select>
-              </div> -->
               <div class="row" style="float: right">
+
                 <button type="submit" name="filter" class="btn btn-primary">Filter</button>
                 <button type="button" name="reset" class="btn btn-info reset">Reset Filter</button>
+
               </div>
             </div>
           </form>
@@ -77,29 +57,71 @@
     </div>
 
     <div class="row">
-      <div class="box box-default box-solid"> 
+      {{#if isReady}}
+      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right" onClick=clickEvent}}
+      {{/if}}
+      <div class="box box-default box-solid">
+        <div class="box-header with-border bg-aqua">
+          <h3 class="box-title">Stock Transfer List </h3>
+        </div>
         {{#if isReady}}
         <div class="box-body no-padding table-responsive">
-          <table class="table table-striped generic">
+          <table class="table table-striped generic table-responsive"
+            style="width:100%;margin-bottom:0;table-layout: fixed">
             <tbody>
               <tr>
-                <th class="text-center sorted-column">Sl.No</th>
-                <th class="text-center sorted-column">Stock Transfer Id</th>
-                <th class="sorted-column text-center">Date</th>
-                <th class="text-center sorted-column">Employee</th>
-                <th class="text-center sorted-column">Status</th>
-                <th class="text-center sorted-column">Total Products</th>
+                <th class="text-center sorted-column" style="width:30px">Sl.No</th>
+                <th class="text-center sorted-column" style="width:200px">Stock No./Date</th>
+                <th class="text-center sorted-column" style="width:150px">Time</th>
+                <th class="text-center sorted-column" style="width:200px">Stock Transfer Unique Id</th>
+                <th class="text-center sorted-column" style="width:200px">Branch Name</th>
+                <th class="text-center sorted-column" style="width:200px">Salesperson</th>
+                <th class="text-center sorted-column " style="width:200px">Requested Ware House</th>
+                <th class="text-center sorted-column " style="width:200px">Issued Ware House</th>
+                <th class="text-center sorted-column" style="width:100px">Total Items</th>
+                <th class="text-center sorted-column" style="width:200px">Total Qty</th>
+                <th class="text-center sorted-column" style="width:200px">Due Date</th>
+                <th class="text-center sorted-column" style="width:200px">Status</th>
+                <th class="text-center sorted-column" style="width:200px" id="name">Approved/Rejected BY</th>
+                <th class="text-center sorted-column" style="width:200px" id="name">Approved/Rejected Date</th>
               </tr>
-              {{#each stockList}}
-              <tr class="view" id={{_id}}>
-                <td class="text-center sorted-column" width="3%">{{incremented @index}}</td>
-                <td class="text-center sorted-column" width="17%">{{temporaryId}}</td>
-                <td class="text-center sorted-column" width="15%">{{transferDate}}</td>
-                <td class="text-center sorted-column userIdVal_{{sdUser}}" width="15%">{{getUserName sdUser}}</td>
-                <td class="text-center sorted-column" width="15%">{{status}}</td>
-                <td class="text-center sorted-column prouctCounts_{{_id}}" width="15%">
-                  {{getProductCount _id}}
-                </td>
+              {{#each stockTransfer}}
+              <tr class="view " title="Click to view details" id="{{_id}}">
+                <td class="text-center" style="width:30px">{{indexCountGet @index}}</td>
+                <td class="pl-20 text-center " style="width:200px">{{stockId}}/{{date docDate}}</td>
+                <td class="pl-20 text-center" style="width:150px">{{timeSeperate createdAt}}</td>
+                <td class="text-center " style="width:200px">{{tempId}}</td>
+                <td class="text-center " style="width:200px">{{branchName}}</td>
+                <td class="text-center " style="width:200px">{{salesmanName}}</td>
+                <td class="text-center " style="width:200px">{{wareHouseFromName}}</td>
+                <td class="text-center " style="width:200px">{{wareHouseToName}}</td>
+                <td class="text-center" style="width:100px">{{totalItem}}</td>
+                <td class="text-center" style="width:200px">{{quantityFormat totalQty}}</td>
+                <td class="text-center" style="width:200px">{{date dueDueDate}}</td>
+                {{#if status stockStatus}}
+                <td class="text-center" style="color:red;">{{stockStatus}}</td>
+                {{else}}
+                <td class="text-center">{{stockStatus}}</td>
+                {{/if}}
+                {{#if approvedByName}}
+                <td class="pl-20 text-center" style="width:200px">{{approvedByName}} (Approved)</td>
+                {{else if rejectedByName}}
+                <td class="pl-20 text-center" style="width:200px">{{rejectedByName}} (Rejected)</td>
+                {{else if onHoldByName}}
+                <td class="pl-20 text-center" style="width:200px">{{onHoldByName}} (Onhold)</td>
+                {{else}}
+                <td class="pl-20 text-center" style="width:200px">-</td>
+                {{/if}}
+
+                {{#if approvedByDate}}
+                <td class="pl-20 text-center" style="width:200px">{{dateFormat approvedByDate}} (Approved)</td>
+                {{else if rejectedDate}}
+                <td class="pl-20 text-center" style="width:200px">{{dateFormat rejectedDate}} (Rejected)</td>
+                {{else if onHoldDate}}
+                <td class="pl-20 text-center" style="width:200px">{{dateFormat onHoldDate}} (Onhold)</td>
+                {{else}}
+                <td class="pl-20 text-center" style="width:200px">-</td>
+                {{/if}}
               </tr>
               {{/each}}
             </tbody>
@@ -112,11 +134,10 @@
         </div>
         {{/if}}
       </div>
-
       {{#if isReady}}
-      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
-      onClick=clickEvent}}
+      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right" onClick=clickEvent}}
       {{/if}}
+
     </div>
     {{#if isReady}}
     <div id="bodySpin">
@@ -127,374 +148,228 @@
       {{#with bodyLoader}}
       <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
       justify-content: center;background: #f1f1f1;">
-        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
-      </div>
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;"></div>
       {{/with}}
     </div>
     {{/if}}
-    <div id="bodySpinLoaders" style=" width: 100%;position: 
-    fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
-      {{#with bodyLoader}}
-      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
-justify-content: center;background: #f1f1f1;">
-        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
-      </div>
-      {{/with}}
-    </div>
   </section>
 
-  <!-- <div class="ic-create-stock-modal">
-    <div class="modal" id="ic-create-stock">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title"> Stock Transfer</h4>
-          </div>
-          <div class="modal-body">
-            {{> stockTransfer_create stockTransfer=stockTransfer}}
-          </div>
-        </div>
-      </div>
-    </div>
-  </div> -->
-
-  {{> successModal id="stockSuccessModal" section=stockTransfer}}
-  {{> errorModal id="stockErrorModal" section=stockTransfer}}
+  {{> successModal id="stockTransferSuccessModal" section='StockTransfer'}}
+  {{> errorModal id="stockTransferErrorModal" section='StockTransfer'}}
 
 
-  <div class="modal fade in" id="stockUploadConfirmation">
+  <div class="modal fade in" id="stockRejectedPage">
     <div class="modal-dialog">
-      <form id="uploadstock" autocomplete="off">
+      <form class="statusUpdate" autocomplete="off">
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">×</span></button>
-            <h4 class="modal-title text-bold" id="stockUploadHeader"></h4>
+            <h4 class="modal-title text-bold" id="salesReturnH"></h4>
           </div>
-          <div class="modal-body">
-            <div id="stocksBody">
-              <div class="fileupload fileupload-new" data-provides="fileupload" style="text-align:center">
-                <span class="btn btn-file btn-default">
-                  <span class="fileupload-exists">{{#if labelName}}
-                    {{labelName}}
-                    {{else}}
-                    Upload File
-                    {{/if}}</span>
-                  <input name="uploadstockFile" class="file-upload-input uploadstockFile" id="uploadstockFile"
-                    method="post" type="file" style="width: 0%;height: 0%; margin-top: 0px;" required />
-                </span>
-                <span class="text-center" id="fileArrayspan"></span>
+          <div class="modal-body" style="overflow: auto;">
+            <div class="box box-default box-solid">
+              <div class="box-header with-border bg-aqua">
+                <h3 class="box-title">Stock Transfer Request Details</h3>
               </div>
-              <br>
-              <p class="">
-                Are you sure to upload Stock .?<span id="stockUploadNameDup" class="text-bold"></span>
-              </p>
+              <table style="width:100%; table-layout:fixed; border-collapse:collapse;" class="table table-striped">
+                <tbody>
+                  <tr class="table-border">
+                    <td width="50%">
+                      <label for="Employee ">Branch Name </label>
+                      <div id="detailBranch"></div>
+                    </td>
+
+                    <td width="50%">
+                      <label for="firstName">Document Date </label>
+                      <div id="detailDocDates"></div>
+                    </td>
+                  </tr>
+                  <tr class="table-border">
+                    <td>
+                      <label for="Employee ">Requested Ware House</label>
+                      <div id="wareHouseFromName"></div>
+                    </td>
+                    <td>
+                      <label for="Employee ">Issued Ware House</label>
+                      <div id="wareHouseToName"></div>
+                    </td>
+                  </tr>
+                  <tr class="table-border">
+                    <td>
+                      <label for="Employee ">Due Date</label>
+                      <div id="detailDocDelivers"></div>
+                    </td>
+                    <td>
+                      <label for="Employee ">Remark</label>
+                      <div id="detailRemark"></div>
+                    </td>
+                  </tr>
+                  <tr class="table-border">
+                    <td>
+                      <label for="Employee ">Stock Transfer Unique Id</label>
+                      <div id="detailUniqueId"></div>
+                    </td>
+                    <td width="50%">
+                      <label for="Employee ">Stock No </label>
+                      <div id="stockNoDetail"></div>
+                    </td>
+                  </tr>
+                  <tr class="table-border">
+                    <td>
+                      <label for="customer"> Salesperson</label>
+                      <div id="detailSalesperson" style="word-wrap:break-word;"></div>
+                    </td> 
+                    <td>
+                      <label for="Employee ">Approved/ Rejected By</label>
+                      <div id="detailApprovedBy" style="word-wrap:break-word;"></div>
+                    </td>
+                   
+                  </tr>
+                  <tr class="table-border">
+                    <td>
+                      <label for="Employee ">Approved/ Rejected Date</label>
+                      <div id="detailApprovedDate" style="word-wrap:break-word;"></div>
+                    </td>
+                    <td>
+                      <label for="Employee ">Approved/ Rejected Remark</label>
+                      <div id="detailApprovedRemark" style="word-wrap:break-word;"></div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <span style="padding-left: 10px;"><label for="Employee ">Items List</label></span>
+              {{#with items}}
+              <div id="detailUsername" class="table-responsive">
+                <div class="row ">
+                  <table style="width:100%;margin-bottom:0;table-layout: fixed" class="table table-striped with-border">
+                    <thead>
+                      <tr>
+                        <th width="30px">No. </th>
+                        <th width="130px">Item Name </th>
+                        <th width="70px">UOM</th>
+                        <th width="70px">Weight</th>
+                        <!-- <th width="70px">Quantity</th> -->
+                        <th width="150px">Transfered Quantity</th>
+                        <th width="130px">Item Remarks</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {{#each items}}
+                      <tr class="table-border">
+                        <td>{{incremented @index}}</td>
+                        <td style="word-wrap: break-word">{{itemNam}}</td>
+                        <td>{{ transferUom}}</td>
+                        <td align="right">{{weightCal transferQty invWeight unitQuantity}}</td>
+                        <!-- <td align="right">{{quantityFormat quantity}}</td> -->
+                        <td align="right">{{#if transferQty}}{{quantityFormat transferQty}}{{/if}}</td>
+                        <td style="word-wrap: break-word" width="150px">{{itemRemark}}</td>
+                      </tr>
+                      {{/each}}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              {{/with}}
+              <div class="col-sm-12" style="padding:20px 10px">
+              </div>
+              <div class="row">
+                <div class="col-sm-5 pull-left">
+                  <span class="pull-left">Weight[kg] :</span>
+                  <span class="pull-right" style="text-align: right; font-weight: bold;" id="detailWeight">
+                  </span>
+                </div>
+              </div>
             </div>
+            {{#if printLoad}}
+            <div class="loadersSpin">
+            </div>
+            {{else}}
+            <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+          absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+              {{#with printLoaderImage}}
+              <div class="loader-lg" style="width: 100%;height: 100%;display: 
+            flex; align-items: center;justify-content: center;background: #fff;">
+                <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;"></div>
+              {{/with}}
+            </div>
+            {{/if}}
           </div>
           <div class="modal-footer">
-            <button type="button" title="Download format" id="downloadstock"
-              class="btn btn-primary pull-left">Format</button>
-            <button type="submit" class="btn btn-success">Yes please!</button>
-            <button type="button" class="btn btn-danger" data-dismiss="modal" id="stockFileClose">Not
-              now</button>
+            <button type="button" class="btn btn-default closen pull-right" data-dismiss="modal">Close</button>
           </div>
         </div>
       </form>
     </div>
   </div>
-
-  <div class="modal fade in" id="stockDelConfirmation">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">×</span></button>
-          <h4 class="modal-title text-bold" id="stockHeader"></h4>
-        </div>
-        <div class="modal-body">
-          <div id="stocksBody">
-            <p class="danger-color">
-              Are you sure to inactivate Stock- '<span id="stockNameDup" class="text-bold"></span>' ?
-            </p>
-          </div>
-          <input type="hidden" id="confirmedUuid">
-        </div>
-        <div class="modal-footer">
-          <button id="stockRemove" class="btn btn-danger">Yes please!</button>
-          <button type="button" class="btn btn-default" data-dismiss="modal" id="stockClose">Not
-            now</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal fade in" id="stockActiveConfirmation">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">×</span></button>
-          <h4 class="modal-title text-bold" id="stockHeaders"></h4>
-        </div>
-        <div class="modal-body">
-          <div id="stocksBody">
-            <p class="success-color">
-              Are you sure to activate Stock- '<span id="stockNameDups" class="text-bold"></span>' ?
-            </p>
-          </div>
-          <input type="hidden" id="confirmedUuids">
-        </div>
-        <div class="modal-footer">
-          <button id="stockActivate" class="btn btn-success">Yes please!</button>
-          <button type="button" class="btn btn-default" data-dismiss="modal" id="stockClose">Not
-            now</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="modal fade in" id="stockDetailPage">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">×</span></button>
-          <h4 class="modal-title text-bold" id="stockH"></h4>
-        </div>
-        <div class="modal-body">
-          <div class="box box-default box-solid">
-            <!-- <div class="box-header with-border bg-aqua">
-              <h3 class="box-title">Stock Transfer Details</h3>
-            </div> -->
-            <table style="width:100%;" class="table table-striped">
-              <tbody>
-                <tr class="table-border">
-                  <td width="50%">
-                    <label for="Employee ">Stock Transfer Id</label>
-                    <div id="detailTransferId"></div>
-                  </td>
-                  <td width="50%">
-                    <label for="firstName">Vertical</label>
-                    <div id="detailvertical"></div>
-                  </td>
-                </tr>
-                <tr class="table-border">
-                  <td width="50%">
-                    <label for="Employee ">Transfer Date</label>
-                    <div id="detailDate"></div>
-                  </td>
-                  <td width="50%">
-                    <label for="Employee ">Employee Name</label>
-                    <div id="detailEmp"></div>
-                  </td>
-                </tr>
-                <!-- <tr class="table-border">
-                  <td width="50%">
-                    <label for="Employee ">Status</label>
-                    <div id="detailStatus"></div>
-                  </td>
-                  <td width="50%"> 
-                  </td>
-                </tr> -->
-              </tbody>
-            </table>
-            {{#with productListGets}}
-            <span style="padding-left: 10px;"><label for="Employee " style="padding-top: 10px;">Product List
-              </label></span>
-            <div id="detailUsername" class="table-responsive">
-              <div class="row ">
-                <table style="width:100%;margin-bottom:0;table-layout: fixed" class="table table-striped with-border">
-                  <thead>
-                    <tr>
-                      <th width="100px">Sl No. </th>
-                      <th width="250px">Product Name</th>
-                      <th width="100px">Unit</th>
-                      <th width="100px">Quantity</th>
-                      <th width="200px">Accepted Quantity</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {{#each productListGets}}
-                    <tr class="table-border">
-                      <td>{{incremented @index}}</td>
-                      <td style="word-wrap: break-word" class="productIdVals_{{product}} ">{{getProductNames
-                        product}}</td>
-                      <td style="word-wrap: break-word " class="unitNameVals_{{unit}}">{{getUnitNames
-                        unit}}</td>
-                      <td class="text-center ">{{quantity}}</td>
-                      {{#if acceptedQuantity}}
-                      <td class="text-center ">{{acceptedQuantity}}</td>
-                      {{else}}
-                      <td class="text-center ">-</td>
-                      {{/if}}
-                    </tr>
-                    {{/each}}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            {{/with}}
-          </div>
-          {{#if printLoad}}
-          <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
-          absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
-            {{#with printLoaderImage}}
-            <div class="loader-lg" style="width: 100%;height: 100%;display: 
-            flex; align-items: center;justify-content: center;background: #fff;">
-              <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
-            </div>
-            {{/with}}
-          </div>
-          {{else}}
-          <div class="loadersSpin">
-          </div>
-          {{/if}}
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default closen" data-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal fade in" id="stockTransferExport">
-    <div class="modal-dialog modal-sm">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close exportClose" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">×</span></button>
-          <h4 class="modal-title text-bold" id="deliveryExportH"></h4>
-        </div>
-        <form class="exportByDate">
-          <div class="modal-body">
-            <div class="box box-default box-solid">
-              <!-- <div class="box-header with-border bg-aqua">
-                <h3 class="box-title">Details</h3>
-              </div> -->
-              <table style="width:100%;" class="table table-striped">
-                <tbody>
-
-                  <tr>
-                    <td>
-                      <label for="stock">Employee</label>
-                      <select class="employeeIdExport" style="width:100%;" name="employeeIdExport"
-                        id="employeeIdExport">
-                        <option selected value=''>Select Employee</option>
-                        {{# each employeeListSd}}
-                        <option value="{{_id}}">{{profile.firstName}}</option>
-                        {{/each}}
-                      </select>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <label for="Employee ">From Date <span class="asteric_red">*</span> </label>
-                      <input type="text" autocomplete="off" class="form-control datepicker date validation startDate1"
-                        data-date-autoclose="true" onkeydown="event.preventDefault()" id="my-datepicker"
-                        data-provide="datepicker" data-date-format="dd-mm-yyyy" placeholder="From Date "
-                        name="startDate" required />
-                      <span id="startDateSpan"></span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <label for="firstName">To Date <span class="asteric_red">*</span> </label>
-                      <input type="text" autocomplete="off" class="form-control datepicker date validation endDate1"
-                        data-date-autoclose="true" onkeydown="event.preventDefault()" id="my-datepicker"
-                        data-provide="datepicker" data-date-format="dd-mm-yyyy" placeholder="To Date " name="endDate"
-                        required />
-                      <span id="endDateSpan"></span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="text-center">
-                      <span id="emptyDataSpan"></span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            {{#if printLoad}}
-            <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
-            absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
-              {{#with printLoaderImage}}
-              <div class="loader-lg" style="width: 100%;height: 100%;display: 
-              flex; align-items: center;justify-content: center;background: #fff;">
-                <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
-              </div>
-              {{/with}}
-            </div>
-            {{else}}
-            <div class="loadersSpin">
-            </div>
-            {{/if}}
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default exportClose pull-left" data-dismiss="modal">Close</button>
-            {{#if stockDataExport}}
-            <button type="button" class="btn btn-primary exportToday">Export</button>
-            {{else}}
-            <button type="submit" class="btn btn-primary" disabled>Export</button>
-            {{/if}}
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
+  {{/if}}
 
   <table class="table table-striped generic" id="exportTodayOrder" style="display:none">
     <tbody>
       <tr>
-        <th class="text-center sorted-column" style="width:40px">Sl.No</th>
-        <th class="text-center sorted-column" style="width:30px">Stock Transfer Id</th>
-        <th class="text-center sorted-column" style="width:30px">Employee</th>
-        <th class="text-center sorted-column" style="width:30px">Vertical</th>
-        <th class="text-center sorted-column" style="width:30px">Transfer Date</th>
-        <th class="text-center sorted-column" style="width:30px">Status</th>
-        <th class="text-center sorted-column" style="width:30px">Product List</th>
+        <th class="text-center sorted-column" style="width:30px">Sl.No</th>
+        <th class="text-center sorted-column" style="width:200px">Stock No./Date</th>
+        <th class="text-center sorted-column" style="width:150px">Time</th>
+        <th class="text-center sorted-column" style="width:200px">Stock Transfer Unique Id</th>
+        <th class="text-center sorted-column" style="width:200px">Branch Name</th>
+        <th class="text-center sorted-column" style="width:200px">Salesperson</th>
+        <th class="text-center sorted-column " style="width:200px">Requested Ware House</th>
+        <th class="text-center sorted-column " style="width:200px">Issued Ware House</th>
+        <th class="text-center sorted-column" style="width:200px">Total Items</th>
+        <th class="text-center sorted-column" style="width:200px">Total Qty</th>
+        <th class="text-center sorted-column" style="width:200px">Due Date</th>
+        <th class="text-center sorted-column" style="width:200px">Status</th>
+        <th class="text-center sorted-column" style="width:200px" id="name">Approved/Rejected BY</th>
+        <th class="text-center sorted-column" style="width:200px" id="name">Approved/Rejected Date</th>
+        <th class="text-center sorted-column" style="width:200px">Sl.No</th>
+        <th class="text-center sorted-column" style="width:200px">Item Name </th>
+        <th class="text-center sorted-column" style="width:200px">UOM</th>
+        <th class="text-center sorted-column" style="width:200px">Weight</th>
+        <th class="text-center sorted-column" style="width:200px">Transfered Quantity</th>
       </tr>
-      {{#each stockDataExport}}
-      <tr class="view " style="cursor:pointer" title="Click to view details" id="{{_id}}">
-        <td class="text-center" style="width:40px">{{incremented @index}}</td>
-        <td class="text-center" style="width:30px">{{stockRes.temporaryId}}</td>
-        <td class="text-center userIdVal_{{stockRes.sdUser}}" style="width:30px">{{getUserName stockRes.sdUser}}</td>
-        <td class="text-center verticalIdVal_{{verticalRes}}" style="width:30px">{{getVerticalName
-          verticalRes}}</td>
-        <td class="text-center" style="width:30px">{{stockRes.transferDate}}</td>
-        <td class="text-center" style="width:30px">{{stockRes.status}}</td>
-        <td class="text-center" style="width:30px">
-          {{#if itemRes}}
-          <table style="width:100%;margin-bottom:0;table-layout: fixed" class="table table-striped with-border">
-            <thead>
-              <tr>
-                <th width="100px">Sl No. </th>
-                <th width="250px">Product Name</th>
-                <th width="100px">Unit</th>
-                <th width="100px">Quantity</th>
-                <th width="200px">Accepted Quantity</th>
-              </tr>
-            </thead>
-            <tbody>
-              {{#each itemRes}}
-              <tr class="table-border">
-                <td>{{incremented @index}}</td>
-                <td style="word-wrap: break-word" class="productIdVals_{{product}}">{{getProductNames
-                  product}}</td>
-                <td style="word-wrap: break-word " class="unitNameVals_{{unit}}">{{getUnitNames
-                  unit}}</td>
-                <td>{{quantity}}</td>
-                {{#if acceptedQuantity}}
-                <td>{{acceptedQuantity}}</td>
-                {{else}}
-                <td>-</td>
-                {{/if}}
-              </tr>
-              {{/each}}
-            </tbody>
-          </table>
-          {{/if}}
-        </td>
+      {{#each orderTodayExport}}
+      {{#each itemLines}}
+      <tr id="{{_id}}">
+        <td class="text-center sorted-column" style="width:200px">{{uniqueSlNo}}</td>
+        <td class="text-center sorted-column" style="width:200px">{{stockId}}/{{date docDate}}</td>
+        <td class="text-center sorted-column" style="width:200px">{{timeSeperate createdAt}}</td>
+        <td class="text-center sorted-column" style="width:200px">{{tempId}}</td>
+        <td class="text-center sorted-column" style="width:200px">{{branchName}}</td>
+        <td class="text-center sorted-column" style="width:200px">{{salesmanName}}</td>
+        <td class="text-center sorted-column" style="width:200px">{{wareHouseFromName}}</td>
+        <td class="text-center sorted-column" style="width:200px">{{wareHouseToName}}</td>
+        <td class="text-center sorted-column" style="width:200px">{{totalItem}}</td>
+        <td class="text-center sorted-column" style="width:200px">{{quantityFormat totalQty}}</td>
+        <td class="text-center sorted-column" style="width:200px">{{dueDueDate}}</td>
+        <td class="text-center sorted-column" style="width:200px">{{stockStatus}}</td>
+        {{#if approvedByName}}
+        <td class="text-center sorted-column" style="width:200px">{{approvedByName}} (Approved)</td>
+        {{else if rejectedByName}}
+        <td class="text-center sorted-column" style="width:200px">{{rejectedByName}} (Rejected)</td>
+        {{else if onHoldByName}}
+        <td class="text-center sorted-column" style="width:200px">{{onHoldByName}} (Onhold)</td>
+        {{else}}
+        <td class="text-center sorted-column" style="width:200px">-</td>
+        {{/if}}
+        {{#if approvedByDate}}
+        <td class="text-center sorted-column" style="width:200px">{{dateFormat approvedByDate}} (Approved)</td>
+        {{else if rejectedDate}}
+        <td class="text-center sorted-column" style="width:200px">{{dateFormat rejectedDate}} (Rejected)</td>
+        {{else if onHoldDate}}
+        <td class="text-center sorted-column" style="width:200px">{{dateFormat onHoldDate}} (Onhold)</td>
+        {{else}}
+        <td class="text-center sorted-column" style="width:200px">-</td>
+        {{/if}}
+        <td class="text-center sorted-column" style="width:200px">{{incremented @index}}</td>
+        <td class="text-center sorted-column" style="width:200px">{{itemNam}}</td>
+        <td class="text-center sorted-column" style="width:200px">{{ transferUom}}</td>
+        <td class="text-center sorted-column" style="width:200px">{{weightCal transferQty invWeight unitQuantity}}</td>
+        <td class="text-center sorted-column" style="width:200px">
+          {{#if transferQty}}{{quantityFormat transferQty}}{{/if}}</td>
       </tr>
+      {{/each}}
       {{/each}}
     </tbody>
   </table>
+
 </template>

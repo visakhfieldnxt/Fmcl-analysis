@@ -252,10 +252,10 @@
             <div class="row">           
                 <table class="pull-right">
                     <tr>
-                        <td style="padding-right:20px;">TAX </td><td style="font-weight: bold;font-size: 17px;">ZMW  <span id="detailGSTs"></span></td>
+                        <td style="padding-right:20px;">TAX </td><td style="font-weight: bold;font-size: 17px;">{{currencyGet}}  <span id="detailGSTs"></span></td>
                       </tr>
                       <tr>
-                          <td style="padding-right:20px;">Total Amount</td><td style="font-weight: bold;font-size: 17px;">ZMW  <span id="detailDocTotals"></span></td>
+                          <td style="padding-right:20px;">Total Amount</td><td style="font-weight: bold;font-size: 17px;">{{currencyGet}}  <span id="detailDocTotals"></span></td>
                         </tr>
                 </table> 
               </div>
@@ -343,7 +343,7 @@
                                   <td style="color:blue !important;word-wrap:break-word;">Order Qty</td>
                                   <td style="color:blue !important;word-wrap:break-word;">Unit</td>
                                   <td style="color:blue !important;word-wrap:break-word;">Weight [Kg.]</td>
-                                  <td style="color:blue !important;word-wrap:break-word;">Rate [ZMW] [VAT incl.]</td>
+                                  <td style="color:blue !important;word-wrap:break-word;">Rate [{{currencyGet}}] [VAT incl.]</td>
                                   <td style="color:blue !important;word-wrap:break-word;">Disc.%</td>
                                   <td style="color:blue !important;word-wrap:break-word;">Exci.%</td>
                                   <td style="color:blue !important;word-wrap:break-word;">VAT %Amt</td>
@@ -385,22 +385,22 @@
                               {{#with orderr}}
                               <table class="tables" border="1" style="font-size:11px;width: 50%;border:1px solid black;float: left;">
                                   <tr >
-                                      <td style="padding-left:10px;height:30px"><b>Basic Order Val[ZMW]</b></td> <td style="padding-left:10px;text-align:right;"><b>ZMW</b> {{priceFormat beforeDiscount}} </td>
+                                      <td style="padding-left:10px;height:30px"><b>Basic Order Val[{{currencyGet}}]</b></td> <td style="padding-left:10px;text-align:right;"><b>{{currencyGet}}</b> {{priceFormat beforeDiscount}} </td>
                                     </tr>
                                     <tr>
-                                        <td style="padding-left:10px"><b>Discount@ 0%</b></td> <td style="padding-left:10px;text-align:right;"><b>ZMW</b> {{disc afterDiscount beforeDiscount}}</td>
+                                        <td style="padding-left:10px"><b>Discount@ 0%</b></td> <td style="padding-left:10px;text-align:right;"><b>{{currencyGet}}</b> {{disc afterDiscount beforeDiscount}}</td>
                                       </tr>
                                     <tr>
-                                        <td style="padding-left:10px"><b>Sub Total</b></td> <td style="padding-left:10px;text-align:right;"><b>ZMW</b> {{priceFormat afterDiscount}}</td>
+                                        <td style="padding-left:10px"><b>Sub Total</b></td> <td style="padding-left:10px;text-align:right;"><b>{{currencyGet}}</b> {{priceFormat afterDiscount}}</td>
                                       </tr>
                                       <tr>
-                                          <td style="padding-left:10px"><b>Excise</b></td> <td style="padding-left:10px;text-align:right;"><b>ZMW</b> 0.00</td>
+                                          <td style="padding-left:10px"><b>Excise</b></td> <td style="padding-left:10px;text-align:right;"><b>{{currencyGet}}</b> 0.00</td>
                                         </tr>
                                             <tr>
-                                                <td style="padding-left:10px"><b>VAT</b></td> <td style="padding-left:10px;text-align:right;"><b>ZMW</b> {{GST}}</td>
+                                                <td style="padding-left:10px"><b>VAT</b></td> <td style="padding-left:10px;text-align:right;"><b>{{currencyGet}}</b> {{GST}}</td>
                                               </tr>
                                               <tr>
-                                                  <td style="padding-left:10px;height:30px"><b>Grand Total[ZMW]</b></td> <td style="padding-left:10px;text-align:right;"><b>ZMW</b> {{priceFormat docTotal}}</td>
+                                                  <td style="padding-left:10px;height:30px"><b>Grand Total[{{currencyGet}}]</b></td> <td style="padding-left:10px;text-align:right;"><b>{{currencyGet}}</b> {{priceFormat docTotal}}</td>
                                                 </tr>
                                   </table>
                                   {{/with}}

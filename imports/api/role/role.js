@@ -1,5 +1,5 @@
 /**
- * @author Nithin
+ * @author Visakh
  */
 import { Meteor } from 'meteor/meteor'
 

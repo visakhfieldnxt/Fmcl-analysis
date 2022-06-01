@@ -41,11 +41,6 @@ Template.approvedRoutes.onCreated(function () {
     sort: {
       createdAt: -1
     },
-    fields:{routeId:1,
-      routeDate:1,
-      routeDateEnd:1,
-      assignedTo:1,
-      routeStatus:1},
     perPage: 20
   });
 
@@ -54,8 +49,8 @@ Template.approvedRoutes.onCreated(function () {
 Template.approvedRoutes.onRendered(function () {
   this.modalLoader.set(false);
   this.bodyLoaders.set(true);
-
-  Meteor.call('routeGroup.masterDataGet', (err, res) => {
+  let vansaleRoles = Session.get("vansaleRoles");
+  Meteor.call('routeGroup.masterForApprovalPages',vansaleRoles, (err, res) => {
     if (!err) {
       this.vansaleUserFullList.set(res.userRes);
       this.routeCodeList.set(res.groupRes);
@@ -85,15 +80,7 @@ Template.approvedRoutes.onRendered(function () {
       this.customerNameArray.set(res);
   });
 
-  Meteor.setInterval(() => {
-    Meteor.call('routeGroup.masterDataGet', (err, res) => {
-      if (!err) {
-        this.vansaleUserFullList.set(res.userRes);
-        this.routeCodeList.set(res.groupRes);
-        this.vanUsersFilter.set(res.vanUsersFilter);
-      }
-    });
-  }, 600000);
+  
   /**
    * TODO: Complete JS doc
    */

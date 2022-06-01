@@ -1,15 +1,40 @@
-createOrUpdateOrders1 = (target, productsArray, vertical, grandTotal, taxTotal, outlet, discountVal) => {
-  return Meteor.call('order.update', productsArray, vertical, grandTotal, taxTotal,
-    outlet, target.orderIdEdit.value, discountVal,
-    (error, result) => {
-      if (error) {
-        $('#orderErrorModal').find('.modal-body').text(error.reason);
+/**
+ * @author Visakh
+ */
+import { HTTP } from 'meteor/http'
+
+/**
+ * TODO: Complete JS doc
+ * @param target
+ * @param id
+ */
+orderEditOrUpdate  = (target, id, customer, branch, totalDiscPercent, address, itemArrayL, beforeDiscountL,
+  afterDiscountL, gSTL, grandTotalL, priceType, priceMode, currency, latitude, longitude, mVATArrayList, weight, taxTotal,approvalValue,approvalResonArray) => {
+
+  Meteor.call('order.editOrUpdate', id, itemArrayL,
+    beforeDiscountL, afterDiscountL, gSTL, grandTotalL, totalDiscPercent, // remark_QuotationEdit.value, custRefDate.value, custRef.value,
+    latitude, longitude, mVATArrayList, weight, taxTotal,approvalValue,approvalResonArray, (err, res) => {
+      if (err) {
         $('#orderErrorModal').modal();
+        $('#orderErrorModal').find('.modal-body').text(err.reason);
+        $("#submit").attr("disabled", false);
+        $('#remark_OrderEdit').val('');
+        $('#custRefEdit').val('');
+        $(".refDateEdit").val('');
+        $(".dueDateEdit").val('');
       }
       else {
-        $('#ic-create-Order').modal('hide');
-        $('#orderSuccessModal').find('.modal-body').text('Order has been Updated successfully');
+
+        $("#selectcustomerEdit").val('').trigger('change');
+        $("#selectCustomerAddressEdit").val('').trigger('change');
+        // $('#orderEditDetailPage').modal('hide');
+        $('#orderSuccessModal').find('.modal-body').text('Order has been updated successfully');
         $('#orderSuccessModal').modal();
+        $("#submit").attr("disabled", false);
+        $('#remark_OrderEdit').val('');
+        $('#custRefEdit').val('');
+        $(".refDateEdit").val('');
+        $(".dueDateEdit").val('');
       }
     });
-}
+};

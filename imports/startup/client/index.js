@@ -8,5 +8,4 @@ import './routes';
 import './datePicker';
 import './toasterMessages';
 import './numberConstants';
-import './imagesBaseUrl';
 import '../../ui/index';

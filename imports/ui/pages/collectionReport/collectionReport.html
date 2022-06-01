@@ -70,15 +70,15 @@
       {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right" onClick=clickEvent}}
       {{/if}}
       <div class="box box-default box-solid">
-        <!-- <div class="box-header with-border bg-aqua">
+        <div class="box-header with-border bg-aqua">
           <h3 class="box-title">Collection List</h3>
-        </div> -->
+        </div>
         {{#if isReady}}
         <div class="box-body no-padding table-responsive">
           <table class="table table-striped generic">
             <tbody>
               <tr>
-                <th class="text-center sorted-column" style="width:40px">Sl.No</th>
+                <th class="text-center sorted-column" style="width:30px">Sl.No</th>
                 <th class="text-center sorted-column" style="width:200px" id="name">Customer Name</th>
                 <th class="text-center sorted-column" style="width:200px" id="name">Branch</th>
                 <th class="text-center sorted-column" style="width:200px" id="name">Collection Type</th>
@@ -92,7 +92,7 @@
               </tr>
               {{#each collections}}
               <tr class="view " id="{{_id}}" style="cursor:pointer">
-                <td class="text-center" style="width:40px">{{incremented @index}}</td>
+                <td class="text-center" style="width:30px">{{indexCountGet @index}}</td>
                 <td class="pl-20 text-center" style="width:200px" width="20%">{{cardName}}</td>
                 <td class="pl-20 text-center" style="width:200px">{{branchName}}</td>
                 <td class="text-center" style="width:200px">{{collectionType}}</td>
@@ -157,9 +157,9 @@
         </div>
         <div class="modal-body">
           <div class="box box-default box-solid">
-            <!-- <div class="box-header with-border bg-aqua">
+            <div class="box-header with-border bg-aqua">
               <h3 class="box-title">Collection Details</h3>
-            </div> -->
+            </div>
             <table style="width:100%;" class="table table-striped; word-wrap: break-word;">
               <tbody>
                 <tr class="table-border">
@@ -230,7 +230,7 @@
                   <tbody>
                     {{#each cheque}}
                     <tr class="table-border">
-                      <td width="16.6%"><b>ZMW</b>&nbsp;{{priceFormat chequeAmount}}</td>
+                      <td width="16.6%"><b>{{currencyGet}}</b>&nbsp;{{priceFormat chequeAmount}}</td>
                       <td width="16.6%">{{chequeNum}}</td>
                       <td class=" text-center pl-20 hidden-xs hidden-sm" width="16.6%">{{bankCode}}</td>
                       <td class=" text-center pl-20 hidden-xs hidden-sm" width="16.6%">{{accountNum}}</td>
@@ -267,7 +267,7 @@
                   <tbody>
                     {{#each cash}}
                     <tr class="table-border">
-                      <td width="33.3%"><b>ZMW</b>&nbsp;{{priceFormat cashAmount}}</td>
+                      <td width="33.3%"><b>{{currencyGet}}</b>&nbsp;{{priceFormat cashAmount}}</td>
                       <td width="33.3%">{{remarks}}</td>
                       {{#if imageData}}
                       <td width="33.3%" style="cursor:zoom-in"><img src="{{imageData}}" id="{{randomId}}"

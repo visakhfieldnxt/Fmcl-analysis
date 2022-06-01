@@ -1,18 +1,22 @@
 <template name="user">
+  {{#if userCan 'userView'}}
+  {{#with userName}}
   <section class="content-header">
-    <h1>User
-      <small>Listing All User</small>
+    <h1>{{user}}
+      <small>Listing All {{user}}</small>
     </h1>
     <ol class="breadcrumb">
       <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
-      <li class="active">User</li>
+      <li class="active">{{user}}</li>
     </ol>
   </section>
   <section class="content">
 
     <div class="row">
       <div style="float: right;">
-        <button class="btn btn-primary btn-flat" id="ic-create-button">Create User</button>
+        {{#if userCan 'userCreate'}}
+        <button class="btn btn-primary btn-flat" id="ic-create-button">Create new {{user}}</button>
+        {{/if}}
         <button class="btn btn-primary btn-flat" id="filterSearch"><i class="fa fa-search"> </i>&nbsp; Search</button>
       </div>
     </div>
@@ -20,9 +24,9 @@
     <div class="row" id="filterDisplay" style="display:none">
       <div class="box box-default box-solid">
         <div class="box-header with-border bg-aqua">
-          <h3 class="box-title"  style="color: black;">User Filter</h3><button type="button" id="removeSearch"
+          <h3 class="box-title">{{user}} Filter</h3><button type="button" id="removeSearch"
             style="color: white; background-color: transparent; border-color:transparent" class="pull-right"><i
-              class="fa fa-close"  style="color: black;"></i></button>
+              class="fa fa-close"></i></button>
         </div>
         <div class="box-body no-padding">
           <form class="userFilter">
@@ -34,14 +38,16 @@
                 <input type="text" class="form-control validation" placeholder="EMP code" id="empcode" name="empcode">
               </div>
               <div class="col-md-3 col-sx-12 col-sm-12">
-                <label for="Firstname">First Name</label>
-                <input type="text" class="form-control validation" placeholder="First Name" id="firstName" name="firstName">
+                <label for="Firstname">Firstname</label>
+                <input type="text" class="form-control validation" placeholder="Firstname" id="firstName"
+                  name="firstName">
               </div>
 
 
               <div class="col-md-3 col-sx-12 col-sm-12">
                 <label for="EmailId">EmailId</label>
-                <input type="email" class="form-control validation" placeholder="Email Id" id="emailfilter" name="emailfilter">
+                <input type="email" class="form-control validation" placeholder="EmailId" id="emailfilter"
+                  name="emailfilter">
               </div>
               <div class="row" style="float: right">
 
@@ -56,99 +62,103 @@
     </div>
 
     <div class="row">
-      <div class="nav-tabs-custom taskHeader" id="taskHeader">
-        <ul class="nav nav-tabs taskHeaderList" id="taskHeaderList">
-          <li class="active paginationFilterValue activeFilter activeHeaders" id="activeFilter"><a href=""
-              data-toggle="tab">Active</a>
-          </li>
-          <li class="paginationFilterValue inactiveFilter" id="inactiveFilter"><a href="" data-toggle="tab">Inactive</a>
-          </li>
-        </ul>
-        <div class="tab-content" style="padding : 0px !important">
-          <div class="box box-default box-solid">
-            <!-- <div class="box-header with-border bg-aqua">
-              <h3 class="box-title">User</h3>
-            </div> -->
-            {{#if isReady}}
-            <div class="box-body no-padding table-responsive">
-              <table class="table table-striped generic">
-                <tbody>
-                  <tr>
-                    <th class="pl-20 sorted-column" id="name">EMP Code</th>
-                    <th class=" sorted-column">Username</th>
-                    <th class=" sorted-column ">First Name</th>
-                    <th class="">Email Id</th>
-                    <th class="text-center"></th>
-                  </tr>
-                  {{#each userList}}
-                  <tr>
-                    <td class="pl-20 word-wrap" width="15%;">
-                      {{profile.empCode}}
-                    </td>
-                    <td class="word-wrap" width="15%;">
-                      {{username}}
-                    </td>
-                    <td class=" word-wrap" width="15%;">
-                      {{profile.firstName}}
-                    </td>
-                    <td class="word-wrap" width="15%;">
-                      {{#each emails}} <a href="mailto:{{address}}">{{address}}</a>{{/each}}</td>
-                    <td class="text-center" width="15%">
-                      <input type="hidden" id="userName_{{_id}}" value="{{username}}">
-                      <a href="javascript:void(0)" class="edit" title="Click to edit {{username}}" id="{{_id}}">
-                        <button class="pd-20 btn btn-primary"><i class="fa fa-pencil"></i></button>
-                      </a> &nbsp;
-                      {{#if activeHelper active}}
-                      <a href="javascript:void(0)" class="deactivate" title="Click to inactivate {{username}}"
-                        id="{{_id}}">
-                        <button class="pd-20 btn btn-danger"><i class="fa fa-close"></i></button>
-                      </a>&nbsp;
-                      {{/if}}
-                      {{#if inactiveHelper active}}
-                      <a href="javascript:void(0)" class="activate" title="Click to activate {{username}}" id="{{_id}}">
-                        <button class="pd-20 btn btn-success"><i class="fa fa-check"></i></button>
-                      </a> &nbsp;
-                      {{/if}}
-                      <input type="hidden" id="userId" name="userid" value="{{_id}}">
-                      <a href="javascript:void(0)" class="view " title="Click to view details" id="{{_id}}">
-                        <button class="pd-20 btn btn-default"><i class="fa fa-ellipsis-v"></i></button>
-                      </a>
-                    </td>
-                  </tr>
-                  {{/each}}
-                </tbody>
-              </table>
-            </div>
-            {{sortIcon}}
-            {{else}}
-            <div class="overlay">
-              <i class="fa fa-refresh fa-spin"></i>
-            </div>
-            {{/if}}
-          </div>
+      {{#if isReady}}
+      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
+      onClick=clickEvent}}
+      {{/if}}
+      <div class="box box-default box-solid">
+        <div class="box-header with-border bg-aqua">
+          <h3 class="box-title">{{user}}</h3>
         </div>
-
         {{#if isReady}}
-        {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
-        onClick=clickEvent}}
-        {{/if}}
+        <div class="box-body no-padding table-responsive">
+          <table class="table table-striped generic">
+            <tbody>
+              <tr>
+                <th class="pl-20 sorted-column" id="name" style="">EMP Code</th>
+                <th class=" sorted-column hidden-xs hidden-sm" style="">User name</th>
+                <th class=" sorted-column ">First name</th>
+                <th class="">Email Id</th>
+                {{#if userCan 'userUpdate'}} <th class="text-center">Edit</th>{{/if}}
+                {{#if userCan 'userDelete'}} <th class="text-center">Delete</th>{{/if}}
+                <th class="text-center">Details</th>
 
+              </tr>
+              {{#each userList}}
+              <tr>
+                <td class="pl-20 word-wrap" width="15%;">
+
+                  {{profile.empCode}}
+                </td>
+                <td class="word-wrap hidden-xs hidden-sm" width="15%;">
+                  <div class="editable-input  ">
+                    {{username}}
+                  </div>
+                </td>
+                <td class=" word-wrap" width="15%;">
+                  <div class="editable-input word-wrap">
+                    {{> editableText options=optionsHelper field="profile.firstName"}}</div>
+                </td>
+                <td class="word-wrap" width="15%;">
+                  {{#each emails}} <a href="mailto:{{address}}">{{address}}</a>{{/each}}</td>
+                {{#if userCan 'userUpdate'}}
+                <td class="text-center">
+                  <input type="hidden" id="username_{{_id}}" value="{{username}}">
+
+                  <a href="javascript:void(0)" class="edit primary-color" title="Click to edit {{username}}"
+                    id="{{_id}}">
+                    <i class="fa fa-pencil"></i>
+                  </a>
+                </td>
+                {{/if}}
+                {{#if userCan 'userDelete'}}
+                <td class="text-center">
+                  <input type="hidden" id="name_{{_id}}" value="{{username}}">
+                  <a href="javascript:void(0)" class="remove danger-color" title="Click to remove {{username}}"
+                    id="{{_id}}">
+                    <i class="fa fa-close"></i>
+                  </a>
+                </td>
+                {{/if}}
+                <td class="text-center" width="15%">
+                  <input type="hidden" id="userId" name="userid" value="{{_id}}">
+                  <a href="javascript:void(0)" class="view " title="Click to view details" id="{{_id}}">
+                    <button class="pd-20 btn btn-default"><i class="fa fa-ellipsis-v"></i></button>
+                  </a>
+                </td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+        {{sortIcon}}
+        {{else}}
+        <div class="overlay">
+          <i class="fa fa-refresh fa-spin"></i>
+        </div>
+        {{/if}}
       </div>
       {{#if isReady}}
-      <div id="bodySpin">
-      </div>
-      {{else}}
-      <div id="bodySpin" style=" width: 100%;position: 
-          fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
-        {{#with bodyLoader}}
-        <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
-      justify-content: center;background: #f1f1f1;">
-          <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
-        </div>
-        {{/with}}
-      </div>
+      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
+      onClick=clickEvent}}
       {{/if}}
+
     </div>
+    {{#if isReady}}
+    <div id="bodySpin">
+    </div>
+    {{else}}
+    <div id="bodySpin" style=" width: 100%;position: 
+          fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+      justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+    {{/if}}
+
   </section>
 
   <div class="ic-create-modal">
@@ -158,7 +168,7 @@
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Create User</h4>
+            <h4 class="modal-title">Create {{user}}</h4>
           </div>
           <div class="modal-body">
             {{> user_create category=category}}
@@ -172,6 +182,30 @@
   {{> errorModal id="userErrorModal" section=user}}
 
 
+  <div class="modal fade in" id="userDelConfirmation">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="userHeader"></h4>
+        </div>
+        <div class="modal-body">
+          <div id="usersBody">
+            <p class="danger-color">
+              Are you sure to remove {{user}}- '<span id="userNameDup" class="text-bold"></span>' ?
+            </p>
+          </div>
+          <input type="hidden" id="confirmedUuid">
+        </div>
+        <div class="modal-footer">
+          <button id="userRemove" class="btn btn-danger">Yes please!</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal" id="userClose">Not now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="modal fade in" id="userEditPage">
     <div class="modal-dialog">
       <form class="updateUser" autocomplete="off">
@@ -184,12 +218,12 @@
           </div>
           <div class="modal-body">
             <div class="box box-default box-solid">
-              <!-- <div class="box-header with-border bg-aqua">
-                <h3 class="box-title">User Details</h3>
-              </div> -->
+              <div class="box-header with-border bg-aqua">
+                <h3 class="box-title">{{user}} Details</h3>
+              </div>
               <table style="width:100%;">
                 <tr>
-                  <div class="form-group has-feedback">
+                  <div class="form-group has-feedback" style="">
                     <div class="col-sm-6" style="padding: 10px 10px 20px 10px;">
                       <label for="empCode">EMP Code </label>
                       <input type="text" id="empCodenew" class="form-control validation"
@@ -206,7 +240,7 @@
                 </tr>
 
                 <tr>
-                  <div class="form-group has-feedback">
+                  <div class="form-group has-feedback" style="">
                     <div class="col-sm-6" style="padding: 10px 10px 20px 10px;">
                       <label for="lastName">Last Name</label>
                       <input type="text" id="userDetailLastName" class="form-control novalidation"
@@ -228,7 +262,7 @@
                   </div>
                 </tr>
                 <tr>
-                  <div class="form-group has-feedback">
+                  <div class="form-group has-feedback" style="">
 
                     <div class="col-sm-6" style="padding: 10px 10px 20px 10px;">
                       <label for="dateOfBirth">Date Of Birth<span class="asteric_red">*</span></label>
@@ -238,9 +272,10 @@
                         placeholder="Select date of birth . . " name="dateOfBirth" required />
                     </div>
                     <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
-                      <label for="roleName">Select Role<span class="asteric_red">*</span></label>
-                      <select class=" select2Dropdown " style="width:100%;" name="roleName" id="roleIdselect" required>
-                        <option value="">Select Role</option>
+                      <label for="roleName">Select Roles<span class="asteric_red">*</span></label>
+
+                      <select class=" select2Dropdown " style="width:100%;" multiple="multiple" name="roleName"
+                        id="roleIdselect" required>
                         {{# each rolesLists}}
                         <option value="{{_id}}">{{name}}</option>
                         {{/each}}
@@ -250,32 +285,50 @@
                   </div>
                 </tr>
                 <tr>
-                  <div class="form-group has-feedback">
-                    <div class="col-sm-6" style="padding: 10px 10px 20px 10px;">
-                      <label for="contactno">Contact No</label>
-                      <input type="tel" pattern="[0-9]{10}" class="form-control validation" id="userDetailContactNo"
-                        placeholder="Enter Contact No . ." name="contactNo">
+                  <div class="form-group has-feedback" style="">
+
+                    <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                      <label for="roleName">Select SAP Employee<span class="asteric_red">*</span></label>
+
+                      <select class="sapEmployees" multiple style="width:100%;" name="sapEmployees" id="sapEmployees"
+                        required>
+                        {{# each employeeList}}
+                        <option value="{{slpCode}}">{{slpName}}</option>
+                        {{/each}}
+                      </select>
                     </div>
+
+                  </div>
+                </tr>
+                <tr>
+                  <div class="form-group has-feedback" style="">
+
+                    <div class="col-sm-6" style="padding: 10px 10px 20px 10px;">
+                      <label for="contactno">Contact No.<span class="asteric_red">*</span></label>
+                      <input type="tel" pattern="[0-9]{10}" class="form-control validation" id="userDetailContactNo"
+                        placeholder="Enter Contact No . ." name="contactNo" required>
+                    </div>
+                    <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                      <label for="dateOfBirth">Supervisor<span class="asteric_red">*</span></label>
+
+                      <select class="userSelect" style="width:100%;" name="supervisor" id="userSelection" required>
+                        {{# each userLists}}
+                        <option value="{{_id}}">{{profile.firstName}} {{profile.lastName}}</option>
+                        {{/each}}
+                      </select>
+                    </div>
+
+                  </div>
+                </tr>
+
+                <tr>
+                  <div class="form-group has-feedback">
                     <div class="col-sm-6" style="padding: 10px 10px 20px 10px;">
                       <label for="Email">Email Id<span class="asteric_red">*</span></label>
                       <input type="email" class="form-control validation email" id="emails"
                         placeholder="Enter email Id . ." name="email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$"
                         title="Please enter a vaild email address eg: example@example.com" required>
                       <span id="emailspans"> </span>
-                    </div>
-                  </div>
-                </tr>
-                <tr>
-                  <div class="form-group has-feedback">
-                    <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
-                      <label for="user">Vertical<span class="asteric_red">*</span></label>
-                      <select class="verticalEditSelection" style="width:100%;" name="verticalEditSelection"
-                        id="verticalEditSelection" required>
-                        <option value="">Select Vertical</option>
-                        {{#each verticalListEdit}}
-                        <option value="{{_id}}">{{verticalName}}</option>
-                        {{/each}}
-                      </select>
                     </div>
                     <div class="col-sm-6" style="padding: 10px 10px 20px 10px;">
                       <label for="username">Username<span class="asteric_red">*</span></label>
@@ -287,110 +340,80 @@
                 <tr>
                   <td>
                     <div class="form-group has-feedback">
-                      <div class="col-sm-6" style="padding: 10px 10px 20px 10px;">
-                        <label for="password">Password
-                        </label>
-                        <input type="password" class="form-control validation" placeholder="Enter password . ."
-                          id="passwords" name="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
-                          style="padding-right: 0" autocomplete="off">
-                        <span toggle="#passwords" style="position: absolute;top:36px;right: 21px;"
-                          class=" fa fa-fw fa-eye-slash field-icon toggle-passwords"></span>
-                        <span id="passwordspans"></span>
-                        <div class="hint">
-                          Password must be at least 8 characters long and should contain at least a number and an
-                          uppercase letter
-                        </div>
+
+                      <!-- <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+         
+              <select class="branchSelections" style="width:100%;"  multiple="multiple" name="branchss" id="userBranchess" >
+              {{# each branch_lists}}          
+             <option value="{{bPLId}}">{{bPLName}}</option>
+            {{/each}}
+           </select> 
+            </div> -->
+                      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                        <label for="branch">Branch<span class="asteric_red">*</span></label>
+
+                        <select multiple="multiple" class="branchSelections" style="width:100%;" name="branchSelections"
+                          id="usBranchess" required>
+                          {{#each branchLists}}
+                          <option value="{{bPLId}}">{{bPLName}}</option>
+                          {{/each}}
+                        </select>
                       </div>
-                      <div class="col-sm-6" style="padding: 10px 10px 20px 10px;">
-                        <label for="confirmPassword">Confirm Password
-                        </label>
-                        <input type="password" id="confirmPasswords" class="form-control validation"
-                          pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" placeholder="Retype password . ."
-                          name="confirmPassword">
-                        <span id="confirmPasswordspans"></span>
+                      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                        <label for="branch">Default Branch<span class="asteric_red">*</span></label>
+
+                        <select class="selectDefaultBrnchs" style="width:100%;" name="defBrnchs" id="defaultBranchs"
+                          required>
+                          {{# each dbranchLists}}
+                          <option value="{{bPLId}}">{{bPLName}}</option>
+                          {{/each}}
+                        </select>
+
                       </div>
+
                     </div>
                   </td>
                 </tr>
+                <tr>
+                  <div class="form-group has-feedback">
+                    <div class="col-sm-6" style="padding: 10px 10px 20px 10px;">
+                      <label for="password">Password
+                      </label>
+                      <input type="password" class="form-control validation" placeholder="Enter password . ."
+                        id="passwords" name="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+                        style="padding-right: 0" autocomplete="off">
+                      <span toggle="#passwords" style="position: absolute;top:36px;right: 21px;"
+                        class=" fa fa-fw fa-eye-slash field-icon toggle-passwords"></span>
+                      <span id="passwordspans"></span>
+                      <div class="hint">
+                        Password must be at least 8 characters long and should contain at least a number and an
+                        uppercase letter
+                      </div>
+                    </div>
+                    <div class="col-sm-6" style="padding: 10px 10px 20px 10px;">
+                      <label for="confirmPassword">Confirm Password
+                      </label>
+                      <input type="password" id="confirmPasswords" class="form-control validation"
+                        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" placeholder="Retype password . ."
+                        name="confirmPassword">
+                      <span id="confirmPasswordspans"></span>
+                    </div>
 
+                  </div>
+                </tr>
                 <input type="hidden" class="id" name="id">
                 <input type="hidden" class="hiddenemail" name="hiddenemail">
                 <input type="hidden" class="isDeleted" name="isDeleted">
               </table>
             </div>
-            {{#if printLoad}}
-            <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
-            absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
-              {{#with printLoaderImage}}
-              <div class="loader-lg" style="width: 100%;height: 100%;display: 
-              flex; align-items: center;justify-content: center;background: #fff;">
-                <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
-              </div>
-              {{/with}}
-            </div>
-            {{else}}
-            <div class="loadersSpin">
-            </div>
-            {{/if}}
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default closen pull-left" data-dismiss="modal"
               id="categoryClose">Close</button>
-            <button type="submit" class="btn btn-primary">Update User </button>
+            <button type="submit" class="btn btn-primary">Update {{user}} </button>
           </div>
         </div>
       </form>
-    </div>
-  </div>
-
-
-  <div class="modal fade in" id="userDelConfirmation">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">×</span></button>
-          <h4 class="modal-title text-bold" id="userHeader"></h4>
-        </div>
-        <div class="modal-body">
-          <div id="usersBody">
-            <p class="danger-color">
-              Are you sure to inactivate User- '<span id="userNameDup" class="text-bold"></span>' ?
-            </p>
-          </div>
-          <input type="hidden" id="confirmedUuid">
-        </div>
-        <div class="modal-footer">
-          <button id="userRemove" class="btn btn-danger">Yes please!</button>
-          <button type="button" class="btn btn-default" data-dismiss="modal" id="userClose">Not
-            now</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal fade in" id="userActiveConfirmation">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">×</span></button>
-          <h4 class="modal-title text-bold" id="userHeaders"></h4>
-        </div>
-        <div class="modal-body">
-          <div id="usersBody">
-            <p class="success-color">
-              Are you sure to activate User- '<span id="userNameDups" class="text-bold"></span>' ?
-            </p>
-          </div>
-          <input type="hidden" id="confirmedUuids">
-        </div>
-        <div class="modal-footer">
-          <button id="userActivate" class="btn btn-success">Yes please!</button>
-          <button type="button" class="btn btn-default" data-dismiss="modal" id="userClose">Not
-            now</button>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -404,9 +427,9 @@
         </div>
         <div class="modal-body">
           <div class="box box-default box-solid">
-            <!-- <div class="box-header with-border bg-aqua">
-              <h3 class="box-title">User Details</h3>
-            </div> -->
+            <div class="box-header with-border bg-aqua">
+              <h3 class="box-title">{{user}} Details</h3>
+            </div>
             <table style="width:100%;" class="table table-striped">
               <tbody>
                 <tr class="table-border">
@@ -414,66 +437,84 @@
                     <label for="Employee ">Employee Code </label>
                     <div id="detailEMPCode"></div>
                   </td>
+
+                </tr>
+                <tr class="table-border">
                   <td width="50%">
                     <label for="Employee ">Firstname </label>
                     <div id="detailFirstName"></div>
                   </td>
-                </tr>
-                <tr class="table-border">
                   <td width="50%">
                     <label for="firstName">Lastname </label>
                     <div id="detailLastName"></div>
                   </td>
+                </tr>
+                <tr class="table-border">
                   <td>
                     <label for="Employee ">Gender</label>
                     <div id="detailGender"></div>
                   </td>
-                </tr>
-                <tr class="table-border">
                   <td>
                     <label for="firstName">Date Of Birth</label>
                     <div id="detailDateOfBirth"></div>
                   </td>
+                </tr>
+
+                <tr class="table-border">
                   <td>
                     <label for="Employee ">Username</label>
                     <div id="detailUsername"></div>
                   </td>
-                </tr>
-                <tr class="table-border">
                   <td>
                     <label for="Employee ">Email Id</label>
                     <div id="detailEmailId"></div>
                   </td>
+
+                </tr>
+                <tr class="table-border">
                   <td>
                     <label for="Employee ">Role </label>
                     <div id="detailRole"></div>
                   </td>
-                </tr>
-                <tr class="table-border">
+
                   <td>
-                    <label for="Employee ">Vertical</label>
-                    <div id="verticalDetails"></div>
-                  </td>  
+                    <label for="Employee ">Branch </label>
+                    <div id="brnch"></div>
+                  </td>
+                </tr>
+
+                <tr class="table-border">
+                  <!-- <td>
+                    <label for="firstName">Company Name </label>
+                    <div id="company"></div>
+                  </td> -->
+                  <td>
+                    <label for="firstName">SAP Employee </label>
+                    <div id="detailSapEmp"></div>
+                  </td>
                   <td>
                     <label for="firstName">Contact Number</label>
                     <div id="contactNum"></div>
                   </td>
                 </tr>
+
+
+
               </tbody>
             </table>
           </div>
           {{#if printLoad}}
+          <div class="loadersSpin">
+          </div>
+          {{else}}
           <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
-          absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+        absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
             {{#with printLoaderImage}}
             <div class="loader-lg" style="width: 100%;height: 100%;display: 
-            flex; align-items: center;justify-content: center;background: #fff;">
+          flex; align-items: center;justify-content: center;background: #fff;">
               <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
             </div>
             {{/with}}
-          </div>
-          {{else}}
-          <div class="loadersSpin">
           </div>
           {{/if}}
         </div>
@@ -483,4 +524,6 @@
       </div>
     </div>
   </div>
+  {{/with}}
+  {{/if}}
 </template>

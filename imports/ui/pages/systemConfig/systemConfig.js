@@ -21,7 +21,8 @@ Template.systemConfig.onCreated(function () {
         { name: { $eq: 'emailTime' } },
         { name: { $eq: 'dbId' } },
         { name: { $eq: 'currency' } },
-        { name: { $eq: 'vansaleAppVersion' } },
+        { name: { $eq: 'boundaryLat' } },
+        { name: { $eq: 'boundaryLng' } },
         { view: true },
         // { name: { $ne: 'modalLoader' } },
         // { name: { $ne: 'loader' } },
@@ -36,41 +37,8 @@ Template.systemConfig.onCreated(function () {
     self.subscribe("config.list");
   });
   this.userDetails = new ReactiveVar();
-  this.vansaleUsersList = new ReactiveVar();
-  this.stockIdList = new ReactiveVar();
 });
-Template.systemConfig.onRendered(function () {
 
-
-  $('.selectVanUsers').select2({
-    placeholder: "Select User",
-    tokenSeparators: [','],
-    allowClear: true,
-    dropdownParent: $(".selectVanUsers").parent(),
-  });
-
-  $('.selectReturnId').select2({
-    placeholder: "Select Return Id",
-    tokenSeparators: [','],
-    allowClear: true,
-    dropdownParent: $(".selectReturnId").parent(),
-  });
-
-
-
-
-
-  Meteor.call('user.vansaleGet', (err, res) => {
-    if (!err) {
-      this.vansaleUsersList.set(res);
-    }
-  });
-  Meteor.call('stockReturn.pendingList', (err, res) => {
-    if (!err) {
-      this.stockIdList.set(res);
-    }
-  });
-});
 Template.systemConfig.helpers({
 
   /**
@@ -90,16 +58,7 @@ Template.systemConfig.helpers({
     config.textarea = true;
     return config;
   },
-  stockReturnIdList: () => {
-    return Template.instance().stockIdList.get();
-  },
-  /**
-     * TODO:COmplete Js doc
-     * Getting specific customers base on type
-     */
-  vanUserArray: function () {
-    return Template.instance().vansaleUsersList.get();
-  },
+
   /**
    * TODO: Complete JS doc
    * @returns {any | *}
@@ -256,54 +215,5 @@ Template.systemConfig.events({
     // console.log("date",itemPriceDate);
     Meteor.call('itemGetPrice.dateWiseSync', itemPriceDate);
     $(".itemPriceDate").val('');
-  },
-
-  'click .resetSyn': (event, template) => {
-    event.preventDefault();
-    $(".selectVanUsers").val('').trigger('change');
-  },
-  'click .resetRtn': (event, template) => {
-    event.preventDefault();
-    $(".selectReturnId").val('').trigger('change');
-  },
-
-  'submit .submitForceFullyLogOut': (event) => {
-    event.preventDefault();
-    let userVal = $(".selectVanUsers").val();
-    Meteor.call('user.clearToken', userVal, (err, res) => {
-      if (!err) {
-        toastr['success']('Forcefully logout successfully');
-      }
-      else {
-        toastr['error'](err);
-      }
-    });
-    $(".selectVanUsers").val('').trigger('change');
-  },
-
-  'submit .cancelStockReturn': (event) => {
-    event.preventDefault();
-    let userVal = $(".selectReturnId").val();
-    Meteor.call('stockReturn.cancel', userVal, (err, res) => {
-      if (!err) {
-        toastr['success']('Stock Return Cancelled successfully');
-      }
-      else {
-        toastr['error'](err);
-      }
-    });
-    $(".selectReturnId").val('').trigger('change');
-  },
-
-  'submit .clearNegativeStock': (event) => {
-    event.preventDefault();
-    Meteor.call('warehouseStock.clearStock', (err, res) => {
-      if (!err) {
-        toastr['success']('Stock cleared successfully');
-      }
-      else {
-        toastr['error'](err);
-      }
-    });
   },
 });

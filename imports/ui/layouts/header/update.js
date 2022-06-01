@@ -2,25 +2,7 @@
  * @author Subrata
  */
 
-import { Meteor } from 'meteor/meteor';
-
-Template.update_profile.onCreated(function () {
-  Blaze._allowJavascriptUrls();
-  let self = this;
-  self.autorun(() => {
-  });
-  this.rolesList = new ReactiveVar();
-});
-
-Template.update_profile.onRendered(function () {
-
-  Meteor.call("roles.rolesListGet", (err, res) => {
-    if (!err) {
-      this.rolesList.set(res);
-    }
-  }
-  )
-});
+import {  Meteor} from 'meteor/meteor';
 
 Template.update_profile.helpers({
   user: function () {
@@ -28,24 +10,20 @@ Template.update_profile.helpers({
   },
   // role: function(){
   // return Meteor.roles.find({_id:Meteor.user().roleId}).fetch();
-
+  
   // },
   date: function () {
     return new Date();
   },
-  roleNameGet: (roles) => {
-    let roleArray = [];
-    let roleDetailsGet = Template.instance().rolesList.get();
-    if (roleDetailsGet) {
-      for (let i = 0; i < roles.length; i++) {
-        let res = roleDetailsGet.find(x => x._id === roles[i]);
-        if (res) {
-          roleArray.push(res.name);
-        }
-      }
-      return roleArray.toString();
+  userTypes: function () {
+    let userType = Meteor.user().userType;
+    if(userType === 'V'){
+      return true;
     }
-  }, 
+    else{
+      return false;
+    }
+  },
 });
 
 Template.update_profile.events({
@@ -56,11 +34,11 @@ Template.update_profile.events({
    */
   "change .file-upload-input": function (event) {
 
-    let ext = $('.file-upload-input').val().split('.').pop().toLowerCase();
-    if ($.inArray(ext.toLowerCase(), ['gif', 'png', 'jpg', 'jpeg']) === -1) {
-      $("#info_upload").css('display', 'block');
+    let ext = $('.file-upload-input').val().split('.').pop().toLowerCase();    
+    if ($.inArray(ext.toLowerCase(), ['gif', 'png', 'jpg', 'jpeg']) === -1) {          
+      $("#info_upload").css('display','block');
       setTimeout(function () {
-        $("#info_upload").css('display', 'none');
+        $("#info_upload").css('display','none');
       }, 5000);
     } else {
       let file = event.currentTarget.files[0];
@@ -80,7 +58,7 @@ Template.update_profile.events({
       }, 200);
     }
   },
-
+  
   /**
    * TODO: Complete JS doc
    * @param event
@@ -89,10 +67,10 @@ Template.update_profile.events({
     event.preventDefault();
     $('.buttonDisabled').prop('disabled', false);
   },
-  /**
-  * TODO:Complete JS doc
-  */
-  'click .toggle-password': () => {
+   /**
+   * TODO:Complete JS doc
+   */
+  'click .toggle-password' :()=>{
     $('.toggle-password').toggleClass("fa-eye fa-eye-slash");
     let input = $($('.toggle-password').attr("toggle"));
     if (input.attr("type") === "password") {
@@ -101,40 +79,40 @@ Template.update_profile.events({
       input.attr("type", "password");
     }
   },
-  /**
-  * TODO:Complete JS doc
-  */
-  'focus #password': () => {
+   /**
+   * TODO:Complete JS doc
+   */
+  'focus #password':()=>{
     $('div.hint').show();
-    $(document).bind('focusin.hint click.hint', function (e) {
+    $(document).bind('focusin.hint click.hint',function(e) {
       if ($(e.target).closest('.hint, #password').length) return;
-      $(document).unbind('.hint');
-      $('div.hint').fadeOut('medium');
+       $(document).unbind('.hint');
+        $('div.hint').fadeOut('medium');
     });
   },
-  /**
-  * TODO:Complete JS doc
-  */
-  'blur #password': () => {
+   /**
+   * TODO:Complete JS doc
+   */
+  'blur #password':()=>{
     $('div.hint').hide()
     let passwordReg = /^((?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,})?$/;
     let passwordaddress = $("#password").val();
-    if (!passwordReg.test(passwordaddress))
-      $("#passwordspan").html('<font color="#fc5f5f" size="2">Please enter valid password</font>');
-
+    if(!passwordReg.test(passwordaddress))
+       $("#passwordspan").html('<font color="#fc5f5f" size="2">Please enter valid password</font>');
+ 
     else
-      $("#passwordspan").html('<font color="#fc5f5f"></font>');
+       $("#passwordspan").html('<font color="#fc5f5f"></font>');
   },
   /**
    * TODO:Complete JS doc
    */
-  'blur #confirmpassword': () => {
+  'blur #confirmpassword':()=>{
     var pass = $("#password").val();
-    var confirmpass = $("#confirmpassword").val();
-    if (confirmpass != pass) {
+    var confirmpass =$("#confirmpassword").val();
+    if(confirmpass != pass){
       $("#confirmpasswordspan").html('<font color="#fc5f5f" size="2">Those passwords didn&apos;t match. Try again !</font>');
 
-    } else {
+    }else{
       $("#confirmpasswordspan").html('<font color="#fc5f5f"></font>');
 
     }
@@ -151,8 +129,8 @@ Template.update_profile.events({
     let image = $('#profileImage');
     let data = $(image).cropper('getCroppedCanvas').toDataURL();
     Meteor.call('user.profileImage.update', Meteor.user()._id, data, (error) => {
-      if (error) {
-      } else {
+      if (error) {       
+      } else {     
         $(image).cropper('destroy');
       }
     })
@@ -170,7 +148,7 @@ Template.update_profile.events({
     event.preventDefault();
     let data = '';
     Meteor.call('user.profileImage.update', Meteor.user()._id, data, (error) => {
-      if (error) {
+      if (error) {      
       } else {
         $('#removeImageModal').modal('hide');
       }
@@ -186,11 +164,11 @@ Template.update_profile.events({
     $(image).attr('src', getProfileImage());
     $(image).cropper('destroy');
   },
-
-  /**
-    * TODO: Complete JS doc
-    * @param event
-    */
+ 
+ /**
+   * TODO: Complete JS doc
+   * @param event
+   */
   "submit .update_profile": function (event) {
     event.preventDefault();
     updateLoginUser(event.target);
@@ -203,19 +181,19 @@ Template.update_profile.events({
     event.preventDefault();
     updateLoginVansaleUser(event.target);
   },
-  /**
-  * TODO: Complete JS doc
-  * @param event
-  */
+   /**
+   * TODO: Complete JS doc
+   * @param event
+   */
   "submit .change_password": function (event) {
     event.preventDefault();
     changePassword(event.target);
   },
 });
-/**
-  * TODO: Complete JS doc
-  * @returns {*}
-  */
+ /**
+   * TODO: Complete JS doc
+   * @returns {*}
+   */
 Template.registerHelper('profileImage', () => {
   return getProfileImage();
 });
