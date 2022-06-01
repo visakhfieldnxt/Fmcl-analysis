@@ -1,0 +1,322 @@
+<template name="approveOrder">
+  {{#if userCan 'orderApprove'}}
+  <section class="content-header">
+    <h1>Approved Order
+      <small>Listing All Approved Order</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
+      <li class="active">Approved Order</li>
+    </ol>
+  </section>
+  <section class="content">
+
+    <div class="row">
+      <div style="float: right;">
+        <button class="btn btn-primary btn-flat" id="filterSearch"><i class="fa fa-search"> </i>&nbsp; Search</button>
+      </div>
+    </div>
+
+    <div class="row" id="filterDisplay" style="display:none">
+      <div class="box box-default box-solid">
+        <div class="box-header with-border bg-aqua">
+          <!-- <h3 class="box-title">{{user}} Filter</h3> -->
+          <button type="button" id="removeSearch"
+            style="color: white; background-color: transparent; border-color:transparent" class="pull-right"><i
+              class="fa fa-close"  style="color: black;"></i></button>
+        </div>
+        <div class="box-body no-padding">
+          <form class="order-filter">
+            <div class="row">
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EMPcode">Vertical Name</label><br>
+                <select value='' name="selectVertical" style="width:100% !important" id="selectVertical"
+                  class="selectVertical1" placeholder="Select Card Name">
+                  <option disabled selected value=''>Select Vertical Name</option>
+                  {{# each verticalLists}}
+                  <option value="{{_id}}">{{verticalName}}</option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EMPcode">Route Name</label><br>
+                <select value='' name="routenameSelect" style="width:100% !important" id="routenameSelect"
+                  class="routenameSelect1" placeholder="Select Card Name">
+                  <option disabled selected value=''>Select Route Name</option>
+                  {{# each routeLists}}
+                  <option value="{{_id}}">{{routeName}}</option>
+                  {{/each}}
+                </select>
+              </div>
+               <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EMPcode">Outlet</label><br>
+                <select value='' name="outletName" style="width:100% !important" id="outletName"
+                  class="outletName" placeholder="Select Outlet">
+                  <option disabled selected value=''>Select Outlet</option>
+                  {{# each outletList}}
+                  <option value="{{_id}}">{{name}}</option>
+                  {{/each}}
+                </select>
+              </div>
+               <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EMPcode">Select Employee</label><br>
+                <select value='' name="userNameClass" style="width:100% !important" id="selectSDName"
+                  class="selectSDName" placeholder="Select Employee">
+                  <option disabled selected value=''>Select Employee</option>
+                  {{# each userList}}
+                  <option value="{{_id}}">{{profile.firstName}}</option>
+                  {{/each}}
+                </select>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                 <label for="EmailId">From Date</label>
+                 <input type="text" autocomplete="off" class="form-control datepicker date validation"
+                   data-date-autoclose="true" onkeydown="event.preventDefault()" id="fromDate" data-provide="datepicker"
+                   data-date-format="dd-mm-yyyy" placeholder="From Date " name="fromDate" />
+                   <span id="itemArrayspan"></span>
+               </div>
+                <div class="col-md-3 col-sx-12 col-sm-12">
+                 <label for="EmailId">To Date</label>
+                 <input type="text" autocomplete="off" class="form-control datepicker date validation"
+                   data-date-autoclose="true" onkeydown="event.preventDefault()" id="toDate" data-provide="datepicker"
+                   data-date-format="dd-mm-yyyy" placeholder="To Date " name="toDate" />
+               </div>
+              <div class="row" style="float: right">
+
+                <button type="submit" name="filter" class="btn btn-primary">Filter</button>
+                <button type="button" name="reset" class="btn btn-info reset">Reset Filter</button>
+
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+
+      <div class="box box-default box-solid">
+        {{#if isReady}}
+        <div class="box-body no-padding table-responsive">
+          <table class="table table-striped generic">
+            <tbody>
+              <tr>
+                <th class="text-center sorted-column">Order Id</th>
+                <th class="text-center sorted-column" id="name">Employee Name</th>
+                <th class="text-center sorted-column">Vertical</th>
+                <th class="text-center sorted-column">Outlet</th>
+                <th class="text-center sorted-column">Order Date</th>
+                <th class="text-center sorted-column">Total Amount</th>
+                <th class="text-center sorted-column"></th>
+              </tr>
+              {{#each orders}}
+              <tr>
+                <td class="pl-20 text-center" width="15%">{{docNum}}</td>
+                <td class="pl-20 text-center sdUserVal_{{sdUser}}" width="15%">{{sdUserHelp sdUser}}</td>
+                <td class="text-center verticalVal_{{vertical}}" width="15%">{{verticalHelp vertical}}</td>
+                <td class="text-center outletVal_{{outlet}}" width="15%">{{outletHelp outlet}}</td>
+                <td class="text-center" width="10%">{{date1 createdAt}}</td>
+                <td class="text-center" width="10%">GHS {{priceFormat docTotal}}</td>
+                <td class="text-center" width="20%">
+
+                  <input type="hidden" id="userId" name="userid" value=" ">
+
+                  <a href="javascript:void(0)" class="view" title="Click to view details" id="{{_id}}">
+                    <button class="pd-20 btn btn-default"><i class="fa fa-ellipsis-v"></i></button>
+                  </a>
+
+                </td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+        {{sortIcon}}
+        {{else}}
+        <div class="overlay">
+          <i class="fa fa-refresh fa-spin"></i>
+        </div>
+        {{/if}}
+      </div>
+      {{#if isReady}}
+      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
+      onClick=clickEvent}}
+      {{/if}}
+    </div>
+    {{#if isReady}}
+    <div id="bodySpin">
+    </div>
+    {{else}}
+    <div id="bodySpin" style=" width: 100%;position: 
+          fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+      justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+    {{/if}}
+    <div id="loadersSpinVals" style=" width: 100%;position: 
+    fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+
+  </section>
+  {{> successModal id="orderSuccessModal" section=order}}
+  {{> errorModal id="orderErrorModal" section=order}}
+  <div class="modal fade in" id="orderDetailPage">
+    <div class="modal-dialog">
+      <form class="statusUpdate" autocomplete="off">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span></button>
+            <h4 class="modal-title text-bold" id="orderH"></h4>
+          </div>
+          <div class="modal-body">
+            <div class="box box-default box-solid">
+              <table style="width:100%;" class="table table-striped">
+                <tbody>
+                  <tr class="table-border">
+                    <td width="50%">
+                      <label for="Employee ">Employee Name </label>
+                      <div id="sdUser" name="sdUser"></div>
+                      <input type="hidden" name="sdUserid" id="sdUserid">
+                      <input type="hidden" name="outletid" id="outletid">
+                    </td>
+                    <td width="50%">
+                      <label for="Employee ">Vertical </label>
+                      <div id="vertical" name="vertical"></div>
+                    </td>
+                  </tr>
+                  <tr class="table-border">
+                    <td width="50%">
+                      <label for="Employee ">Outlet </label>
+                      <div id="outlet" name="outlet"></div>
+                    </td>
+                    <td width="50%">
+                      <label for="Employee ">Order Date</label>
+                      <div id="createdAt" name="createdAt"></div>
+                    </td>
+                  </tr>
+                  <tr class="table-border">
+                    <td width="50%">
+                      <label for="Employee ">Route </label>
+                      <div id="route" name="route"></div>
+                    </td>
+                    <td width="50%">
+                      <label for="Employee ">Order Id</label>
+                      <div id="detailOrderId" name="detailOrderId"></div>
+                    </td>
+                  </tr>
+                  <tr class="table-border">
+                    <td width="50%">
+                      <label for="Employee ">Approved Date</label>
+                      <div id="approvedDate" name="approvedDate"></div>
+                    </td>
+                    <td width="50%">
+                      <label for="Employee ">Approval Remarks</label>
+                      <div id="detailRemarks" name="detailRemarks" style="word-wrap: break-word;"></div>
+                    </td>
+                  </tr>
+                  <tr>
+                  </tr>
+                </tbody>
+              </table>
+              {{#with items}}
+              <span style="padding-left: 10px;"><label for="Employee " style="padding-top: 10px;">Item
+                  List</label></span>
+              <div id="detailUsername" class="table-responsive">
+                <div class="row ">
+                  <table style="width:100%;margin-bottom:0;table-layout: fixed" class="table table-striped with-border">
+                    <thead>
+                      <tr>
+                        <th width="100px">Sl No. </th>
+                        <th width="200px">Product</th>
+                        <th width="100px">Unit</th>
+                        <th width="100px">Unit Price</th>
+                        <th width="100px">Quantity</th>
+                        <th width="100px">Tax Amount</th>
+                        <th width="100px"> Total Amount </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {{#each items}}
+                      <tr>
+                        <td>{{incremented @index}}</td>
+                        <td class="productVal_{{product}}" style="word-wrap: break-word;">
+                          {{getproductHelp product}}
+                        </td>
+                        <td class="unitVal_{{unit}}">{{getunitHelp unit}}</td>
+                        <td>{{priceFormat unitPrice}}</td>
+                        <td>{{quantity}}</td>
+                        <td>{{priceFormat taxtAmount}}</td>
+                        <td>{{priceFormat grossTotal}}</td>
+                      </tr>
+                      {{/each}}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              {{/with}}
+              <div class="row">
+                <div class="col-sm-7 pull-right">
+                  <table>
+                    <tr>
+                      <td class="pull-right">Tax Amount[GHS] : </td>
+                      <td style="text-align: right;font-weight: bold;" id="taxAmount"></td>
+                    </tr>
+                    <tr>
+                      <td class="pull-right">Discount[GHS] : </td>
+                      <td style="text-align: right;font-weight: bold;" id="discountAmtData"></td>
+                    </tr>
+                    <tr>
+                      <td class="pull-right">Grand Total[GHS] :</td>
+                      <td style="text-align: right;font-weight: bold; width: 60%;" id="totalAmt">
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+            {{#if printLoad}}
+            <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+          absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+              {{#with printLoaderImage}}
+              <div class="loader-lg" style="width: 100%;height: 100%;display: 
+            flex; align-items: center;justify-content: center;background: #fff;">
+                <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+              </div>
+              {{/with}}
+            </div>
+            {{else}}
+            <div class="loadersSpin">
+            </div>
+            {{/if}} 
+            <div id="loadersSpinItems" style=" width: 98%;opacity: 0.9;position: 
+            absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+                {{#with printLoaderImage}}
+                <div class="loader-lg" style="width: 100%;height: 100%;display: 
+              flex; align-items: center;justify-content: center;background: #fff;">
+                  <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+                </div>
+                {{/with}}
+              </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default closen pull-right" data-dismiss="modal">Close</button>
+            <!-- <button type="submit" class="btn btn-primary pull-right orderApprovalBtn">Submit</button> -->
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  {{/if}}
+</template>

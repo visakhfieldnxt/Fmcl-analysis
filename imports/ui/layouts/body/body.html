@@ -1,0 +1,36 @@
+<template name="main">
+  {{#if currentUser}}
+  <div class="wrapper">
+    {{> header}}
+    {{> menu}}
+    <div class="content-wrapper">
+      {{> Template.dynamic template=name}}
+    </div>
+    {{> footer}}
+  </div>
+  {{else}}
+  <div class="wrapper">
+    {{> Template.dynamic template=name}}
+    <div class="login_footer">
+      {{> footer }}
+    </div>
+  </div>
+  {{/if}}
+
+  {{#if currentUser}}
+  {{#if connTest}}
+  <div id="bodySpins">
+  </div>
+  {{else}}
+  <div id="bodySpins" style=" width: 100%;position: 
+    fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+    {{#with connectionLoad}}
+    <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+      justify-content: center;background: #F8F8F6;">
+      <img src="{{connectionLoaderImg}}" class="mainLoaders" style="width: 450px;"></div>
+    {{/with}}
+  </div>
+  {{/if}}
+  {{/if}}
+
+</template>

@@ -1,0 +1,54 @@
+<template name="delivery_create">
+   <!-- {{#if userCan 'deliveryCreate'}} -->
+  <form autocomplete="off" class="delivery-add" >
+    <div class="box box-default box-solid">
+      <!-- <div class="box-header with-border bg-aqua">
+        <h3 class="box-title headtit">delivery</h3>
+      </div> -->
+      <table style="width:100%;" class="table table-striped table-responsive">
+        <tr>
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-6" style="padding: 10px 10px 20px 10px;">
+                <label for="lastName">delivery Code <span class="asteric_red">*</span></label>
+                  <input type="text" class="form-control validation" placeholder="Enter delivery code" name="deliveryCode" required id="deliveryCode">
+                 </div>
+              <div class="col-sm-6" style="padding: 10px 10px 20px 10px;">
+                <label for="lastName">delivery Name <span class="asteric_red">*</span></label>
+                 <input type="text" class="form-control validation" placeholder="Enter delivery name" name="deliveryName" required  id="deliveryName">
+                </div>
+                <div class="col-sm-6" style="padding: 10px 10px 20px 10px;">
+                  <label for="lastName">delivery Percentage <span class="asteric_red">*</span></label>
+                  <input type="text" class="form-control validation" placeholder="Enter delivery Percentage"  name="deliveryPrec" required id="deliveryPrec">
+                  <input type="hidden" id="deliveryid" name="deliverynameid">
+                  <span id="deliveryArrayspan"></span>
+                 </div>
+                </div>
+          </td>
+        </tr>
+        <tr>
+          <div class="col-sm-12" style="padding:20px 10px">
+          </div>
+        </tr>
+      </table>
+    </div>
+    {{#if printLoad}}
+            <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+            absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+              {{#with printLoaderImage}}
+              <div class="loader-lg" style="width: 100%;height: 100%;display: 
+              flex; align-items: center;justify-content: center;background: #fff;">
+                <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+              </div>
+              {{/with}}
+            </div>
+            {{else}}
+            <div class="loadersSpin">
+            </div>
+            {{/if}}
+    <button type="submit" name="submit" id="submit" class="btn btn-primary pull-right saveapp">Save</button>
+    <button type="button" class="btn btn-default closeOrder" data-dismiss="modal">Close</button>
+  </form>
+  <!-- {{/if}} -->
+</template>
+

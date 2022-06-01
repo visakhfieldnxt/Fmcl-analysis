@@ -1,0 +1,415 @@
+<template name="sdPrice">
+  {{#if userCan 'sdPriceListView'}}
+  <section class="content-header">
+    <h1> Price List
+      <small>Listing All Prices</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
+      <li class="active"> Price List</li>
+    </ol>
+  </section>
+  <section class="content">
+
+    <div class="row">
+      <div style="float: right;">
+        <!-- <button class="btn btn-primary btn-flat" id="fileUploadprice">Upload</button> -->
+        <!--  {{#if userCan 'priceCreate'}}
+        <button class="btn btn-primary btn-flat" id="ic-create-price-button">Create Price</button>
+        {{/if}} -->
+        <button class="btn btn-primary btn-flat" id="filterSearch"><i class="fa fa-search"> </i>&nbsp; Search</button>
+      </div>
+    </div>
+    <div class="row" id="filterDisplay" style="display:none">
+      <div class="box box-default box-solid">
+        <div class="box-header with-border bg-aqua">
+          <h3 class="box-title">Price Filter</h3><button type="button" id="removeSearch"
+            style="color: white; background-color: transparent; border-color:transparent" class="pull-right"><i
+              class="fa fa-close"></i></button>
+        </div>
+        <div class="box-body no-padding">
+          <form class="priceFilter">
+            <div class="row">
+              <div class="col-sm-4" style="padding: 10px 10px 10px 10px;">
+                <label for="price">Select Vertical</label>
+                <select class="getVerticalIds" style="width:100%;" name="getVerticalIds" id="getVerticalIds">
+                  <option selected value=''>Select Vertical</option>
+                  {{# each getVertical}}
+                  <option value="{{_id}}">{{verticalName}}</option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="col-sm-4" style="padding: 10px 10px 10px 10px;">
+                <label for="price">Select Product</label>
+                <select class="getProductIds" style="width:100%;" name="getProductIds" id="getProductIds">
+                  <option selected value=''>Select Product</option>
+                  {{# each getProduct}}
+                  <option value="{{_id}}">{{product}}</option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="col-sm-4" style="padding: 10px 10px 10px 10px;">
+                <label for="price">Select Type</label>
+                <select class="getTypeIds" style="width:100%;" name="getTypeIds" id="getTypeIds">
+                  <option selected value=''>Select Type</option>
+                  {{# each getType}}
+                  <option value="{{_id}}">{{priceTypeName}}</option>
+                  {{/each}}
+                </select>
+              </div>
+
+              <div class="row" style="float: right">
+                <button type="submit" name="filter" class="btn btn-primary">Filter</button>
+                <button type="button" name="reset" class="btn btn-info reset">Reset Filter</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="box box-default box-solid">
+        <div class="box-body no-padding table-responsive">
+          <table class="table table-striped generic">
+            <tbody>
+              {{# if lenthCheck priceList}}
+              <tr>
+                <th class="sorted-column text-center">Product</th>
+                <th class="text-center sorted-column">Price Type</th>
+                <th class="text-center sorted-column">Unit</th>
+                <th class="text-center sorted-column">VSR Price</th>
+                <th class="text-center sorted-column">OMR Price</th>
+                <th class="text-center sorted-column">WS Exe Price</th>
+                <th class="text-center sorted-column"> Status</th>
+              </tr>
+              {{#each priceList}}
+              <tr>
+                <td class="text-center sorted-column" style="word-wrap:break-word;" width="25%">
+                  {{product}}</td>
+                <td class="text-center sorted-column " width="10%">{{priceType}}</td>
+                
+                <td class="text-center sorted-column" width="10%">{{unit}}</td>
+                <td class="text-center sorted-column" width="10%">{{priceFormat priceVsr}}</td>
+                <td class="text-center sorted-column" width="10%">{{priceFormat priceOmr}}</td>
+                <td class="text-center sorted-column" width="10%">{{priceFormat priceWs}}</td>
+                <td class="text-center sorted-column" width="10%">{{statusCheck active}}</td>
+              </tr>
+              {{/each}}
+              {{else}}
+              <tr>
+                <td class="sorted-column text-center" width="15%">
+                  <span style="font-weight: bold; text-align: center;">No Records Found</span>
+                </td>
+              </tr>
+              {{/if}}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {{#if printLoad}}
+    <div id="bodySpin" style=" width: 100%;position: 
+    fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+    {{else}}
+    <div id="bodySpin">
+    </div>
+    {{/if}}
+  </section>
+
+  <div class="ic-create-price-modal">
+    <div class="modal" id="ic-create-price">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Create Price</h4>
+          </div>
+          <div class="modal-body">
+            {{> price_create price=price}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {{> successModal id="priceSuccessModal" section=price}}
+  {{> errorModal id="priceErrorModal" section=price}}
+
+
+  <div class="modal fade in" id="priceUploadConfirmation">
+    <div class="modal-dialog">
+      <form id="uploadprice" autocomplete="off">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span></button>
+            <h4 class="modal-title text-bold" id="priceUploadHeader"></h4>
+          </div>
+          <div class="modal-body">
+            <div id="pricesBody">
+              <div class="fileupload fileupload-new" data-provides="fileupload" style="text-align:center">
+                <span class="btn btn-file btn-default">
+                  <span class="fileupload-exists">{{#if labelName}}
+                    {{labelName}}
+                    {{else}}
+                    Upload File
+                    {{/if}}</span>
+                  <input name="uploadpriceFile" class="file-upload-input uploadpriceFile" id="uploadpriceFile"
+                    method="post" type="file" style="width: 0%;height: 0%; margin-top: 0px;" required />
+                </span>
+                <span class="text-center" id="fileArrayspan"></span>
+              </div>
+              <br>
+              <p class="">
+                Are you sure to upload Price .?<span id="priceUploadNameDup" class="text-bold"></span>
+              </p>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" title="Download format" id="downloadprice"
+              class="btn btn-primary pull-left">Format</button>
+            <button type="submit" class="btn btn-success">Yes please!</button>
+            <button type="button" class="btn btn-danger" data-dismiss="modal" id="priceFileClose">Not
+              now</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal fade in" id="priceDelConfirmation">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="priceHeader"></h4>
+        </div>
+        <div class="modal-body">
+          <div id="pricesBody">
+            <p class="danger-color">
+              Are you sure to inactivate Price- '<span id="priceNameDup" class="text-bold"></span>' ?
+            </p>
+          </div>
+          <input type="hidden" id="confirmedUuid">
+        </div>
+        <div class="modal-footer">
+          <button id="priceRemove" class="btn btn-danger">Yes please!</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal" id="priceClose">Not
+            now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade in" id="priceActiveConfirmation">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="priceHeaders"></h4>
+        </div>
+        <div class="modal-body">
+          <div id="pricesBody">
+            <p class="success-color">
+              Are you sure to activate Price- '<span id="priceNameDups" class="text-bold"></span>' ?
+            </p>
+          </div>
+          <input type="hidden" id="confirmedUuids">
+        </div>
+        <div class="modal-footer">
+          <button id="priceActivate" class="btn btn-success">Yes please!</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal" id="priceClose">Not
+            now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade in" id="priceEditPagess">
+    <div class="modal-dialog">
+      <form class="updatepricesss" autocomplete="off">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span></button>
+            <h4 class="modal-title text-bold" id="categoryH"></h4>
+          </div>
+          <div class="modal-body">
+            <div class="box box-default box-solid">
+              <table style="width:100%;">
+                <tr>
+                  <td>
+                    <div class="form-group has-feedback">
+                      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                        <label for="lastName">Select Product <span class="asteric_red">*</span></label>
+                        <select class="selectProductEdit" disabled required style="width:100%;" name="selectProductEdit"
+                          id="selectProductEdit">
+                          <option selected='selected' value="">Select Product</option>
+                          {{# each getProductListEdit}}
+                          <option value="{{_id}}">{{productName}}</option>
+                          {{/each}}
+                        </select>
+                      </div>
+                      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                        <label for="lastName">Select Price Type <span class="asteric_red">*</span></label>
+                        <select class="selectPriceTypeEdit" disabled required style="width:100%;"
+                          name="selectPriceTypeEdit" id="selectPriceTypeEdit">
+                          <option selected='selected' value="">Select Price Type</option>
+                          {{# each getPriceTypeEdit}}
+                          <option value="{{_id}}">{{priceTypeName}}</option>
+                          {{/each}}
+                        </select>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="form-group has-feedback">
+                      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                        <label for="lastName">Select Unit <span class="asteric_red">*</span></label>
+                        <select class="selectUnitEdit" required style="width:100%;" name="selectUnitEdit"
+                          id="selectUnitEdit">
+                          <option selected='selected' value="">Select Unit</option>
+                          {{# each getUnitListEdit}}
+                          <option value="{{_id}}">{{unitName}}</option>
+                          {{/each}}
+                        </select>
+                      </div>
+                      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                        <label for="lastName">VSR Price <span class="asteric_red">*</span></label>
+                        <input type="text" class="form-control validation" placeholder="Price" id="priceGetEdit"
+                          name="priceGetEdit" required>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="form-group has-feedback">
+                      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                        <label for="lastName">OMR Price <span class="asteric_red">*</span></label>
+                        <input type="text" class="form-control validation" placeholder="Price" id="priceGetOmrEdit"
+                          name="priceGetOmrEdit" required>
+                      </div>
+                      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                        <label for="lastName">WS Exe Price <span class="asteric_red">*</span></label>
+                        <input type="text" class="form-control validation" placeholder="Price" id="priceGetWSEdit"
+                          name="priceGetWSEdit" required>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <input type="hidden" class="id" name="id">
+              </table>
+            </div>
+            {{#if printLoad}}
+            <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+            absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+              {{#with printLoaderImage}}
+              <div class="loader-lg" style="width: 100%;height: 100%;display: 
+              flex; align-items: center;justify-content: center;background: #fff;">
+                <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+              </div>
+              {{/with}}
+            </div>
+            {{else}}
+            <div class="loadersSpin">
+            </div>
+            {{/if}}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default closen pull-left" data-dismiss="modal"
+              id="categoryClose">Close</button>
+            <button type="submit" class="btn btn-primary">Update Price </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal fade in" id="priceDetailPage">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="priceH"></h4>
+        </div>
+        <div class="modal-body">
+          <div class="box box-default box-solid">
+            <table style="width:100%;" class="table table-striped">
+              <tbody>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="Employee ">Product Name</label>
+                    <div id="detailProduct" style="word-wrap:break-word;"></div>
+                  </td>
+                  <td width="50%">
+                    <label for="firstName">Price Type </label>
+                    <div id="detailpriceTypeName" style="word-wrap:break-word;"></div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="firstName">Unit</label>
+                    <div id="detailUnit" style="word-wrap:break-word;"></div>
+                  </td>
+                  <td width="50%">
+                    <label for="Employee ">VSR Price</label>
+                    <div id="detailPrice" style="word-wrap:break-word;"></div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="firstName">OMR Price</label>
+                    <div id="detailPriceOmr" style="word-wrap:break-word;"></div>
+                  </td>
+                  <td width="50%">
+                    <label for="Employee ">WS Exe Price</label>
+                    <div id="detailPriceWs" style="word-wrap:break-word;"></div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="Employee ">Status</label>
+                    <div id="detailStatus" style="word-wrap:break-word;"></div>
+                  </td>
+                  <td width="50%">
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          {{#if printLoad}}
+          <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+          absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+            {{#with printLoaderImage}}
+            <div class="loader-lg" style="width: 100%;height: 100%;display: 
+            flex; align-items: center;justify-content: center;background: #fff;">
+              <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+            </div>
+            {{/with}}
+          </div>
+          {{else}}
+          <div class="loadersSpin">
+          </div>
+          {{/if}}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default closen" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  {{/if}}
+</template>

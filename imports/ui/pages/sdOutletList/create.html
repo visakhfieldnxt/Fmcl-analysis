@@ -1,0 +1,158 @@
+<template name="outletCreate">
+  <form class="outletAdds" autocomplete="off" id="outletAdds">
+    <div class="box box-default box-solid">
+      <div class="box-header with-border bg-aqua">
+        <!-- <h3 class="box-title">Branch Details</h3> -->
+        <button type="button" class="close closeOutlet" id="closeUserBranch" data-dismiss="modal" aria-label="Close">
+          <span style="margin-top: -65px;margin-left: -5px;position: absolute;" aria-hidden="true">×</span></button>
+      </div>
+      <table style="width:100%;" class="table table-striped">
+        <tr>
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="lastName">Outlet Name <span class="asteric_red">*</span></label>
+                <input type="text" class="form-control validation" placeholder="Outlet Name" id="outletName"
+                  name="outletName" required>
+              </div>
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="dateOfBirth">Select Outlet Type <span class="asteric_red">*</span></label>
+                <select class="outletTypeVal" required style="width:100%;" name="outletTypeVal" id="outletTypeVal">
+                  <option value="">Select Outlet Type</option>
+                  <option value="Super Market">Super Market</option>
+                  <option value="Wholesale">Wholesale</option>
+                  <option value="Semi Wholesale">Semi Wholesale</option>
+                  <option value="Fuel Mart">Fuel Mart</option>
+                  <option value="Cosmetics">Cosmetics</option>
+                  <option value="Pharmacy">Pharmacy</option> 
+                  <option value="Large Traditional Store">Large Traditional Store</option>
+                  <option value="Medium Traditional Store">Medium Traditional Store</option>
+                  <option value="Baby Care Shop">Baby Care Shop</option>
+                  <option value="Kiosk/Container Shop">Kiosk/Container Shop</option>
+                </select>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="dateOfBirth">Select Class<span class="asteric_red">*</span></label>
+                <select class="outletClassVal" required style="width:100%;" name="outletClassVal" id="outletClassVal">
+                  <option value="">Select Class</option>
+                  <option value="A">A</option>
+                  <option value="B">B</option>
+                  <option value="C">C</option>
+                </select>
+              </div>
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="lastName">Contact Person <span class="asteric_red">*</span></label>
+                <input type="text" class="form-control validation" placeholder="Contact Person" id="contactPerson"
+                  name="contactPerson" required>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="username">Contact No <span class="asteric_red">*</span> </label>
+                <input type="tel" pattern="[0-9]{10}" class="form-control validation"
+                  placeholder="Enter Contact No. . ." name="contactNo" required>
+              </div>
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="Email">Email Id</label>
+                <input type="email" class="form-control validation" id="email" placeholder="Enter email Id . ."
+                  name="email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$"
+                  title="Please enter a vaild email address eg: example@example.com">
+                <span id="emailspan"> </span>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="lastName">Address <span class="asteric_red">*</span></label>
+                <textarea name="addressval" id="addressval" cols="5" rows="7" style="height:50px"
+                  placeholder="Enter Address" required></textarea>
+              </div>
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="lastName">Remarks</label>
+                <textarea name="remarkval" id="remarkval" cols="5" rows="7" style="height:50px"
+                  placeholder="Enter Remarks"></textarea>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-12" style="padding: 10px">
+                <div class="uploads-btns-wrapper">
+                  <label for="Acknowledgement Image Upload">Outlet Inside Image <span class="asteric_red">*</span></label>
+                  <div style="text-align: center"><img class="" src="" alt=" Image" width="200px" id="insideImgs"
+                      style="display: none;">
+                    <div class="loadersSpinsImgIn" style="display: none;text-align: center;">
+                      {{#with printLoaderImage}}
+                      <div class="loader-lg">
+                        <img src="{{printLoaderImg}}" class="mainLoaders"
+                          style="margin-top: -50px!important;width: 35%; text-align: center !important;">
+                      </div>
+                      {{/with}}
+                    </div>
+                  </div>
+                  <div class="fileupload fileupload-inside" data-provides="fileupload" style="margin-top:10px;">
+                    <div class="upload-btn">
+                      <span class="btn btn-file btn-default">
+                        <span class="fileupload-inside">Upload Image</span>
+                        <input name="profile_image" class="file-upload-input" id="myFile" method="post" type="file" />
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-12" style="padding: 10px">
+                <div class="uploads-btns-wrapper">
+                  <label for="Acknowledgement Image Upload">Outlet Outside Image <span class="asteric_red">*</span></label>
+                  <div style="text-align: center;"><img class="" src="" alt=" Image" width="200px" id="outsideImgs"
+                      style="display: none;">
+                    <div class="loadersSpinsImg" style="display: none;text-align: center;">
+                      {{#with printLoaderImage}}
+                      <div class="loader-lg">
+                        <img src="{{printLoaderImg}}" class="mainLoaders"
+                          style="margin-top: -50px!important;width: 35%; text-align: center !important;">
+                      </div>
+                      {{/with}}
+                    </div>
+                  </div>
+                  <div class="fileupload fileupload-outside" data-provides="fileupload" style="margin-top:10px;">
+                    <div class="upload-btn">
+                      <span class="btn btn-file btn-default">
+                        <span class="fileupload-outside">Upload Image</span>
+                        <input name="profile_image2" class="file-upload-inputOut" id="myFile1" method="post"
+                          type="file" />
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <button type="submit" id="updatebranch" class="btn btn-primary  pull-right">Save
+      Outlet</button>
+    <button type="button" class="btn btn-default closeOutlet" data-dismiss="modal">Close</button>
+  </form>
+</template>

@@ -1,0 +1,24 @@
+<template name="databaseSync">
+    {{#if userCan 'adminDashboard'}}
+      <section class="content-header">
+        <h1>Database
+          <small>Listing All DataBase </small>
+        </h1>
+        <ol class="breadcrumb">
+          <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
+          <li class="active">DataBase</li>
+        </ol>
+      </section>
+  
+      <section class="content">
+        
+          <div class="row">
+            <div style="float: right;">
+            
+              <button class="btn btn-primary btn-flat " id="dataSync" >Sync  </button>
+            </div>
+          </div>
+          </section>
+          {{/if}}
+  </template>
+  

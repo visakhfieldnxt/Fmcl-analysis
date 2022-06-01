@@ -1,0 +1,413 @@
+<template name="noTransactionReport">
+  {{#if userCan 'noSalesReportView'}}
+  <section class="content-header">
+    <h1>Customer With No Sales Report
+      <small>Listing All Customer With No Sales Report</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
+      <li class="active">Customer With No Sales Report</li>
+    </ol>
+  </section>
+
+  <section class="content">
+    <div class="row">
+      <div style="float: right;">
+        <form>
+          <button type="button" title="Export Route Data" class="btn btn-primary btn-flat export">Export</button>
+          <button type="button" title="Search" class="btn btn-primary btn-flat" id="filterSearch"><i
+              class="fa fa-search"> </i>&nbsp; Search</button>
+        </form>
+      </div>
+    </div>
+    <div class="row" id="filterDisplay" style="display:none">
+      <div class="box box-default box-solid">
+        <div class="box-header with-border bg-aqua">
+          <h3 class="box-title">{{user}} Filter</h3><button type="button" id="removeSearch"
+            style="color: white; background-color: transparent; border-color:transparent" class="pull-right"><i
+              class="fa fa-close"></i></button>
+        </div>
+        <div class="box-body no-padding">
+          <form class="order-filter">
+            <div class="row">
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EMPcode">Route Name</label><br>
+                <select value='' name="cardName" style="width:100% !important" id="selectRouteName"
+                  class="selectRouteName" placeholder="Select Route Name">
+                  <option disabled selected value=''>Select Route Name</option>
+                  {{# each routeList}}
+                  <option value="{{_id}}">{{routeName}}</option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EMPcode">Branch</label><br>
+                <select value='' name="selectBranchFilter" style="width:100% !important" id="selectBranchFilter"
+                  class="selectBranchFilter" placeholder="Select Branch">
+                  <option disabled selected value=''>Select Branch Name</option>
+                  {{# each branchList}}
+                  <option value="{{bPLId}}">{{bPLName}}</option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EMPcode">Sales Person</label><br>
+                <select value='' name="selectSalesPerson" style="width:100% !important" id="selectSalesPerson"
+                  class="selectSalesPerson" placeholder="Select Sales Person">
+                  <option disabled selected value=''>Select Sales Person</option>
+                  {{# each vanUserList}}
+                  <option value="{{_id}}">{{profile.firstName}} {{profile.lastName}}</option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EmailId">From Date</label>
+                <input type="text" autocomplete="off" class="form-control datepicker date validation"
+                  data-date-autoclose="true" onkeydown="event.preventDefault()" id="fromDate" data-provide="datepicker"
+                  data-date-format="dd-mm-yyyy" placeholder="From Date " name="fromDate" />
+              </div>
+
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EmailId">To Date</label>
+                <input type="text" autocomplete="off" class="form-control datepicker date validation"
+                  data-date-autoclose="true" onkeydown="event.preventDefault()" id="toDate" data-provide="datepicker"
+                  data-date-format="dd-mm-yyyy" placeholder="To Date " name="toDate" />
+              </div>
+              <div class="row" style="float: right">
+                <button type="submit" name="filter" class="btn btn-primary">Filter</button>
+                <button type="button" name="reset" class="btn btn-info reset">Reset Filter</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      {{#if isReady}}
+      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
+      onClick=clickEvent}}
+      {{/if}}
+      <div class="box box-default box-solid">
+        <div class="box-header with-border bg-aqua">
+          <h3 class="box-title">Customer With No Sales Report List</h3>
+        </div>
+        {{#if isReady}}
+        <div class="box-body no-padding table-responsive">
+          <table class="table table-striped generic" style="width:100%;margin-bottom:0;table-layout: fixed">
+            <tbody>
+              <tr>
+                <th class="text-center sorted-column" style="width:40px">Sl.No</th>
+                <th class="text-center sorted-column" style="width:200px">Sales Person</th>
+                <th class="text-center sorted-column" style="width:200px">Route Code</th>
+                <th class="text-center sorted-column" style="width:200px">Route Name</th>
+                <th class="text-center sorted-column" style="width:200px">Branch</th>
+                <th class="text-center sorted-column" style="width:200px" id="name">No Of Customers</th>
+              </tr>
+              {{#each orderes}}
+              <tr class="view " title="Click to view details" id="{{_id}}">
+                <td class="text-center" style="width:40px">{{incremented @index}}</td>
+                <td class="text-center" width="200px"> {{vanUserName assignedTo}}</td>
+                <td class="text-center" style="width:200px">{{routeCodeHelp routeId}}</td>
+                <td class="text-center" style="width:200px">{{routeNameHelp routeId}}</td>
+                <td class="text-center" style="width:200px">{{routeBranchHelp routeId}}</td>
+                <td class="text-center" width="200px">{{customerCount _id}}</td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+        {{sortIcon}}
+        {{else}}
+        <div class="overlay">
+          <i class="fa fa-refresh fa-spin"></i>
+        </div>
+        {{/if}}
+      </div>
+      {{#if isReady}}
+      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
+      onClick=clickEvent}}
+      {{/if}}
+
+    </div>
+    {{#if isReady}}
+    <div id="bodySpin">
+    </div>
+    {{else}}
+    <div id="bodySpin" style=" width: 100%;position: 
+          fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+      justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+    {{/if}}
+    {{#if printLoadBody}}
+    <div id="bodySpin" style=" width: 100%;position: 
+    fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+    {{else}}
+    <div id="bodySpin">
+    </div>
+    {{/if}}
+
+  </section>
+
+  <div class="modal fade in" id="orderDetailPage">
+    <div class="modal-dialog" style="width: 80%;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="orderHs"></h4>
+        </div>
+        <div class="modal-body">
+          <div class="box box-default box-solid">
+            <div class="box-header with-border bg-aqua">
+              <h3 class="box-title">Customer With No Sales Details</h3>
+            </div>
+            <table style="width:100%; table-layout:fixed; border-collapse:collapse;" class="table">
+              <tbody>
+                <tr>
+                  <td width="50%" style="border: none;">
+                    <label for="Employee " style="width: 25%;">Sales Person </label>
+                    &nbsp; : &nbsp;
+                    <div id="detailedAssignedTo" style="display: inline; width: 75%;"></div>
+                  </td>
+                  <td width="50%" style="border: none;">
+                    <label for="firstName" style="width: 25%;">Branch </label>
+                    &nbsp; : &nbsp;
+                    <div id="detailBranch" style="display: inline; width: 75%;"></div>
+                  </td>
+                </tr>
+                <tr style="border: none;">
+                  <td width="50%" style="border: none;">
+                    <label for="Employee " style="width: 25%;">Route Name </label>
+                    &nbsp; : &nbsp;
+                    <div id="detailrouteName" style="display: inline; width: 75%;"></div>
+                  </td>
+                  <td width="50%" style="border: none;">
+                    <label for="Employee " style="width: 25%;">Start Date </label>
+                    &nbsp; : &nbsp;
+                    <div id="detailDate" style="display: inline; width: 75%;"></div>
+                  </td>
+                </tr>
+                <tr style="border: none;">
+                  <td width="50%" style="border: none;">
+                    <label for="Employee " style="width: 25%;">Route Code </label>
+                    &nbsp; : &nbsp;
+                    <div id="detailrouteCode" style="display: inline; width: 75%;"></div>
+                  </td>
+                  <td width="50%" style="border: none;">
+                    <label for="Employee " style="width: 25%;">End Date </label>
+                    &nbsp; : &nbsp;
+                    <div id="detailDateEnd" style="display: inline; width: 75%;"></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            {{#with routeDataList}}
+            <span style="padding-left: 10px;"><label for="Employee ">Customer List</label></span>
+            <div id="detailUsername" class="table-responsive">
+              <div class="row ">
+                <table style="width:100%;margin-bottom:0;table-layout: fixed" class="table table-striped with-border">
+                  <thead>
+                    <tr>
+                      <th class="text-center sorted-column" width="100px">Sl no. </th>
+                      <th class="text-center sorted-column" width="200px">Customer Name </th>
+                      <th class="text-center sorted-column" width="200px">Address </th>
+                      <th class="text-center sorted-column" width="200px">Check In</th>
+                      <th class="text-center sorted-column" width="200px">Check Out</th>
+                      <th class="text-center sorted-column" width="200px">Time Spent</th>
+                      <th class="text-center sorted-column" width="200px">Remark</th>
+                      <th class="text-center sorted-column" width="200px">Remark Description</th>
+
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {{#each routeDataList}}
+                    <tr class="table-border">
+                      <td class="text-center sorted-column" style="word-wrap: break-word">{{incremented @index}}</td>
+                      <td class="text-center sorted-column" style="word-wrap: break-word">{{custNameHelp customer}}</td>
+                      <td class="text-center sorted-column" style="word-wrap: break-word">{{addressNameGetHelp customer
+                        routeGroup}}</td>
+                      <td class="text-center sorted-column" style="word-wrap: break-word">{{dateValue}} {{checkIn}}</td>
+                      <td class="text-center sorted-column" style="word-wrap: break-word">{{dateValue}} {{checkOut}}
+                      </td>
+                      <td class="text-center sorted-column" style="word-wrap: break-word">{{timeSpent}}</td>
+                      <td class="text-center sorted-column" style="word-wrap: break-word">{{remark}}</td>
+                      {{#if remarkDescription}}
+                      <td class="text-center sorted-column" style=" word-wrap: break-word">{{remarkDescription}}</td>
+                      {{else}}
+                      <td class="text-center sorted-column">-</td>
+                      {{/if}}
+                    </tr>
+                    {{/each}}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            {{/with}}
+          </div>
+          {{#if printLoad}}
+          <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+          absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+            {{#with printLoaderImage}}
+            <div class="loader-lg" style="width: 100%;height: 100%;display: 
+            flex; align-items: center;justify-content: center;background: #fff;">
+              <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+            </div>
+            {{/with}}
+          </div>
+          {{else}}
+          <div class="loadersSpin">
+          </div>
+          {{/if}}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default closen" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="fullScreen">
+    <img src="" alt="" />
+  </div>
+
+  <table class="table table-striped generic" id="exportTodayOrder" style="display:none">
+    <tbody>
+      <tr>
+        <th class="text-center sorted-column" style="width:100px">Sl.No</th>
+        <th class="text-center sorted-column" style="width:200px">Sales Person</th>
+        <th class="text-center sorted-column" style="width:200px">Route Code</th>
+        <th class="text-center sorted-column" style="width:200px">Route Name</th>
+        <th class="text-center sorted-column" style="width:200px">Branch</th>
+        <th class="text-center sorted-column" style="width:200px" id="name">No Of Customers</th>
+        <th class="text-center sorted-column" style="width:200px" id="name">Customer List</th>
+      </tr>
+      {{#each orderByDateExport}}
+      <tr id="{{_id}}">
+        <td class="text-center sorted-column" style="width:100px">{{incremented @index}}</td>
+        <td class="text-center" width="200px"> {{vanUserName routeData.assignedTo}}</td>
+        <td class="text-center" style="width:200px">{{routeCodeHelp routeData.routeId}}</td>
+        <td class="text-center" style="width:200px">{{routeNameHelp routeData.routeId}}</td>
+        <td class="text-center" style="width:200px">{{routeBranchHelp routeData.routeId}}</td>
+        <td class="text-center" width="200px">{{customerCount routeData._id}}</td>
+        <td class="text-center sorted-column" style="width:500px">
+          <table style="width:100%" class="table table-striped with-border">
+            <thead>
+              <tr>
+                <th>Sl no. </th>
+                <th>Customer Name </th>
+                <th>Address </th>
+                <th>Check In</th>
+                <th>Check Out</th>
+                <th>Time Spent</th>
+                <th>Remark</th>
+                <th>Remark Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each routeUpdateData}}
+              <tr class="table-border">
+                <td class="text-center sorted-column" style="word-wrap: break-word">{{incremented @index}}</td>
+                <td class="text-center sorted-column" style="word-wrap: break-word">{{custNameHelp customer}}</td>
+                <td class="text-center sorted-column" style="word-wrap: break-word">{{addressNameGetHelp customer
+                  routeGroup}}</td>
+                <td class="text-center sorted-column" style="word-wrap: break-word">{{dateValue}} {{checkIn}}</td>
+                <td class="text-center sorted-column" style="word-wrap: break-word">{{dateValue}} {{checkOut}}
+                </td>
+                <td class="text-center sorted-column" style="word-wrap: break-word">{{timeSpent}}</td>
+                <td class="text-center sorted-column" style="word-wrap: break-word">{{remark}}</td>
+                {{#if remarkDescription}}
+                <td class="text-center sorted-column" style=" word-wrap: break-word">{{remarkDescription}}</td>
+                {{else}}
+                <td class="text-center sorted-column">-</td>
+                {{/if}}
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+
+  <div class="modal fade in" id="routeReportExportPage">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close exportClose" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="deliveryExportH"></h4>
+        </div>
+        <form class="exportByDate">
+          <div class="modal-body">
+            <div class="box box-default box-solid">
+              <div class="box-header with-border bg-aqua">
+                <h3 class="box-title">Details</h3>
+              </div>
+              <table style="width:100%;" class="table table-striped">
+                <tbody>
+                  <tr>
+                    <td>
+                      <label for="Employee ">From Date </label>
+                      <input type="text" autocomplete="off" class="form-control datepicker date validation startDate"
+                        data-date-autoclose="true" onkeydown="event.preventDefault()" id="my-datepicker"
+                        data-provide="datepicker" data-date-format="dd-mm-yyyy" placeholder="From Date "
+                        name="startDate" required />
+                      <span id="startDateSpan"></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label for="firstName">To Date </label>
+                      <input type="text" autocomplete="off" class="form-control datepicker date validation endDate"
+                        data-date-autoclose="true" onkeydown="event.preventDefault()" id="my-datepicker" disabled='true'
+                        data-provide="datepicker" data-date-format="dd-mm-yyyy" placeholder="To Date " name="endDate"
+                        required />
+                      <span id="endDateSpan"></span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            {{#if printLoad}}
+            <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+            absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+              {{#with printLoaderImage}}
+              <div class="loader-lg" style="width: 100%;height: 100%;display: 
+              flex; align-items: center;justify-content: center;background: #fff;">
+                <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+              </div>
+              {{/with}}
+            </div>
+            {{else}}
+            <div id="loaderSpin">
+            </div>
+            {{/if}}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default exportClose pull-left" data-dismiss="modal">Close</button>
+            {{#if orderByDateExport}}
+            <button type="submit" id="exportButton" class="btn btn-primary">Export</button>
+            {{else}}
+            <button type="submit" class="btn btn-primary" disabled>Export</button>
+            {{/if}}
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  {{/if}}
+</template>

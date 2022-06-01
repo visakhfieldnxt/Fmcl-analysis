@@ -1,0 +1,66 @@
+<template name="routeGroup_create">
+  <form autocomplete="off" class="route-add" id="route">
+    <div class="box box-default box-solid">
+      <div class="box-header with-border bg-aqua">
+        <!-- <h3 class="box-title">Route Details</h3> -->
+        <button type="button" class="close closeRoute" id="closeRoute" data-dismiss="modal" aria-label="Close">
+          <span style="margin-top: -65px;margin-left: -5px;position: absolute;" aria-hidden="true">×</span></button>
+      </div>
+      <table style="width:100%;table-layout: fixed;border-collapse: collapse;" class="table table-striped">
+        <tr>
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="empCode">Route Name <span class="asteric_red">*</span></label>
+                <input type="text" id="routeNameValue" class="form-control validation" placeholder="Enter Route Name"
+                  name="routeNameValue" required>
+                <span id="routeCodeSpan"></span>
+              </div>
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="customer">Select Sub Distributor <span class="asteric_red">*</span></label>
+                <select class="selectSdIds" style="width:100%;" required name="selectSdIds" id="selectSdIds">
+                  <option selected='selected' value="">Select Sub Distributor </option>
+                  {{# each sdUsersGet}}
+                  <option value="{{_id}}">{{profile.firstName}} {{profile.lastName}}</option>
+                  {{/each}}
+                </select>
+                <span id="verticalSpan"> </span> <br>
+                <span id="branchSpan"></span> <br>
+                <span id="locationSpan"></span><br>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-12" style="padding: 10px 10px 20px 10px;">
+                <label for="customer">Enter Description <span class="asteric_red">*</span></label>
+                <textarea name="descriptionVal" id="descriptionVal" required cols="7" rows="10" style="height:85px"
+                  placeholder="Enter Description"></textarea>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <button type="submit" name="submit" id="submit" class="btn btn-primary pull-right">Save Route</button>
+    <button type="button" class="btn btn-default closeRoute" data-dismiss="modal">Close</button>
+  </form>
+  {{#if printLoad}}
+  <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+  fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+    {{#with printLoaderImage}}
+    <div class="loader-lg" style="width: 100%;height: 100%;display: 
+    flex; align-items: center;justify-content: center;background: #fff;">
+      <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+    </div>
+    {{/with}}
+  </div>
+
+  {{else}}
+  <div class="loadersSpin">
+  </div>
+  {{/if}}
+
+</template>

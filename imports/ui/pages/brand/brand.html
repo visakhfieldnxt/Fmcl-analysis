@@ -1,0 +1,416 @@
+<template name="brand">
+  {{#if userCan 'brandView'}}
+  <section class="content-header">
+    <h1>Brand
+      <small>Listing All Brand</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
+      <li class="active">Brand</li>
+    </ol>
+  </section>
+  <section class="content">
+
+    <div class="row">
+      <div style="float: right;">
+        {{#if userCan 'brandCreate'}}
+        <button class="btn btn-primary btn-flat" id="fileUploadBrand">Upload</button>
+        <button class="btn btn-primary btn-flat" id="ic-create-brand-button">Create Brand</button>
+        {{/if}}
+        <button class="btn btn-primary btn-flat" id="filterSearch"><i class="fa fa-search"> </i>&nbsp; Search</button>
+      </div>
+    </div>
+
+    <div class="row" id="filterDisplay" style="display:none">
+      <div class="box box-default box-solid">
+        <div class="box-header with-border bg-aqua">
+          <h3 class="box-title" style="color: black;">Brand Filter</h3><button type="button" id="removeSearch"
+            style="color: white; background-color: transparent; border-color:transparent" class="pull-right"><i
+              class="fa fa-close" style="color: black;"></i></button>
+        </div>
+        <div class="box-body no-padding">
+          <form class="brandFilter">
+            <div class="row">
+
+              <div class="col-sm-4" style="padding: 10px 10px 10px 10px;">
+                <label for="brand">Brand Code</label>
+                <select class="brandCodeSelection" style="width:100%;" name="brandCodeSelection"
+                  id="brandCodeSelection">
+                  <option selected value=''>Select Brand Code</option>
+                  {{# each brandLists}}
+                  <option value="{{brandCode}}">{{brandCode}}</option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="col-sm-4" style="padding: 10px 10px 10px 10px;">
+                <label for="brand">Brand Name</label>
+                <select class="brandNameSelection" style="width:100%;" name="brandNameSelection"
+                  id="brandNameSelection">
+                  <option selected value=''>Select Brand Name</option>
+                  {{# each brandLists}}
+                  <option value="{{brandName}}">{{brandName}}</option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="row" style="float: right">
+                <button type="submit" name="filter" class="btn btn-primary">Filter</button>
+                <button type="button" name="reset" class="btn btn-info reset">Reset Filter</button>
+
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- {{#if isReady}}
+      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
+      onClick=clickEvent}}
+      {{/if}} -->
+      <div class="nav-tabs-custom taskHeader" id="taskHeader">
+        <ul class="nav nav-tabs taskHeaderList" id="taskHeaderList">
+          <li class="active paginationFilterValue activeFilter activeHeaders" id="activeFilter"><a href=""
+              data-toggle="tab">Active</a>
+          </li>
+          <li class="paginationFilterValue inactiveFilter" id="inactiveFilter"><a href="" data-toggle="tab">Inactive</a>
+          </li>
+        </ul>
+        <div class="tab-content" style="padding : 0px !important">
+          <div class="box box-default box-solid">
+            <!-- <div class="box-header with-border bg-aqua">
+              <h3 class="box-title">Brand</h3>
+            </div> -->
+            {{#if isReady}}
+            <div class="box-body no-padding table-responsive">
+              <table class="table table-striped generic">
+                <tbody>
+                  <tr>
+                    <th class="sorted-column text-center">Brand Code</th>
+                    <th class="text-center sorted-column">Brand Name</th>
+                    <th class="text-center sorted-column">Principal</th>
+                    <th class="text-center sorted-column"> </th>
+                  </tr>
+                  {{#each brandList}}
+                  <tr>
+                    <td class="text-center sorted-column " width="25%">{{brandCode}}</td>
+                    <td class="text-center sorted-column" width="25%">{{brandName}}</td>
+                    <td class="text-center sorted-column principalVal_{{principal}}" width="25%">{{getPrincipalName
+                      principal}}</td>
+                    <td class="text-center" width="25%">
+                      <input type="hidden" id="brandName_{{_id}}" value="{{brandName}}">
+                      {{#if userCan 'brandUpdate'}}
+                      <a href="javascript:void(0)" class="edit" title="Click to edit {{brandName}}" id="{{_id}}">
+                        <button class="pd-20 btn btn-primary"><i class="fa fa-pencil"></i></button>
+                      </a> &nbsp;
+                      {{/if}}
+                      {{#if userCan 'brandDelete'}}
+                      {{#if activeHelper active}}
+                      <a href="javascript:void(0)" class="deactivate" title="Click to inactivate {{brandName}}"
+                        id="{{_id}}">
+                        <button class="pd-20 btn btn-danger"><i class="fa fa-close"></i></button>
+                      </a>&nbsp;
+                      {{/if}}
+                      {{#if inactiveHelper active}}
+                      <a href="javascript:void(0)" class="activate" title="Click to activate {{brandName}}"
+                        id="{{_id}}">
+                        <button class="pd-20 btn btn-success"><i class="fa fa-check"></i></button>
+                      </a> &nbsp;
+                      {{/if}}
+                      {{/if}}
+                      <input type="hidden" id="userId" name="userid" value="{{_id}}">
+                      <a href="javascript:void(0)" class="view " title="Click to view details" id="{{_id}}">
+                        <button class="pd-20 btn btn-default"><i class="fa fa-ellipsis-v"></i></button>
+                      </a>
+                    </td>
+                  </tr>
+                  {{/each}}
+                </tbody>
+              </table>
+            </div>
+            {{sortIcon}}
+            {{else}}
+            <div class="overlay">
+              <i class="fa fa-refresh fa-spin"></i>
+            </div>
+            {{/if}}
+          </div>
+        </div>
+      </div>
+
+      {{#if isReady}}
+      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
+      onClick=clickEvent}}
+      {{/if}}
+    </div>
+    {{#if isReady}}
+    <div id="bodySpin">
+    </div>
+    {{else}}
+    <div id="bodySpin" style=" width: 100%;position: 
+          fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+      justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+    {{/if}}
+    <div id="bodySpinLoaders" style=" width: 100%;position: 
+    fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+  </section>
+
+  <div class="ic-create-brand-modal">
+    <div class="modal" id="ic-create-brand">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Create Brand</h4>
+          </div>
+          <div class="modal-body">
+            {{> brand_create brand=brand}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {{> successModal id="brandSuccessModal" section=brand}}
+  {{> errorModal id="brandErrorModal" section=brand}}
+
+
+  <div class="modal fade in" id="brandUploadConfirmation">
+    <div class="modal-dialog">
+      <form id="uploadbrand" autocomplete="off">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span></button>
+            <h4 class="modal-title text-bold" id="brandUploadHeader"></h4>
+          </div>
+          <div class="modal-body">
+            <div id="brandsBody">
+              <div class="fileupload fileupload-new" data-provides="fileupload" style="text-align:center">
+                <span class="btn btn-file btn-default">
+                  <span class="fileupload-exists">{{#if labelName}}
+                    {{labelName}}
+                    {{else}}
+                    Upload File
+                    {{/if}}</span>
+                  <input name="uploadbrandFile" class="file-upload-input uploadbrandFile" id="uploadbrandFile"
+                    method="post" type="file" style="width: 0%;height: 0%; margin-top: 0px;" required />
+                </span>
+                <span class="text-center" id="fileArrayspan"></span>
+              </div>
+              <br>
+              <p class="">
+                Are you sure to upload Brand .?<span id="brandUploadNameDup" class="text-bold"></span>
+              </p>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" title="Download format" id="downloadbrand"
+              class="btn btn-primary pull-left">Format</button>
+            <button type="submit" class="btn btn-success">Yes please!</button>
+            <button type="button" class="btn btn-danger" data-dismiss="modal" id="brandFileClose">Not
+              now</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal fade in" id="brandDelConfirmation">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="brandHeader"></h4>
+        </div>
+        <div class="modal-body">
+          <div id="brandsBody">
+            <p class="danger-color">
+              Are you sure to inactivate Brand- '<span id="brandNameDup" class="text-bold"></span>' ?
+            </p>
+          </div>
+          <input type="hidden" id="confirmedUuid">
+        </div>
+        <div class="modal-footer">
+          <button id="brandRemove" class="btn btn-danger">Yes please!</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal" id="brandClose">Not
+            now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade in" id="brandActiveConfirmation">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="brandHeaders"></h4>
+        </div>
+        <div class="modal-body">
+          <div id="brandsBody">
+            <p class="success-color">
+              Are you sure to activate Brand- '<span id="brandNameDups" class="text-bold"></span>' ?
+            </p>
+          </div>
+          <input type="hidden" id="confirmedUuids">
+        </div>
+        <div class="modal-footer">
+          <button id="brandActivate" class="btn btn-success">Yes please!</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal" id="brandClose">Not
+            now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade in" id="brandEditPage">
+    <div class="modal-dialog">
+      <form class="updatebrand" autocomplete="off">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span></button>
+            <h4 class="modal-title text-bold" id="categoryH"></h4>
+          </div>
+          <div class="modal-body">
+            <div class="box box-default box-solid">
+              <!-- <div class="box-header with-border bg-aqua">
+                <h3 class="box-title">Brand Details</h3>
+              </div> -->
+              <table style="width:100%;">
+                <tr>
+                  <td>
+                    <div class="form-group has-feedback">
+                      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                        <label for="lastName">Brand Code <span class="asteric_red">*</span></label>
+                        <input type="text" class="form-control validation" placeholder="Brand Code" id="brandCodeEdits"
+                          name="brandCodeEdits" disabled required>
+                      </div>
+                      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                        <label for="lastName">Brand Name <span class="asteric_red">*</span></label>
+                        <input type="text" class="form-control validation" placeholder="Brand Name" id="brandNameEdits"
+                          name="brandNameEdits" required>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="form-group has-feedback">
+                      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                        <label for="lastName">Select Principal <span class="asteric_red">*</span></label>
+                        <select class="selectPrincipalEdit" disabled required style="width:100%;" name="selectPrincipalEdit"
+                          id="selectPrincipalEdit">
+                          <option selected='selected' value="">Select Principal</option>
+                          {{# each getPricipalListEdit}}
+                          <option value="{{_id}}">{{principalName}}</option>
+                          {{/each}}
+                        </select>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <input type="hidden" class="id" name="id">
+              </table>
+            </div>
+            {{#if printLoad}}
+            <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+            absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+              {{#with printLoaderImage}}
+              <div class="loader-lg" style="width: 100%;height: 100%;display: 
+              flex; align-items: center;justify-content: center;background: #fff;">
+                <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+              </div>
+              {{/with}}
+            </div>
+            {{else}}
+            <div class="loadersSpin">
+            </div>
+            {{/if}}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default closen pull-left" data-dismiss="modal"
+              id="categoryClose">Close</button>
+            <button type="submit" class="btn btn-primary">Update Brand </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal fade in" id="brandDetailPage">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="brandH"></h4>
+        </div>
+        <div class="modal-body">
+          <div class="box box-default box-solid">
+            <!-- <div class="box-header with-border bg-aqua">
+              <h3 class="box-title">Brand Details</h3>
+            </div> -->
+            <table style="width:100%;" class="table table-striped">
+              <tbody>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="Employee ">Brand Code</label>
+                    <div id="detailbrandCode"></div>
+                  </td>
+                  <td width="50%">
+                    <label for="firstName">Brand Name </label>
+                    <div id="detailbrandName"></div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="firstName">Principal</label>
+                    <div id="detailPricipalName"></div>
+                  </td>
+                  <td width="50%">
+                    <label for="Employee ">Status</label>
+                    <div id="detailStatus"></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          {{#if printLoad}}
+          <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+          absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+            {{#with printLoaderImage}}
+            <div class="loader-lg" style="width: 100%;height: 100%;display: 
+            flex; align-items: center;justify-content: center;background: #fff;">
+              <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+            </div>
+            {{/with}}
+          </div>
+          {{else}}
+          <div class="loadersSpin">
+          </div>
+          {{/if}}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default closen" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  {{/if}}
+</template>

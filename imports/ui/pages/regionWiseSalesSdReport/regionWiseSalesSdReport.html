@@ -1,0 +1,160 @@
+<template name="regionWiseSalesSdReport">
+    <section class="content-header">
+     <h1>Region wise Sale Report - SD
+       <small>Listing All Region wise Sale</small>
+     </h1>
+     <ol class="breadcrumb">
+       <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
+       <li class="active">Region wise Sale</li>
+     </ol>
+   </section>
+ <section class="content">
+    <div class="row">
+       <div style="float: right;">
+         <form class="exportToday">
+          <button type="submit" title="Export Today's Order" id="exportButtons"
+            class="btn btn-primary btn-flat">Export</button>
+           <button type="button" title="Search" class="btn btn-primary btn-flat" id="filterSearch"><i
+               class="fa fa-search"> </i>&nbsp; Search</button>
+             </form>
+       </div>
+     </div>
+     <div class="row" id="filterDisplay" style="display:none">
+       <div class="box box-default box-solid">
+         <div class="box-header with-border bg-aqua">
+           <h3 class="box-title">{{user}} Filter</h3> <button type="button" id="removeSearch"
+            style="color: white; background-color: transparent; border-color:transparent" class="pull-right"><i
+              class="fa fa-close"  style="color: black;"></i></button>
+         </div>
+         <div class="box-body no-padding">
+           <form class="verticalwise-filter">
+             <div class="row">
+               <div class="col-md-3 col-sx-12 col-sm-12">
+                   <label for="EMPcode">Vertical Name</label><br>
+                   <select class="verticalfilter" style="width:100%;" name="verticalfilter"
+                   id="verticalfilter">
+                   <option  selected value=''>Select Vertical Code</option>
+                   {{# each vertical1}}
+                     <option value="{{_id}}">{{verticalName}}</option>
+                     {{/each}}
+                 </select>
+                 <span id="itemArrayspan1"></span>
+               </div>
+
+               <div class="col-md-3 col-sx-12 col-sm-12">
+                   <label for="EMPcode">Region Name</label><br>
+                   <select class="regionfilter" style="width:100%;" name="regionfilter"
+                   id="regionfilter">
+                   <option  selected value=''>Select Region Code</option>
+                   {{# each listofRegion}}
+                     <option value="{{_id}}">{{branchName}}</option>
+                     {{/each}}
+                 </select>
+                 <span id="regionNameArrayspan1"></span>
+               </div> 
+              
+               <div class="col-md-3 col-sx-12 col-sm-12">
+                 <label for="EmailId">From Date</label>
+                 <input type="text" autocomplete="off" class="form-control datepicker date validation"
+                   data-date-autoclose="true" onkeydown="event.preventDefault()" id="fromDate" data-provide="datepicker"
+                   data-date-format="dd-mm-yyyy" placeholder="From Date " name="fromDate" />
+                   <span id="itemArrayspan"></span>
+               </div>
+ 
+               <div class="col-md-3 col-sx-12 col-sm-12">
+                 <label for="EmailId">To Date</label>
+                 <input type="text" autocomplete="off" class="form-control datepicker date validation"
+                   data-date-autoclose="true" onkeydown="event.preventDefault()" id="toDate" data-provide="datepicker"
+                   data-date-format="dd-mm-yyyy" placeholder="To Date " name="toDate" />
+               </div>
+ 
+               <div class="row" style="float: right">
+                 <button type="submit" name="filter" class="btn btn-primary">Filter</button>
+                 <button type="button" name="reset" class="btn btn-info reset">Reset Filter</button>
+               </div>
+             </div>
+            
+           </form>
+          
+         </div>
+       </div>
+     </div>
+     <div class="row">
+        <div class="box box-default box-solid">
+          <div class="box-header with-border bg-aqua">
+            <h3 class="box-title">Order Report List</h3>
+          </div>
+          {{#if isReady}}
+          <div class="box-body no-padding table-responsive">
+            <table class="table table-striped generic" style="width:100%;margin-bottom:0;table-layout: fixed" >
+              <tbody>
+                <tr >
+                   <th class="text-center sorted-column" style="width:40px">Sl.No</th>           
+                   <th class="text-center sorted-column" style="width:200px">Region</th>
+                   <th class="text-center sorted-column" style="width:200px">From date</th>
+                   <th class="text-center sorted-column" style="width:200px">To date</th>
+                   <th class="text-center sorted-column" style="width:200px">Sales by Volume</th>
+                   <th class="text-center sorted-column" style="width:200px">Sales by Value</th>
+                </tr>
+               {{#each listOfData}} 
+               <tr class="view" id="{{_id}}" style="cursor:pointer;">
+                 <td class="text-center sorted-column" style="width:40px">{{incremented @index}}</td>
+                 <td class="text-center sorted-column regionIdVal_{{region}}" style="width:200px">{{getRegionName region}} </td>
+                 <td class="text-center sorted-column" style="width:200px">{{dates fromDate}}</td>
+                 <td class="text-center sorted-column" style="width:200px">{{dates toDate}}</td>
+                 <td class="text-center sorted-column" style="width:200px">{{ctnTotal}} CTN & {{pcsBalance}} PCS</td>
+                 <td class="text-center sorted-column" style="width:200px">{{roundIt sale_by_val}}</td>
+               </tr>
+              {{/each}} 
+              <tr>
+                <td class="text-left sorted-column" style="width:200px;font-weight: bold;" colspan="4">Total</td>
+                <td class="text-center sorted-column" style="width:200px" id="total"></td>
+                <td class="text-center sorted-column" style="width:200px" id="gtotal"></td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+          {{sortIcon}}
+          {{else}}
+          <div class="overlay">
+            <i class="fa fa-refresh fa-spin"></i>
+          </div>
+          {{/if}}
+        </div>
+        {{#if isReady}}
+        {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
+        onClick=clickEvent}}
+        {{/if}}
+  
+      </div>
+ </section>
+<table class="table table-striped generic" id="exportTodayOrder" style="display:none">
+   <tbody>
+        <tr >
+           <th class="text-center sorted-column" style="width:40px">Sl.No</th>           
+           <th class="text-center sorted-column" style="width:200px">Region</th>
+           <th class="text-center sorted-column" style="width:200px">From date</th>
+           <th class="text-center sorted-column" style="width:200px">To date</th>
+           <th class="text-center sorted-column" style="width:200px">Sales by Volume</th>
+           <th class="text-center sorted-column" style="width:200px">Sales by Value</th>
+        </tr>
+       {{#each listOfData}} 
+       <tr class="view" id="{{_id}}" style="cursor:pointer;">
+         <td class="text-center sorted-column" style="width:40px">{{incremented @index}}</td>
+         <!-- <td class="text-center sorted-column productIdVal_{{productId}}" style="width:200px">{{getProductName productId}}</td> -->
+         <td class="text-center sorted-column brandIdVal_{{regionName}}" style="width:200px">{{getRegionName regionName}} {{regionName}}</td>
+         <td class="text-center sorted-column" style="width:200px">{{dates fromDate}}</td>
+         <td class="text-center sorted-column" style="width:200px">{{dates toDate}}</td>
+         <td class="text-center sorted-column" style="width:200px">{{ctnTotal}} CTN & {{pcsBalance}} PCS</td>
+         <td class="text-center sorted-column" style="width:200px">{{roundIt sale_by_val}}</td>
+       </tr>
+      {{/each}} 
+      <tr>
+        <td class="text-left sorted-column" style="width:200px;font-weight: bold;" colspan="4">Total</td>
+        <td class="text-center sorted-column" style="width:200px" id="total"></td>
+        <td class="text-center sorted-column" style="width:200px" id="gtotal"></td>
+      </tr>
+      </tbody>
+</table>
+  
+ </template>

@@ -1,0 +1,204 @@
+<template name="header">
+  <header class="main-header">
+    <!-- Logo -->
+    {{#with href}}
+    <a href="{{href_url}}" target="_blank" class="logo">
+      {{#with logo}}
+      <span class="logo-mini"><img src="{{logo_img}}" class="mainLogo"></span>
+      <span class="logo-lg"><img src="{{logo_img}}" class="mainLogo">&emsp;<b>
+          {{#with appName}} {{app}} {{/with}}</b></span>
+      {{/with}}
+    </a>
+    {{/with}}
+    <!-- Header Navbar: style can be found in header.less -->
+    <nav class="navbar navbar-static-top">
+      <!-- Sidebar toggle button-->
+      <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+
+      <div class="navbar-custom-menu">
+
+        <ul class="nav navbar-nav">
+          {{#if userCan 'cashSalesView'}}
+          <li class="dropdown notifications-menu " style="font-size: 19px;">
+            <a href="#" class="dropdown-toggle" style="color: #181e25;" data-toggle="dropdown" aria-expanded="true">
+              <i class="fa fa-bell-o" style="color:white;"></i>
+              {{#with notificationCount}}
+              <span class="label label-danger">{{notificationCount}}</span>
+              {{/with}}
+            </a>
+            <ul class="dropdown-menu">
+              {{#with notificationCount}}
+              <li class="header">You have {{notificationCount}} notifications</li>
+              {{/with}}
+              <li>
+                <ul class="menu">
+                  {{#with notificationStockAccept}}
+                  <li>
+                    <a href="/stockAcceptance/list" id="stockRem">
+                      <i class="fa fa-cubes " style="color: #4CAF50;"></i>
+                      {{{this}}}
+                    </a>
+                  </li>
+                  {{/with}}
+                  {{#with notificationOutletAprvd}}
+                  <li>
+                    <a href="/sdOutletList/list" id="outletAprvRem">
+                      <i class="fa fa-building " style="color: #4c8baf;"></i>
+                      {{{this}}}
+                    </a>
+                  </li>
+                  {{/with}}
+                  {{#with notificationOrdrAprvd}}
+                  <li>
+                    <a href="/order/list" id="ordrAprRem">
+                      <i class="fa fa-cart-plus " style="color: #9e4caf;"></i>
+                      {{{this}}}
+                    </a>
+                  </li>
+                  {{/with}}
+                </ul>
+              </li>
+            </ul>
+          </li>
+          {{/if}}
+          {{#if userCan 'outletsApproveView'}}
+          <li class="dropdown notifications-menu " style="font-size: 19px;">
+            <a href="#" class="dropdown-toggle" style="color: #181e25;" data-toggle="dropdown" aria-expanded="true">
+              <i class="fa fa-bell-o" style="color:white;"></i>
+              {{#with notificationCount}}
+              <span class="label label-danger">{{notificationCount}}</span>
+              {{/with}}
+            </a>
+            <ul class="dropdown-menu">
+              {{#with notificationCount}}
+              <li class="header">You have {{notificationCount}} notifications</li>
+              {{/with}}
+              <li>
+                <ul class="menu">
+                  {{#with notificationOutletChecker}}
+                  <li>
+                    <a href="/outletApproval/list" id="outletRem">
+                      <i class="fa fa-building " style="color: #4CAF50;"></i>
+                      {{{this}}}
+                    </a>
+                  </li>
+                  {{/with}}
+                  {{#with notificationAcceptChecker}}
+                  <li>
+                    <a href="/stockTransfer/list" id="acceptRem">
+                      <i class="fa fa-cubes " style="color: #4c8baf;"></i>
+                      {{{this}}}
+                    </a>
+                  </li>
+                  {{/with}}
+                  {{#with notificationEditChecker}}
+                  <li>
+                    <a href="/stockTransfer/list" id="editRem">
+                      <i class="fa fa-pencil " style="color: #9e4caf;"></i>
+                      {{{this}}}
+                    </a>
+                  </li>
+                  {{/with}}
+                  {{#with notificationOrderChecker}}
+                  <li>
+                    <a href="/orderApprove/list" id="ordrRem">
+                      <i class="fa fa-cart-plus " style="color: #e9e522;"></i>
+                      {{{this}}}
+                    </a>
+                  </li>
+                  {{/with}}
+                  {{#with notificationStockRtn}}
+                  <li>
+                    <a href="/stockReturnAccept/list" id="stockReturnId">
+                      <i class="fa fa-cart-plus " style="color: #4CAF50;"></i>
+                      {{{this}}}
+                    </a>
+                  </li>
+                  {{/with}}
+                  {{#with notificationCollectionAdd}}
+                  <li>
+                    <a href="/collection/list" id="collectionId">
+                      <i class="fa fa-credit-card" style="color: hsl(180, 93%, 37%);"></i>
+                      {{{this}}}
+                    </a>
+                  </li>
+                  {{/with}}
+                </ul>
+              </li>
+            </ul>
+          </li>
+          {{/if}}
+          {{#if userCan 'sdOutletsView'}}
+
+          <li class="user user-menu notification">
+            <a href="#" class="dropdown-toggle " data-toggle="dropdown">
+              <i class="fa fa-hand-paper-o"></i>
+            </a>
+            <ul class="dropdown-menu">
+              <li class="user-header">
+                <h3 style="color:#fff"><b>Attendance</b></h3>
+                <p>
+                  {{#with user}}
+                  {{profile.firstName}} {{profile.lastName}}<br>
+                  {{else}}
+                  {{/with}}
+                </p>
+                <div class="">
+                  {{#with attCheck}}
+                  {{{attCheck}}}
+                  {{/with}}
+                </div>
+              </li>
+            </ul>
+          </li>
+          {{/if}}
+          <li class="dropdown user user-menu">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <img src="{{profileImage}}" class="user-image" alt="User Image">
+              {{#with user}}
+              <span class="hidden-xs"> Hi {{profile.firstName}} {{profile.lastName}} !</span>
+              {{else}}
+              <span class="hidden-xs">Hi Guest !</span>
+              {{/with}}
+            </a>
+            <ul class="dropdown-menu">
+              <!-- User image -->
+              <li class="user-header">
+                <img src="{{profileImage}}" class="img-circle" alt="User Image">
+                <p>
+                  {{#with user}}
+                  {{profile.firstName}} {{profile.lastName}}<br>
+                  {{roleNameGet roles}}
+                  {{else}}
+                  {{/with}}
+                </p>
+
+              </li>
+              <li class="user-footer">
+                <div class="pull-left">
+                  <a href="/profile/update" class="btn btn-default btn-flat profile" id="ic-update">Profile</a>
+                </div>
+                <div class="pull-right">
+                  <a class="btn btn-default btn-flat signOutVal">Sign out</a>
+                </div>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    {{#if notification}}
+    <!-- {{> notification}} -->
+
+    {{/if}}
+    {{> warningModal id="notificationWarnigModal" section='Warning' }}
+
+
+  </header>
+</template>

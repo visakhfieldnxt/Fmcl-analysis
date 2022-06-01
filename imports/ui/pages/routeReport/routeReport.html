@@ -1,0 +1,362 @@
+<template name="routeReport">
+  <section class="content-header">
+    <h1>Route Details Report
+      <small>Listing All Routes</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
+      <li class="active">Route Details Report</li>
+    </ol>
+  </section>
+
+  <section class="content">
+    <div class="row">
+      <div style="float: right;">
+        <form class="exportToday">
+          <button type="submit" title="Export Route Data" id="exportButtons"
+            class="btn btn-primary btn-flat">Export</button>
+          <button type="button" title="Search" class="btn btn-primary btn-flat" id="filterSearch"><i
+              class="fa fa-search"> </i>&nbsp; Search</button>
+        </form>
+      </div>
+    </div>
+    <div class="row" id="filterDisplay" style="display:none">
+      <div class="box box-default box-solid">
+        <div class="box-header with-border bg-aqua">
+          <h3 class="box-title">{{user}} Filter</h3><button type="button" id="removeSearch"
+          style="color: white; background-color: transparent; border-color:transparent" class="pull-right"><i
+            class="fa fa-close"  style="color: black;"></i></button>
+        </div>
+        <div class="box-body no-padding">
+          <form class="route-filter">
+            <div class="row">
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EMPcode">Route Name</label>
+                <select name="routeCodeVal" style="width:100% !important" id="routeCodeVal" class="routeCodeVal"
+                  placeholder="Select Route Code">
+                  <option disabled selected value=''>Select Route Name</option>
+                  {{# each routeCodeLists}}
+                  <option value="{{routeName}}"> {{routeName}}
+                  </option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EMPcode">Route Code</label>
+                <select name="routeCode" style="width:100% !important" id="routeCode" class="routeCode"
+                  placeholder="Select Route Code">
+                  <option disabled selected value=''>Select Route Code</option>
+                  {{# each routeCodeLists}}
+                  <option value="{{routeCode}}">{{routeCode}}
+                  </option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EMPcode">Sub Distributor</label>
+                <select name="selectSubD" style="width:100% !important" id="selectSubD" class="selectSubD"
+                  placeholder="Select Sub Distributor">
+                  <option disabled selected value=''>Select Sub Distributor</option>
+                  {{# each vanUserNameList}}
+                  <option value="{{_id}}">{{profile.firstName}} {{profile.lastName}}
+                  </option>
+                  {{/each}}
+                </select>
+              </div>
+
+              <div class="row" style="float: right">
+
+                <button type="submit" name="filter" class="btn btn-primary">Filter</button>
+                <button type="button" name="reset" class="btn btn-info reset">Reset Filter</button>
+
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      {{#if isReady}}
+      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
+      onClick=clickEvent}}
+      {{/if}}
+      <div class="box box-default box-solid"> 
+        {{#if isReady}}
+        <div class="box-body no-padding table-responsive">
+          <table class="table table-striped generic" style="width:100%;margin-bottom:0;table-layout: fixed">
+            <tbody>
+              <tr>
+                <th class="text-center sorted-column" style="width:40px">Sl.No</th>
+                <th class="text-center sorted-column" style="width:200px">Route Name</th>
+                <th class="text-center sorted-column" style="width:200px">Route Code</th>
+                <th class="text-center sorted-column" style="width:200px">No Of Outlets</th>
+                <th class="text-center sorted-column" style="width:200px">Vertical</th>
+                <th class="text-center sorted-column" style="width:200px">Sub Distributor</th>
+                <th class="text-center sorted-column" style="width:200px">Status</th>
+              </tr>
+              {{#each orderes}}
+              <tr>
+                <td class="text-center" style="width:40px">{{incremented @index}}</td>
+                <td class="text-center" style="width:200px">{{routeName}}</td>
+                <td class="text-center" style="width:200px">{{routeCode}}</td>
+                <td class="pl-20 text-center getOutletCountGet_{{_id}}" style="width:200px">{{getOutletCount _id}}</td>
+                <td class="pl-20 text-center getVerticalNames_{{_id}}" style="width:200px">{{getVerticalNam _id
+                  vertical}}</td>
+                <td class="pl-20 text-center userIdVal_{{subDistributor}}" style="width:200px">{{getUserName
+                  subDistributor}}</td>
+                <td class="pl-20 text-center" style="width:200px">{{activeCheckss active}}</td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+        {{sortIcon}}
+        {{else}}
+        <div class="overlay">
+          <i class="fa fa-refresh fa-spin"></i>
+        </div>
+        {{/if}}
+      </div>
+      {{#if isReady}}
+      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
+      onClick=clickEvent}}
+      {{/if}}
+
+    </div>
+    {{#if isReady}}
+    <div id="bodySpin">
+    </div>
+    {{else}}
+    <div id="bodySpin" style=" width: 100%;position: 
+          fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+      justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+    {{/if}}
+
+
+    <div id="bodySpinLoaders" style=" width: 100%;position: 
+    fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+
+  </section>
+
+  <div class="modal fade in" id="orderDetailPage">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="orderHs"></h4>
+        </div>
+        <div class="modal-body">
+          <div class="box box-default box-solid">
+            <div class="box-header with-border bg-aqua">
+              <h3 class="box-title">Route Details</h3>
+            </div>
+            <table style="width:100%; table-layout:fixed; border-collapse:collapse;" class="table table-striped">
+              <tbody>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="Employee ">Route Name </label>
+                    <div id="detailrouteName"></div>
+                  </td>
+                  <td width="50%">
+                    <label for="Employee ">Route Code</label>
+                    <div id="detailrouteCode"></div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="firstName">Branch Name</label>
+                    <div id="detailBranch"></div>
+                  </td>
+                  <td width="50%">
+                    <label for="firstName">Description</label>
+                    <div id="detailDescription"></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            {{#with items}}
+            <span style="padding-left: 10px;"><label for="Employee " style="padding-top: 10px;">Customer
+                List</label></span>
+            <div id="detailUsername" class="table-responsive">
+              <div class="row ">
+                <table style="width:100%;margin-bottom:0;table-layout: fixed" class="table table-striped with-border">
+                  <thead>
+                    <tr>
+                      <th width="100px">Sl No. </th>
+                      <th width="200px">Customer Name</th>
+                      <th width="100px">Priority</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {{#each items}}
+                    <tr class="table-border">
+                      <td>{{incremented @index}}</td>
+                      <td style="word-wrap: break-word">{{custNameHelp customer}}</td>
+                      <td style="word-wrap: break-word">{{ priority}}</td>
+                    </tr>
+                    {{/each}}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            {{/with}}
+          </div>
+          {{#if printLoad}}
+          <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+          absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+            {{#with printLoaderImage}}
+            <div class="loader-lg" style="width: 100%;height: 100%;display: 
+            flex; align-items: center;justify-content: center;background: #fff;">
+              <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+            </div>
+            {{/with}}
+          </div>
+          {{else}}
+          <div class="loadersSpin">
+          </div>
+          {{/if}}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default closen" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="fullScreen">
+    <img src="" alt="" />
+  </div>
+  <div class="modal fade in" id="deliveryReportExportPage">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close exportClose" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="deliveryExportH"></h4>
+        </div>
+        <form class="exportByDate">
+          <div class="modal-body">
+            <div class="box box-default box-solid">
+              <div class="box-header with-border bg-aqua">
+                <h3 class="box-title">Details</h3>
+              </div>
+
+              <table style="width:100%;" class="table table-striped">
+                <tbody>
+                  <tr>
+                    <td>
+
+                      <label for="Employee ">From Date </label>
+                      <input type="text" autocomplete="off" class="form-control datepicker date validation startDate"
+                        data-date-autoclose="true" onkeydown="event.preventDefault()" id="my-datepicker"
+                        data-provide="datepicker" data-date-format="yyyy-mm-dd" placeholder="From Date "
+                        name="startDate" required />
+                      <span id="startDateSpan"></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label for="firstName">To Date </label>
+                      <input type="text" autocomplete="off" class="form-control datepicker date validation endDate"
+                        data-date-autoclose="true" onkeydown="event.preventDefault()" id="my-datepicker" disabled='true'
+                        data-provide="datepicker" data-date-format="yyyy-mm-dd" placeholder="To Date " name="endDate"
+                        required />
+                      <span id="endDateSpan"></span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              {{#if orderByDateExport}}
+              <div id="loaderSpin">
+              </div>
+              {{else}}
+              <div id="loaderSpin">
+                {{#with loader}}
+                <span class="loader-lg"><img src="{{loader_img}}" style="width: 100%;opacity: 0.8;position: 
+                    absolute;top: 0;bottom: 0;right: 0;left: 0;" class="mainLoader"></span>
+                {{/with}}
+              </div>
+              {{/if}}
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default exportClose pull-left" data-dismiss="modal">Close</button>
+            {{#if orderByDateExport}}
+            <button type="submit" id="exportButton" class="btn btn-primary">Export</button>
+            {{else}}
+            <button type="submit" class="btn btn-primary" disabled>Export</button>
+            {{/if}}
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <table class="table table-striped generic" id="viewNew" style="display:none">
+    <tbody>
+      <tr>
+        <th class="text-center sorted-column">Sl.No</th>
+        <th class="text-center sorted-column">Sales Return No./Date</th>
+        <th class="text-center sorted-column" id="name">Dealer Name</th>
+        <th class="text-center sorted-column" id="name">Dealer Code</th>
+
+        <th class="text-center sorted-column" id="name">Status</th>
+        <th class="text-center sorted-column">Amount</th>
+        <th class="text-center sorted-column">Salesman</th>
+      </tr>
+      {{#each orderByDateExport}}
+      <tr id="{{_id}}">
+        <td class="text-center" width="3%">{{incremented @index}}</td>
+        <td class="text-center" width="10%">{{docNum}}/{{dateFormat docDate}}</td>
+        <td class="pl-20 text-center" width="15%">{{cardName}}</td>
+        <td class="pl-20 text-center" width="10%">{{cardCode}}</td>
+
+        <td class="pl-20 text-center" width="10%">{{sRStatus}}</td>
+        <td class="text-center" width="15%">{{total grandTotal}}</td>
+        <td class="text-center" width="15%"> {{createdByName}}</td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+  <table class="table table-striped generic" id="exportTodayOrder" style="display:none">
+    <tbody>
+      <tr>
+        <th class="text-center sorted-column" style="width:100px">Sl.No</th>
+        <th class="text-center sorted-column" style="width:200px">Route Name</th>
+        <th class="text-center sorted-column" style="width:200px">Route Code</th>
+        <th class="text-center sorted-column" style="width:200px">No Of Outlets</th>
+        <th class="text-center sorted-column" style="width:200px">Vertical</th>
+        <th class="text-center sorted-column" style="width:200px">Sub Distributor</th>
+        <th class="text-center sorted-column" style="width:200px">Status</th>
+      </tr>
+      {{#each orderTodayExport}}
+      <tr id="{{_id}}">
+        <td class="text-center sorted-column" style="width:100px">{{incremented @index}}</td>
+        <td class="text-center sorted-column" style="width:200px">{{routeName}}</td>
+        <td class="text-center sorted-column" style="width:200px">{{routeCode}}</td>
+        <td class="pl-20 text-center sorted-column getOutletCountGet_{{_id}}" style="width:200px">{{getOutletCount _id}}
+        </td>
+        <td class="pl-20 text-center sorted-column getVerticalNames_{{_id}}" style="width:200px">{{getVerticalNam _id
+          vertical}}</td>
+        <td class="pl-20 text-center sorted-column userIdVal_{{subDistributor}}" style="width:200px">{{getUserName
+          subDistributor}}</td>
+        <td class="pl-20 text-center" sorted-column style="width:200px">{{activeCheckss active}}</td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</template>

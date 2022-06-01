@@ -1,0 +1,76 @@
+<template name="signup_create">
+  <section class="content">
+  <div class="register-box" style="margin: 0% auto;">
+    <div class="login-logo" style="margin-bottom: 0px;">
+      {{#with href}}
+      <a  href="{{href_url}}" target="_blank">
+      {{#with logo}}
+       <span class="logo-mini"><img src="{{logo_img}}" class="mainLogo"></span>
+       {{/with}}
+
+         <b>{{#with appName}} {{app}} {{/with}}</b></a>
+       {{/with}}
+    </div>
+    <div class="login-box-body">
+      <form class="signup-add" autocomplete="off" >
+        <div class="form-group has-feedback" style="margin-top:20px;">
+          <label for="firstName">First Name <span class="asteric_red">*</span> </label>
+          <input type="text" class="form-control validation" placeholder="Enter first name . ."   name="firstName" required>
+          <span class="glyphicon glyphicon-user form-control-feedback"></span>
+        </div>
+        <div class="form-group has-feedback" >
+          <label for="lastName">Last Name</label>
+          <input type="text" class="form-control novalidation"   placeholder=" Enter last name . ." name="lastName" >
+          <span class="glyphicon glyphicon-user form-control-feedback"></span>
+        </div>
+        <div class="form-group has-feedback" style="margin-top:20px;" >
+          <label for="gender" style="margin-right: 5px;">Gender<span class="asteric_red">*</span>&nbsp;:</label>
+          <input type="radio" name="gender" value="Male" style="margin-right: 5px;" required> Male
+          <input type="radio" name="gender" value="Female" style="margin-right: 5px;margin-left:5px;" required> Female
+          <input type="radio" name="gender" value="Other" style="margin-right: 5px;margin-left:5px;"  required> Other
+        </div>
+        <div class="form-group has-feedback">
+          <label for="dateOfBirth">Date Of Birth<span class="asteric_red">*</span></label>
+          <input type="text" class="form-control datepicker date validation" onkeydown="event.preventDefault()" id="my-datepicker" data-provide="datepicker" data-date-format="dd/mm/yyyy" placeholder="Select date of birth . . " name="dateOfBirth" required/>
+          <span class="glyphicon glyphicon-calendar form-control-feedback"></span>
+        </div>
+        <div class="form-group has-feedback">
+          <label for="Email">Email Id<span class="asteric_red">*</span></label>
+          <input type="email" class="form-control validation" id="email" placeholder="Enter email Id . ." name="email"  pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$"
+          title ="Please enter a vaild email address eg: example@example.com" required>
+          <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+          <span id="emailspan"> </span>
+        </div>
+        <div class="form-group has-feedback">
+          <label for="username">Username<span class="asteric_red">*</span></label>
+          <input type="text" class="form-control validation" placeholder="Enter username . ."  name="username" required>
+          <span class="glyphicon glyphicon-user form-control-feedback"></span>
+        </div>
+        <div class="form-group has-feedback">
+          <label for="password">Password<span class="asteric_red">*</span></label>
+          <input type="password"  class="form-control validation" placeholder="Enter password . ." id="password" name="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" style="padding-right: 0"
+          required  >         
+          <span toggle="#password" style="position: absolute;top:32px;right: 8px;" class=" fa fa-fw fa-eye-slash field-icon toggle-password"></span>
+          <span id="passwordspan"></span>
+          <div class="hint" >
+            Password must be at least 8 characters long and should contain at least a number and an uppercase letter
+          </div>
+        </div>
+        <div class="form-group has-feedback">
+          <label for="confirmPassword">Confirm Password<span class="asteric_red">*</span></label>
+          <input type="password" id="confirmpassword" class="form-control validation" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"  placeholder="Retype password . ." name="confirmPassword" required>
+          <span class="glyphicon glyphicon-log-in form-control-feedback"></span>
+          <span id="confirmpasswordspan"></span>
+        </div>
+        <div class="row" style="margin-top: 21px !important;margin-right: 0 !important;">
+          <button type="submit" class="btn btn-primary btn-block btn-flat right-btn" >Register</button>
+        </div>
+      </form>
+          <a href="/login"  data-dismiss="modal" class="text-center reset_modal" >I already have {{#with
+          appName}} {{app}} {{/with}} account</a>
+    </div>
+    <!-- /.form-box -->
+  </div>
+</section>
+
+</template>

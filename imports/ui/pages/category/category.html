@@ -1,0 +1,436 @@
+<template name="category">
+  {{#if userCan 'categoryView'}}
+  <section class="content-header">
+    <h1>Category
+      <small>Listing All Category</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
+      <li class="active">Category</li>
+    </ol>
+  </section>
+  <section class="content">
+
+    <div class="row">
+      <div style="float: right;">
+        {{#if userCan 'categoryCreate'}}
+        <button class="btn btn-primary btn-flat" id="fileUploadcategory">Upload</button>
+        <button class="btn btn-primary btn-flat" id="ic-create-category-button">Create Category</button>
+        {{/if}}
+        <button class="btn btn-primary btn-flat" id="filterSearch"><i class="fa fa-search"> </i>&nbsp; Search</button>
+      </div>
+    </div>
+
+    <div class="row" id="filterDisplay" style="display:none">
+      <div class="box box-default box-solid">
+        <div class="box-header with-border bg-aqua">
+          <h3 class="box-title" style="color: black;">Category Filter</h3><button type="button" id="removeSearch"
+            style="color: white; background-color: transparent; border-color:transparent" class="pull-right"><i
+              class="fa fa-close" style="color: black;"></i></button>
+        </div>
+        <div class="box-body no-padding">
+          <form class="categoryFilter">
+            <div class="row">
+
+              <div class="col-sm-4" style="padding: 10px 10px 10px 10px;">
+                <label for="category">Category Code</label>
+                <select class="categoryCodeSelection" style="width:100%;" name="categoryCodeSelection"
+                  id="categoryCodeSelection">
+                  <option selected value=''>Select Category Code</option>
+                  {{# each categoryLists}}
+                  <option value="{{categoryCode}}">{{categoryCode}}</option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="col-sm-4" style="padding: 10px 10px 10px 10px;">
+                <label for="category">Category Name</label>
+                <select class="categoryNameSelection" style="width:100%;" name="categoryNameSelection"
+                  id="categoryNameSelection">
+                  <option selected value=''>Select Category Name</option>
+                  {{# each categoryLists}}
+                  <option value="{{categoryName}}">{{categoryName}}</option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="row" style="float: right">
+                <button type="submit" name="filter" class="btn btn-primary">Filter</button>
+                <button type="button" name="reset" class="btn btn-info reset">Reset Filter</button>
+
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- {{#if isReady}}
+      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
+      onClick=clickEvent}}
+      {{/if}} -->
+      <div class="nav-tabs-custom taskHeader" id="taskHeader">
+        <ul class="nav nav-tabs taskHeaderList" id="taskHeaderList">
+          <li class="active paginationFilterValue activeFilter activeHeaders" id="activeFilter"><a href=""
+              data-toggle="tab">Active</a>
+          </li>
+          <li class="paginationFilterValue inactiveFilter" id="inactiveFilter"><a href="" data-toggle="tab">Inactive</a>
+          </li>
+        </ul>
+        <div class="tab-content" style="padding : 0px !important">
+          <div class="box box-default box-solid">
+            <!-- <div class="box-header with-border bg-aqua">
+              <h3 class="box-title">Category</h3>
+            </div> -->
+            {{#if isReady}}
+            <div class="box-body no-padding table-responsive">
+              <table class="table table-striped generic">
+                <tbody>
+                  <tr>
+                    <th class="sorted-column text-center">Category Code</th>
+                    <th class="text-center sorted-column">Category Name</th>
+                    <th class="text-center sorted-column">Principal</th>
+                    <th class="text-center sorted-column">Brand</th>
+                    <th class="text-center sorted-column"> </th>
+                  </tr>
+                  {{#each categoryList}}
+                  <tr>
+                    <td class="text-center sorted-column ">{{categoryCode}}</td>
+                    <td class="text-center sorted-column">{{categoryName}}</td>
+                    <td class="text-center sorted-column principalVal_{{principal}}" width="25%">{{getPrincipalName
+                      principal}}</td>
+                    <td class="text-center sorted-column brandIdVal_{{brand}}">{{getbrandName brand}}</td>
+                    <td class="text-center" width="25%">
+                      <input type="hidden" id="categoryName_{{_id}}" value="{{categoryName}}">
+                      {{#if userCan 'categoryUpdate'}}
+                      <a href="javascript:void(0)" class="edit" title="Click to edit {{categoryName}}" id="{{_id}}">
+                        <button class="pd-20 btn btn-primary"><i class="fa fa-pencil"></i></button>
+                      </a> &nbsp;
+                      {{/if}}
+                      {{#if userCan 'categoryDelete'}}
+                      {{#if activeHelper active}}
+                      <a href="javascript:void(0)" class="deactivate" title="Click to inactivate {{categoryName}}"
+                        id="{{_id}}">
+                        <button class="pd-20 btn btn-danger"><i class="fa fa-close"></i></button>
+                      </a>&nbsp;
+                      {{/if}}
+                      {{#if inactiveHelper active}}
+                      <a href="javascript:void(0)" class="activate" title="Click to activate {{categoryName}}"
+                        id="{{_id}}">
+                        <button class="pd-20 btn btn-success"><i class="fa fa-check"></i></button>
+                      </a> &nbsp;
+                      {{/if}}
+                      {{/if}}
+                      <input type="hidden" id="userId" name="userid" value="{{_id}}">
+                      <a href="javascript:void(0)" class="view " title="Click to view details" id="{{_id}}">
+                        <button class="pd-20 btn btn-default"><i class="fa fa-ellipsis-v"></i></button>
+                      </a>
+                    </td>
+                  </tr>
+                  {{/each}}
+                </tbody>
+              </table>
+            </div>
+            {{sortIcon}}
+            {{else}}
+            <div class="overlay">
+              <i class="fa fa-refresh fa-spin"></i>
+            </div>
+            {{/if}}
+          </div>
+        </div>
+      </div>
+
+      {{#if isReady}}
+      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
+      onClick=clickEvent}}
+      {{/if}}
+    </div>
+    {{#if isReady}}
+    <div id="bodySpin">
+    </div>
+    {{else}}
+    <div id="bodySpin" style=" width: 100%;position: 
+          fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+      justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+    {{/if}}
+    <div id="bodySpinLoaders" style=" width: 100%;position: 
+    fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+  </section>
+
+  <div class="ic-create-category-modal">
+    <div class="modal" id="ic-create-category">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Create Category</h4>
+          </div>
+          <div class="modal-body">
+            {{> category_create category=category}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {{> successModal id="categorySuccessModal" section=category}}
+  {{> errorModal id="categoryErrorModal" section=category}}
+
+
+  <div class="modal fade in" id="categoryUploadConfirmation">
+    <div class="modal-dialog">
+      <form id="uploadcategory" autocomplete="off">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span></button>
+            <h4 class="modal-title text-bold" id="categoryUploadHeader"></h4>
+          </div>
+          <div class="modal-body">
+            <div id="categorysBody">
+              <div class="fileupload fileupload-new" data-provides="fileupload" style="text-align:center">
+                <span class="btn btn-file btn-default">
+                  <span class="fileupload-exists">{{#if labelName}}
+                    {{labelName}}
+                    {{else}}
+                    Upload File
+                    {{/if}}</span>
+                  <input name="uploadcategoryFile" class="file-upload-input uploadcategoryFile" id="uploadcategoryFile"
+                    method="post" type="file" style="width: 0%;height: 0%; margin-top: 0px;" required />
+                </span>
+                <span class="text-center" id="fileArrayspan"></span>
+              </div>
+              <br>
+              <p class="">
+                Are you sure to upload Category .?<span id="categoryUploadNameDup" class="text-bold"></span>
+              </p>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" title="Download format" id="downloadcategory"
+              class="btn btn-primary pull-left">Format</button>
+            <button type="submit" class="btn btn-success">Yes please!</button>
+            <button type="button" class="btn btn-danger" data-dismiss="modal" id="categoryFileClose">Not
+              now</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal fade in" id="categoryDelConfirmation">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="categoryHeader"></h4>
+        </div>
+        <div class="modal-body">
+          <div id="categorysBody">
+            <p class="danger-color">
+              Are you sure to inactivate Category- '<span id="categoryNameDup" class="text-bold"></span>' ?
+            </p>
+          </div>
+          <input type="hidden" id="confirmedUuid">
+        </div>
+        <div class="modal-footer">
+          <button id="categoryRemove" class="btn btn-danger">Yes please!</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal" id="categoryClose">Not
+            now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade in" id="categoryActiveConfirmation">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="categoryHeaders"></h4>
+        </div>
+        <div class="modal-body">
+          <div id="categorysBody">
+            <p class="success-color">
+              Are you sure to activate Category- '<span id="categoryNameDups" class="text-bold"></span>' ?
+            </p>
+          </div>
+          <input type="hidden" id="confirmedUuids">
+        </div>
+        <div class="modal-footer">
+          <button id="categoryActivate" class="btn btn-success">Yes please!</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal" id="categoryClose">Not
+            now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade in" id="categoryEditPage">
+    <div class="modal-dialog">
+      <form class="updatecategory" autocomplete="off">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span></button>
+            <h4 class="modal-title text-bold" id="categoryH"></h4>
+          </div>
+          <div class="modal-body">
+            <div class="box box-default box-solid">
+              <!-- <div class="box-header with-border bg-aqua">
+                <h3 class="box-title">Category Details</h3>
+              </div> -->
+              <table style="width:100%;">
+                <tr>
+                  <td>
+                    <div class="form-group has-feedback">
+                      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                        <label for="lastName">Category Code <span class="asteric_red">*</span></label>
+                        <input type="text" disabled class="form-control validation" placeholder="Category Code"
+                          id="categoryCodeEdits" name="categoryCodeEdits" required>
+                      </div>
+                      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                        <label for="lastName">Category Name <span class="asteric_red">*</span></label>
+                        <input type="text" class="form-control validation" placeholder="Category Name"
+                          id="categoryNameEdits" name="categoryNameEdits" required>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="form-group has-feedback">
+                      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                        <label for="lastName">Select Principal <span class="asteric_red">*</span></label>
+                        <select class="selectPrincipalEdit" disabled required style="width:100%;" name="selectPrincipalEdit"
+                          id="selectPrincipalEdit">
+                          <option selected='selected' value="">Select Principal</option>
+                          {{# each getPricipalListEdit}}
+                          <option value="{{_id}}">{{principalName}}</option>
+                          {{/each}}
+                        </select>
+                      </div>
+                      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                        <label for="lastName">Select Brand <span class="asteric_red">*</span></label>
+                        <select class="selectbrandEdit" disabled required style="width:100%;" name="selectbrandEdit"
+                          id="selectbrandEdit">
+                          <option selected='selected' value="">Select Brand</option>
+                          {{# each getbrandListEdit}}
+                          <option value="{{_id}}">{{brandName}}</option>
+                          {{/each}}
+                        </select>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <input type="hidden" class="id" name="id">
+              </table>
+            </div>
+            {{#if printLoad}}
+            <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+            absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+              {{#with printLoaderImage}}
+              <div class="loader-lg" style="width: 100%;height: 100%;display: 
+              flex; align-items: center;justify-content: center;background: #fff;">
+                <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+              </div>
+              {{/with}}
+            </div>
+            {{else}}
+            <div class="loadersSpin">
+            </div>
+            {{/if}}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default closen pull-left" data-dismiss="modal"
+              id="categoryClose">Close</button>
+            <button type="submit" class="btn btn-primary">Update Category </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal fade in" id="categoryDetailPage">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="categoryH"></h4>
+        </div>
+        <div class="modal-body">
+          <div class="box box-default box-solid">
+            <!-- <div class="box-header with-border bg-aqua">
+              <h3 class="box-title">Category Details</h3>
+            </div> -->
+            <table style="width:100%;" class="table table-striped">
+              <tbody>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="Employee ">Category Code</label>
+                    <div id="detailcategoryCode"></div>
+                  </td>
+                  <td width="50%">
+                    <label for="firstName">Category Name </label>
+                    <div id="detailcategoryName"></div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="firstName">Principal</label>
+                    <div id="detailPricipalName"></div>
+                  </td>
+                  <td width="50%">
+                    <label for="firstName">Brand</label>
+                    <div id="detailbrand"></div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="Employee ">Status</label>
+                    <div id="detailStatus"></div>
+                  </td>
+                  <td width="50%"> 
+                  </td> 
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          {{#if printLoad}}
+          <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+          absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+            {{#with printLoaderImage}}
+            <div class="loader-lg" style="width: 100%;height: 100%;display: 
+            flex; align-items: center;justify-content: center;background: #fff;">
+              <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+            </div>
+            {{/with}}
+          </div>
+          {{else}}
+          <div class="loadersSpin">
+          </div>
+          {{/if}}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default closen" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  {{/if}}
+</template>

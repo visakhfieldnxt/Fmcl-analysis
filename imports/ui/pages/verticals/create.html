@@ -1,0 +1,33 @@
+<template name="vertical_create">
+  <form class="verticalAdd" autocomplete="off" id="verticalAdd">
+    <div class="box box-default box-solid">
+      <div class="box-header with-border bg-aqua">
+        <!-- <h3 class="box-title">Vertical Details</h3> -->
+        <button type="button" class="close closevertical" id="closeUserVertical" data-dismiss="modal"
+          aria-label="Close">
+          <span style="margin-top: -65px;margin-left: -5px;position: absolute;" aria-hidden="true">×</span></button>
+      </div>
+      <table style="width:100%;" class="table table-striped">
+        <tr>
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="lastName">Vertical Code<span class="asteric_red">*</span></label>
+                <input type="text" class="form-control validation" placeholder="Vertical Code" id="verticalCodes"
+                  name="verticalCodes" required>
+              </div>
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="lastName">Vertical Name<span class="asteric_red">*</span></label>
+                <input type="text" class="form-control validation" placeholder="Vertical Name" id="verticalNames"
+                  name="verticalNames" required>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <button type="submit" id="updatevertical" class="btn btn-primary  pull-right">Save
+      Vertical</button>
+    <button type="button" class="btn btn-default closevertical" data-dismiss="modal">Close</button>
+  </form>
+</template>

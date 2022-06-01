@@ -1,0 +1,8 @@
+/**
+ * @author Nithin
+ */
+
+Meteor.methods({
+
+
+});

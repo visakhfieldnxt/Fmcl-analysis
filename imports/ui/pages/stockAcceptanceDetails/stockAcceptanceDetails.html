@@ -1,0 +1,130 @@
+<template name="stockAcceptanceDetails">
+  <section class="content-header">
+    <h1>Product List
+      <small id="divValuesGet"></small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
+      <li class="active">Product List</li>
+    </ol>
+  </section>
+  <section class="content">
+    <div class="content">
+      <div class="header">
+      </div>
+      <div class="body">
+        <div class="box box-default box-solid">
+          <form class="acceptStockDetails" autocomplete="off" id="acceptStockDetails">
+            <div id="detailUsername" class="table-responsive">
+              <div class="row ">
+                <table style="width:100%;margin-bottom:0;table-layout: fixed" class="table table-striped">
+                  <tbody>
+                    {{#each stockList}}
+                    <tr class="view" id="{{_id}}">
+                      <td class="sorted-column" width="15%">
+                        <span class="text-left verticalIdVal_{{vertical}}"
+                          style="word-wrap: break-word; font-weight: bold;">
+                          {{getVerticalName
+                          vertical}}
+                        </span><br>
+                        <span style="word-wrap: break-word;"
+                          class="text-center  productIdVals_{{product}}">{{getProductNames
+                          product}}</span> <br>
+                      </td>
+                      <td class="sorted-column" width="15%">
+                        <span style="text-align: center;font-weight: bold;" class="stockVal_{{_id}}">{{getUnitNames
+                          unit
+                          quantity _id}}
+                        </span><br>
+                        <a href="javascript:void(0)" class="editProductStock editVal_{{_id}}"
+                          title="Click To Update Stock" id="{{_id}}">
+                          <i class="fa fa-pencil"></i>
+                        </a>
+                      </td>
+                    </tr>
+                    {{/each}}
+                  </tbody>
+                </table>
+              </div>
+              <div class="row">
+                <table class="table generic">
+                  <tbody>
+                    <tr>
+                      <button type="submit" class="btn btn-primary pull-right">
+                        Accept Stock</button>
+                      <button type="button" id="backHome" class="btn btn-default closen pull-left"
+                        data-dismiss="modal">Close</button>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+  <div id="bodySpinLoaders" style=" width: 100%;position: 
+  fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+    {{#with bodyLoader}}
+    <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+justify-content: center;background: #f1f1f1;">
+      <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+    </div>
+    {{/with}}
+  </div>
+
+  <div class="modal fade in" id="stockEditModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="userHeader"></h4>
+        </div>
+        <div class="modal-body">
+          <table style="width:100%;" class="table table-responsive">
+            <tbody>
+              <tr>
+                <td style="border: none;">
+                  <div class="form-group has-feedback">
+                    <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                      <label for="lastName">Quantity <span class="asteric_red">*</span></label>
+                      <input type="text" class="form-control validation" placeholder="Quantity" id="stockData"
+                        name="stockData">
+                    </div>
+                    <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                      <label for="lastName">Remarks</label>
+                      <textarea name="remarkStock" id="remarkStock" cols="5" rows="7" style="height:50px"
+                        placeholder="Enter Remark"></textarea>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <input type="hidden" id="confirmedUuid">
+        <div class="modal-footer">
+          <button id="updateProductStock" class="btn btn-success">Update</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal" id="userClose">Close
+          </button>
+        </div>
+      </div>
+      {{#if printLoad}}
+      <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+      fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+        {{#with printLoaderImage}}
+        <div class="loader-lg" style="width: 100%;height: 100%;display: 
+        flex; align-items: center;justify-content: center;background: #fff;">
+          <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+        </div>
+        {{/with}}
+      </div>
+      {{else}}
+      <div class="loadersSpin">
+      </div>
+      {{/if}}
+    </div>
+  </div>
+</template>

@@ -1,0 +1,29 @@
+<template name="routeWiseMap">
+  <section class="content-header">
+    <h1>Route Map
+      <small>Listing Route Map </small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
+      <li class="active">Route Map</li>
+    </ol>
+  </section>
+  <section class="content">
+    <div class="row">
+      <div style="float: right;">
+        <button class="btn btn-secondary addbuttonNew closeMap" title="Close Map"><i
+            class="fa fa-close" style="font-size: 20px; color: blue;"></i></button>
+      </div>
+    </div>
+    <div class="row" style="padding-top: 30px;">
+      <div class="box box-default box-solid">
+        <!-- {{#with mapLoad}} -->
+        <div id="mapContainer">
+          <!-- <div id="map"></div> -->
+          {{> googleMap name="exampleMap" options=exampleMapOptions}}
+        </div>
+        <!-- {{/with}} -->
+      </div>
+    </div>
+  </section>
+</template>

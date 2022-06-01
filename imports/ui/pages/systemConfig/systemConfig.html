@@ -1,0 +1,212 @@
+<template name="systemConfig">
+  <!-- {{#if userCan 'userView'}} -->
+  <section class="content-header">
+    <h1>System Configuration
+      <small>System Configuration</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
+      <li class="active">System Configuration</li>
+    </ol>
+  </section>
+  <section class="content">
+    <div class="row">
+      <div>
+        <button class="btn btn-primary btn-flat pull-right" id="config-create-button">New Config</button>
+        <!-- <button type="button" class="btn btn-primary btn-flat" id="customerSync">Customer Sync</button>
+        <button type="button" class="btn btn-primary btn-flat itemSync">Item Sync</button>
+        <button type="button" class="btn btn-primary btn-flat branchSync">Branch Sync</button>
+        <button type="button" class="btn btn-primary btn-flat countrySync">Country Sync</button>
+        <button type="button" class="btn btn-primary btn-flat currencySync">Currency ItemSyc</button>
+        <button type="button" class="btn btn-primary btn-flat customerAddressSync">Customer Address Syc</button>
+        <button type="button" class="btn btn-primary btn-flat customerGroupSync">Customer Group Syc</button>
+        <button type="button" class="btn btn-primary btn-flat customerPriceSync">Customer Price list Syc</button>
+        <button type="button" class="btn btn-primary btn-flat defaultWareHouseSync">default WareHouse Sync</button>
+        <button type="button" class="btn btn-primary btn-flat employeeSync">Employee Sync</button>
+        <button type="button" class="btn btn-primary btn-flat itemGetPriceSync">Item Get Price Sync</button>
+        <button type="button" class="btn btn-primary btn-flat itemCategorySync">itemCategory Sync</button>
+        <button type="button" class="btn btn-primary btn-flat itemPriceSync">ItemPrice List Sync</button>
+        <button type="button" class="btn btn-primary btn-flat itemSpecialPriceSync">ItemSpecial Price List Sync</button>
+        <button type="button" class="btn btn-primary btn-flat returnActionSync">Return Action Sync</button>
+        <button type="button" class="btn btn-primary btn-flat returnReasonSync">Return ReasonSync Sync</button>
+        <button type="button" class="btn btn-primary btn-flat stateSync">State Sync</button>
+        <button type="button" class="btn btn-primary btn-flat taxSync">Tax Sync</button>
+        <button type="button" class="btn btn-primary btn-flat unitSync">Unit Sync</button>
+        <button type="button" class="btn btn-primary btn-flat wareHouseSync">wareHouse Sync</button>
+        <button type="button" class="btn btn-primary btn-flat wareHouseStockSync">wareHouse Stock Sync</button>
+        <button type="button" class="btn btn-primary btn-flat customerBrancSync">Customer Branch Sync</button>
+        <button type="button" class="btn btn-primary btn-flat binQuantitySync">Bin Quantity Sync</button>
+        <button type="button" class="btn btn-primary btn-flat binSync">Bin Sync</button>
+        <button type="button" class="btn btn-primary btn-flat BatchSync">Batch Sync</button> -->
+
+        <!-- <button type="button" class="btn btn-primary btn-flat warehouseStockDelete"  >Delete Warehouse Stock</button> -->
+
+        <!-- <div class="row">
+          <div class="col-md-3 col-sx-12 col-sm-12">
+            <form class="warehouseStockDelete">
+              <label for="EMPcode">Delete Warehouse Stock</label>
+              <input type="text" autocomplete="off" class="form-control datepicker date validation whsDate"
+                data-date-autoclose="true" onkeydown="event.preventDefault()" id="my-datepicker"
+                data-provide="datepicker" data-date-format="yyyy-mm-dd" placeholder="Date " name="whsDate"
+                style="width:50px" />
+              <button type="submit" class="btn btn-primary btn-flat "> Delete Warehouse Stock </button>
+              <button type="button" class="btn btn-default closen" data-dismiss="modal">Clear</button>
+            </form>
+          </div>
+        </div> -->
+
+
+        <!-- <div class="row">
+          <div class="col-md-3 col-sx-12 col-sm-12">
+            <form class="warehouseStockDateWise">
+              <label for="EMPcode">Date Wise Warehouse Stock</label>
+              <input type="text" autocomplete="off" class="form-control datepicker date validation whsStockDate"
+                data-date-autoclose="true" onkeydown="event.preventDefault()" id="my-datepickers"
+                data-provide="datepicker" data-date-format="yyyy-mm-dd" placeholder="Date " name="whsStockDate"
+                style="width:50px" />
+              <button type="submit" class="btn btn-primary btn-flat "> Update Warehouse Stock </button>
+              <button type="button" class="btn btn-default closen" data-dismiss="modal">Clear</button>
+            </form>
+          </div>
+        </div> -->
+
+
+        <!-- <div class="row">
+          <div class="col-md-3 col-sx-12 col-sm-12">
+            <form class="itemPriceDateWise">
+              <label for="EMPcode">Date Wise Item Get Price</label>
+              <input type="text" autocomplete="off" class="form-control datepicker date validation itemPriceDate"
+                data-date-autoclose="true" onkeydown="event.preventDefault()" id="my-datepickerss"
+                data-provide="datepicker" data-date-format="yyyy-mm-dd" placeholder="Date " name="itemPriceDate"
+                style="width:50px" />
+              <button type="submit" class="btn btn-primary btn-flat "> Update Item Get Price  </button>
+              <button type="button" class="btn btn-default closen" data-dismiss="modal">Clear</button>
+            </form>
+          </div>
+        </div>
+      </div> -->
+        <div class="row">
+          <div class="col-md-4 col-sx-12 col-sm-12">
+            <h4>Forcefully Logout</h4>
+            <div class="row">
+              <form class="submitForceFullyLogOut">
+                <table style="width:100%;" class="table table-striped">
+                  <tr>
+                    <div class="form-group has-feedback">
+                      <label for="customer">Select User <span class="asteric_red">*</span></label>
+                      <select class=" selectVanUsers" style="width:100%;" name="selectVanUsers" id="selectVanUsers"
+                        required>
+                        <option value="">Select User</option>
+                        <option value="allUsers">All - Users</option>
+                        {{# each vanUserArray}}
+                        <option value="{{_id}}">{{profile.firstName}} {{profile.lastName}}</option>
+                        {{/each}}
+                      </select>
+                    </div>
+                  </tr>
+                </table>
+                <button type="submit" class="btn btn-primary btn-flat ">Submit</button>
+                &nbsp;
+                <button type="button" class="btn btn-default resetSyn" data-dismiss="modal">Clear</button>
+              </form>
+            </div>
+          </div>
+          <div class="col-md-4 col-sx-12 col-sm-12">
+            <h4>Cancel Stock Return</h4>
+            <div class="row">
+              <form class="cancelStockReturn">
+                <table style="width:100%;" class="table table-striped">
+                  <tr>
+                    <div class="form-group has-feedback">
+                      <label for="customer">Select Stock Return Id <span class="asteric_red">*</span></label>
+                      <select class="selectReturnId" style="width:100%;" name="selectReturnId" id="selectReturnId"
+                        required>
+                        <option value="">Select Stock Return Id</option> 
+                        {{# each stockReturnIdList}}
+                        <option value="{{_id}}">{{temporaryId}}</option>
+                        {{/each}}
+                      </select>
+                    </div>
+                  </tr>
+                </table>
+                <button type="submit" class="btn btn-primary btn-flat ">Submit</button>
+                &nbsp;
+                <button type="button" class="btn btn-default resetRtn" data-dismiss="modal">Clear</button>
+              </form>
+            </div>
+          </div>
+          <div class="col-md-4 col-sx-12 col-sm-12">
+            <h4>Clear Negative Stock</h4>
+            <div class="row">
+              <form class="clearNegativeStock">
+                <button type="submit" class="btn btn-primary btn-flat ">Submit</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="box box-default box-solid" style="width:400">
+        <div class="box-header with-border bg-aqua">
+          <h3 class="box-title">System Configuration</h3>
+        </div>
+        {{#if isReady}}
+        <div class="box-body no-padding table-responsive">
+          <table class="table table-striped generic">
+            <tbody>
+              <tr>
+                <th class=" sorted-column">Name</th>
+                <th class=" sorted-column">Value</th>
+              </tr>
+              {{#each systemConfig}}
+              <tr class="view " id="{{_id}}">
+                <td class="pl-20 " width="50%">
+                  {{name}}
+                </td>
+                <td class="pl-20 " width="50%">
+                  <div class="editable-input">
+                    {{> editableText options=optionsHelper field="value"}}
+                  </div>
+                </td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+        {{sortIcon}}
+        {{else}}
+        <div class="overlay">
+          <i class="fa fa-refresh fa-spin"></i>
+        </div>
+        {{/if}}
+      </div>
+      {{#if isReady}}
+      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
+      onClick=clickEvent}}
+      {{/if}}
+    </div>
+  </section>
+  <div class="config-create-modal">
+    <div class="modal" id="config-create">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Create Config</h4>
+          </div>
+          <div class="modal-body">
+            {{> config_create config=Config}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {{> successModal id="configSuccessModal" section='Config'}}
+  {{> errorModal id="configErrorModal" section='Config'}}
+  <!-- {{/if}} -->
+
+</template>

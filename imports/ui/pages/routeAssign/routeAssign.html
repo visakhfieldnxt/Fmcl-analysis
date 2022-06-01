@@ -1,0 +1,513 @@
+<template name="routeAssign">
+  {{#if userCan 'routeAssignView'}}
+  <section class="content-header">
+    <h1>Route Assign
+      <small>Listing All Assigned Routes</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
+      <li class="active">Assigned Routes</li>
+    </ol>
+  </section>
+  <section class="content">
+
+    <div class="row">
+      <div style="float: right;">
+        <button class="btn btn-primary btn-flat" id="routeAssign-create-button">Assign Route</button>
+        <button class="btn btn-primary btn-flat" id="filterSearch"><i class="fa fa-search"> </i>&nbsp; Search</button>
+      </div>
+    </div>
+
+    <div class="row" id="filterDisplay" style="display:none">
+      <div class="box box-default box-solid">
+        <div class="box-header with-border bg-aqua">
+          <h3 class="box-title">Route Filter</h3><button type="button" id="removeSearch"
+            style="color: white; background-color: transparent; border-color:transparent" class="pull-right"><i
+              class="fa fa-close"></i></button>
+        </div>
+        <div class="box-body no-padding">
+          <form class="route-filter">
+            <div class="row">
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EMPcode">Sub Distributor</label>
+                <select name="sdUserVal" style="width:100% !important" id="sdUserVal" class="sdUserVal"
+                  placeholder="Select Sub Distributor">
+                  <option disabled selected value=''>Select Sub Distributor</option>
+                  {{# each sdUsersFullList}}
+                  <option value="{{_id}}">{{profile.firstName}} {{profile.lastName}}
+                  </option>
+                  {{/each}}
+                </select>
+              </div>
+
+              <!-- <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EmailId">From Date</label>
+                <input type="text" autocomplete="off" class="form-control datepicker date validation"
+                  data-date-autoclose="true" onkeydown="event.preventDefault()" id="fromDate" data-provide="datepicker"
+                  data-date-format="dd-mm-yyyy" placeholder="From Date " name="fromDate" />
+              </div>
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EmailId">To Date</label>
+                <input type="text" autocomplete="off" class="form-control datepicker date validation"
+                  data-date-autoclose="true" onkeydown="event.preventDefault()" id="toDate" data-provide="datepicker"
+                  data-date-format="dd-mm-yyyy" placeholder="To Date " name="toDate" />
+              </div> -->
+              <div class="row" style="float: right">
+                <button type="submit" name="filter" class="btn btn-primary">Filter</button>
+                <button type="button" name="reset" class="btn btn-info reset">Reset Filter</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <!-- {{#if isReady}}
+      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
+      onClick=clickEvent}}
+      {{/if}} -->
+      <div class="nav-tabs-custom taskHeader" id="taskHeader">
+        <ul class="nav nav-tabs taskHeaderList" id="taskHeaderList">
+          <li class="active paginationFilterValue activeFilter activeHeaders" id="activeFilter"><a href=""
+              data-toggle="tab">Active</a>
+          </li>
+          <li class="paginationFilterValue inactiveFilter" id="inactiveFilter"><a href="" data-toggle="tab">Inactive</a>
+          </li>
+        </ul>
+        <div class="tab-content" style="padding : 0px !important">
+          <div class="box box-default box-solid">
+            <!-- <div class="box-header with-border bg-aqua">
+              <h3 class="box-title">Route</h3>
+            </div> -->
+            {{#if isReady}}
+            <div class="box-body no-padding table-responsive">
+              <table class="table table-striped generic">
+                <tbody>
+                  <tr>
+                    <th class="text-center sorted-column">Route Name</th>
+                    <th class="text-center sorted-column">Route Code</th>
+                    <th class="text-center sorted-column"> Date</th>
+                    <th class="text-center sorted-column">Sub Distributor</th>
+                    <th class="text-center sorted-column">Assigned To</th>
+                    <th class="text-center sorted-column">Status</th>
+                    <th class="text-center"> </th>
+                  </tr>
+                  {{#each routeAssignLists}}
+                  <tr>
+                    <td class=" text-center routeVal_{{routeId}}" width="15%">{{routeNameHelp routeId}}</td>
+                    <td class="text-center routeCodeVal_{{routeId}}" width="15%">{{routeCodeHelp routeId}}</td>
+                    <td class="text-center " width="10%">{{routeDate}}</td>
+                    <td class="text-center sorted-column word-wrap: break-word userIdVal_{{subDistributor}}"
+                      width="15%">
+                      {{getUserName subDistributor}}</td>
+                    {{#if assignedTo}}
+                    <td class="text-center  vanUserName_{{assignedTo}}" width="15%">{{vanUserName assignedTo}}</td>
+                    {{else}}
+                    <td class="text-center " width="15%">-</td>
+                    {{/if}}
+                    <td class="text-center " width="15%">{{{statCheck routeStatus}}}</td>
+                    <td class="text-center" width="25%">
+                      {{#if routeCompCheck routeStatus}}
+                      {{#if userCan 'routeDelete'}}
+                      {{#if activeCheck active}}
+                      <input type="hidden" class="routeIdVals" id="routeCode_{{_id}}" value="">
+                      <a href="javascript:void(0)" class="remove routeValTitle_{{routeId}}" id="{{_id}}">
+                        <button class="pd-20 btn btn-warning"> <i class="fa fa-close"></i></button>
+                      </a> &nbsp;
+                      {{/if}}
+                      {{#if inactiveCheck active}}
+                      {{#if activateStatCheck groupDeactivated}}
+                      <input type="hidden" id="routeCode_{{_id}}" class="routeIdVals" value="">
+                      <a href="javascript:void(0)" class="activate danger-color routeValTitleDe_{{routeId}}"
+                        id="{{_id}}">
+                        <button class="pd-20 btn btn-info"><i class="fa fa-check"></i></button>
+                      </a> &nbsp;
+                      {{/if}}
+                      {{/if}}
+                      {{/if}}
+                      {{#if activeCheck active}}
+                      {{#if routeAssigneeRemove routeStatus}}
+                      <input type="hidden" id="routeCodeGet_{{_id}}" class="routeIdVals" value="">
+                      <a href="javascript:void(0)" title="Click To Remove Assignee" name="removeAssigneeButton"
+                        class="removeAssigneeButton " id="{{_id}}">
+                        <button class="pd-20 btn btn-danger"><i class="fa fa-user-times"></i></button>
+                      </a> &nbsp;
+                      {{/if}}
+                      {{/if}}
+                      {{#if activeCheck active}}
+                      {{#if assigneeAddCheck routeStatus}}
+                      <input type="hidden" id="routeCodeGet_{{_id}}" class="routeIdVals" value="">
+                      <a href="javascript:void(0)" name="routeAssignButton" class="routeAssignButton"
+                        title="Click to assign route" id="{{_id}}">
+                        <button class="pd-20 btn btn-success"><i class="fa fa-paper-plane-o"></i></button>
+                      </a> &nbsp;
+                      {{/if}}
+                      {{/if}}
+                      {{/if}}
+                      <input type="hidden" id="userId" name="userid" value="{{_id}}">
+                      <a href="javascript:void(0)" class="view " title="Click to view details" id="{{_id}}">
+                        <button class="pd-20 btn btn-default"><i class="fa fa-ellipsis-v"></i></button>
+                      </a>
+                    </td>
+                  </tr>
+                  {{/each}}
+                </tbody>
+              </table>
+            </div>
+            {{sortIcon}}
+            {{else}}
+            <div class="overlay">
+              <i class="fa fa-refresh fa-spin"></i>
+            </div>
+            {{/if}}
+          </div>
+        </div>
+      </div>
+      {{#if isReady}}
+      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
+      onClick=clickEvent}}
+      {{/if}}
+
+    </div>
+    {{#if isReady}}
+    <div id="bodySpin">
+    </div>
+    {{else}}
+    <div id="bodySpin" style=" width: 100%;position: 
+          fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+      justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+    {{/if}}
+
+    <div id="bodySpinVal" style=" width: 100%;position: 
+    fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+  </section>
+
+  <div class="routeAssign-create-modal">
+    <div class="modal" id="routeAssign-create">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Assign Route</h4>
+          </div>
+          <div class="modal-body">
+            {{> routeAssign_create route=route}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  {{> successModal id="routeSuccessModal" section='route'}}
+  {{> errorModal id="routeErrorModal" section='route'}}
+
+  <div class="modal fade in" id="routeDelConfirmation">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="userHeader"></h4>
+        </div>
+        <div class="modal-body">
+          <p class="danger-color">
+            Are you sure to deactivate route ?
+          </p>
+          <input type="hidden" id="confirmedUuid">
+        </div>
+        <div class="modal-footer">
+          <button id="deactivateRoute" class="btn btn-danger">Yes please!</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal" id="removeClose">Not now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade in" id="routeActiveConfirmation">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="routeHeaders"></h4>
+        </div>
+        <div class="modal-body">
+          <div id="routeBody">
+            <p class="success-color">
+              Are you sure to activate route ?
+            </p>
+          </div>
+          <input type="hidden" id="confirmedUuids">
+        </div>
+        <div class="modal-footer">
+          <button id="routeActivate" class="btn btn-success">Yes please!</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal" id="routeClose">Not
+            now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade in" id="orderDetailPage">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="orderHs"></h4>
+        </div>
+        <div class="modal-body">
+          <div class="box box-default box-solid">
+            <!-- <div class="box-header with-border bg-aqua">
+              <h3 class="box-title">Route Details</h3>
+            </div> -->
+            <table style="width:100%; table-layout:fixed; border-collapse:collapse;" class="table table-striped">
+              <tbody>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="Employee ">Route Name </label>
+                    <div id="detailrouteName"></div>
+                  </td>
+                  <td width="50%">
+                    <label for="Employee ">Route Code </label>
+                    <div id="detailrouteCode"></div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="Employee ">Route Date</label>
+                    <div id="detailDate"></div>
+                  </td>
+                  <td width="50%">
+                    <label for="firstName">Description</label>
+                    <div id="detailDescription"></div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="firstName">Sub Distributor</label>
+                    <div id="detailSubDistributor"></div>
+                  </td>
+                  <td width="50%">
+                    <label for="firstName">Assigned By</label>
+                    <div id="detailedAssignedBy"></div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="Employee ">Assigned To</label>
+                    <div id="detailedAssignedTo"></div>
+                  </td>
+                  <td width="50%">
+                    <label for="firstName">Assignee Remark</label>
+                    <div id="detailedAssigneeRemark"></div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="firstName">Assigned Date</label>
+                    <div id="detailedAssignedDate"></div>
+                  </td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+            {{#with items}}
+            <span style="padding-left: 10px;"><label for="Employee " style="padding-top: 10px;">Outlet
+                List</label></span>
+            <div id="detailUsername" class="table-responsive">
+              <div class="row ">
+                <table style="width:100%;margin-bottom:0;table-layout: fixed" class="table table-striped with-border">
+                  <thead>
+                    <tr>
+                      <th width="100px">Sl No. </th>
+                      <th width="200px">Outlet Name</th>
+                      <th width="100px">Priority</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {{#each items}}
+                    <tr class="table-border">
+                      <td>{{incremented @index}}</td>
+                      <td style="word-wrap: break-word">{{name}}</td>
+                      <td style="word-wrap: break-word">{{priority}}</td>
+                    </tr>
+                    {{/each}}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            {{/with}}
+          </div>
+          {{#if printLoad}}
+          <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+          absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+            {{#with printLoaderImage}}
+            <div class="loader-lg" style="width: 100%;height: 100%;display: 
+            flex; align-items: center;justify-content: center;background: #fff;">
+              <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+            </div>
+            {{/with}}
+          </div>
+          {{else}}
+          <div class="loadersSpin">
+          </div>
+          {{/if}}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default closen" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade in" id="routeAssignModal">
+    <div class="modal-dialog">
+      <form class="assignEmployeeDetails" autocomplete="off">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span></button>
+            <h4 class="modal-title text-bold" id="assignRouteHeader"></h4>
+          </div>
+          <div class="modal-body" style="overflow: auto;">
+            <div class="box box-default box-solid">
+              <!-- <div class="box-header with-border bg-aqua">
+                <h3 class="box-title">Assign Route</h3>
+              </div> -->
+              <div id="status" style="text-align:left; padding: 10px;">
+                <b>Select Employee <span class="asteric_red">*</span></b><br>
+                <select name="selectAssignEmp" id="selectAssignEmp" style="width:100%" class="selectAssignEmp" required>
+                  <option selected="selected" value="">Select Employee</option>
+                  {{# each vansaleUserList}}
+                  <option value="{{_id}}">{{profile.firstName}} {{profile.lastName}}
+                  </option>
+                  {{/each}}
+                </select>
+              </div><br>
+              <div id="remarkId" style="text-align:left;padding: 10px;">
+                <b>Remarks</b> <span class="asteric_red">*</span><br>
+                <textarea name="assignRemarks" placeholder="Remark" id="assignRemarks" style="width:330px; resize: none"
+                  required></textarea>
+              </div>
+              <div class="col-sm-12" style="padding:20px 10px">
+              </div>
+            </div>
+            <input type="hidden" id="confirmedUuidAssign">
+            {{#if printLoad}}
+            <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+            absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+              {{#with printLoaderImage}}
+              <div class="loader-lg" style="width: 100%;height: 100%;display: 
+              flex; align-items: center;justify-content: center;background: #fff;">
+                <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+              </div>
+              {{/with}}
+            </div>
+            {{else}}
+            <div class="loadersSpin">
+            </div>
+            {{/if}}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default closen pull-left" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary pull-right stockApproveBtn">Assign</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <div class="modal fade in" id="assignDelConfirmation">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="assignedHeader"></h4>
+        </div>
+        <div class="modal-body">
+          <div id="usersBody">
+            <p class="danger-color">
+              Are you sure to remove - '<span id="assignedNameDup" class="text-bold"></span>' ?
+            </p>
+          </div>
+          <input type="hidden" id="confirmedUuidRemoveAssign">
+        </div>
+        <div class="modal-footer">
+          <button id="assignRemove" class="btn btn-danger">Yes please!</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal" id="userClose">Not now</button>
+        </div>
+      </div>
+      {{#if printLoad}}
+      <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+      absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+        {{#with printLoaderImage}}
+        <div class="loader-lg" style="width: 100%;height: 100%;display: 
+        flex; align-items: center;justify-content: center;background: #fff;">
+          <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+        </div>
+        {{/with}}
+      </div>
+      {{else}}
+      <div class="loadersSpin">
+      </div>
+      {{/if}}
+    </div>
+  </div>
+
+
+
+  <div class="modal fade in" id="route_map">
+    <div class="modal-dialog googleMapWidth">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold"> Route Map</h4>
+        </div>
+        <div class="modal-body">
+          <div id="mapContainer">
+            {{> googleMap name="exampleMapNew" options=exampleMapOptionsList}}
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal" id="closeMap">Close
+          </button>
+        </div>
+      </div>
+      {{#if printLoad}}
+      <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+      absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+        {{#with printLoaderImage}}
+        <div class="loader-lg" style="width: 100%;height: 100%;display: 
+        flex; align-items: center;justify-content: center;background: #fff;">
+          <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+        </div>
+        {{/with}}
+      </div>
+      {{else}}
+      <div class="loadersSpin">
+      </div>
+      {{/if}}
+    </div>
+  </div>
+
+  {{/if}}
+
+</template>

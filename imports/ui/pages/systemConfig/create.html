@@ -1,0 +1,22 @@
+<template name="config_create">
+  <form class="config-add" id="configAdd">
+    <div class="box box-default box-solid">
+      <div class="box-header with-border bg-aqua">
+        <h3 class="box-title">Config Details</h3>
+      </div>
+      <div class="box-body no-padding">
+        <div class="row">
+          <div class="col-md-4 col-sm-12 col-xs-12">{{config}} Name <span class="asteric_red">*</span></div>
+          <div class="col-md-8 col-sm-12 col-xs-12"><input type="text" minlength="2" pattern="[^-\s][a-zA-Z0-9_\s-]+$" title="Can't starts the field with space" name="name" placeholder="{{config}} Name" required></div>
+        </div>
+        <div class="row">
+          <div class="col-md-4 col-sm-12 col-xs-12">Value <span class="asteric_red">*</span></div>
+          <div class="col-md-8 col-sm-12 col-xs-12"><textarea name="description" class="createTextarea" title="Enter Config Value" placeholder="Enter Config Value" required></textarea></div>
+        </div>
+      </div>
+    </div>
+    <button type="submit" name="submit" class="btn btn-primary pull-right">Save {{config}}</button>
+    <button type="button" class="btn btn-default closeConfig" data-dismiss="modal">Close</button>
+  </form>
+
+</template>

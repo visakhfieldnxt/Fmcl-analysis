@@ -1,0 +1,568 @@
+<template name="subDStockUpdatesReport">
+  <section class="content-header">
+    <h1> Stock Update Report
+      <small>Listing All Stock Update Report</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
+      <li class="active">Stock Update Report List</li>
+    </ol>
+  </section>
+  <section class="content">
+    <div class="row">
+      <div style="float: right;">
+        <form>
+          <button type="button" title="Export Route Data" class="btn btn-primary btn-flat export">Export</button>
+          <button type="button" title="Search" class="btn btn-primary btn-flat" id="filterSearch"><i
+              class="fa fa-search"> </i>&nbsp; Search</button>
+        </form>
+      </div>
+    </div>
+    <div class="row" id="filterDisplay" style="display:none">
+      <div class="box box-default box-solid">
+        <div class="box-header with-border bg-aqua">
+          <h3 class="box-title" style="color: black;">Stock Filter</h3><button type="button" id="removeSearch"
+            style="color: white; background-color: transparent; border-color:transparent" class="pull-right"><i
+              class="fa fa-close" style="color: black;"></i></button>
+        </div>
+        <div class="box-body no-padding">
+          <form class="stockFilter">
+            <div class="row">
+              <div class="col-sm-3" style="padding: 10px 10px 10px 10px;">
+                <label for="stock">Vertical</label>
+                <select class="selectVerticalId" style="width:100%;" name="selectVerticalId" id="selectVerticalId">
+                  <option disabled selected value=''>Select vertical Name</option>
+                  {{# each getVertical}}
+                  <option value="{{_id}}">{{verticalName}}</option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="col-sm-3" style="padding: 10px 10px 10px 10px;">
+                <label for="stock">Product</label>
+                <select class="selectProductId" style="width:100%;" name="selectProductId" id="selectProductId">
+                  <option disabled selected value=''>Select Product</option>
+                  {{# each getProductList}}
+                  <option value="{{_id}}">{{product}}</option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="col-sm-3" style="padding: 10px 10px 10px 10px;">
+                <label for="EmailId">From Date</label>
+                <input type="text" autocomplete="off" class="form-control datepicker date validation"
+                  data-date-autoclose="true" onkeydown="event.preventDefault()" id="fromDate" data-provide="datepicker"
+                  data-date-format="dd-mm-yyyy" placeholder="From Date " name="fromDate" />
+              </div>
+              <div class="col-sm-3" style="padding: 10px 10px 10px 10px;">
+                <label for="EmailId">To Date</label>
+                <input type="text" autocomplete="off" class="form-control datepicker date validation"
+                  data-date-autoclose="true" onkeydown="event.preventDefault()" id="toDate" data-provide="datepicker"
+                  data-date-format="dd-mm-yyyy" placeholder="To Date " name="toDate" />
+              </div>
+              <div class="row" style="float: right">
+                <button type="submit" name="filter" class="btn btn-primary">Filter</button>
+                <button type="button" name="reset" class="btn btn-info reset">Reset Filter</button>
+
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="box box-default box-solid">
+        <!-- <div class="box-header with-border bg-aqua">
+          <h3 class="box-title">Stock List</h3>
+        </div> -->
+        {{#if isReady}}
+        <div class="box-body no-padding table-responsive">
+          <table class="table table-striped generic" style="width:100%;margin-bottom:0;table-layout: fixed">
+            <tbody>
+              <tr>
+                <th class="text-center sorted-column" style="width: 100px;">Sl.No</th>
+                <th class="sorted-column text-center" style="width: 200px;">Vertical</th>
+                <th class="text-center sorted-column" style="width: 300px;">Product Name</th>
+                <th class="text-center sorted-column" style="width: 200px;">Invoice No</th>
+                <th class="text-center sorted-column" style="width: 200px;">Updated Date</th>
+                <th class="text-center sorted-column" style="width: 200px;">Existing Stock (Unit)</th>
+                <th class="text-center sorted-column" style="width: 200px;">Updated Stock (Unit)</th>
+                <th class="text-center sorted-column" style="width: 200px;">Total Stock (Unit)</th>
+              </tr>
+              {{#each stockList}}
+              <tr>
+                <td class="text-center sorted-column" width="3%">{{incremented @index}}</td>
+                <td class="text-center sorted-column verticalIdVal_{{vertical}}" width="10%">{{getVerticalName
+                  vertical}}</td>
+                <td class="text-center sorted-column  productIdVals_{{product}} " style="word-wrap: break-word;"
+                  width="20%">{{getProductNames product}}
+                </td>
+                <td class="text-center sorted-column" width="10%">{{invoiceNo}}
+                </td>
+                <td class="text-center sorted-column" width="10%">{{stockDate}}
+                </td>
+                {{#if oldStock}}
+                <td class="text-center sorted-column" width="15%">{{oldStock}} (CTN)
+                </td>
+                {{else}}
+                <td class="text-center sorted-column" width="15%">-
+                </td>
+                {{/if}}
+                {{#if newStock}}
+                <td class="text-center sorted-column" width="15%">{{newStock}} (CTN)
+                </td>
+                {{else}}
+                <td class="text-center sorted-column" width="15%">-
+                </td>
+                {{/if}}
+                {{# if qtyCTN}}
+                <td class="text-center sorted-column stockVal_{{_id}}" width="15%">{{ getUnitNames unit qtyCTN
+                  _id}}
+                </td>
+                {{else}}
+                <td class="text-center sorted-column stockVal_{{_id}}" width="15%">{{ getUnitNames unit stock
+                  _id}}
+                </td>
+                {{/if}}
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+        {{sortIcon}}
+        {{else}}
+        <div class="overlay">
+          <i class="fa fa-refresh fa-spin"></i>
+        </div>
+        {{/if}}
+      </div>
+
+      {{#if isReady}}
+      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
+      onClick=clickEvent}}
+      {{/if}}
+    </div>
+    {{#if isReady}}
+    <div id="bodySpin">
+    </div>
+    {{else}}
+    <div id="bodySpin" style=" width: 100%;position: 
+          fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+      justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+    {{/if}}
+    <div id="bodySpinLoaders" style=" width: 100%;position: 
+    fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+  </section>
+
+  <!-- <div class="ic-create-stock-modal">
+    <div class="modal" id="ic-create-stock">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Update Stock</h4>
+          </div>
+          <div class="modal-body">
+            {{> stockList_create stock=stock}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
+
+  {{> successModal id="stockSuccessModal" section=stock}}
+  {{> errorModal id="stockErrorModal" section=stock}}
+
+
+  <div class="modal fade in" id="stockUploadConfirmation">
+    <div class="modal-dialog">
+      <form id="uploadstock" autocomplete="off">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span></button>
+            <h4 class="modal-title text-bold" id="stockUploadHeader"></h4>
+          </div>
+          <div class="modal-body">
+            <table style="width:100%;" class="table table-striped">
+              <tr>
+                <td>
+                  <div class="form-group has-feedback">
+                    <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                      <label for="customer">Select Vertical<span class="asteric_red">*</span></label>
+                      <select class="selectVerticalVal" required style="width:100%;" name="selectVerticalVal"
+                        id="selectVerticalVal">
+                        <option selected='selected' value="">Select Vertical </option>
+                        {{# each getVertical}}
+                        <option value="{{_id}}">{{verticalName}}</option>
+                        {{/each}}
+                      </select>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="form-group has-feedback" style="padding-top: 10px;">
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div id="stocksBody">
+                    <div class="fileupload fileupload-new" data-provides="fileupload" style="text-align:center">
+                      <span class="btn btn-file btn-default">
+                        <span class="fileupload-exists">{{#if labelName}}
+                          {{labelName}}
+                          {{else}}
+                          Upload File
+                          {{/if}}</span>
+                        <input name="uploadstockFile" class="file-upload-input uploadstockFile" id="uploadstockFile"
+                          method="post" type="file" style="width: 0%;height: 0%; margin-top: 0px;" required />
+                      </span>
+                      <span class="text-center" id="fileArrayspan"></span>
+                    </div>
+                    <br>
+                    <p class="">
+                      Are you sure to upload Stock .?<span id="stockUploadNameDup" class="text-bold"></span>
+                    </p>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </div>
+          <div class="modal-footer">
+            <button type="button" title="Download format" id="downloadstock"
+              class="btn btn-primary pull-left">Format</button>
+            <button type="submit" class="btn btn-success">Yes please!</button>
+            <button type="button" class="btn btn-danger" data-dismiss="modal" id="stockFileClose">Not
+              now</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal fade in" id="stockDelConfirmation">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="stockHeader"></h4>
+        </div>
+        <div class="modal-body">
+          <div id="stocksBody">
+            <p class="danger-color">
+              Are you sure to inactivate Stock- '<span id="stockNameDup" class="text-bold"></span>' ?
+            </p>
+          </div>
+          <input type="hidden" id="confirmedUuid">
+        </div>
+        <div class="modal-footer">
+          <button id="stockRemove" class="btn btn-danger">Yes please!</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal" id="stockClose">Not
+            now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade in" id="stockActiveConfirmation">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="stockHeaders"></h4>
+        </div>
+        <div class="modal-body">
+          <div id="stocksBody">
+            <p class="success-color">
+              Are you sure to activate Stock- '<span id="stockNameDups" class="text-bold"></span>' ?
+            </p>
+          </div>
+          <input type="hidden" id="confirmedUuids">
+        </div>
+        <div class="modal-footer">
+          <button id="stockActivate" class="btn btn-success">Yes please!</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal" id="stockClose">Not
+            now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade in" id="stockEditPage">
+    <div class="modal-dialog">
+      <form class="updatestock" autocomplete="off">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span></button>
+            <h4 class="modal-title text-bold" id="categoryH"></h4>
+          </div>
+          <div class="modal-body">
+            <div class="box box-default box-solid">
+              <!-- <div class="box-header with-border bg-aqua">
+                <h3 class="box-title">Stock Details</h3>
+              </div> -->
+              <table style="width:100%;">
+                <tr>
+                  <td>
+                    <div class="form-group has-feedback">
+                      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                        <label for="lastName">Stock Code <span class="asteric_red">*</span></label>
+                        <input type="text" disabled class="form-control validation" placeholder="Stock Code"
+                          id="stockCodeEdits" name="stockCodeEdits" required>
+                      </div>
+                      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                        <label for="lastName">Stock Name <span class="asteric_red">*</span></label>
+                        <input type="text" class="form-control validation" placeholder="Stock Name" id="stockNameEdits"
+                          name="stockNameEdits" required>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <input type="hidden" class="id" name="id">
+              </table>
+            </div>
+            {{#if printLoad}}
+            <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+            absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+              {{#with printLoaderImage}}
+              <div class="loader-lg" style="width: 100%;height: 100%;display: 
+              flex; align-items: center;justify-content: center;background: #fff;">
+                <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+              </div>
+              {{/with}}
+            </div>
+            {{else}}
+            <div class="loadersSpin">
+            </div>
+            {{/if}}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default closen pull-left" data-dismiss="modal"
+              id="categoryClose">Close</button>
+            <button type="submit" class="btn btn-primary">Update Stock </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal fade in" id="stockDetailPage">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="stockH"></h4>
+        </div>
+        <div class="modal-body">
+          <div class="box box-default box-solid">
+            <!-- <div class="box-header with-border bg-aqua">
+              <h3 class="box-title">Stock Details</h3>
+            </div> -->
+            <table style="width:100%;" class="table table-striped">
+              <tbody>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="Employee ">Stock Code</label>
+                    <div id="detailstockCode"></div>
+                  </td>
+                  <td width="50%">
+                    <label for="firstName">Stock Name </label>
+                    <div id="detailstockName"></div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="Employee ">Status</label>
+                    <div id="detailStatus"></div>
+                  </td>
+                  <td width="50%">
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          {{#if printLoad}}
+          <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+          absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+            {{#with printLoaderImage}}
+            <div class="loader-lg" style="width: 100%;height: 100%;display: 
+            flex; align-items: center;justify-content: center;background: #fff;">
+              <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+            </div>
+            {{/with}}
+          </div>
+          {{else}}
+          <div class="loadersSpin">
+          </div>
+          {{/if}}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default closen" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade in" id="stockExport">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close exportClose" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="deliveryExportH"></h4>
+        </div>
+        <form class="exportByDate">
+          <div class="modal-body">
+            <div class="box box-default box-solid">
+              <table style="width:100%;" class="table table-striped">
+                <tbody>
+                  <tr>
+                    <td>
+                      <label for="stock">Vertical</label>
+                      <select class="selectVerticalIdExport" style="width:100%;" name="selectVerticalIdExport"
+                        id="selectVerticalIdExport">
+                        <option disabled selected value=''>Select vertical Name</option>
+                        {{# each getVertical}}
+                        <option value="{{_id}}">{{verticalName}}</option>
+                        {{/each}}
+                      </select>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label for="stock">Product</label>
+                      <select class="selectProductIdExport" style="width:100%;" name="selectProductIdExport"
+                        id="selectProductIdExport">
+                        <option disabled selected value=''>Select Product</option>
+                        {{# each getProductList}}
+                        <option value="{{_id}}">{{product}}</option>
+                        {{/each}}
+                      </select>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label for="Employee ">From Date <span class="asteric_red">*</span> </label>
+                      <input type="text" autocomplete="off" class="form-control datepicker date validation startDate1"
+                        data-date-autoclose="true" onkeydown="event.preventDefault()" id="my-datepicker"
+                        data-provide="datepicker" data-date-format="dd-mm-yyyy" placeholder="From Date "
+                        name="startDate" required />
+                      <span id="startDateSpan"></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label for="firstName">To Date <span class="asteric_red">*</span> </label>
+                      <input type="text" autocomplete="off" class="form-control datepicker date validation endDate1"
+                        data-date-autoclose="true" onkeydown="event.preventDefault()" id="my-datepicker"
+                        data-provide="datepicker" data-date-format="dd-mm-yyyy" placeholder="To Date " name="endDate"
+                        required />
+                      <span id="endDateSpan"></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-center">
+                      <span id="emptyDataSpan"></span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            {{#if printLoad}}
+            <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+            absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+              {{#with printLoaderImage}}
+              <div class="loader-lg" style="width: 100%;height: 100%;display: 
+              flex; align-items: center;justify-content: center;background: #fff;">
+                <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+              </div>
+              {{/with}}
+            </div>
+            {{else}}
+            <div class="loadersSpin">
+            </div>
+            {{/if}}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default exportClose pull-left" data-dismiss="modal">Close</button>
+            {{#if stockDataExport}}
+            <button type="button" class="btn btn-primary exportToday">Export</button>
+            {{else}}
+            <button type="submit" class="btn btn-primary" disabled>Export</button>
+            {{/if}}
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+
+  <table class="table table-striped generic" id="exportTodayOrder" style="display:none">
+    <tbody>
+      <tr>
+        <th class="text-center sorted-column" style="width: 100px;">Sl.No</th>
+        <th class="sorted-column text-center" style="width: 200px;">Vertical</th>
+        <th class="text-center sorted-column" style="width: 400px;">Product Name</th>
+        <th class="text-center sorted-column" style="width: 200px;">Invoice No</th>
+        <th class="text-center sorted-column" style="width: 200px;">Updated Date</th>
+        <th class="text-center sorted-column" style="width: 200px;">Existing Stock (Unit)</th>
+        <th class="text-center sorted-column" style="width: 200px;">Updated Stock (Unit)</th>
+        <th class="text-center sorted-column" style="width: 200px;">Total Stock (Unit)</th>
+      </tr>
+      {{#each stockDataExport}}
+      <tr>
+        <td class="text-center sorted-column" width="3%">{{incremented @index}}</td>
+        <td class="text-center sorted-column verticalIdVal_{{vertical}}" width="10%">{{getVerticalName
+          vertical}}</td>
+        <td class="text-center sorted-column  productIdVals_{{product}} " style="word-wrap: break-word;" width="20%">
+          {{getProductNames product}}
+        </td>
+        <td class="text-center sorted-column" width="10%">{{invoiceNo}}
+        </td>
+        <td class="text-center sorted-column" width="10%">{{stockDate}}
+        </td>
+        {{#if oldStock}}
+        <td class="text-center sorted-column" width="15%">{{oldStock}} (CTN)
+        </td>
+        {{else}}
+        <td class="text-center sorted-column" width="15%">-
+        </td>
+        {{/if}}
+        {{#if newStock}}
+        <td class="text-center sorted-column" width="15%">{{newStock}} (CTN)
+        </td>
+        {{else}}
+        <td class="text-center sorted-column" width="15%">-
+        </td>
+        {{/if}}
+        {{# if qtyCTN}}
+        <td class="text-center sorted-column stockVal_{{_id}}" width="15%">{{ getUnitNames unit qtyCTN
+          _id}}
+        </td>
+        {{else}}
+        <td class="text-center sorted-column stockVal_{{_id}}" width="15%">{{ getUnitNames unit stock
+          _id}}
+        </td>
+        {{/if}}
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</template>

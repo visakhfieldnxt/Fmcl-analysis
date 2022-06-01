@@ -1,0 +1,237 @@
+<template name="sd_create">
+  <form class="sdAdd" autocomplete="off" id="sdAdd">
+    <div class="box box-default box-solid">
+      <!-- <div class="box-header with-border bg-aqua">
+        <h3 class="box-title">Sub Distributor Details</h3>
+      </div> -->
+      <table style="width:100%;" class="table table-striped">
+        <tr>
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="branch">Branch <span class="asteric_red">*</span></label>
+                <select class="branchSelection" style="width:100%;" name="branchSelection" id="branchSelection"
+                  required>
+                  <option value="">Select Branch</option>
+                  {{# each branchList}}
+                  <option value="{{_id}}">{{branchName}}</option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="branch">Location<span class="asteric_red">*</span></label>
+                <select class="selectLocation" style="width:100%;" required name="selectLocation" id="selectLocation">
+                  <option value="">Select Location</option>
+                  {{# each locationList}}
+                  <option value="{{_id}}">{{locationName}}</option>
+                  {{/each}}
+                </select>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <div class="form-group has-feedback">
+            <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+              <label for="subDistributorName">Sub Distributor Name <span class="asteric_red">*</span> </label>
+              <input type="text" id="subDistributorName" class="form-control validation" placeholder="Enter Name"
+                name="subDistributorName" required>
+              <div style="display: none;" class="distributorDiv">
+                <select class="selectDistributor" style="width:100%;" name="selectDistributor" id="selectDistributor">
+                  {{# each distributorList}}
+                  <option value="{{_id}}">{{profile.firstName}}</option>
+                  {{/each}}
+                </select>
+              </div>
+            </div>
+            <div class="col-sm-6 priceTypeDiv" style="padding: 10px 10px 10px 10px; ">
+              <label for="branch">Select Price Type <span class="asteric_red">*</span></label>
+              <select class="selectPriceType" required style="width:100%;" name="selectPriceType" id="selectPriceType">
+                <option value="">Select Price Type </option>
+                {{# each priceTypeList}}
+                <option value="{{_id}}">{{priceTypeName}}</option>
+                {{/each}}
+              </select>
+            </div>
+          </div>
+        </tr>
+        <tr>
+          <div class="form-group has-feedback">
+            <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+              <label for="username">Contact Person </label>
+              <input type="text" id="contactPerson" class="form-control validation" placeholder="Enter Contact Person"
+                name="contactPerson">
+            </div>
+            <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+              <label for="username">Contact No </label>
+              <input type="tel" pattern="[0-9]{10}" id="contactNo" class="form-control validation"
+                placeholder="Enter Contact No. . ." name="contactNo">
+            </div>
+          </div>
+        </tr>
+        <tr>
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="Email">Email Id <span class="asteric_red">*</span></label>
+                <input type="email" class="form-control validation" id="email" placeholder="Enter Email Id" name="email"
+                  pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$"
+                  title="Please enter a vaild email address eg: example@example.com" required>
+                <span id="emailspan"> </span>
+              </div>
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="username">Address <span class="asteric_red">*</span></label>
+                <textarea name="addresVal" placeholder="Enter Address" id="addresVal" style="height: 50px;" cols="5"
+                  rows="5"></textarea>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="username">Username<span class="asteric_red">*</span></label>
+                <input type="text" id="usernameValue" class="form-control validation" placeholder="Enter username . ."
+                  name="username" required>
+              </div>
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="password">Password <span class="asteric_red requiredDiv">*</span></label>
+                <input type="password" class="form-control validation" placeholder="Enter password . ." id="password"
+                  name="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" style="padding-right: 0"
+                  autocomplete="off" required>
+                <span toggle="#password" style="position: absolute;top:36px;right: 21px;"
+                  class=" fa fa-fw fa-eye-slash field-icon toggle-password"></span>
+                <span id="passwordspan"></span>
+                <div class="hint">
+                  Password must be at least 8 characters long and should contain at least a number and an uppercase
+                  letter
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="confirmPassword">Confirm Password <span class="asteric_red requiredDiv">*</span></label>
+                <input type="password" id="confirmPassword" class="form-control validation"
+                  pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" placeholder="Retype password . ." autocomplete="off"
+                  name="confirmPassword" required>
+                <span id="confirmPasswordspan"></span>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </table>
+      <div class="verticalAddDiv" style="display: none;">
+      <table style="width:100%;" class="table table-striped">
+        <tr class="lightGreenBG">
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="customer">Select Vertical <span class="asteric_red">*</span></label>
+                <select class="selectVerticalId" style="width:100%;" name="selectVerticalId" id="selectVerticalId">
+                  <option selected='selected' value="">Select Vertical</option>
+                  {{# each verticalList}}
+                  <option value="{{_id}}">{{verticalName}}</option>
+                  {{/each}}
+                </select>
+                <span id="verticalSpan"></span>
+              </div>
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="customer">Select Price Type <span class="asteric_red">*</span></label>
+                <select class="selectPriceTypeId" style="width:100%;" name="selectPriceTypeId" id="selectPriceTypeId">
+                  <option selected='selected' value="">Select Price Type</option>
+                  {{# each verticalPriceType}}
+                  <option value="{{_id}}">{{priceTypeName}}</option>
+                  {{/each}}
+                </select>
+                <span id="priceTypeSpan"></span>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr class="lightGreenBG">
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-12" style="padding: 10px">
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr class="lightGreenBG">
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-12" style="padding: 10px">
+                <button type="button" class="btn btn-success addVertical"
+                  style="width:50%;padding: 10px;box-shadow: #a8a8a8 2px 3px 12px;">
+                  Add Vertical
+                </button>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <div class="col-sm-12" style="padding:20px 10px">
+          </div>
+        </tr>
+      </table>
+      {{#with addedVerticals}}
+      <span style="padding-left: 10px;"><label for="Employee " style="font-weight: bold; color: black;">
+          Verticals List</label></span>
+      <div id="detailUsername" class="table-responsive" style="border: none;">
+        <div class="row">
+          <table style="width:100%;table-layout: fixed; border: solid 1px #e0d8d8;"
+            class="table table-striped with-border">
+            <thead>
+              <tr class="bg-light-blue-4">
+                <th width="100px">Sl No. </th>
+                <th width="200px">Vertical Name </th>
+                <th width="110px">Price Type</th>
+                <th width="110px"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each addedVerticals}}
+              <tr class="table-border">
+                <td>{{incremented @index}}</td>
+                <td style="word-wrap: break-word" class="verticalIds_{{vertical}}">{{getSingleVerticalName
+                  vertical}}</td>
+                <td style="word-wrap: break-word " class="priceTypeIds_{{priceType}}">{{getPriceTypeName priceType}}</td>
+                <td>
+                  <a href="javascript:void(0)" class="deleteVerticals"
+                    style="border:none !important;font-size: 17px;" id="{{randomId}}" title="Click To Remove Verticals">
+                    <i class="fa fa-close danger-color"></i>
+                  </a>
+                </td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {{/with}}
+      </div>
+    </div>
+
+    <button type="submit" id="updateUser" class="btn btn-primary  pull-right">Save Sub Distributor</button>
+    <button type="button" class="btn btn-default closeUser" data-dismiss="modal">Close</button>
+  </form>
+
+  {{#if printLoad}}
+  <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+  fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+    {{#with printLoaderImage}}
+    <div class="loader-lg" style="width: 100%;height: 100%;display: 
+    flex; align-items: center;justify-content: center;background: #fff;">
+      <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+    </div>
+    {{/with}}
+  </div>
+  {{else}}
+  <div class="loadersSpin">
+  </div>
+  {{/if}}
+</template>

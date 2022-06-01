@@ -1,0 +1,494 @@
+<template name="cashSaleReport">
+  <section class="content-header">
+    <h1>Cash Sale Report
+      <small>Listing All Cash Sale</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
+      <li class="active">Cash Sale</li>
+    </ol>
+  </section>
+  <section class="content">
+    <div class="row">
+      <div style="float: right;">
+        <form>
+          <button type="button" title="Export Today's Order" class="btn btn-primary btn-flat export">Export</button>
+          <button type="button" title="Search" class="btn btn-primary btn-flat" id="filterSearch"><i
+              class="fa fa-search"> </i>&nbsp; Search</button>
+        </form>
+      </div>
+    </div>
+    <div class="row" id="filterDisplay" style="display:none">
+      <div class="box box-default box-solid">
+        <div class="box-header with-border bg-aqua">
+          <h3 class="box-title">{{user}} Filter</h3>
+          <button type="button" id="removeSearch"
+            style="color: white; background-color: transparent; border-color:transparent" class="pull-right"><i
+              class="fa fa-close" style="color: black;"></i></button>
+        </div>
+        <div class="box-body no-padding">
+          <form class="order-filter">
+            <div class="row">
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EMPcode">Employee</label><br>
+                <select value='' name="sduserfilter" style="width:100% !important" id="sduserfilter"
+                  class="sduserfilter" placeholder="Select Employee">
+                  <option disabled selected value=''>Select Employee</option>
+                  {{# each sdUser1}}
+                  <option value="{{_id}}">{{profile.firstName}}</option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EMPcode">Vertical Name</label><br>
+                <select value='' name="verticalfilter" style="width:100% !important" id="verticalfilter"
+                  class="verticalfilter" placeholder="Select Card Name">
+                  <option disabled selected value=''>Select Vertical Name</option>
+                  {{# each vertical1}}
+                  <option value="{{_id}}">{{verticalName}}</option>
+                  {{/each}}
+                </select>
+              </div>
+              <!-- <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EMPcode">Outlet Name</label><br>
+                <select value='' name="outletfilter" style="width:100% !important" id="outletfilter"
+                  class="outletfilter" placeholder="Select Card Name">
+                  <option disabled selected value=''>Select Outlet Name</option>
+                  {{# each outlet1}}
+                  <option value="{{_id}}">{{name}}</option>
+                  {{/each}}
+                </select>
+              </div> -->
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EmailId">From Date <span class="asteric_red">*</span></label>
+                <input type="text" autocomplete="off" class="form-control datepicker date validation"
+                  data-date-autoclose="true" onkeydown="event.preventDefault()" id="fromDate" data-provide="datepicker"
+                  data-date-format="dd-mm-yyyy" placeholder="From Date " name="fromDate" required />
+              </div>
+
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EmailId">To Date <span class="asteric_red">*</span></label>
+                <input type="text" autocomplete="off" class="form-control datepicker date validation"
+                  data-date-autoclose="true" onkeydown="event.preventDefault()" id="toDate" data-provide="datepicker"
+                  data-date-format="dd-mm-yyyy" placeholder="To Date " name="toDate" required />
+              </div>
+
+              <div class="row" style="float: right">
+                <button type="submit" name="filter" class="btn btn-primary">Filter</button>
+                <button type="button" name="reset" class="btn btn-info reset">Reset Filter</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="box box-default box-solid"> 
+        {{#if isReady}}
+        <div class="box-body no-padding table-responsive">
+          <table class="table table-striped generic" style="width:100%;margin-bottom:0;table-layout: fixed">
+            <tbody>
+              <tr>
+                <th class="text-center sorted-column" style="width:40px">Sl.No</th>
+                <th class="text-center sorted-column" style="width:200px">Employee</th>
+                <th class="text-center sorted-column" style="width:200px">Vertical</th>
+                <th class="text-center sorted-column" style="width:200px">Outlet</th>
+                <th class="text-center sorted-column" style="width:200px">Date</th>
+                <th class="text-center sorted-column" style="width:200px">Total</th>
+                <th class="text-center sorted-column" style="width:200px">Tax Amount</th>
+              </tr>
+              {{#each creditSale}}
+              <tr class="view" id="{{_id}}" style="cursor:pointer;">
+                <td class="text-center sorted-column" style="width:40px">{{incremented @index}}</td>
+                <td class="text-center sorted-column userIdVal_{{sdUser}}" style="width:200px">{{getUserName sdUser}}
+                </td>
+                <td class="text-center sorted-column verticalIdVal_{{vertical}}" style="width:200px">{{getVerticalName
+                  vertical}}</td>
+                {{#if walkInCustomer}}
+                <td class="text-center sorted-column" style="width:200px">Walk-In Customer</td>
+                {{else}}
+                <td class="text-center sorted-column outletVal_{{outlet}}" style="width:200px">{{outletHelp outlet}}
+                </td>
+                {{/if}}
+                <td class="text-center sorted-column" style="width:200px">{{docDate}}</td>
+                <td class="text-center sorted-column" style="width:200px">{{docTotal}}</td>
+                <td class="text-center sorted-column" style="width:200px">{{taxAmount}}</td>
+              </tr>
+              {{/each}}
+              <tr>
+                <td class="text-left sorted-column" style="width:200px;font-weight: bold;" colspan="5">Total</td>
+                <td class="text-center sorted-column docTotalSum_1" style="width:200px">{{docTotalSum}}</td>
+                <td class="text-center sorted-column taxAmountSum" style="width:200px">{{taxAmountSum}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        {{sortIcon}}
+        {{else}}
+        <div class="overlay">
+          <i class="fa fa-refresh fa-spin"></i>
+        </div>
+        {{/if}}
+      </div>
+      {{#if isReady}}
+      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
+      onClick=clickEvent}}
+      {{/if}}
+
+    </div>
+    {{#if isReady}}
+    <div id="bodySpin">
+    </div>
+    {{else}}
+    <div id="bodySpin" style=" width: 100%;position: 
+          fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+      justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+    {{/if}}
+    <div id="bodySpinLoaders" style=" width: 100%;position: 
+    fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+  </section>
+  <!-- modal sect0ion -->
+  <div class="modal fade in" id="CreditSaleDetailPage">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="CreditSaleH"></h4>
+        </div>
+        <div class="modal-body">
+          <div class="box box-default box-solid">
+            <table style="width:100%;" class="table table-striped">
+              <tbody>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="Employee ">SD User</label>
+                    <div id="CreditSalesdUser"></div>
+                  </td>
+                  <td width="50%">
+                    <label for="firstName">Vertical </label>
+                    <div id="CreditSalevertical"></div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="Employee ">Outlet</label>
+                    <div id="CreditSaleoutlet"></div>
+                  </td>
+                  <td width="50%">
+                    <label for="firstName">Date </label>
+                    <div id="CreditSaledocDate"></div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="firstName">Remarks </label>
+                    <div id="CreditSaleremarks"></div>
+                  </td>
+
+
+                  <td width="50%">
+                    <label for="firstName">Route </label>
+                    <div id="CreditSalerouteId"></div>
+                  </td>
+
+                </tr>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="firstName">Doc Number </label>
+                    <div id="CreditSaledocNum"></div>
+                  </td>
+                  <td width="50%">
+                    <label for="Employee ">Created By</label>
+                    <div id="CreditSalecreatedBy"></div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="firstName">Device Info </label>
+                    <div id="detailDeviceInfo"></div>
+                  </td>
+                </tr>
+
+              </tbody>
+            </table>
+            {{#with items}}
+            <span style="padding-left: 10px;"><label for="Employee " style="padding-top: 10px;">Item
+                List</label></span>
+            <div id="detailUsername" class="table-responsive">
+              <div class="row ">
+                <table style="width:100%;margin-bottom:0;table-layout: fixed" class="table table-striped with-border">
+                  <thead>
+                    <tr>
+                      <th width="100px">Sl No. </th>
+                      <th width="200px">Product</th>
+                      <th width="100px">Unit</th>
+                      <th width="100px">Quantity</th>
+                      <th width="100px">UnitPrice</th>
+                      <th width="100px">GrandTotal</th>
+                      <th width="100px">Tax Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {{#each items}}
+                    <tr>
+                      <td>{{incremented @index}}</td>
+                      <td class="productVal_{{product}}">{{getproductHelp product}}</td>
+                      <td class="unitVal_{{unit}}">{{getunitHelp unit}}</td>
+                      <td>{{quantity}}</td>
+                      <td>{{formateAmountFix unitPrice}}</td>
+                      <td>{{formateAmountFix grossTotal}}</td>
+                      <td>{{formateAmountFix taxtAmount}}</td>
+                    </tr>
+                    {{/each}}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            {{/with}}
+            <div class="row">
+              <table class="pull-right">
+
+                <tr>
+                  <td style="padding-right:20px;">Tax Amount[GHS]:</td>
+                  <td style="font-weight: bold;font-size: 17px;"> <span id="CreditSaletaxAmount"></span></td>
+                </tr>
+                <tr>
+                  <td style="padding-right:20px;">Grand Total[GHS]:</td>
+                  <td style="font-weight: bold;font-size: 17px;"> <span id="CreditSaledocTotal"></span></td>
+                </tr>
+
+              </table>
+            </div>
+          </div>
+          {{#if printLoad}}
+          <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+        absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+            {{#with printLoaderImage}}
+            <div class="loader-lg" style="width: 100%;height: 100%;display: 
+          flex; align-items: center;justify-content: center;background: #fff;">
+              <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+            </div>
+            {{/with}}
+          </div>
+          {{else}}
+          <div class="loadersSpin">
+          </div>
+          {{/if}}
+          <div class="loadersSpinModal" style=" width: 98%;opacity: 0.9;position: 
+          absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+            {{#with printLoaderImage}}
+            <div class="loader-lg" style="width: 100%;height: 100%;display: 
+            flex; align-items: center;justify-content: center;background: #fff;">
+              <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+            </div>
+            {{/with}}
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default closen" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <table class="table table-striped generic" id="exportTodayOrder" style="display:none">
+    <tbody>
+      <tr>
+        <th class="text-center sorted-column" style="width:40px">Sl.No</th>
+        <th class="text-center sorted-column" style="width:200px">Employee</th>
+        <th class="text-center sorted-column" style="width:200px">Vertical</th>
+        <th class="text-center sorted-column" style="width:200px">Outlet</th>
+        <th class="text-center sorted-column" style="width:200px">Date</th>
+        <th class="text-center sorted-column" style="width:200px">Total</th>
+        <th class="text-center sorted-column" style="width:200px">Tax Amount</th>
+        <th class="text-center sorted-column" style="width:200px">Items</th>
+      </tr>
+      {{#each cashExpo}}
+      <tr class="view" id="{{_id}}" style="cursor:pointer;">
+        <td class="text-center sorted-column" style="width:40px">{{incremented @index}}</td>
+        <td class="text-center sorted-column userIdVal_{{sdUser}}" style="width:200px">{{getUserName sdUser}}</td>
+        <td class="text-center sorted-column verticalIdVal_{{vertical}}" style="width:200px">{{getVerticalName
+          vertical}}</td>
+        {{#if walkInCustomer}}
+        <td class="text-center sorted-column" style="width:200px">Walk-In Customer</td>
+        {{else}}
+        <td class="text-center sorted-column outletVal_{{outlet}}" style="width:200px">{{outletHelp outlet}}
+        </td>
+        {{/if}}
+        <td class="text-center sorted-column" style="width:200px">{{docDate}}</td>
+        <td class="text-center sorted-column" style="width:200px">{{docTotal}}</td>
+        <td class="text-center sorted-column" style="width:200px">{{taxAmount}}</td>
+        <td class="text-center sorted-column" style="width:200px;word-wrap: break-word !important">
+          <table style="width:100%" class="table table-striped with-border">
+            <thead>
+              <tr>
+                <th class=" text-center">Sl no. </th>
+                <!-- <th class=" text-center">RandomId </th> -->
+                <th class=" text-center">Product </th>
+                <th class=" text-center">Unit </th>
+                <th class=" text-center">Quantity </th>
+                <th class=" text-center"> Unit Price </th>
+                <th class=" text-center"> Grand Total </th>
+                <th class=" text-center"> Taxrate </th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each itemArray}}
+              <tr class="table-border">
+                <td class="  text-center">{{incremented @index}}</td>
+                <!-- <td style="word-wrap: break-word !important">{{randomId}}</td> -->
+                <td style="word-wrap: break-word !important" class="productVal_{{product}}">{{getproductHelp product}}
+                </td>
+                <td style="word-wrap: break-word !important" class="unitVal_{{unit}}">{{getunitHelp unit}}</td>
+                <td style="word-wrap: break-word !important">{{quantity}}</td>
+                <td style="word-wrap: break-word !important">{{unitPrice}}</td>
+                <td style="word-wrap: break-word !important">{{formateAmountFix grossTotal}}</td>
+                <td style="word-wrap: break-word !important">{{taxRate}}</td>
+                <td></td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </td>
+      </tr>
+      {{/each}}
+      <tr>
+        <td class="text-left sorted-column" style="width:200px;font-weight: bold;" colspan="5">Total</td>
+        <td class="text-center sorted-column docTotalSumExport" style="width:200px">{{docTotalSumExport}}</td>
+        <td class="text-center sorted-column taxAmountSumExport" style="width:200px">{{taxAmountSumExport}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="modal fade in" id="routeReportExportPage">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close exportClose" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="deliveryExportH"></h4>
+        </div>
+        <form class="exportByModal">
+          <div class="modal-body">
+            <div class="box box-default box-solid">
+              <div class="box-header with-border bg-aqua">
+                <h3 class="box-title">Details</h3>
+              </div>
+              <table style="width:100%;" class="table table-striped">
+                <tbody>
+                  <tr>
+                    <td>
+                      <label for="EMPcode">Employee</label><br>
+                      <select value='' name="sduserfilter1" style="width:100% !important" id="sduserfilter1"
+                        class="sduserfilter1" placeholder="Select Employee">
+                        <option disabled selected value=''>Select Employee</option>
+                        {{# each sdUser1}}
+                        <option value="{{_id}}">{{profile.firstName}}</option>
+                        {{/each}}
+                      </select>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label for="EMPcode">Vertical Name</label><br>
+                      <select value='' name="verticalfilter1" style="width:100% !important" id="verticalfilter1"
+                        class="verticalfilter1" placeholder="Select Card Name">
+                        <option disabled selected value=''>Select Vertical Name</option>
+                        {{# each vertical1}}
+                        <option value="{{_id}}">{{verticalName}}</option>
+                        {{/each}}
+                      </select>
+                    </td>
+                  </tr>
+                  <!-- <tr>
+                    <td>
+                    <label for="EMPcode">Outlet Name</label><br>
+                        <select value='' name="outletfilter1" style="width:100% !important" id="outletfilter1"
+                          class="outletfilter1" placeholder="Select Card Name">
+                          <option disabled selected value=''>Select Outlet Name</option>
+                          <option value="Walk-In Customer">Walk-In Customer</option>
+                          {{# each outlet1}}
+                          <option value="{{_id}}">{{name}}</option>
+                          {{/each}}
+                        </select>
+                      </td>
+                  </tr> -->
+                  <!-- <tr>
+                    <td>
+                      <label for="Employee ">From Date </label>
+                      <input type="text" autocomplete="off" class="form-control datepicker date validation startDate1"
+                        data-date-autoclose="true" onkeydown="event.preventDefault()" id="my-datepicker"
+                        data-provide="datepicker" data-date-format="dd-mm-yyyy" placeholder="From Date "
+                        name="startDate" required />
+                      <span id="startDateSpan"></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label for="firstName">To Date </label>
+                      <input type="text" autocomplete="off" class="form-control datepicker date validation endDate1"
+                        data-date-autoclose="true" onkeydown="event.preventDefault()" id="my-datepicker"
+                        data-provide="datepicker" data-date-format="dd-mm-yyyy" placeholder="To Date " name="endDate"
+                        required />
+                      <span id="endDateSpan"></span>
+                    </td>
+                  </tr> -->
+                  <tr>
+                    <td>
+                      <label for="Employee ">Select Month And Year <span class="asteric_red">*</span> </label>
+                      <input type="text" autocomplete="off" class="form-control datepicker date validation startDate1"
+                        data-date-autoclose="true" onkeydown="event.preventDefault()" id="my-datepicker"
+                        data-provide="datepicker" data-date-format="dd-mm-yyyy" placeholder="Month And Year"
+                        name="startDate1" required />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-center">
+                      <span id="emptyDataSpan"></span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            {{#if printLoad}}
+            <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+            absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+              {{#with printLoaderImage}}
+              <div class="loader-lg" style="width: 100%;height: 100%;display: 
+              flex; align-items: center;justify-content: center;background: #fff;">
+                <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+              </div>
+              {{/with}}
+            </div>
+            {{else}}
+            <div id="loaderSpin">
+            </div>
+            {{/if}}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default exportClose pull-left" data-dismiss="modal">Close</button>
+            {{#if cashExpo}}
+            <button type="button" class="btn btn-primary exportToday">Export</button>
+            {{else}}
+            <button type="submit" class="btn btn-primary" disabled>Export</button>
+            {{/if}}
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</template>

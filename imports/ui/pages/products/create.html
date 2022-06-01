@@ -1,0 +1,104 @@
+<template name="product_create">
+  {{#if userCan 'productCreate'}}
+  <form class="productAdd" autocomplete="off" id="productAdd">
+    <div class="box box-default box-solid">
+      <div class="box-header with-border bg-aqua">
+        <!-- <h3 class="box-title">Product Details</h3> -->
+        <button type="button" class="close closeproduct" id="closeUserproduct" data-dismiss="modal" aria-label="Close">
+          <span style="margin-top: -65px;margin-left: -5px;position: absolute;" aria-hidden="true">×</span></button>
+      </div>
+      <table style="width:100%;" class="table table-striped">
+        <tr>
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="lastName">Product Code <span class="asteric_red">*</span></label>
+                <input type="text" class="form-control validation" placeholder="Product Code" id="productCodes"
+                  name="productCodes" required>
+              </div>
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="lastName">Product Name <span class="asteric_red">*</span></label>
+                <input type="text" class="form-control validation" placeholder="Product Name" id="productNames"
+                  name="productNames" required>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="lastName">Select Principal <span class="asteric_red">*</span></label>
+                <select class="selectPrincipal" required style="width:100%;" name="selectPrincipal"
+                  id="selectPrincipal">
+                  <option selected='selected' value="">Select Principal</option>
+                  {{# each getPricipalList}}
+                  <option value="{{_id}}">{{principalName}}</option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="lastName">Select Brand <span class="asteric_red">*</span></label>
+                <select class="selectbrandS" required style="width:100%;" name="brand" id="selectbrandS">
+                  <option selected='selected' value="">Select Brand</option>
+                  {{# each getbrandList}}
+                  <option value="{{_id}}">{{brandName}}</option>
+                  {{/each}}
+                </select>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="lastName">Select Category <span class="asteric_red">*</span></label>
+                <select class="selectCategory" required style="width:100%;" name="selectCategory" id="selectCategory">
+                  <option selected='selected' value="">Select Category</option>
+                  {{# each getCategoryList}}
+                  <option value="{{_id}}">{{categoryName}}</option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="lastName">Basic Unit <span class="asteric_red">*</span></label>
+                <input type="text" class="form-control validation" placeholder="Base Unit" id="baseUnit" name="baseUnit"
+                  required>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="lastName">Base Quantity<span class="asteric_red">*</span></label>
+                <input type="text" class="form-control validation" placeholder="Base Quantity" id="baseQty"
+                  name="baseQty" required>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <button type="submit" id="updateproduct" class="btn btn-primary  pull-right">Save
+      Product</button>
+    <button type="button" class="btn btn-default closeproduct" data-dismiss="modal">Close</button>
+  </form>
+  {{#if printLoad}}
+  <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+  fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+    {{#with printLoaderImage}}
+    <div class="loader-lg" style="width: 100%;height: 100%;display: 
+    flex; align-items: center;justify-content: center;background: #fff;">
+      <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+    </div>
+    {{/with}}
+  </div>
+  {{else}}
+  <div class="loadersSpin">
+  </div>
+  {{/if}}
+  {{/if}}
+</template>

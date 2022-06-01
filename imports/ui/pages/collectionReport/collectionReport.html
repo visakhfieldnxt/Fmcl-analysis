@@ -1,0 +1,352 @@
+<template name="collectionReport">
+  {{#if userCan 'collectionReportView'}}
+  <section class="content-header">
+    <h1>Collection Report
+      <small>Listing All Collection Report</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
+      <li class="active">Collection Report</li>
+    </ol>
+  </section>
+  <section class="content">
+
+    <div class="row">
+      <div style="float: right;">
+        <form class="exportToday">
+          <button type="submit" title="Export Today's Collection" id="exportButtons"
+            class="btn btn-primary btn-flat">Export</button>
+          <button type="button" class="btn btn-primary btn-flat" id="filterSearch"><i class="fa fa-search"> </i>&nbsp; Search</button>
+        </form>
+      </div>
+    </div>
+    <div class="row" id="filterDisplay" style="display:none">
+      <div class="box box-default box-solid">
+        <div class="box-header with-border bg-aqua">
+          <h3 class="box-title">{{user}} Filter</h3><button type="button" id="removeSearch"
+            style="color: white; background-color: transparent; border-color:transparent" class="pull-right"><i
+              class="fa fa-close"></i></button>
+        </div>
+        <div class="box-body no-padding">
+          <form class="collectionFilter">
+            <div class="row">
+
+
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EMPcode">Customer Name</label>
+                <select value='' name="cardName" style="width:100% !important" id="selectCustomerName"
+                  class="selectCustomerName" placeholder="Select Card Name">
+                  <option disabled selected value=''>Select Customer Name</option>
+                  {{# each customersList}}
+                  <option value="{{cardName}}">{{cardName}}</option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EmailId">From Date</label>
+                <input type="text" autocomplete="off" class="form-control datepicker date validation"
+                  data-date-autoclose="true" onkeydown="event.preventDefault()" id="fromDate" data-provide="datepicker"
+                  data-date-format="yyyy-mm-dd" placeholder="From Date " name="fromDate" />
+              </div>
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EmailId">To Date</label>
+                <input type="text" autocomplete="off" class="form-control datepicker date validation"
+                  data-date-autoclose="true" onkeydown="event.preventDefault()" id="toDate" data-provide="datepicker"
+                  data-date-format="yyyy-mm-dd" placeholder="To Date " name="toDate" />
+              </div>
+              <div class="row" style="float: right">
+
+                <button type="submit" name="filter" class="btn btn-primary">Filter</button>
+                <button type="button" name="reset" class="btn btn-info reset">Reset Filter</button>
+
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      {{#if isReady}}
+      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right" onClick=clickEvent}}
+      {{/if}}
+      <div class="box box-default box-solid">
+        <!-- <div class="box-header with-border bg-aqua">
+          <h3 class="box-title">Collection List</h3>
+        </div> -->
+        {{#if isReady}}
+        <div class="box-body no-padding table-responsive">
+          <table class="table table-striped generic">
+            <tbody>
+              <tr>
+                <th class="text-center sorted-column" style="width:40px">Sl.No</th>
+                <th class="text-center sorted-column" style="width:200px" id="name">Customer Name</th>
+                <th class="text-center sorted-column" style="width:200px" id="name">Branch</th>
+                <th class="text-center sorted-column" style="width:200px" id="name">Collection Type</th>
+                <th class="text-center sorted-column" style="width:200px">Invoice No.</th>
+                <th class="text-center sorted-column" style="width:200px">Date</th>
+                <th class="text-center sorted-column" style="width:200px">Time</th>
+                <th class="text-center sorted-column" style="width:200px;">Cash Amount</th>
+                <th class="text-center sorted-column" style="width:200px;">Cheque Amount</th>
+                <th class="text-center sorted-column" style="width:200px;">Amount</th>
+                <th class="text-center sorted-column" style="width:200px">Collected By</th>
+              </tr>
+              {{#each collections}}
+              <tr class="view " id="{{_id}}" style="cursor:pointer">
+                <td class="text-center" style="width:40px">{{incremented @index}}</td>
+                <td class="pl-20 text-center" style="width:200px" width="20%">{{cardName}}</td>
+                <td class="pl-20 text-center" style="width:200px">{{branchName}}</td>
+                <td class="text-center" style="width:200px">{{collectionType}}</td>
+                <td class="text-center" style="width:200px">{{invoiceNo}}</td>
+                <td class="text-center" style="width:200px">{{dates date}}</td>
+                <td class="text-center" style="width:200px">{{timeSeperate date}}</td>
+                {{#if cashSum}}
+                <td class="text-center" style="width:200px;text-align:right">{{priceFormat cashSum}}</td>
+                {{else}}
+                <td class="text-center" style="width:200px">-</td>
+                {{/if}}
+                {{#if chequeSum}}
+                <td class="text-center" style="width:200px;text-align:right">{{priceFormat chequeSum}}</td>
+                {{else}}
+                <td class="text-center" style="width:200px">-</td>
+                {{/if}}
+                <td class="text-center" style="width:200px;text-align:right">{{priceFormat invoicePayment.sumApplied}}</td>
+                <td class="text-center" style="width:200px">{{createdBy}}</td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+        {{sortIcon}}
+        {{else}}
+        <div class="overlay">
+          <i class="fa fa-refresh fa-spin"></i>
+        </div>
+        {{/if}}
+      </div>
+      {{#if isReady}}
+      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right" onClick=clickEvent}}
+      {{/if}}
+
+    </div>
+    {{#if isReady}}
+    <div id="bodySpin">
+    </div>
+    {{else}}
+    <div id="bodySpin" style=" width: 100%;position: 
+          fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+      justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;"></div>
+      {{/with}}
+    </div>
+    {{/if}}
+
+  </section>
+
+  {{> successModal id="salesQuotationSuccessModal" section='salesQuotation'}}
+  {{> errorModal id="salesQuotationErrorModal" section='salesQuotation'}}
+
+  <div class="modal fade in" id="orderDetailPage">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="orderH"></h4>
+        </div>
+        <div class="modal-body">
+          <div class="box box-default box-solid">
+            <!-- <div class="box-header with-border bg-aqua">
+              <h3 class="box-title">Collection Details</h3>
+            </div> -->
+            <table style="width:100%;" class="table table-striped; word-wrap: break-word;">
+              <tbody>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="Employee ">Customer Name </label>
+                    <div id="detailCardName"></div>
+                  </td>
+                  <td width="50%">
+                    <label for="Employee ">Address</label>
+                    <div id="detailAddress"></div>
+                  </td>
+
+                </tr>
+                <tr class="table-border">
+
+                  <td width="50%">
+                    <label for="Employee ">Branches </label>
+                    <div id="detailBranch"></div>
+                  </td>
+                  <td width="50%">
+                    <label for="Employee ">Collection Type</label>
+                    <div id="detailCollectionType"></div>
+                  </td>
+
+                </tr>
+                <tr class="table-border">
+
+                  <td width="50%">
+                    <label for="Employee ">Date</label>
+                    <div id="detailDate"></div>
+                  </td>
+                  <td width="50%">
+                    <label for="Employee ">Total collection</label>
+                    <div id="detailCashAmount"></div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+
+                  <td>
+                    <label for="Employee ">Collection By</label>
+                    <div id="detailCreatedBy"></div>
+                  </td>
+                  <td width="50%">
+                    <label for="Employee ">Collection Id</label>
+                    <div id="detailCollectionId"></div>
+                  </td>
+                </tr>
+
+              </tbody>
+            </table>
+
+            {{#with cheque}}
+            <span style="padding-left: 10px;"><label for="Employee ">Cheque Collection List</label></span>
+            <div id="detailUsername" class="table-responsive">
+              <div class="row ">
+                <table style="width:100%; word-wrap: break-word;" class="table table-striped with-border">
+                  <thead>
+                    <tr>
+                      <th>Cheque Amount </th>
+                      <th>Cheque No. </th>
+                      <th class=" text-center pl-20 hidden-xs hidden-sm">Bank</th>
+                      <th class=" text-center pl-20 hidden-xs hidden-sm">Account Number</th>
+                      <th class=" text-center pl-20 hidden-xs hidden-sm">Remarks</th>
+                      <th>Ack</th>
+
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {{#each cheque}}
+                    <tr class="table-border">
+                      <td width="16.6%"><b>ZMW</b>&nbsp;{{priceFormat chequeAmount}}</td>
+                      <td width="16.6%">{{chequeNum}}</td>
+                      <td class=" text-center pl-20 hidden-xs hidden-sm" width="16.6%">{{bankCode}}</td>
+                      <td class=" text-center pl-20 hidden-xs hidden-sm" width="16.6%">{{accountNum}}</td>
+                      <td class=" text-center pl-20 hidden-xs hidden-sm" width="16.6%">{{remarks}}</td>
+                      {{#if imageData}}
+                      <td width="16.6%" style="cursor:zoom-in"><img src="{{imageData}}" id="{{randomId}}"
+                          title="Click to View Acknowledgement" class="js-activate-s-image-box attachment" width="40"
+                          height="auto" data-image=""></td>
+                      {{else}}
+                      <td width="16.6%">-</td>
+                      {{/if}}
+                    </tr>
+                    {{/each}}
+                  </tbody>
+                </table>
+              </div>
+
+            </div>
+            {{/with}}
+
+            {{#with cash}}
+            <span style="padding-left: 10px;"><label for="Employee ">Cash Collection List</label></span>
+            <div id="detailUsername" class="table-responsive">
+              <div class="row ">
+                <table style="width:100%; word-wrap: break-word;" class="table table-striped with-border">
+                  <thead>
+                    <tr>
+                      <th>Cash Amount </th>
+                      <th>Remarks</th>
+                      <th>Ack</th>
+
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {{#each cash}}
+                    <tr class="table-border">
+                      <td width="33.3%"><b>ZMW</b>&nbsp;{{priceFormat cashAmount}}</td>
+                      <td width="33.3%">{{remarks}}</td>
+                      {{#if imageData}}
+                      <td width="33.3%" style="cursor:zoom-in"><img src="{{imageData}}" id="{{randomId}}"
+                          title="Click to View Acknowledgement" class="js-activate-s-image-box attachment" width="40"
+                          height="auto" data-image=""></td>
+                      {{else}}
+                      <td width="33.3%">-</td>
+                      {{/if}}
+                    </tr>
+                    {{/each}}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            {{/with}}
+          </div>
+          {{#if printLoad}}
+          <div class="loadersSpin">
+          </div>
+          {{else}}
+          <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+        absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+            {{#with printLoaderImage}}
+            <div class="loader-lg" style="width: 100%;height: 100%;display: 
+          flex; align-items: center;justify-content: center;background: #fff;">
+              <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;"></div>
+            {{/with}}
+          </div>
+          {{/if}}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default closen" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="fullScreen">
+    <img src="" id="screen" alt="" />
+  </div>
+  <table class="table table-striped generic" id="exportTodayOrder" style="display:none">
+    <tbody>
+      <tr>
+        <th class="text-center sorted-column" style="width:100px">Sl.No</th>
+        <th class="text-center sorted-column" style="width:200px" id="name">Customer Name</th>
+        <th class="text-center sorted-column" style="width:200px" id="name">Branch</th>
+        <th class="text-center sorted-column" style="width:200px" id="name">Collection Type</th>
+        <th class="text-center sorted-column" style="width:200px">Invoice No.</th>
+        <th class="text-center sorted-column" style="width:200px">Date</th>
+        <th class="text-center sorted-column" style="width:200px">Time</th>
+        <th class="text-center sorted-column" style="width:200px;text-align:right">Cash Amount</th>
+        <th class="text-center sorted-column" style="width:200px;text-align:right">Cheque Amount</th>
+        <th class="text-center sorted-column" style="width:200px;">Amount</th>
+        <th class="text-center sorted-column" style="width:200px">Collected By</th>
+      </tr>
+      {{#each orderTodayExport}}
+      <tr id="{{_id}}">
+        <td class="text-center" style="width:100px">{{incremented @index}}</td>
+        <td class="pl-20 text-center" style="width:200px" width="20%">{{cardName}}</td>
+        <td class="pl-20 text-center" style="width:200px">{{branchName}}</td>
+        <td class="text-center" style="width:200px">{{collectionType}}</td>
+        <td class="text-center" style="width:200px">{{invoiceNo}}</td>
+        <td class="text-center" style="width:200px">{{dates date}}</td>
+        <td class="text-center" style="width:200px">{{timeSeperate date}}</td>
+        {{#if cashSum}}
+        <td class="text-center" style="width:200px;text-align:right">{{priceFormat cashSum}}</td>
+        {{else}}
+        <td class="text-center" style="width:200px">-</td>
+        {{/if}}
+        {{#if chequeSum}}
+        <td class="text-center" style="width:200px;text-align:right">{{priceFormat chequeSum}}</td>
+        {{else}}
+        <td class="text-center" style="width:200px">-</td>
+        {{/if}}
+        <td class="text-center" style="width:200px;text-align:right">{{priceFormat invoicePayment.sumApplied}}</td>
+        <td class="text-center" style="width:200px">{{createdBy}}</td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+  {{/if}}
+
+</template>

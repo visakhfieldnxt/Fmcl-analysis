@@ -1,0 +1,471 @@
+<template name="sdUserStockSummary">
+  {{#if userCan 'sdUserStockSummaryView'}}
+  <section class="content-header">
+    <h1>Stock Summary
+      <small>Listing All Stock Summary</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
+      <li class="active">Stock Summary</li>
+    </ol>
+  </section>
+
+  <section class="content">
+    <div class="row">
+      <div style="float: right;">
+        <button type="button" title="Export Today's Order"
+              class="btn btn-primary btn-flat export">Export</button>
+        <button type="button" title="Search" class="btn btn-primary btn-flat" id="filterSearch"><i class="fa fa-search">
+          </i>&nbsp; Search</button>
+      </div>
+    </div>
+    <div class="row" id="filterDisplay" style="display:none">
+      <div class="box box-default box-solid">
+        <div class="box-header with-border bg-aqua">
+          <h3 class="box-title" style="color: black;"> Stock Filter</h3><button type="button" id="removeSearch"
+            style="color: white; background-color: transparent; border-color:transparent" class="pull-right"><i
+              class="fa fa-close" style="color: black;"></i></button>
+        </div>
+        <div class="box-body no-padding">
+          <form class="stock-filter">
+            <div class="row">
+               <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EMPcode">Product Name</label><br>
+                <select value='' name="productName" style="width:100% !important" id="productName"
+                  class="productName" placeholder="Select Product">
+                  <option disabled selected value=''>Select Product</option>
+                  {{# each prodList}}
+                  <option value="{{_id}}">{{productName}}</option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EmailId">From Date</label>
+                <input type="text" autocomplete="off" class="form-control datepicker date validation"
+                  data-date-autoclose="true" onkeydown="event.preventDefault()" id="fromDate" data-provide="datepicker"
+                  data-date-format="dd-mm-yyyy" placeholder="From Date " name="fromDate" />
+              </div>
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EmailId">To Date</label>
+                <input type="text" autocomplete="off" class="form-control datepicker date validation"
+                  data-date-autoclose="true" onkeydown="event.preventDefault()" id="toDate" data-provide="datepicker"
+                  data-date-format="dd-mm-yyyy" placeholder="To Date " name="toDate" />
+              </div>
+              <div class="row" style="float: right">
+                <button type="submit" name="filter" class="btn btn-primary">Filter</button>
+                <button type="button" name="reset" class="btn btn-info reset">Reset Filter</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      {{#if isReady}}
+      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
+      onClick=clickEvent}}
+      {{/if}}
+      <div class="box box-default box-solid">
+        {{#if isReady}}
+        <div class="box-body no-padding table-responsive">
+          <table class="table table-striped generic" style="width:100%;margin-bottom:0;table-layout: fixed">
+            <tbody>
+              <tr>
+                <th class="text-center sorted-column" style="width:30px">Product</th>
+                <th class="text-center sorted-column" style="width:30px">Date</th>
+                <th class="text-center sorted-column" style="width:30px">Opening Stock(PCS)</th>
+                <th class="text-center sorted-column" style="width:30px">Sold Stock(PCS)</th>
+                <th class="text-center sorted-column" style="width:30px">Balance Stock(PCS)</th> 
+              </tr>
+              {{#each stocklist}}
+              <tr>
+                <td class="text-center productVal_{{product}}" style="width:30px">{{getproductHelp product}}</td>
+                <td class="text-center" style="width:30px">{{date}}</td>
+                <td class="text-center" style="width:30px">{{openingStock}}</td>
+                <td class="text-center" style="width:30px">{{soldStock}}</td>
+                <td class="text-center" style="width:30px">{{closingStock}}</td>
+              </tr>
+              {{/each}}
+              <tr>
+                <td class="text-left" style="width:30px; font-weight: bold;" colspan="2">Total</td>
+                <td class="text-center openingStockTotal" style="width:30px">{{openingStockTotal}}</td>
+                <td class="text-center soldStockTotal" style="width:30px">{{soldStockTotal}}</td>
+                <td class="text-center closingStockTotal" style="width:30px">{{closingStockTotal}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        {{sortIcon}}
+        {{else}}
+        <div class="overlay">
+          <i class="fa fa-refresh fa-spin"></i>
+        </div>
+        {{/if}}
+      </div>
+      {{#if isReady}}
+      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
+      onClick=clickEvent}}
+      {{/if}}
+
+    </div>
+    {{#if isReady}}
+    <div id="bodySpin">
+    </div>
+    {{else}}
+    <div id="bodySpin" style=" width: 100%;position: 
+            fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+        justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+    {{/if}}
+    <div id="bodySpinLoaders" style=" width: 100%;position: 
+    fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+  </section>
+
+
+  <div class="modal fade in" id="orderDetailPage">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="orderHs"></h4>
+        </div>
+        <div class="modal-body">
+          <div class="box box-default box-solid">
+
+            <table style="width:100%;table-layout: fixed;border-collapse: collapse;" class="table table-striped">
+              <tbody>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="Employee ">SD User</label>
+                    <div id="employeeId" style="word-wrap:break-word;"></div>
+                  </td>
+                  <td width="50%">
+                    <label for="Employee ">SD</label>
+                    <div id="subDistributor" style="word-wrap:break-word;"></div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="Employee ">Vertical</label>
+                    <div id="vertical" style="word-wrap:break-word;"></div>
+                  </td>
+                  <td width="50%">
+                    <label for="Employee ">Product</label>
+                    <div id="product" style="word-wrap:break-word;"></div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="Employee ">Opening Stock</label>
+                    <div id="stock" style="word-wrap:break-word;"></div>
+                  </td>
+                </tr>
+
+              </tbody>
+            </table>
+            <!--    
+               <div class="row">
+                  <table class="pull-right">
+                   <tr>
+                     <td style="padding-right:20px;">Tax Amount[GHS] : </td>
+                      <td style="font-weight: bold;font-size: 17px;" id="ordertaxAmount"></td>
+                    </tr>   
+                    <tr>
+                     <td style="padding-right:20px;">Grand Total[GHS] :</td>
+                      <td style="font-weight: bold;font-size: 17px;" id="orderdocTotal"></td>
+                    </tr>
+  
+                  </table>
+                </div> -->
+          </div>
+          {{#if printLoad}}
+          <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+            absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+            {{#with printLoaderImage}}
+            <div class="loader-lg" style="width: 100%;height: 100%;display: 
+              flex; align-items: center;justify-content: center;background: #fff;">
+              <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+            </div>
+            {{/with}}
+          </div>
+          {{else}}
+          <div class="loadersSpin">
+          </div>
+          {{/if}}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default closen" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- {{/if}} -->
+  <div class="modal fade in" id="deliveryReportExportPage">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close exportClose" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="deliveryExportH"></h4>
+        </div>
+        <form class="exportByDate">
+          <div class="modal-body">
+            <div class="box box-default box-solid">
+              <div class="box-header with-border bg-aqua">
+                <h3 class="box-title">Details</h3>
+              </div>
+              <table style="width:100%;" class="table table-striped">
+                <tbody>
+                  <tr>
+                    <td>
+                      <label for="Employee ">From Date </label>
+                      <input type="text" autocomplete="off" class="form-control datepicker date validation startDate"
+                        data-date-autoclose="true" onkeydown="event.preventDefault()" id="my-datepicker"
+                        data-provide="datepicker" data-date-format="yyyy-mm-dd" placeholder="From Date "
+                        name="startDate" required />
+                      <span id="startDateSpan"></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label for="firstName">To Date </label>
+                      <input type="text" autocomplete="off" class="form-control datepicker date validation endDate"
+                        data-date-autoclose="true" onkeydown="event.preventDefault()" id="my-datepicker" disabled='true'
+                        data-provide="datepicker" data-date-format="yyyy-mm-dd" placeholder="To Date " name="endDate"
+                        required />
+                      <span id="endDateSpan"></span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              {{#if orderByDateExport}}
+              <div id="loaderSpin">
+              </div>
+              {{else}}
+              <div id="loaderSpin">
+                {{#with loader}}
+                <span class="loader-lg"><img src="{{loader_img}}" style="width: 100%;opacity: 0.8;position: 
+                      absolute;top: 0;bottom: 0;right: 0;left: 0;" class="mainLoader"></span>
+                {{/with}}
+              </div>
+              {{/if}}
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default exportClose pull-left" data-dismiss="modal">Close</button>
+            {{#if orderByDateExport}}
+            <button type="submit" id="exportButton" class="btn btn-primary">Export</button>
+            {{else}}
+            <button type="submit" class="btn btn-primary" disabled>Export</button>
+            {{/if}}
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <table class="table table-striped generic" id="exportTodayOrder" style="display:none">
+    <tbody>
+      <tr>
+        <th class="text-center sorted-column" style="width:30px">Product</th>
+        <th class="text-center sorted-column" style="width:30px">Date</th>
+        <th class="text-center sorted-column" style="width:30px">Opening Stock(PCS)</th>
+        <th class="text-center sorted-column" style="width:30px">Sold Stock(PCS)</th>
+        <th class="text-center sorted-column" style="width:30px">Balance Stock(PCS)</th> 
+      </tr>
+      {{#each listofExport}}
+      <tr>
+        <td class="text-center productVal_{{product}}" style="width:200px">{{getproductHelp product}}</td>
+        <td class="text-center" style="width:200px">{{date}}</td>
+        <td class="text-center" style="width:200px">{{openingStock}}</td>
+        <td class="text-center" style="width:200px">{{soldStock}}</td>
+        <td class="text-center" style="width:200px">{{closingStock}}</td>
+      </tr>
+      {{/each}}
+        <tr>
+          <td class="text-left" style="width:30px; font-weight: bold;" colspan="2">Total</td>
+          <td class="text-center openingStockTotalExport" style="width:30px">{{openingStockTotalExport}}</td>
+          <td class="text-center soldStockTotalExport" style="width:30px">{{soldStockTotalExport}}</td>
+          <td class="text-center closingStockTotalExport" style="width:30px">{{closingStockTotalExport}}</td>
+        </tr>
+    </tbody>
+  </table>
+  <div class="modal fade in" id="orderDetailPage">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="orderHs"></h4>
+        </div>
+        <div class="modal-body">
+          <div class="box box-default box-solid">
+
+            <table style="width:100%;table-layout: fixed;border-collapse: collapse;" class="table table-striped">
+              <tbody>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="Employee ">SD User</label>
+                    <div id="ordersdUser" style="word-wrap:break-word;"></div>
+                  </td>
+                  <td width="50%">
+                    <label for="Employee ">SD</label>
+                    <div id="ordersubDistributor" style="word-wrap:break-word;"></div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="Employee ">Vertical</label>
+                    <div id="ordervertical" style="word-wrap:break-word;"></div>
+                  </td>
+                  <td width="50%">
+                    <label for="Employee ">Outlet</label>
+                    <div id="orderoutletoutlet" style="word-wrap:break-word;"></div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="Employee ">Route</label>
+                    <div id="orderrouteIdrouteId" style="word-wrap:break-word;"></div>
+                  </td>
+                  <td width="50%">
+                    <label for="Employee ">Date</label>
+                    <div id="orderdocDatedocDate" style="word-wrap:break-word;"></div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="Employee ">Doc Number</label>
+                    <div id="orderdocNum" style="word-wrap:break-word;"></div>
+                  </td>
+
+                  <td width="50%">
+                    <label for="Employee ">Status</label>
+                    <div id="orderstatus" style="word-wrap:break-word;"></div>
+                  </td>
+                </tr>
+                <tr>
+                  <td width="50%">
+                    <label for="Employee ">Created By</label>
+                    <div id="ordercreatedBy" style="word-wrap:break-word;"></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="row">
+              <table class="pull-right">
+                <tr>
+                  <td style="padding-right:20px;">Tax Amount[GHS] : </td>
+                  <td style="font-weight: bold;font-size: 17px;" id="ordertaxAmount"></td>
+                </tr>
+                <tr>
+                  <td style="padding-right:20px;">Grand Total[GHS] :</td>
+                  <td style="font-weight: bold;font-size: 17px;" id="orderdocTotal"></td>
+                </tr>
+
+              </table>
+            </div>
+          </div>
+          {{#if printLoad}}
+          <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+              absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+            {{#with printLoaderImage}}
+            <div class="loader-lg" style="width: 100%;height: 100%;display: 
+                flex; align-items: center;justify-content: center;background: #fff;">
+              <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+            </div>
+            {{/with}}
+          </div>
+          {{else}}
+          <div class="loadersSpin">
+          </div>
+          {{/if}}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default closen" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  {{/if}}
+  <div class="modal fade in" id="routeReportExportPage">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close exportClose" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="deliveryExportH"></h4>
+        </div>
+        <form class="exportByModal">
+          <div class="modal-body">
+            <div class="box box-default box-solid">
+              <div class="box-header with-border bg-aqua">
+                <h3 class="box-title">Details</h3>
+              </div>
+              <table style="width:100%;" class="table table-striped">
+                <tbody>
+                    <tr>
+                    <td>
+                      <label for="Employee ">From Date </label>
+                      <input type="text" autocomplete="off" class="form-control datepicker date validation startDate1"
+                        data-date-autoclose="true" onkeydown="event.preventDefault()" id="my-datepicker"
+                        data-provide="datepicker" data-date-format="dd-mm-yyyy" placeholder="From Date "
+                        name="startDate" required />
+                      <span id="startDateSpan"></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label for="firstName">To Date </label>
+                      <input type="text" autocomplete="off" class="form-control datepicker date validation endDate1"
+                        data-date-autoclose="true" onkeydown="event.preventDefault()" id="my-datepicker"
+                        data-provide="datepicker" data-date-format="dd-mm-yyyy" placeholder="To Date " name="endDate"
+                        required />
+                      <span id="endDateSpan"></span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            {{#if printLoad}}
+            <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+            absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+              {{#with printLoaderImage}}
+              <div class="loader-lg" style="width: 100%;height: 100%;display: 
+              flex; align-items: center;justify-content: center;background: #fff;">
+                <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+              </div>
+              {{/with}}
+            </div>
+            {{else}}
+            <div id="loaderSpin">
+            </div>
+            {{/if}}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default exportClose pull-left" data-dismiss="modal">Close</button>
+            {{#if listofExport}}
+            <button type="button" class="btn btn-primary exportToday">Export</button>
+            {{else}}
+            <button type="submit" class="btn btn-primary" disabled>Export</button>
+            {{/if}}
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</template>

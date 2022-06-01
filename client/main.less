@@ -1,0 +1,49 @@
+@import "{}/imports/ui/stylesheets/not-found.less";
+
+form {
+
+
+  // positioning context
+  > div {
+
+    // Looks like placeholder
+    > label {
+
+    }
+
+    > input.validation[type="text"],
+    > input.validation[type="email"],
+    > input.validation[type="password"] {
+
+
+      &:required{
+
+      & + label {
+
+      }
+    }
+        &:focus {
+
+
+        & + label {
+          opacity: 0;
+        }
+      }
+
+
+      &:invalid:not(:focus):not(:placeholder-shown) {
+        border: 1px solid #ff0b0bb3;
+        // box-shadow : 0 0 6px #ff0b0bb3;
+        & + label {
+          opacity: 0;
+        }
+      }
+
+
+    }
+
+
+  }
+
+
+}

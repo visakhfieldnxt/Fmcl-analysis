@@ -1,0 +1,54 @@
+<template name="tax_create">
+   {{#if userCan 'taxCreate'}}
+  <form autocomplete="off" class="tax-add" >
+    <div class="box box-default box-solid">
+      <!-- <div class="box-header with-border bg-aqua">
+        <h3 class="box-title headtit">Tax</h3>
+      </div> -->
+      <table style="width:100%;" class="table table-striped table-responsive">
+        <tr>
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-6" style="padding: 10px 10px 20px 10px;">
+                <label for="lastName">Tax Code <span class="asteric_red">*</span></label>
+                  <input type="text" class="form-control validation" placeholder="Enter tax code" name="taxCode" required id="taxCode">
+                 </div>
+              <div class="col-sm-6" style="padding: 10px 10px 20px 10px;">
+                <label for="lastName">Tax Name <span class="asteric_red">*</span></label>
+                 <input type="text" class="form-control validation" placeholder="Enter tax name" name="taxName" required  id="taxName">
+                </div>
+                <div class="col-sm-6" style="padding: 10px 10px 20px 10px;">
+                  <label for="lastName">Tax Percentage <span class="asteric_red">*</span></label>
+                  <input type="text" class="form-control validation" placeholder="Enter tax Percentage"  name="taxPrec" required id="taxPrec">
+                  <input type="hidden" id="taxid" name="taxnameid">
+                  <span id="taxArrayspan"></span>
+                 </div>
+                </div>
+          </td>
+        </tr>
+        <tr>
+          <div class="col-sm-12" style="padding:20px 10px">
+          </div>
+        </tr>
+      </table>
+    </div>
+    {{#if printLoad}}
+            <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+            absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+              {{#with printLoaderImage}}
+              <div class="loader-lg" style="width: 100%;height: 100%;display: 
+              flex; align-items: center;justify-content: center;background: #fff;">
+                <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+              </div>
+              {{/with}}
+            </div>
+            {{else}}
+            <div class="loadersSpin">
+            </div>
+            {{/if}}
+    <button type="submit" name="submit" id="submit" class="btn btn-primary pull-right saveapp">Save</button>
+    <button type="button" class="btn btn-default closeOrder" data-dismiss="modal">Close</button>
+  </form>
+  {{/if}}
+</template>
+

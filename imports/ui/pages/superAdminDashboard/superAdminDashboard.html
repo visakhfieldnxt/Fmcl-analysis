@@ -1,0 +1,207 @@
+<template name="superAdminDashboard">
+  <section class="content-header">
+    <h1>
+      Dashboard
+      <small>Control panel</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+      <li class="active">Dashboard</li>
+    </ol>
+  </section>
+  <div class="row">
+    <section class="col-lg-6 connectedSortable">
+      <div class="box box-solid ">
+        <div class="box-header">
+          <i class="fa fa-dashboard"></i>
+          <h3 class="box-title">Vertical Wise Sales</h3>
+          <div class="box-tools ">
+            <a href="/verticalWiseSalesReport/list"><button type="button" title="More" class="btn btn-primary btn-flat"><i
+              class="fa fa-plus"> </i></button></a>
+          </div>
+        </div>
+        <div class="box-body"> 
+          <div class="row" >
+              <div class="chart-responsive" id="outletDataDisplay">
+                <div class="chart" id="doughnut-chart" width="800" height="200" >
+                  {{#with verticalData}}{{verticalData}}{{/with}}
+                </div>
+              </div>
+              <div class="overlay" id="refreshvert" >
+                <i class="fa fa-refresh fa-spin"></i>
+              </div>
+            </div>
+              
+          </div>
+          
+      </div>
+    </section>
+    <section class="col-lg-6 connectedSortable">
+      <div class="box box-solid ">
+        <div class="box-header">
+          <i class="fa fa-shopping-cart"></i>
+          <h3 class="box-title">Outlets</h3>
+          <div class="box-tools pull-right">
+            <!-- <button type="button" title="Search" class="btn btn-info btn-flat filterTransaction"><i
+                class="fa fa-filter"> </i></button> -->
+            &nbsp;
+            <a href="/ouletWiseReport/list"><button type="button" title="More" class="btn btn-primary btn-flat"><i
+                class="fa fa-plus"></i></button> </a>
+          </div>
+        </div>
+        <div class="box-body">
+          {{#with outletWise}}{{outletWise}}{{/with}}
+      
+          <div class="row">
+            <div class="chart-responsive">
+              <canvas id="polarAreaChart" width="800" height="400"></canvas>
+            </div>
+            <div class="overlay" id="refreshvoutlet" >
+              <i class="fa fa-refresh fa-spin"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="col-lg-12 connectedSortable">
+      <div class="box box-solid ">
+        <div class="box-header">
+          <i class="fa fa-cart-arrow-down"></i>
+          <h3 class="box-title">Sub Distributor Wise Sales</h3>
+         
+          <div class="box-tools ">
+            <a href="/subDWiseSalesRep/list"> <button type="button" title="More" class="btn btn-primary btn-flat"><i
+              class="fa fa-plus"> </i></button></a>
+          </div>
+        </div>
+        <div class="box-body">
+          
+          <div class="row">
+            {{#with sdWiseSales}}{{sdWiseSales}}{{/with}}
+
+            <div class="chart-responsive">
+              <canvas id="bar-chart-grouped" width="800" height="200"></canvas>
+            </div>
+
+            <div class="overlay" id="refreshvsd" >
+              <i class="fa fa-refresh fa-spin"></i>
+            </div>
+          </div>
+        </div>
+        <!-- <div class="box-body">
+          <div class="row">
+        
+          </div>
+          <div class="row chart-responsive">
+            <table class="table generic ">
+              <tbody>
+                <tr>
+                  <th class="sorted-column" style="border: none !important; padding:13px 8px 13px 10px;">Items</th>
+                  <th class="sorted-column" style="border: none !important; padding:13px 8px 13px 10px;">Price</th>
+                  <th class="sorted-column" style="border: none !important; padding:13px 8px 13px 10px;">Manufacturer
+                  </th>
+                  <th class="sorted-column" style="border: none !important; padding:13px 8px 13px 10px;">Quantity</th>
+                </tr>
+                <tr>
+                  <td class="" style=" border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    CHAPAMANDASHI
+                    -100 GM
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <span class="badge bg-success " style="font-size: 10px;"> ZMW </span>&nbsp;
+                    12.258
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <span class="badge bg-primary "> North Safety</span>
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">20000</td>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">SUGAR D'LITE
+                    -
+                    1KG
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;"> <span
+                      class="badge bg-success " style="font-size: 10px;"> ZMW </span>&nbsp;
+                    12.258</td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <span class="badge bg-warning " > <span style="color: black;">Supa Oil</span></span>
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">15000</td>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">KASAMA SUGAR
+                    BROWN
+                    BALE - 500GM</td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;"> <span
+                      class="badge bg-success " style="font-size: 10px;"> ZMW </span>&nbsp;
+                    18.258</td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <span class="badge bg-warning "> <span style="color: black;">Supa Oil</span></span>
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">7500</td>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">SUGAR D'LITE
+                    -
+                    2KG
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;"> <span
+                      class="badge bg-success " style="font-size: 10px;"> ZMW </span>&nbsp;
+                    17.238</td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <span class="badge bg-warning "><span style="color: black;">Supa Oil</span> </span>
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">5000</td>
+                </tr>
+                <tr>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">BRITELITE
+                    PURE
+                    WRAPPED
+                    - 500GM</td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;"> <span
+                      class="badge bg-success " style="font-size: 10px;"> ZMW </span>&nbsp;
+                    12.858</td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">
+                    <span class="badge bg-primary "> North Safety</span>
+                  </td>
+                  <td class="" style="border-top: 1px solid #f3f3f3 !important;padding:13px 8px 13px 10px;">1000</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div> -->
+      </div>
+    </section>
+
+    <section class="col-lg-12 connectedSortable">
+      <div class="box box-solid ">
+        <div class="box-header">
+          <i class="fa fa-shopping-cart"></i>
+          <h3 class="box-title">Region Wise Sales</h3>
+          <div class="box-tools pull-right">
+          
+            <a href="/regionWiseSalesReport/list"><button type="button" title="More" class="btn btn-primary btn-flat"><i
+              class="fa fa-plus"> </i></button></a>
+          </div>
+        </div>
+        <div class="box-body">
+          {{#with regionSales}}{{regionSales}}{{/with}}
+      
+          <div class="row">
+            <div class="chart-responsive">
+              <canvas id="line-chart" width="800" height="200"></canvas>
+            </div>
+            <div class="overlay" id="refreshvregion" >
+              <i class="fa fa-refresh fa-spin"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+ 
+
+  </div>
+
+
+</template>

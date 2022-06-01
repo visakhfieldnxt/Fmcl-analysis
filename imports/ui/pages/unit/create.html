@@ -1,0 +1,54 @@
+<template name="unit_create">
+   {{#if userCan 'unitCreate'}}
+  <form class="unitAdd" autocomplete="off" id="unitAdd">
+    <div class="box box-default box-solid">
+      <div class="box-header with-border bg-aqua">
+        <!-- <h3 class="box-title">Unit Details</h3> -->
+        <button type="button" class="close closeunit" id="closeUserunit" data-dismiss="modal" aria-label="Close">
+          <span style="margin-top: -65px;margin-left: -5px;position: absolute;" aria-hidden="true">×</span></button>
+      </div>
+      <table style="width:100%;" class="table table-striped">
+        <tr>
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="lastName">Unit Code <span class="asteric_red">*</span></label>
+                <input type="text" class="form-control validation" placeholder="Unit Code" id="unitCodes"
+                  name="unitCodes" required>
+              </div>
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="lastName">Unit Name <span class="asteric_red">*</span></label>
+                <input type="text" class="form-control validation" placeholder="Unit Name" id="unitNames"
+                  name="unitNames" required>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="lastName">Select Product <span class="asteric_red">*</span></label>
+                <select class="selectProduct" style="width:100%;" name="selectProduct" id="selectProduct">
+                  <option selected='selected' required value="" >Select Product</option>
+                  {{# each getProductList}}
+                  <option value="{{_id}}">{{productName}}</option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="lastName">Base Quantity <span class="asteric_red">*</span></label>
+                <input type="text" class="form-control validation" placeholder="Base Quantity" id="baseQty"
+                  name="baseQty" required>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <button type="submit" id="updateunit" class="btn btn-primary  pull-right">Save
+      Unit</button>
+    <button type="button" class="btn btn-default closeunit" data-dismiss="modal">Close</button>
+  </form>
+  {{/if}}
+</template>

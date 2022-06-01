@@ -1,0 +1,290 @@
+<template name="userDetailsReport">
+    <section class="content-header">
+        <h1>User Details Report
+          <small>Listing User Details Report</small>
+        </h1>
+        <ol class="breadcrumb">
+          <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
+          <li class="active">User Details Report</li>
+        </ol>
+      </section>
+  <section class="content">
+    <div class="row">
+      <div style="float: right;">
+        <form>
+          <button type="button" title="Export Route Data" class="btn btn-primary btn-flat export">Export</button>
+          <button type="button" title="Search" class="btn btn-primary btn-flat" id="filterSearch"><i
+              class="fa fa-search"> </i>&nbsp; Search</button>
+        </form>
+      </div>
+    </div>
+    <div class="row" id="filterDisplay" style="display:none">
+      <div class="box box-default box-solid">
+        <div class="box-header with-border bg-aqua">
+          <h3 class="box-title">{{user}} Filter</h3>
+          <button type="button" id="removeSearch"
+            style="color: white; background-color: transparent; border-color:transparent" class="pull-right"><i
+              class="fa fa-close"  style="color: black;"></i></button>
+        </div>
+        <div class="box-body no-padding">
+          <form class="order-filter">
+            <div class="row">
+               <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EMPcode">User Code</label><br>
+                <select value='' name="userCode" style="width:100% !important" id="userCode"
+                  class="userCode" placeholder="Select User Code">
+                  <option disabled selected value=''>Select User Code</option>
+                  {{# each uList}}
+                  <option value="{{_id}}">{{profile.empCode}}</option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EMPcode">User Name</label><br>
+                <select value='' name="userName" style="width:100% !important" id="userName"
+                  class="userName" placeholder="Select User Name">
+                  <option disabled selected value=''>Select User Name</option>
+                  {{# each uList}}
+                  <option value="{{_id}}">{{profile.firstName}} &nbsp; {{profile.lastName}}</option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EmailId">From Date</label>
+                <input type="text" autocomplete="off" class="form-control datepicker date validation"
+                  data-date-autoclose="true" onkeydown="event.preventDefault()" id="fromDate" data-provide="datepicker"
+                  data-date-format="dd-mm-yyyy" placeholder="From Date " name="fromDate" />
+              </div>
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EmailId">To Date</label>
+                <input type="text" autocomplete="off" class="form-control datepicker date validation"
+                data-date-autoclose="true" onkeydown="event.preventDefault()" id="toDate" data-provide="datepicker"
+                data-date-format="dd-mm-yyyy" placeholder="To Date " name="toDate" />
+              </div>
+              <div class="row" style="float: right">
+                <button type="submit" name="filter" class="btn btn-primary">Filter</button>
+                <button type="button" name="reset" class="btn btn-info reset">Reset Filter</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      {{#if isReady}}
+      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
+      onClick=clickEvent}}
+      {{/if}}
+      <div class="box box-default box-solid">
+        <div class="box-header with-border bg-aqua">
+          <h3 class="box-title">Outlet Wise Report</h3>
+        </div>
+        {{#if isReady}}
+        <div class="box-body no-padding table-responsive">
+          <table class="table table-striped generic" style="width:100%;margin-bottom:0;table-layout: fixed">
+            <tbody>
+              <tr>
+                <th class="text-center sorted-column" style="width:40px">Sl.No</th>
+                <th class="text-center sorted-column" style="width:200px">Emp Code</th>
+                <th class="text-center sorted-column" style="width:200px">Name</th>
+                <th class="text-center sorted-column" style="width:200px">Gender</th>
+                <th class="text-center sorted-column" style="width:200px">DOB</th>
+                <th class="text-center sorted-column" style="width:200px">Contact No.</th>
+                <th class="text-center sorted-column" style="width:200px">Username</th>
+                <th class="text-center sorted-column" style="width:200px">Email</th>
+                <th class="text-center sorted-column" style="width:200px">Vertical</th>
+                <th class="text-center sorted-column" style="width:200px">Roles</th>
+                 <th class="text-center sorted-column" style="width:200px">Active</th>
+              </tr>
+              {{#each outletList}}
+              <tr >
+                <td class="text-center" style="width:40px">{{incremented @index}}</td>
+                <td class="text-center" style="width:200px">{{profile.empCode}}</td>
+                <td class="text-center" style="width:200px">{{profile.firstName}} &nbsp; {{profile.lastName}}</td>
+                <td class="text-center" style="width:200px">{{profile.gender}}</td>
+                <td class="text-center" style="width:200px">{{profile.dateOfBirth}}</td>
+                <td class="text-center" style="width:200px">{{contactNo}}</td>
+                <td class="text-center" style="width:200px">{{username}}</td>
+                <td class="text-center emailsHelp_{{_id}}" style="width:100px">{{emailsHelp emails _id}}</td>
+                <td class="text-center verticalVal_{{_id}}" style="width:100px">{{verticalHelp vertical _id}}</td>
+                <td class="text-center channelVal_{{_id}}" style="width:100px">{{channelHelp roles _id}}</td>
+                <td class="text-center" style="width:200px">{{statusHelp active}}</td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+        {{sortIcon}}
+        {{else}}
+        <div class="overlay">
+          <i class="fa fa-refresh fa-spin"></i>
+        </div>
+        {{/if}}
+      </div>
+      {{#if isReady}}
+      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
+      onClick=clickEvent}}
+      {{/if}}
+
+    </div>
+    {{#if isReady}}
+    <div id="bodySpin">
+    </div>
+    {{else}}
+    <div id="bodySpin" style=" width: 100%;position: 
+          fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+      justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+    {{/if}}
+    {{#if printLoadBody}}
+    <div id="bodySpin" style=" width: 100%;position: 
+    fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+    {{else}}
+    <div id="bodySpin">
+    </div>
+    {{/if}}
+     <div id="bodySpinLoaders" style=" width: 100%;position: 
+    fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+  </section>
+
+ <div class="modal fade in" id="routeReportExportPage">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close exportClose" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="deliveryExportH"></h4>
+        </div>
+        <form class="exportByModal">
+          <div class="modal-body">
+            <div class="box box-default box-solid">
+              <div class="box-header with-border bg-aqua">
+                <h3 class="box-title">Details</h3>
+              </div>
+              <table style="width:100%;" class="table table-striped">
+                <tbody>
+                 <!--  <tr>
+                    <td>
+                      <label for="EMPcode">User Name</label><br>
+                      <select value='' name="userName1" style="width:100% !important" id="userName1"
+                        class="userName1" placeholder="Select User Name">
+                        <option disabled selected value=''>Select User Name</option>
+                        {{# each uList}}
+                        <option value="{{_id}}">{{profile.firstName}} &nbsp; {{profile.lastName}}</option>
+                        {{/each}}
+                      </select>
+                      <label for="EMPcode">Vertical</label><br>
+                      <select value='' name="verticalId" style="width:100% !important" id="verticalId"
+                        class="verticalId" placeholder="Select Vertical">
+                        <option disabled selected value=''>Select Vertical</option>
+                        {{# each verticalList}}
+                        <option value="{{_id}}" >{{verticalName}}</option>
+                        {{/each}}
+                      </select>
+                      <span id="spanvertical"></span>
+                    </td>
+                  </tr> -->
+                  <tr>
+                    <td>
+                    <label for="EmailId">From Date</label>
+                    <input type="text" autocomplete="off" class="form-control datepicker date validation startDate1"
+                      data-date-autoclose="true" onkeydown="event.preventDefault()" id="fromDate1" data-provide="datepicker"
+                      data-date-format="dd-mm-yyyy" placeholder="From Date " name="fromDate" />
+                        </td>
+                  </tr>
+                  <tr>
+                    <td>
+                       <label for="EmailId">To Date</label>
+                      <input type="text" autocomplete="off" class="form-control datepicker date validation endDate1"
+                      data-date-autoclose="true" onkeydown="event.preventDefault()" id="toDate1" data-provide="datepicker"
+                      data-date-format="dd-mm-yyyy" placeholder="To Date " name="toDate" />
+                    </td>
+                  </tr>
+                   <tr>
+                    <td class="text-center">
+                      <span id="emptyDataSpan"></span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            {{#if printLoad}}
+            <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+            absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+              {{#with printLoaderImage}}
+              <div class="loader-lg" style="width: 100%;height: 100%;display: 
+              flex; align-items: center;justify-content: center;background: #fff;">
+                <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+              </div>
+              {{/with}}
+            </div>
+            {{else}}
+            <div id="loaderSpin">
+            </div>
+            {{/if}}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default exportClose pull-left" data-dismiss="modal">Close</button>
+            {{#if exportList1}}
+            <button type="button" class="btn btn-primary exportToday">Export</button>
+            {{else}}
+            <button type="submit" class="btn btn-primary" disabled>Export</button>
+            {{/if}}
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+<table class="table table-striped generic"  id="exportTodayOrder" style="display: none;">
+  <tbody>
+  <tr>
+      <th class="text-center sorted-column" style="width:40px">Sl.No</th>
+      <th class="text-center sorted-column" style="width:100px">Emp Code</th>
+      <th class="text-center sorted-column" style="width:100px">Name</th>
+      <th class="text-center sorted-column" style="width:100px">Gender</th>
+      <th class="text-center sorted-column" style="width:100px">DOB</th>
+      <th class="text-center sorted-column" style="width:100px">Contact No.</th>
+      <th class="text-center sorted-column" style="width:100px">Username</th>
+      <th class="text-center sorted-column" style="width:100px">Email</th>
+      <th class="text-center sorted-column" style="width:100px">Vertical</th>
+      <th class="text-center sorted-column" style="width:100px">Roles</th>
+      <th class="text-center sorted-column" style="width:100px">Active</th>
+  </tr>
+  {{#each exportList1}}
+  <tr>
+    <td class="text-center" style="width:40px">{{incremented @index}}</td>
+    <td class="text-center" style="width:100px">{{profile.empCode}}</td>
+    <td class="text-center" style="width:100px">{{profile.firstName}} &nbsp; {{profile.lastName}}</td>
+    <td class="text-center" style="width:100px">{{profile.gender}}</td>
+    <td class="text-center" style="width:100px">{{profile.dateOfBirth}}</td>
+    <td class="text-center" style="width:100px">{{contactNo}}</td>
+    <td class="text-center" style="width:100px">{{username}}</td>
+    <td class="text-center emailsHelp_{{_id}}" style="width:100px">{{emailsHelp emails _id}}</td>
+    <td class="text-center verticalVal_{{_id}}" style="width:100px">{{verticalHelp vertical _id}}</td>
+    <td class="text-center channelVal_{{_id}}" style="width:100px">{{channelHelp roles _id}}</td>
+    <td class="text-center" style="width:100px">{{statusHelp active}}</td>
+  </tr>
+  {{/each}}
+  </tbody>
+</table>
+</template>

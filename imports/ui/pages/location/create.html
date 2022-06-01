@@ -1,0 +1,50 @@
+<template name="location_create">
+  {{#if userCan 'locationCreate'}}
+  <form class="locationAdd" autocomplete="off" id="locationAdd">
+    <div class="box box-default box-solid">
+      <div class="box-header with-border bg-aqua">
+        <!-- <h3 class="box-title">Location Details</h3> -->
+        <button type="button" class="close closelocation" id="closeUserlocation" data-dismiss="modal"
+          aria-label="Close">
+          <span style="margin-top: -65px;margin-left: -5px;position: absolute;" aria-hidden="true">×</span></button>
+      </div>
+      <table style="width:100%;" class="table table-striped">
+        <tr>
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="lastName">Location Code <span class="asteric_red">*</span></label>
+                <input type="text" class="form-control validation" placeholder="Location Code" id="locationCodes"
+                  name="locationCodes" required>
+              </div>
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="lastName">Location Name <span class="asteric_red">*</span></label>
+                <input type="text" class="form-control validation" placeholder="Location Name" id="locationNames"
+                  name="locationNames" required>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="lastName">Select Branch <span class="asteric_red">*</span></label>
+                <select class="selectbranchS" required style="width:100%;" name="branch" id="selectbranchS">
+                  <option selected='selected' value="">Select Branch</option>
+                  {{# each getbranchList}}
+                  <option value="{{_id}}">{{branchName}}</option>
+                  {{/each}}
+                </select>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <button type="submit" id="updatelocation" class="btn btn-primary  pull-right">Save
+      Location</button>
+    <button type="button" class="btn btn-default closelocation" data-dismiss="modal">Close</button>
+  </form>
+  {{/if}}
+</template>

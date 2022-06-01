@@ -1,0 +1,269 @@
+<template name="outletReject">
+  <section class="content-header">
+    <h1>Outlet Rejected
+      <small>Listing All outlet Rejected</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
+      <li class="active">Outlet Rejected</li>
+    </ol>
+  </section>
+  <section class="content">
+    <div class="row">
+      <div style="float: right;">
+        <button class="btn btn-primary btn-flat" id="filterSearch"><i class="fa fa-search"> </i>&nbsp; Search</button>
+      </div>
+    </div>
+
+    <div class="row" id="filterDisplay" style="display:none">
+      <div class="box box-default box-solid">
+        <div class="box-header with-border bg-aqua">
+          <h3 class="box-title" style="color: black;">Outlet Filter</h3><button type="button" id="removeSearch"
+            style="color: white; background-color: transparent; border-color:transparent" class="pull-right"><i
+              class="fa fa-close" style="color: black;"></i></button>
+        </div>
+        <div class="box-body no-padding">
+          <form class="outletFilter">
+            <div class="row">
+              <div class="col-sm-4" style="padding: 10px 10px 10px 10px;">
+                <label for="branch">Outlet</label>
+                <select class="selectOutletSe" style="width:100%;" name="selectOutletSe" id="selectOutletSe">
+                  <option disabled selected value=''>Select Outlet</option>
+                  {{# each outletLis}}
+                  <option value="{{_id}}">{{name}}</option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="col-sm-4" style="padding: 10px 10px 10px 10px;">
+                <label for="branch">Route</label>
+                <select class="selectRouteSe" style="width:100%;" name="selectRouteSe" id="selectRouteSe">
+                  <option disabled selected value=''>Select Route</option>
+                  {{# each routeLists}}
+                  <option value="{{_id}}">{{routeName}}</option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="row" style="float: right">
+                <button type="submit" name="filter" class="btn btn-primary">Filter</button>
+                <button type="button" name="reset" class="btn btn-info reset">Reset Filter</button>
+
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="tab-content" style="padding : 0px !important">
+        <div class="box box-default box-solid">
+          <!-- <div class="box-header with-border bg-aqua">
+            <h3 class="box-title">Outlet</h3>
+          </div> -->
+          {{#if isReady}}
+          <div class="box-body no-padding table-responsive">
+            <table class="table table-striped generic">
+              <tbody>
+                <tr>
+                  <th class="pl-20  sorted-column text-center" id="name">Name</th>
+                  <th class="sorted-column text-center">Address</th>
+                  <th class="sorted-column text-center">Contact Person</th>
+                  <th class="sorted-column text-center">Outlet Type</th>
+                  <th class="sorted-column text-center">Class</th>
+                  <th class="sorted-column text-center">Route</th>
+                  <th class="sorted-column text-center">Date</th>
+                  <th class="sorted-column text-center"></th>
+                </tr>
+                {{#each outletList}}
+                <tr>
+                  <td class="pl-20  sorted-column text-center" width="15%;">
+                    {{name}}
+                  </td>
+                  <td class=" sorted-column text-center" width="15%;">
+                    {{address}}
+                  </td>
+                  <td class=" sorted-column text-center" width="15%;">
+                    {{contactPerson}}
+                  </td>
+                  <td class=" sorted-column text-center" width="15%;">
+                    {{outletType}}
+                  </td>
+                  <td class=" sorted-column text-center" width="15%;">
+                    {{outletClass}}
+                  </td>
+                  <td class=" text-center routeVal_{{routeId}}" width="15%">{{routeNameHelp routeId}}</td>
+                  <td class=" text-center" width="8%">{{dateFormates createdAt}}</td>
+                  <td class="text-center" width="15%">
+                    <input type="hidden" id="userName_{{_id}}" value="{{username}}">
+                    <input type="hidden" id="userId" name="userid" value="{{_id}}">
+                    <a href="javascript:void(0)" class="view " title="Click to view details" id="{{_id}}">
+                      <button class="pd-20 btn btn-default"><i class="fa fa-ellipsis-v"></i></button>
+                    </a>
+                  </td>
+                </tr>
+                {{/each}}
+              </tbody>
+            </table>
+          </div>
+          {{sortIcon}}
+          {{else}}
+          <div class="overlay">
+            <i class="fa fa-refresh fa-spin"></i>
+          </div>
+          {{/if}}
+        </div>
+      </div>
+      {{#if isReady}}
+      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
+      onClick=clickEvent}}
+      {{/if}}
+    </div>
+    {{#if isReady}}
+    <div id="bodySpin">
+    </div>
+    {{else}}
+    <div id="bodySpin" style=" width: 100%;position: 
+          fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+      justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+    {{/if}}
+    <div id="bodySpinLoaders" style=" width: 100%;position: 
+    fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+    {{> successModal id="outletSuccessModal" section=outlet}}
+    {{> errorModal id="outletErrorModal" section=outlet}}
+    <!-- modal section -->
+
+    <div class="modal fade in" id="outletDetailPage">
+      <div class="modal-dialog">
+        <form class="statusUpdate" autocomplete="off">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span></button>
+              <h4 class="modal-title text-bold" id="outletH"></h4>
+            </div>
+            <div class="modal-body">
+              <div class="box box-default box-solid">
+                <!-- <div class="box-header with-border bg-aqua">
+                  <h3 class="box-title">Outlet Details</h3>
+                </div> -->
+                <table style="width:100%;" class="table table-striped">
+                  <tbody>
+                    <tr class="table-border">
+                      <td width="50%">
+                        <label for="Employee ">Outlet Name </label>
+                        <div id="outletName" name="outletName"></div>
+                      </td>
+                      <td width="50%">
+                        <label for="Employee ">Outlet Address </label>
+                        <div id="outletAddress" name="outletAddress"></div>
+                      </td>
+                    </tr>
+                    <tr class="table-border">
+                      <td width="50%">
+                        <label for="firstName">Outlet Type </label>
+                        <div id="outletTypes" name="outletTypes"></div>
+                      </td>
+                      <td>
+                        <label for="Employee ">Outlet Class</label>
+                        <div id="outletClass" name="outletClass"></div>
+                      </td>
+                    </tr>
+                    <tr class="table-border">
+                      <td width="50%">
+                        <label for="firstName">Contact No </label>
+                        <div id="outletContactno" name="outletContactno"></div>
+                      </td>
+                      <td>
+                        <label for="Employee ">Contact Person</label>
+                        <div id="outletCperson" name="outletCperson"></div>
+                      </td>
+                    </tr>
+                    <tr class="table-border">
+                      <td width="50%">
+                        <label for="firstName">Email Id </label>
+                        <div id="outletemailId" name="outletemailId"></div>
+                      </td>
+                      <td>
+                        <label for="Employee ">Remark</label>
+                        <div id="outletremark" name="outletremark"></div>
+                      </td>
+                    </tr>
+                    <tr class="table-border">
+                      <td width="50%">
+                        <label for="firstName">Route </label>
+                        <div id="outletrouteId" name="outletrouteId"></div>
+                      </td>
+                      <td>
+                        <label for="Employee "> Employee Name</label>
+                        <div id="detailCreatedBy" name="detailCreatedBy"></div>
+                      </td>
+                    </tr>
+                    <tr class="table-border">
+                      <td>
+                        <label for="Employee "> Status</label>
+                        <div id="outletapprovalstatus" name="outletapprovalstatus"></div>
+                      </td>
+                      <td width="50%">
+                      </td>
+                    </tr>
+                    <tr class="table-border">
+                      <td width="50%">
+                        <label for="firstName">Inside Image </label>
+                        <div id="insideImgDiv" style="cursor: zoom-in;">
+                          <img width="100%" class="js-activate-s-image-box attachment" data-image="" id="attachment1">
+                        </div>
+                      </td>
+                      <td>
+                        <label for="Employee ">Outside Image</label>
+                        <div id="ousideImgDiv" style="cursor: zoom-in;">
+                          <img width="100%" class="js-activate-s-image-box attachment" data-image="" id="attachment2">
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                    </tr>
+                  </tbody>
+                </table>
+                
+              </div>
+              {{#if printLoad}}
+              <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+            absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+                {{#with printLoaderImage}}
+                <div class="loader-lg" style="width: 100%;height: 100%;display: 
+              flex; align-items: center;justify-content: center;background: #fff;">
+                  <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+                </div>
+                {{/with}}
+              </div>
+              {{else}}
+              <div class="loadersSpin">
+              </div>
+              {{/if}}
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default closen pull-left" data-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-primary pull-right orderApprovalBtn">Submit</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </section>
+  <div id="fullScreen">
+    <img src="" alt="" />
+  </div>
+</template>

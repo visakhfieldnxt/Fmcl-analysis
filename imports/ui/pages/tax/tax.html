@@ -1,0 +1,347 @@
+<template name="tax_dash">
+   {{#if userCan 'taxView'}}
+  <section class="content-header">
+      <h1>Tax
+        <small>Listing All taxs</small>
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">Tax</li>
+      </ol>
+    </section>
+    <section class="content">
+      <div class="row">
+        <div style="float: right;">
+           {{#if userCan 'taxCreate'}}
+          <button class="btn btn-primary btn-flat" id="tax-create-button">Create Tax</button>
+          {{/if}}
+          <button class="btn btn-primary btn-flat" id="filterSearch"><i class="fa fa-search"> </i>&nbsp; Search</button>
+        </div>
+      </div>
+      <div class="row" id="filterDisplay" style="display:none">
+        <div class="box box-default box-solid">
+          <div class="box-header with-border bg-aqua">
+            <h3 class="box-title"  style="color: black;">Tax Filter</h3><button type="button" id="removeSearch"
+              style="color: white; background-color: transparent; border-color:transparent" class="pull-right"><i
+                class="fa fa-close"  style="color: black;"></i></button>
+          </div>
+          <div class="box-body no-padding">
+            <form class="taxFilter">
+              <div class="row">
+                <div class="col-sm-4" style="padding: 10px 10px 10px 10px;">
+                  <label for="tax">Tax Code</label>
+                  <select class="taxCodeSelection" style="width:100%;" name="taxCodeSelection"
+                    id="taxCodeSelection">
+                    <option disabled selected value=''>Select tax Code</option>
+                    {{# each taxList}}
+                    <option value="{{taxCode}}">{{taxCode}}</option>
+                    {{/each}}
+                  </select>
+                </div>
+                <div class="col-sm-4" style="padding: 10px 10px 10px 10px;">
+                  <label for="tax">Tax Name</label>
+                  <select class="taxNameSelection" style="width:100%;" name="taxNameSelection"
+                    id="taxNameSelection">
+                    <option disabled selected value=''>Select tax Name</option>
+                    {{# each taxList}}
+                    <option value="{{taxName}}">{{taxName}}</option>
+                    {{/each}}
+                  </select>
+                </div>
+                <div class="row" style="float: right">
+                  <button type="submit" name="filter" class="btn btn-primary">Filter</button>
+                  <button type="button" name="reset" class="btn btn-info reset">Reset Filter</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="nav-tabs-custom taskHeader" id="taskHeader">
+          <ul class="nav nav-tabs taskHeaderList" id="taskHeaderList">
+            <li class="active paginationFilterValue activeFilter activeHeaders" id="activeFilter">
+              <a href=""
+                data-toggle="tab">Active</a>
+            </li>
+            <li class="paginationFilterValue inactiveFilter" id="inactiveFilter"><a href="" data-toggle="tab">Inactive</a>
+            </li>
+          </ul>
+          <div class="tab-content" style="padding : 0px !important">
+            <div class="box box-default box-solid">
+              <!-- <div class="box-header with-border bg-aqua">
+                <h3 class="box-title">Tax</h3>
+              </div> -->
+              {{#if isReady}}
+              <div class="box-body no-padding table-responsive">
+                <table class="table table-striped generic">
+                  <tbody>
+                    <tr>
+                      <th class="text-center sorted-column" id="name">Tax code</th>
+                      <th class="text-center sorted-column">Tax Name</th>
+                      <th class="text-center sorted-column">Tax Percentage</th>
+                      <th class="text-center sorted-column">Status</th>
+                      <th class="text-center sorted-column"></th>
+                    </tr>
+                    {{#each taxlist}}
+                    <tr style="cursor:pointer">
+                      <td class="text-center" width="16.6%">{{taxCode}}</td>
+                      <td class="text-center" width="16.6%">{{taxName}}</td>
+                      <td class="text-center" width="16.6%">{{taxPercentage}}</td>
+                      <td class="text-center" width="16.6%">{{getActiveStatus active}}</td>
+                      <td class="text-center" width="16.6%">
+                         {{#if userCan 'taxUpdate'}}
+                        <input type="hidden" id="taxName_{{_id}}" value="{{taxName}}">
+                        <a href="javascript:void(0)" class="edit" title="Click to edit " id="{{_id}}">
+                          <button class="pd-20 btn btn-primary"><i class="fa fa-pencil"></i></button>
+                        </a>&nbsp;
+                        {{/if}}
+                        {{#if userCan 'taxDelete'}}
+                        {{#if activeHelper active}}
+                        <a href="javascript:void(0)" class="deactivate deactivateTax" title="Click to inactivate {{taxName}}"
+                          id="{{_id}}">
+                          <button class="pd-20 btn btn-danger"><i class="fa fa-close"></i></button>
+                        </a>&nbsp;&nbsp;
+                        {{/if}}
+                       
+                        {{#if inactiveHelper active}}
+                       
+                        <a  class="activateTax" title="Click to activate {{taxName}}"
+                          id="{{_id}}">
+                          <button class="pd-20 btn btn-success"><i class="fa fa-check"></i></button>
+                        </a> &nbsp;&nbsp;
+                        {{/if}}
+                        {{/if}}
+                        <a href="javascript:void(0)" class="view " title="Click to view details" id="{{_id}}">
+                          <button class="pd-20 btn btn-default"><i class="fa fa-ellipsis-v"></i></button>
+                        </a>
+                      </td>
+                    </tr>
+                    {{/each}}
+                  </tbody>
+                </table>
+              </div>
+              {{sortIcon}}
+            {{else}}
+            <div class="overlay">
+              <i class="fa fa-refresh fa-spin"></i>
+            </div>
+              {{/if}}
+             
+            </div>
+            </div>
+        </div>
+        {{#if isReady}}
+        {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
+        onClick=clickEvent}}
+        {{/if}}
+      </div>
+      {{#if isReady}}
+      <div id="bodySpin">
+      </div>
+      {{else}}
+      <div id="bodySpin" style=" width: 100%;position: 
+            fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+        {{#with bodyLoader}}
+        <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+        justify-content: center;background: #f1f1f1;">
+          <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+        </div>
+        {{/with}}
+      </div>
+      {{/if}}
+  </section>
+  <div class="tax-create-modal">
+    <div class="modal" id="tax-create">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+
+            <h4 class="modal-title ">Create Tax</h4>
+          </div>
+          <div class="modal-body">
+            {{> tax_create tax=Tax}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{{> successModal id="taxSuccessModal" section=user}}
+{{> errorModal id="taxErrorModal" section=tax}}
+<div class="modal fade in" id="taxActiveConfirmation">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span></button>
+        <h4 class="modal-title text-bold" id="taxHeaders"></h4>
+        <input id="taxRemAndActId" type="hidden" value="">
+      </div>
+      <div class="modal-body">
+        <div id="taxsBody">
+          <p class="success-color">
+            Are you sure to activate Tax- '<span id="taxNameDups" class="text-bold"></span>' ?
+          </p>
+        </div>
+        <input type="hidden" id="confirmedUuids">
+      </div>
+      <div class="modal-footer">
+        <button id="taxActivate" class="btn btn-success">Yes please!</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal" id="taxClose">Not
+          now</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade in" id="taxDelConfirmation">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span></button>
+        <h4 class="modal-title text-bold" id="taxHeader"></h4>
+      </div>
+      <div class="modal-body">
+        <div id="taxsBody">
+          <p class="danger-color">
+            Are you sure to inactivate tax- '<span id="taxNameDup" class="text-bold"></span>' ?
+          </p>
+        </div>
+        <input type="hidden" id="confirmedUuid">
+      </div>
+      <div class="modal-footer">
+        <button id="taxRemove" class="btn btn-danger">Yes please!</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal" id="taxClose">Not
+          now</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade in" id="taxDetailPage">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span></button>
+        <h4 class="modal-title text-bold" id="taxHead"></h4>
+      </div>
+      <div class="modal-body">
+        <div class="box box-default box-solid">
+          <!-- <div class="box-header with-border bg-aqua">
+            <h3 class="box-title">Tax  Details</h3>
+          </div> -->
+          <table style="width:100%;" class="table table-striped">
+            <tbody>
+              <tr class="table-border">
+                <td width="50%">
+                  <label for="Employee ">Tax Code</label>
+                  <div id="detailtaxCode"></div>
+                </td>
+                <td width="50%">
+                  <label for="firstName">Tax Name </label>
+                  <div id="detailtaxName"></div>
+                </td>
+                
+              </tr>
+              <tr class="table-border">
+                <td width="50%">
+                  <label for="Employee ">Tax Percentage</label>
+                  <div id="detailtaxPerc"></div>
+                </td>
+                <td width="50%">
+                  <label for="Employee ">Status</label>
+                  <div id="detailStatus"></div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        {{#if printLoad}}
+        <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+        absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+          {{#with printLoaderImage}}
+          <div class="loader-lg" style="width: 100%;height: 100%;display: 
+          flex; align-items: center;justify-content: center;background: #fff;">
+            <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+          </div>
+          {{/with}}
+        </div>
+        {{else}}
+        <div class="loadersSpin">
+        </div>
+        {{/if}}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default closen" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade in" id="taxEditPage">
+  <div class="modal-dialog">
+    <form class="tax-update" autocomplete="off">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="categoryH">Edit</h4>
+        </div>
+        <div class="modal-body">
+          <div class="box box-default box-solid">
+            <!-- <div class="box-header with-border bg-aqua">
+              <h3 class="box-title">Tax Details</h3>
+            </div> -->
+            <table style="width:100%;" class="table table-striped table-responsive">
+              <tr>
+                <td>
+                  <div class="form-group has-feedback">
+                    <div class="col-sm-6" style="padding: 10px 10px 20px 10px;">
+                      <label for="lastName">Tax Code <span class="asteric_red">*</span></label>
+                        <input type="text" disabled class="form-control validation" placeholder="Enter tax code" name="taxCode1" required id="taxCode1">
+                       </div>
+                    <div class="col-sm-6" style="padding: 10px 10px 20px 10px;">
+                      <label for="lastName">Tax Name <span class="asteric_red">*</span></label>
+                       <input type="text" class="form-control validation" placeholder="Enter tax name" name="taxName1" required  id="taxName1">
+                      </div>
+                      <div class="col-sm-6" style="padding: 10px 10px 20px 10px;">
+                        <label for="lastName">Tax Percentage <span class="asteric_red">*</span></label>
+                        <input type="text" class="form-control validation" placeholder="Enter tax Percentage"  name="taxPrec1" required id="taxPrec1">
+                        <input type="hidden" id="taxid1" name="taxnameid1">
+                        <span id="taxArrayspan1"></span>
+                       </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <div class="col-sm-12" style="padding:20px 10px">
+                </div>
+              </tr>
+            </table>
+          </div>
+          {{#if printLoad}}
+          <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+          absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+            {{#with printLoaderImage}}
+            <div class="loader-lg" style="width: 100%;height: 100%;display: 
+            flex; align-items: center;justify-content: center;background: #fff;">
+              <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+            </div>
+            {{/with}}
+          </div>
+          {{else}}
+          <div class="loadersSpin">
+          </div>
+          {{/if}}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default closen pull-left" data-dismiss="modal"
+            id="categoryClose">Close</button>
+          <button type="submit" class="btn btn-primary">Update </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{{/if}}
+  <!-- modal section ends-->
+</template>

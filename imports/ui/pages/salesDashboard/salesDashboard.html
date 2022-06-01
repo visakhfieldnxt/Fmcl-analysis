@@ -1,0 +1,204 @@
+<template name="sales_dashboard">
+  <!-- {{#if userCan 'salesDashboard'}} -->
+
+  <section class="content-header">
+    <h1>
+      Dashboard
+      <small>Control panel</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+      <li class="active">Dashboard</li>
+    </ol>
+  </section>
+  <div class="row">
+    <section class="col-lg-6 connectedSortable">
+      <!-- 
+      
+      <div class="box box-solid ">
+        <div class="box-header">
+          <i class="fa fa-th"></i>
+
+          <h3 class="box-title">Target Vs Achievement</h3>
+
+          <div class="box-tools pull-right">
+            <button type="button" class="btn bg-teal btn-sm" data-widget="collapse"><i class="fa fa-minus"></i>
+            </button>
+            <button type="button" class="btn bg-teal btn-sm" data-widget="remove"><i class="fa fa-times"></i>
+            </button>
+          </div>
+        </div>
+        <div class="box-body border-radius-none">
+          <div class="chart" id="revenue-chart" style="height: 250px;width:100%"></div>
+        </div>
+      
+        
+      </div> -->
+
+      <div class="box box-solid ">
+        <div class="info-box">
+          <span class="info-box-icon bg-green"><i class="fa fa-newspaper-o"></i></span>
+
+          <div class="info-box-content Orders">
+            <span class="info-box-text"> Current Month Orders</span>
+            <span class="info-box-number" style="font-size: 28px;"> {{#with todaysOrder}}{{todaysOrder}}{{/with}}
+              Orders</span>
+          </div>
+        </div>
+      </div>
+      <div class="box box-solid ">
+        <div class="info-box">
+          <span class="info-box-icon bg-blue"><i class="fa fa-book"></i></span>
+
+          <div class="info-box-content Orders">
+            <span class="info-box-text"> Current Month Cash Sales</span>
+            <span class="info-box-number" style="font-size: 28px;">
+              {{#with todaysQuotations}}{{todaysQuotations}}{{/with}} Sales</span>
+          </div>
+        </div>
+      </div>
+      <!-- 
+  <div class="box box-solid ">            
+    <div class="info-box">
+      <span class="info-box-icon bg-green">ZMW</span>
+
+      <div class="info-box-content outstanding">
+        <span class="info-box-text">Total Outstanding</span>
+        <span class="info-box-number" style="font-size: 34px;"> ZMW {{#with totalOutstanding}}{{totalOutstanding}}{{/with}}</span>
+      </div>
+  </div>
+</div> -->
+      <div class="box box-solid ">
+        <div class="info-box">
+          <span class="info-box-icon bg-green"><i class="fa fa-legal"></i></span>
+
+          <div class="info-box-content Orders">
+            <span class="info-box-text">Current Month Credit Sales </span>
+            <span class="info-box-text"></span>
+            <span class="info-box-number" style="font-size: 28px;"> {{#with creditSales}}{{creditSales}}{{/with}} Sales
+              </span>
+          </div>
+        </div>
+      </div>
+      <div class="box box-solid ">
+        <div class="info-box">
+          <span class="info-box-icon bg-blue"><i class="fa fa-money"></i></span>
+
+          <div class="info-box-content Orders">
+            <span class="info-box-text">Current Month Outstanding </span>
+            <span class="info-box-text"></span>
+            <span class="info-box-number" style="font-size: 28px;">
+              {{#with martketOutstanding}}{{martketOutstanding}}{{/with}} GHS</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="box box-solid ">
+        <div class="info-box">
+          <span class="info-box-icon bg-green"><i class="fa fa-check"></i></span>
+
+          <div class="info-box-content orderRejectC">
+            <span class="info-box-text">Order Approved </span>
+            <span class="info-box-text"></span>
+            <span class="info-box-number" style="font-size: 28px;">
+              {{#with orderApproved}}{{orderApproved}}{{/with}}
+              Orders</span>
+          </div>
+        </div>
+      </div>
+      <div class="box box-solid ">
+        <div class="info-box">
+          <span class="info-box-icon bg-blue"><i class="fa fa-exclamation-circle"></i></span>
+
+          <div class="info-box-content orderRejectC">
+            <span class="info-box-text">Orders onHold  Current Month</span>
+            <span class="info-box-text"></span>
+            <span class="info-box-number" style="font-size: 28px;"> {{#with onHoldQuotation}}{{onHoldQuotation}}{{/with}}
+              Orders</span>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="col-lg-6 connectedSortable">
+      <div class="box box-solid ">
+        <div class="box-header">
+          <i class="fa fa-dashboard"></i>
+          <h3 class="box-title">Outlet On Current Month</h3>
+          <div class="box-tools ">
+            <a href="/outletApproved/list"><button type="button" title="More" class="btn btn-primary btn-flat"><i
+              class="fa fa-plus"> </i></button></a>
+          </div>
+        </div>
+        <div class="box-body"> 
+          <div class="row" >
+              <div class="chart-responsive" id="outletDataDisplay">
+                <div class="chart" id="doughnut-chart" width="800" height="200" >
+                  {{#with verticalData}}{{verticalData}}{{/with}}
+                </div>
+              </div>
+              <div class="overlay" id="refreshvert" >
+                <i class="fa fa-refresh fa-spin"></i>
+              </div>
+            </div>
+              
+          </div>
+          
+      </div>
+      <div class="box box-solid ">
+        <div class="info-box">
+          <span class="info-box-icon bg-green"><i class="fa fa-close"></i></span>
+
+          <div class="info-box-content orderRejectC">
+            <span class="info-box-text">Order Rejected Current Month </span>
+            <span class="info-box-text"></span>
+            <span class="info-box-number" style="font-size: 28px;"> {{#with rejectedOrder}}{{rejectedOrder}}{{/with}}
+              Orders</span>
+          </div>
+        </div>
+      </div>
+      <div class="box box-solid ">
+        <div class="info-box">
+          <span class="info-box-icon bg-blue"><i class="fa fa-check"></i></span>
+
+          <div class="info-box-content orderRejectC">
+            <span class="info-box-text">Credit Sales Approved Current Month </span>
+            <span class="info-box-text"></span>
+            <span class="info-box-number" style="font-size: 28px;">
+              {{#with rejectedQuotation}}{{rejectedQuotation}}{{/with}}
+              Sales</span>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- right col -->
+    <section class="col-lg-6 connectedSortable">
+
+      <!-- <div class="box box-solid ">            
+            <div class="info-box">
+              <span class="info-box-icon bg-aqua"><i class="fa fa-legal"></i></span>
+  
+              <div class="info-box-content stockUnavailability">
+                <span class="info-box-text">Order Pending due to stock Unavailability</span>
+                <span class="info-box-text">yesterday & today</span>
+                <span class="info-box-number" style="font-size: 28px;">{{#with stockUnavilability}}{{stockUnavilability}}{{/with}} Orders</span>
+              </div>
+             
+          </div>
+      </div> -->
+
+      
+
+    
+    </section>
+    
+  </div>
+  <!-- /.row (main row) -->
+
+
+
+  <!-- {{/with}} -->
+  <!-- {{else}}
+    {{> accessDenied}} -->
+  <!-- {{/if}} -->
+
+</template>

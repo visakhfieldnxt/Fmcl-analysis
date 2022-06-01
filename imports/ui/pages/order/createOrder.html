@@ -1,0 +1,283 @@
+<template name="createOrder">
+  <section class="content-header">
+    <h1>Create Order
+      <small>Enter Order Details</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
+      <li class="active">Create Order </li>
+    </ol>
+  </section>
+  <section class="content">
+    <div class="body">
+      <div class="box box-default box-solid">
+        <form class="addCashSales" autocomplete="off" id="addCashSales">
+          <table style="width:100%;" class="table table-responsive">
+            <tr>
+              <td>
+                <div class="form-group has-feedback">
+                  <div class="col-sm-6 form-unit" style="padding: 10px 10px 10px 10px;">
+                    <label for="customer">Select Outlet<span class="asteric_red">*</span></label>
+                    <select class="selectOutlet" required style="width:100%;" name="selectOutlet" id="selectOutlet">
+                      <option selected='selected' value="">Select Outlets </option>
+                      {{# each getOutletList}}
+                      <option value="{{_id}}">{{name}}</option>
+                      {{/each}}
+                    </select>
+                  </div>
+                  <div class="col-sm-6 form-unit" style="padding: 10px 10px 10px 10px;">
+                    <label for="customer">Select Vertical<span class="asteric_red">*</span></label>
+                    <select class="selectVertical" required style="width:100%;" name="selectVertical"
+                      id="selectVertical">
+                      <option selected='selected' value="">Select Vertical </option>
+                      {{# each getVertical}}
+                      <option value="{{_id}}">{{verticalName}}</option>
+                      {{/each}}
+                    </select>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="form-group has-feedback">
+                </div>
+              </td>
+            </tr>
+            <!-- <tr class="lightGreenBG">
+              <td>
+                <div class="form-group has-feedback">
+                  <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                    <label for="lastName">Select Principal <span class="asteric_red">*</span></label>
+                    <select class="selectPrincipal" style="width:100%;" name="selectPrincipal"
+                      id="selectPrincipal">
+                      <option selected='selected' value="">Select Principal</option>
+                      {{# each getPricipalList}}
+                      <option value="{{_id}}">{{principalName}}</option>
+                      {{/each}}
+                    </select>
+                    <span id="principalArraySpan"></span>
+                  </div>
+                  <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                    <label for="customer">Select Brand<span class="asteric_red">*</span></label>
+                    <select class="selectBrand" style="width:100%;" name="selectBrand" id="selectBrand">
+                      <option selected='selected' value="">Select Brand </option>
+                      {{# each getbrandList}}
+                      <option value="{{_id}}">{{brandName}}
+                      </option>
+                      {{/each}}
+                    </select>
+                    <span id="brandArraySpan"></span>
+                  </div>
+                </div>
+              </td>
+            </tr> -->
+            <tr class="lightGreenBG">
+              <td>
+                <div class="form-group has-feedback">
+                  <!-- <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                    <label for="customer">Select Category<span class="asteric_red">*</span></label>
+                    <select class="selectCategory" style="width:100%; overflow: hidden;" name="selectCategory"
+                      id="selectCategory">
+                      <option selected='selected' value="">Select Category </option>
+                      {{# each getCategoryList}}
+                      <option value="{{_id}}">{{categoryName}}</option>
+                      {{/each}}
+                    </select>
+                    <span id="categoryArraySpan"></span>
+                  </div> -->
+                  <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                    <label for="customer">Select Product<span class="asteric_red">*</span></label>
+                    <select class="selectProduct" name="selectProduct" id="selectProduct">
+                      <option selected='selected' value="">Select Product </option>
+                      {{# each getProductList}}
+                      <option value="{{product}}" style="overflow: hidden; word-break: break-all;">{{productName}}
+                      </option>
+                      {{/each}}
+                    </select>
+                    <span id="itemArrayspan"></span>
+                  </div>
+                  <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                    <label for="customer">Select Unit<span class="asteric_red">*</span></label>
+                    <select class="selectUnits" style="width:100%; overflow: hidden;" name="selectUnits"
+                      id="selectUnits">
+                      <option selected='selected' value="">Select Unit </option>
+                      {{# each getUnitList}}
+                      <option value="{{_id}}">{{unitName}}</option>
+                      {{/each}}
+                    </select>
+                    <div style="padding:4px 14px; "> <span id="unitQuantityShows"> </span> </div>
+                    <span id="unitArrayspan"></span>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr class="lightGreenBG">
+              <td>
+                <div class="form-group has-feedback">
+                  <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                    <label for="lastName">Unit Price <span class="asteric_red">*</span></label>
+                    <input type="text" class="form-control validation" placeholder="Unit Price" id="priceVals"
+                      name="priceVals" disabled>
+                    <span id="priceArrayspan"></span>
+                  </div>
+                  <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                    <label for="lastName">Quantity <span class="asteric_red">*</span></label>
+                    <input type="text" class="form-control validation" placeholder="Quantity" id="quantityVal"
+                      name="quantityVal">
+                    <span id="quantityArrayspan"></span>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="form-group has-feedback">
+                  <div class="col-sm-6" style="padding: 10px">
+                    <button type="button" class="btn btn-success addItem"
+                      style="width:50%;padding: 10px;box-shadow: #a8a8a8 2px 3px 12px;">
+                      Add Product
+                    </button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="form-group has-feedback">
+                  <div class="col-sm-12" style="padding: 10px;" id="disableDiv">
+
+                    {{#with itemArrayList}}
+                    {{#each itemArrayList}}
+                    <div class="row"
+                      style="background:#fff;border-radius: 15px;box-shadow: 0 10px 16px rgba(0,0,0,0.25), 0 6px 10px rgba(0,0,0,0.22);">
+                      <div class="">
+                        <div class="" style="float:left;width:70%">
+                          <div class="card">
+                            <div class="card-body" style="padding:10px">
+                              <div class="card-title text-left productIdVal_{{product}} " style="padding-left: 12px;height:20px;color: #3d3d3d;
+                                font-weight: bold;font-size: 12px;overflow: hidden;">
+                                {{getProductName product}}</div>
+                              <div class="card-text text-left "
+                                style="padding-left: 12px;color: #696969;font-weight: lighter;font-size: small;">
+                                <span class="fontOne">Unit Price:<span style="font-weight: bold;">&nbsp;{{
+                                    unitPrice}}</span>
+                                </span> &nbsp;&nbsp;
+                                <span class="fontOne"> Tax:<span style="font-weight: bold;">&nbsp;{{
+                                    taxRate}}</span>
+                                </span>
+                              </div>
+                              <div class="card-text text-left"
+                                style="padding-left: 12px;color: #696969;font-weight: lighter;font-size: small;">
+                                <span class="fontOne"> Unit: &nbsp;<span style="font-weight: bold;"
+                                    class="unitNameVal_{{unit}}">
+                                    {{getUnitName unit}}</span>
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div style="float:left;width:20%;padding: 15px;">
+                          <div class="card-title text-center "
+                            style="color:#3d3d3d;font-size:20px;text-align:center;vertical-align: middle">
+                            <span class="fontTwo">{{digitSeperator quantity}}</span>
+                          </div>
+                          <div style="text-align:center;color: #848484;;font-weight: lighter;font-size: smaller;">
+                            <span class="fontThree">Quantity</span>
+                          </div>
+                        </div>
+                        <a href="javascript:void(0)" class="remove color-white itemDelete" id="{{randomId}}">
+                          <div class=" btn btn-danger mobileView"
+                            style="width: 10%;border-radius: 0px 15px 15px 0px; float: right;padding:45px 0px 45px;">
+                            <div>
+                              <input type="hidden" id="itemDelete" value="{{randomId}}">
+                              <i class="fa fa-close deletePosition"></i>
+                            </div>
+                          </div>
+                        </a>
+                      </div>
+                    </div>
+                    {{/each}}
+                    {{/with}}
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="form-group has-feedback">
+                  <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                    <label for="lastName">Discount Amount <span class="asteric_red">*</span></label>
+                    <input type="text" required class="form-control validation" placeholder="Discount Amount"
+                      id="discountAmt" name="discountAmt">
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="form-group has-feedback amtShowDiv" style="display: none;">
+                  <div class="col-sm-12">
+                    <table style="float: right;">
+                      <tr>
+                        <td>Tax Amount[GHS] : </td>
+                        <td style="text-align: right; font-weight: bold;" id="taxAdded"></td>
+                      </tr>
+                      <tr>
+                        <td>Discount[GHS] : </td>
+                        <td style="text-align: right; font-weight: bold;" id="discountAmtVal"></td>
+                      </tr>
+                      <tr>
+                        <td>Grand Total[GHS] :</td>
+                        <td style="text-align: right; font-weight: bold;" id="total">
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="form-group has-feedback">
+                  <div class="col-sm-12" style="padding: 10px 10px 10px 10px;">
+                    <button type="submit" id="updateStock" class="btn btn-primary  pull-right">Submit
+                    </button>
+                    <button type="button" class="btn btn-default closestocks" data-dismiss="modal">Close</button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </form>
+        {{#if printLoad}}
+        <div class="loadersSpin" style=" width: 100%;opacity: 0.9;position: 
+        absolute;top: 0;bottom: 0;right: 0;left: 0px;z-index:100000;">
+          {{#with printLoaderImage}}
+          <div class="loader-lg" style="width: 100%;height: 100%;display: 
+          flex; align-items: center;justify-content: center;background: #fff;">
+            <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 25%;">
+          </div>
+          {{/with}}
+        </div>
+        {{else}}
+        <div class="loadersSpin">
+        </div>
+        {{/if}}
+      </div>
+    </div>
+  </section>
+  <div id="bodySpinLoaderVal" style=" width: 100%;position: 
+  fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+    {{#with bodyLoader}}
+    <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+justify-content: center;background: #f1f1f1;">
+      <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+    </div>
+    {{/with}}
+  </div>
+
+  {{> successModal id="stock1SuccessModal" section=stock}}
+  {{> errorModal id="stock1ErrorModal" section=stock}}
+
+</template>

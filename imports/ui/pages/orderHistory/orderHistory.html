@@ -1,0 +1,479 @@
+<template name="orderHistory">
+  {{#if userCan 'orderView'}}
+    <section class="content-header">
+      <h1>Order
+        <small>Listing All Order History</small>
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">Order History</li>
+      </ol>
+    </section>
+    <section class="content">
+      
+        <div class="row">
+          <div style="float: right;">
+            <button class="btn btn-primary btn-flat" id="filterSearch" ><i class="fa fa-search" > </i>&nbsp;  Search</button>
+          </div>
+        </div>
+
+        <div class="row" id="filterDisplay" style="display:none">
+          <div class="box box-default box-solid">
+            <div class="box-header with-border bg-aqua">
+              <h3 class="box-title">{{user}} Filter</h3><button type="button" id="removeSearch" style="color: white; background-color: transparent; border-color:transparent" class="pull-right"><i class="fa fa-close"></i></button>
+            </div>
+            <div class="box-body no-padding">
+              <form class="orderFilter">
+                <div class="row">
+                
+                  <div class="col-md-3 col-sx-12 col-sm-12">
+                     <label for="EMPcode">Customer Code</label>
+                    <input type="text" placeholder="Customer Code" id="cardCode" name="cardCode">
+                  </div>
+                  <div class="col-md-3 col-sx-12 col-sm-12">
+                 <label for="Firstname">Order Id</label>
+                    <input type="text" placeholder="Order Id" id="orderId" name="orderId">
+                  </div>
+                  <div class="col-md-3 col-sx-12 col-sm-12">
+                    <label for="EmailId">From Date</label>
+                    <input type="text" autocomplete="off" class="form-control datepicker date validation" data-date-autoclose="true" onkeydown="event.preventDefault()" id="my-datepicker" data-provide="datepicker" data-date-format="yyyy-mm-dd" placeholder="From Date " name="fromDate"/>
+                  </div>
+                  <div class="col-md-3 col-sx-12 col-sm-12">
+                    <label for="EmailId">To Date</label>
+                    <input type="text" autocomplete="off" class="form-control datepicker date validation" data-date-autoclose="true" onkeydown="event.preventDefault()" id="my-datepicker" data-provide="datepicker" data-date-format="yyyy-mm-dd" placeholder="To Date " name="toDate"/>
+                  </div>
+                  <div class="row" style="float: right">
+                  
+                    <button type="submit" name="filter" class="btn btn-primary">Filter</button>
+                    <button type="button" name="reset" class="btn btn-info reset">Reset Filter</button>
+                  
+                </div>
+                </div>
+              </form>
+            </div>
+          </div>
+          </div>
+      <div class="row">
+        {{#if isReady}}
+      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right" onClick=clickEvent}}
+      {{/if}}
+        <div class="box box-default box-solid">
+          <div class="box-header with-border bg-aqua">
+            <h3 class="box-title">Order</h3>
+          </div>
+          {{#if isReady}}
+            <div class="box-body no-padding table-responsive">
+              <table class="table table-striped generic">
+                <tbody>
+                <tr>
+                  <th class="text-center sorted-column hidden-xs hidden-sm" id="name" >Customer Name</th>
+                  <th class="text-center sorted-column"  >Customer Code.</th>
+                  <th class="text-center sorted-column"  >Order No./Date</th>                  
+                  <th class="text-center sorted-column" >Delivery Date</th>
+                  <th class="text-center sorted-column" >Status</th>
+                  <th class="text-center sorted-column" ></th>
+
+                 
+                </tr>
+                {{#each orders}}
+                  <tr>
+                    <td class="pl-20 text-center hidden-xs hidden-sm" width="30%">{{cardName}}</td>
+                    <td class="text-center" width="20%">{{cardCode}}</td>
+                    <td class="text-center" width="10%">{{orderId}}/{{dates docDate}}</td>
+                    <td class="text-center" width="10%">{{date docDueDate}}</td>
+                    <td class="text-center" width="10%" >{{status docStatus}}</td>
+                    <td class="text-center" width="20%">
+                        <input type="hidden" id="userId" name="userid" value="{{_id}}">
+                     
+                        <a href="javascript:void(0)" class="view " title="Click to view details" id="{{_id}}">
+                          <button class="pd-20 btn btn-default"><i class="fa fa-ellipsis-v"></i></button>
+                        </a>
+                        {{#if orderId}}
+                        <a href="javascript:void(0)" class="print" title="Click to print" id="{{_id}}">
+                          <button class="pd-20 btn btn-primary"><i class="fa fa-print"></i></button>
+                        </a>
+                        {{else}}
+                        <button class="pd-20 btn btn-primary" disabled><i class="fa fa-print"></i></button>
+                      {{/if}}
+                        
+                      </td>
+                  </tr>
+                {{/each}}
+                </tbody>
+              </table>
+            </div>
+            {{sortIcon}}
+          {{else}}
+            <div class="overlay">
+              <i class="fa fa-refresh fa-spin"></i>
+            </div>
+          {{/if}}
+        </div>
+        {{#if isReady}}
+          {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right" onClick=clickEvent}}
+        {{/if}}
+
+      </div>
+      {{#if isReady}}
+      <div id="bodySpin">
+      </div>
+      {{else}}
+      <div id="bodySpin" style=" width: 100%;position: 
+            fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+        {{#with bodyLoader}}
+        <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+        justify-content: center;background: #f1f1f1;">
+          <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;"></div>
+        {{/with}}
+      </div>
+      {{/if}}
+
+    </section>
+
+    <div class="order-create-modal">
+      <div class="modal" id="orderCreate">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              
+              <h4 class="modal-title">Create Order</h4>
+            </div>
+            <div class="modal-body">
+              {{> order_create order=Order}}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {{> successModal id="orderSuccessModal" section='Order'}}
+    {{> errorModal id="orderErrorModal" section='Order'}}
+
+
+
+    <div class="modal fade in" id="orderDetailPage">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span></button>
+            <h4 class="modal-title text-bold" id="orderHs"></h4>
+          </div>
+          <div class="modal-body">
+            <div class="box box-default box-solid">
+              <div class="box-header with-border bg-aqua">
+                <h3 class="box-title">Order Details</h3>
+              </div>
+            <table style="width:100%;" class="table table-striped" >
+              <tbody>
+                  <tr class="table-border">
+                      <td width="50%">
+                        <label for="Employee ">Customer Name </label>
+                        <div id="detailCardNames"></div>
+                      </td>
+                      <td width="50%">
+                        <label for="Employee ">Customer Code</label>
+                        <div id="detailCardCodes"></div>
+                      </td>
+                    </tr>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="Employee ">Branch </label>
+                    <div id="detailBranchs"></div>
+                  </td>
+                  <td width="50%">
+                    <label for="firstName">Order Date </label>
+                    <div id="detailDocDates"></div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td>
+                    <label for="Employee ">Delivery Date</label>
+                    <div id="detailDocDelivers"></div>
+                  </td>
+                  <td>
+                    <label for="firstName">Order No.</label>
+                    <div id="detailOrderIds"></div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td>
+                    <label for="Employee ">Customer Reference Date</label>
+                    <div id="detailCustRefDate"></div>
+                  </td>
+                  <td>
+                    <label for="firstName">Customer Reference</label>
+                    <div id="detailcustRefer"></div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td>
+                    <label for="Employee ">Approved By</label>
+                    <div id="detailApprovedBy"></div>
+                  </td>
+                  <td>
+                    <label for="Employee ">Remark</label>
+                    <div id="detailRemark"></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+            <span style="padding-left: 10px;"><label for="Employee ">Items List</label></span> 
+            {{#with items}}
+            <div id="detailUsername">
+              <div class="row " >
+                <table style="width:100%;margin-bottom:0;table-layout: fixed" class="table table-striped with-border" >
+                    <thead>
+                  <tr>
+                    <th>No. </th>
+                    <th>Item Name </th>
+                    <th>Unit Price </th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+             </tr>
+             </thead>
+             <tbody>
+            {{#each items}}
+             <tr class="table-border">
+                <td>{{incremented @index}}</td>
+               <td style="word-wrap: break-word">{{itemNam}}</td>
+               <td>{{priceFormat price}}</td>
+               <td>{{quantityFormat quantity}}</td>
+               <!-- <td>{{ totalPrice}}</td> -->
+               <td>{{totalIn price quantity}}</td>
+             </tr>
+            {{/each}}
+            </tbody>
+                </table>      
+              </div>
+          </div>
+            {{/with}}
+            <div class="row">           
+                <table class="pull-right">
+                    <tr>
+                        <td style="padding-right:20px;">TAX </td><td style="font-weight: bold;font-size: 17px;">ZMW  <span id="detailGSTs"></span></td>
+                      </tr>
+                      <tr>
+                          <td style="padding-right:20px;">Total Amount</td><td style="font-weight: bold;font-size: 17px;">ZMW  <span id="detailDocTotals"></span></td>
+                        </tr>
+                </table> 
+              </div>
+            </div>
+            </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default closen" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade in" id="printDetailPage">
+        <div class="modal-dialog" style="width:23cm">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span></button>
+              <h4 class="modal-title text-bold" id="">Print Invoice</h4>
+            </div>
+            <div class="modal-body">
+              <div id="printSection">
+                  
+                  <div class="row mainDiv">  
+                    <div class="header" style="font-family:'Times New Roman', Times, serif;text-align:center;width: 65%;margin: 0 auto;">
+                        <div class="titleHeader" >
+                            <p style="font-size: 25px;font-weight:bolder; color:rgb(224, 0, 0) !important">Gourock Zambia Limited</p>
+                            <p style="font-size: 12px;">Birkmyre House,E12,Arusha Street,P.O BOX 70467,NDOLA,Copperbelt,Zambia</p>
+                            <p style="font-size: 12px;"><b><span id="branchNamePrint"></span></b> &nbsp; &nbsp;<span id="branchAddressPrint"></span></p>
+                            <p style="font-size: 12px; font-size:11px;"><b>Tel</b>: +260 212 650 374,+260 212 650 375 <b>Fax</b>: +260 212 650 793 </p>
+                        </div>
+                        <div class="logoHeader" style="position: absolute;top: 25px;right: 13px;">
+                          {{#with logo}} <img  class="pull-left" src="{{logo}}" height="75px" alt="">{{/with}}
+                          </div>
+                    </div>
+                    <div class="body_1" style="font-family:'Times New Roman', Times, serif;text-align:center">
+                    <span class="salesOrder" style="font-weight: bold;font-family:'Times New Roman', Times, serif;font-size: 15px;">Sales Order</span>
+                    </div>
+                    <div class="body_2" style="width:100%">
+                      <div class="firstTable" style="font-size:11px;width: 50%;border:1px solid black;float: left; padding:13px 5px">
+                         
+                       
+
+                          {{#with cstmrDetail}}
+                          <b>M/s</b> : {{cardName}}<br>
+                          <b>Address</b> : {{#with ordDetail}} {{address}} {{/with}}<br>
+                          <b>Tele</b> : {{phone1}}<br>
+                          <b>Email</b> : {{mailAddres}}<br>
+                          <b>Location</b> : {{#with ordDetail}} {{address}} {{/with}}
+                          {{/with}}<br>
+                          <b>Rep.</b> :
+                         
+                      </div>
+                      <table  border='1' class="tables" style="font-size:11px;width: 50%;border:1px solid black;float: left">
+                          <tr >
+                            <td style="padding-left:10px"><b>Order No. </b></td> <td style="padding-left:10px;height:19px;"><span id="printOrdId"></span></td>
+                          </tr>
+                          <tr>
+                              
+                              <td style="padding-left:10px"><b>Order Date </b></td> <td style="padding-left:10px">{{date docDate}}</td>
+                            </tr>
+                          <tr>
+                              <td style="padding-left:10px"><b>Sale Exec. </b></td> <td style="padding-left:10px"><span id="salesExce"></span></td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left:10px"><b>Cust Ordno </b></td> <td style="padding-left:10px"><span id="custRefs"></span></td>
+                              </tr>
+                                  <tr>
+                                      <td style="padding-left:10px"><b>Del Date </b></td> <td style="padding-left:10px">{{date docDate}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding-left:10px"><b>Del.Location </b></td> <td style="padding-left:10px"><span id="printOrderAddress"></span></td>
+                                      </tr>
+                                      <tr>
+                                       <td style="padding-left:10px"><b>Paymt. Terms </b></td> <td style="padding-left:10px"><span id="paymentDays"></span> </td>
+                                     </tr>
+                        </table>
+                      </div>
+   
+                      <div class="body_3" style="width:100%">
+                          <table class="tables" border="1" style="font-size:11px; text-align:right;width: 100%;border:1px solid black;table-layout:auto;border-top:none">
+                              <tr style="color:blue !important;text-align:center">
+                                  <td style="color:blue !important;word-wrap:break-word;">Sr.</td>
+                                  <td style="color:blue !important;word-wrap:break-word;">Product Description</td>
+                                  <td style="color:blue !important;word-wrap:break-word;">Pack Size</td>
+                                  <td style="color:blue !important;word-wrap:break-word;">Order Qty</td>
+                                  <td style="color:blue !important;word-wrap:break-word;">Unit</td>
+                                  <td style="color:blue !important;word-wrap:break-word;">Weight [Kg.]</td>
+                                  <td style="color:blue !important;word-wrap:break-word;">Rate [ZMW] [VAT incl.]</td>
+                                  <td style="color:blue !important;word-wrap:break-word;">Disc.%</td>
+                                  <td style="color:blue !important;word-wrap:break-word;">Exci.%</td>
+                                  <td style="color:blue !important;word-wrap:break-word;">VAT %Amt</td>
+                                  <td style="color:blue !important;word-wrap:break-word;"> Gross Total</td>
+                                </tr>
+                                {{#each ordDetail.itemLines}}
+                                <tr>
+                                  <td>{{incremented @index}}</td>
+                                  <td style="text-align:left;word-wrap:break-word !important;">{{itemNam}}</td>
+                                  <td></td>
+                                  <td>{{quantity}}</td>
+                                  <td>{{uomCode}}</td>
+                                  <td></td>
+                                  <td>{{quantityFormat salesPrice}}</td>
+                                  <td>{{discount}}</td>
+                                  <td>0.00%</td>
+                                  <td>{{quantityFormat taxRate}}</td>
+                                  <td>{{afterDiscount}}</td>
+                                </tr>
+                                {{/each}}
+                              </table>
+                      </div>
+                      <div class="body_3" style="width:100%">
+                          <div class="freeSpace" style="width: 100%;border:1px solid black;float: left; height:75px;border-top:none;">
+                            <!-- Free Space -->
+                          </div>
+                      </div>
+                      <div class="body_4" style="width:100%">
+                          <table class="tables" border="1" style="font-size:11px;width: 50%;border:1px solid black;float: left;">
+                              <tr height="23px">
+                                  .
+                                </tr>
+                                <tr height="103px">
+                                    <td style="word-wrap: break-word"><b>Special Instruction &nbsp;:</b> &nbsp;&nbsp;&nbsp;&nbsp; {{remark_order}}</td>
+                                    
+                                </tr>
+                                
+                              </table>
+                              {{#with orderr}}
+                              <table class="tables" border="1" style="font-size:11px;width: 50%;border:1px solid black;float: left;">
+                                  <tr >
+                                      <td style="padding-left:10px;height:30px"><b>Basic Order Val[ZMW]</b></td> <td style="padding-left:10px;text-align:right;"><b>ZMW</b> {{priceFormat beforeDiscount}} </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding-left:10px"><b>Discount@ 0%</b></td> <td style="padding-left:10px;text-align:right;"><b>ZMW</b> {{disc afterDiscount beforeDiscount}}</td>
+                                      </tr>
+                                    <tr>
+                                        <td style="padding-left:10px"><b>Sub Total</b></td> <td style="padding-left:10px;text-align:right;"><b>ZMW</b> {{priceFormat afterDiscount}}</td>
+                                      </tr>
+                                      <tr>
+                                          <td style="padding-left:10px"><b>Excise</b></td> <td style="padding-left:10px;text-align:right;"><b>ZMW</b> 0.00</td>
+                                        </tr>
+                                            <tr>
+                                                <td style="padding-left:10px"><b>VAT</b></td> <td style="padding-left:10px;text-align:right;"><b>ZMW</b> {{GST}}</td>
+                                              </tr>
+                                              <tr>
+                                                  <td style="padding-left:10px;height:30px"><b>Grand Total[ZMW]</b></td> <td style="padding-left:10px;text-align:right;"><b>ZMW</b> {{priceFormat docTotal}}</td>
+                                                </tr>
+                                  </table>
+                                  {{/with}}
+                      </div>
+                      <div class="body_5" style="width:100%">
+                          <table class="tables" border="1" style="font-size:11px;width: 100%;border:1px solid black;float: left; border-top:none">
+                              <tr style="text-align: left">
+                                  <th style="padding-left:20px" width="50%">Authorized By :<span id="authorizedBy"></span></th>
+                                  <th style="padding-left:20px" width="50%">Prepared By : <span id="preparedByPrint"></span></th>
+                                </tr>
+                                <tr height="60px">
+                                  <td style="padding-left:20px">Email :<span id="approvedByEmailss"></span><br>
+                                  Contact No. : <span id="approvedByphone"></span></td>
+                                  <td style="padding-left:20px">
+                                      Email :<span id="emailForSalesperson"></span><br>
+                                      Contact No: <span id="contactNoForSalesperson"></span>
+                                  </td>
+                                </tr>
+                              </table>
+                      </div>
+                      <div class="prepared" style="font-family:'Times New Roman', Times, serif;">
+                          <table class="tables"  style="font-size:11px;width: 100%;float: left;margin-top:5px">
+                              <tr>
+                                  <td style="text-align:left" width="33.3%">
+                                    Printed by : {{printedBy}}
+                                  </td>
+                                  <td style="text-align:center" width="33.3%">
+                                    <b style="margin-left: 70px;">Page No. 1 of 1</b>
+                                  </td>
+                                  <td style="text-align:right" width="33.3%">
+                                    {{printTime}}
+                                  </td>
+                                </tr>
+                          </table>
+                      </div>
+                      <div class="footerBreak" style="width:100%">
+                          <div class="footerDiv" style="width:100%">
+                              <div class="freeSpace" style="width: 99.8%;float: left; height:24px;margin-top:-16px">
+                                  <hr style="border:brown; border-style: solid; border-width: 1px !important">
+                              </div>
+                          </div>
+                      </div>
+                      <div class="footer" style="font-family:'Times New Roman', Times, serif;">
+                          <table class="tables"  style="width: 100%;float: left;">
+                              <tr>
+                                  <td style="text-align:left;font-size:11px;" width="33.3%" >
+                                    <b>Telephone :</b><br>
+                                    +260 212 615402<br>
+                                    +260 212 615658<br>
+                                  </td>
+                                  <td style="text-align:center;font-size:11px;" width="33.3%">
+                                    <b>Fax No :</b>
+                                    +260 212 615657<br>
+                                    <b style="color: blue !important">www.gourockzambia.com</b>
+                                  </td>
+                                  <td style="text-align:right;font-size:11px;" width="33.3%">
+                                    <b >Email:</b>info@gourockzambia.com
+                                  </td>
+                                </tr>
+                          </table>
+                      </div>
+                  </div>
+                    
+                   
+                  </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default pull-left closed" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary printThis">Print</button>
+            </div>
+          </div>
+        </div>
+      </div>
+  {{/if}}
+  
+</template>

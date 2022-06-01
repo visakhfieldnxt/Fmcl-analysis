@@ -1,0 +1,361 @@
+<template name="routeApprove">
+  {{#if userCan 'routeApproveView'}}
+  <section class="content-header">
+    <h1>Route Approval
+      <small>Listing All Route Approval</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
+      <li class="active">Listing All Route Approval</li>
+    </ol>
+  </section>
+  <section class="content">
+
+    <div class="row">
+      <div style="float: right;">
+        <button class="btn btn-primary btn-flat" id="filterSearch"><i class="fa fa-search"> </i>&nbsp; Search</button>
+      </div>
+    </div>
+
+    <div class="row" id="filterDisplay" style="display:none">
+      <div class="box box-default box-solid">
+        <div class="box-header with-border bg-aqua">
+          <h3 class="box-title">Route Filter</h3><button type="button" id="removeSearch"
+            style="color: white; background-color: transparent; border-color:transparent" class="pull-right"><i
+              class="fa fa-close"></i></button>
+        </div>
+        <div class="box-body no-padding">
+          <form class="route-filter">
+            <div class="row">
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EMPcode">Route Name</label>
+                <select name="routeCodeVal" style="width:100% !important" id="routeCodeVal" class="routeCodeVal"
+                  placeholder="Select Route Name">
+                  <option disabled selected value=''>Select Route Name</option>
+                  {{# each routeCodeLists}}
+                  <option value="{{_id}}">{{routeName}}
+                  </option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EMPcode">Assigned To</label>
+                <select name="selectVanemp" style="width:100% !important" id="selectVanemp" class="selectVanemp"
+                  placeholder="Select Route Name">
+                  <option disabled selected value=''>Select Employee Name</option>
+                  {{# each vanUsersList}}
+                  <option value="{{_id}}">{{profile.firstName}} {{profile.lastName}}
+                  </option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EmailId">From Date</label>
+                <input type="text" autocomplete="off" class="form-control datepicker date validation"
+                  data-date-autoclose="true" onkeydown="event.preventDefault()" id="fromDate" data-provide="datepicker"
+                  data-date-format="dd-mm-yyyy" placeholder="From Date " name="fromDate" />
+              </div>
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EmailId">To Date</label>
+                <input type="text" autocomplete="off" class="form-control datepicker date validation"
+                  data-date-autoclose="true" onkeydown="event.preventDefault()" id="toDate" data-provide="datepicker"
+                  data-date-format="dd-mm-yyyy" placeholder="To Date " name="toDate" />
+              </div>
+              <div class="row" style="float: right">
+                <button type="submit" name="filter" class="btn btn-primary">Filter</button>
+                <button type="button" name="reset" class="btn btn-info reset">Reset Filter</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      {{#if isReady}}
+      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
+      onClick=clickEvent}}
+      {{/if}}
+      <div class="nav-tabs-custom taskHeader" id="taskHeader">
+        <div class="tab-content" style="padding : 0px !important">
+          <div class="box box-default box-solid">
+            <!-- <div class="box-header with-border bg-aqua">
+              <h3 class="box-title">Route</h3>
+            </div> -->
+            {{#if isReady}}
+            <div class="box-body no-padding table-responsive">
+              <table class="table table-striped generic">
+                <tbody>
+                  <tr>
+                    <th class="text-center sorted-column">Route Name</th>
+                    <th class="text-center sorted-column">Route Code</th>
+                    <th class="text-center sorted-column">Start Date</th>
+                    <th class="text-center sorted-column">End Date</th>
+                    <th class="text-center sorted-column">Assigned To</th>
+                    <th class="text-center sorted-column">Status</th>
+                    <th class="text-center"> </th>
+                  </tr>
+                  {{#each orders}}
+                  <tr>
+                    <td class=" text-center" width="15%">{{routeNameHelp routeId}}</td>
+                    <td class="text-center" width="15%">{{routeCodeHelp routeId}}</td>
+                    <td class="text-center " width="10%">{{routeDate}}</td>
+                    <td class="text-center " width="10%">{{routeDateEnd}}</td>
+                    {{#if assignedTo}}
+                    <td class="text-center " width="15%">{{vanUserName assignedTo}}</td>
+                    {{else}}
+                    <td class="text-center " width="15%">-</td>
+                    {{/if}}
+                    <td class="text-center " width="15%">{{{statCheck routeStatus}}}</td>
+                    <td class="text-center" width="25%">
+                      <input type="hidden" id="userId" name="userid" value="{{_id}}">
+                      <a href="javascript:void(0)" class="view " title="Click to view details" id="{{_id}}">
+                        <button class="pd-20 btn btn-default"><i class="fa fa-ellipsis-v"></i></button>
+                      </a>
+                    </td>
+                  </tr>
+                  {{/each}}
+                </tbody>
+              </table>
+            </div>
+            {{sortIcon}}
+            {{else}}
+            <div class="overlay">
+              <i class="fa fa-refresh fa-spin"></i>
+            </div>
+            {{/if}}
+          </div>
+        </div>
+      </div>
+      {{#if isReady}}
+      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
+      onClick=clickEvent}}
+      {{/if}}
+
+    </div>
+    {{#if isReady}}
+    <div id="bodySpin">
+    </div>
+    {{else}}
+    <div id="bodySpin" style=" width: 100%;position: 
+          fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+      justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+    {{/if}}
+
+    {{#if printLoadBody}}
+    <div id="bodySpin" style=" width: 100%;position: 
+    fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+    {{else}}
+    <div id="bodySpin">
+    </div>
+    {{/if}}
+  </section>
+
+  <div class="routeAssign-create-modal">
+    <div class="modal" id="routeAssign-create">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Assign Route</h4>
+          </div>
+          <div class="modal-body">
+            {{> routeAssign_create route=route}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  {{> successModal id="routeStatusSuccessModal" section='route'}}
+  {{> errorModal id="routeStatusErrorModal" section='route'}}
+ 
+  <div class="modal fade in" id="orderDetailPage">
+    <div class="modal-dialog">
+      <form class="statusUpdate" autocomplete="off">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span></button>
+            <h4 class="modal-title text-bold" id="orderHs"></h4>
+          </div>
+          <div class="modal-body">
+            <div class="box box-default box-solid">
+              <div class="box-header with-border bg-aqua">
+                <h3 class="box-title">Route Details</h3>
+              </div>
+              <table style="width:100%; table-layout:fixed; border-collapse:collapse;" class="table table-striped">
+                <tbody>
+                  <tr class="table-border">
+                    <td width="50%">
+                      <label for="Employee ">Route Name </label>
+                      <div id="detailrouteName"></div>
+                    </td>
+                    <td width="50%">
+                      <label for="Employee ">Route Code </label>
+                      <div id="detailrouteCode"></div>
+                    </td>
+                  </tr>
+                  <tr class="table-border">
+                    <td width="50%">
+                      <label for="firstName">Branch Name</label>
+                      <div id="detailBranch"></div>
+                    </td>
+                    <td width="50%">
+                      <label for="Employee ">Route Start Date</label>
+                      <div id="detailDate"></div>
+                    </td>
+                  </tr>
+                  <tr class="table-border">
+                    <td width="50%">
+                      <label for="Employee ">Route End Date</label>
+                      <div id="detailDateEnd"></div>
+                    </td>
+                    <td width="50%">
+                      <label for="Employee ">Status</label>
+                      <div id="detailStatus"></div>
+                    </td>
+                  </tr>
+                  <tr class="table-border">
+                    <td width="50%">
+                      <label for="firstName">Description</label>
+                      <div id="detailDescription"></div>
+                    </td>
+                    <td width="50%">
+                      <label for="firstName">Assigned By</label>
+                      <div id="detailedAssignedBy"></div>
+                    </td>
+                  </tr>
+                  <tr class="table-border">
+                    <td width="50%">
+                      <label for="Employee ">Assigned To</label>
+                      <div id="detailedAssignedTo"></div>
+                    </td>
+                    <td width="50%">
+                      <label for="firstName">Assignee Remark</label>
+                      <div id="detailedAssigneeRemark"></div>
+                    </td>
+                  </tr>
+                  <tr class="table-border">
+                    <td width="50%">
+                      <label for="firstName">Assigned Date</label>
+                      <div id="detailedAssignedDate"></div>
+                    </td>
+                    <td width="50%">
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              {{#with items}}
+              <span style="padding-left: 10px;"><label for="Employee " style="padding-top: 10px;">Customer
+                  List</label></span>
+              <div id="detailUsername" class="table-responsive">
+                <div class="row ">
+                  <table style="width:100%;margin-bottom:0;table-layout: fixed" class="table table-striped with-border">
+                    <thead>
+                      <tr>
+                        <th width="100px">Sl No. </th>
+                        <th width="200px">Customer Name</th>
+                        <th width="100px">Priority</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {{#each items}}
+                      <tr class="table-border">
+                        <td>{{incremented @index}}</td>
+                        <td style="word-wrap: break-word">{{custNameHelp customer}}</td>
+                        <td style="word-wrap: break-word">{{ priority}}</td>
+                      </tr>
+                      {{/each}}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              {{/with}}
+              {{#with routeDataList}}
+
+              <span style="padding-left: 10px;"><label for="Employee ">Route Updated Data</label></span>
+              <div id="detailUsername" class="table-responsive">
+                <div class="row ">
+                  <table style="width:100%;margin-bottom:0;table-layout: fixed" class="table table-striped with-border">
+                    <thead>
+                      <tr>
+                        <th width="100px">Sl no. </th>
+                        <th width="200px">Customer Name </th>
+                        <th width="200px">Check In</th>
+                        <th width="200px">Check Out</th>
+                        <th width="200px">Remark</th>
+
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {{#each routeDataList}}
+                      <tr class="table-border">
+                        <td style="word-wrap: break-word">{{incremented @index}}</td>
+                        <td style="word-wrap: break-word">{{custNameHelp customer}}</td>
+                        <td style="word-wrap: break-word">{{dateValue}} {{checkIn}}</td>
+                        <td style="word-wrap: break-word">{{dateValue}} {{checkOut}}</td>
+                        <td style="word-wrap: break-word">{{remark}}</td>
+                      </tr>
+                      {{/each}}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              {{/with}}
+              <div id="status" style="text-align:left; padding: 10px;">
+                <b>Route Status</b><br>
+                <select name="routeStatus" id="routeStatus" style="width:100%" class="select1-dropdown" required>
+                  <option selected="selected" value="">Select status</option>
+                  <option value="approved">Approved</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+              </div><br>
+              <b>Remarks</b><br>
+              <div id="remarkId" style="text-align:center;padding: 10px;">
+                <textarea name="remark" placeholder="Enter Remark" id="remark" style="width:330px; resize: none"
+                  required></textarea>
+              </div>
+            </div>
+            {{#if printLoad}}
+            <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+          absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+              {{#with printLoaderImage}}
+              <div class="loader-lg" style="width: 100%;height: 100%;display: 
+            flex; align-items: center;justify-content: center;background: #fff;">
+                <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+              </div>
+              {{/with}}
+            </div>
+            {{else}}
+            <div class="loadersSpin">
+            </div>
+            {{/if}}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default closen pull-left" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary pull-right routeApproveButton">Submit</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div> 
+ 
+
+  {{/if}}
+
+</template>

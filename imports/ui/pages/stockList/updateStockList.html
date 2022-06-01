@@ -1,0 +1,185 @@
+<template name="updateStockList">
+  <section class="content-header">
+    <h1>Update Stock
+      <small>Listing All Products Stock</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
+      <li class="active">Update Stock</li>
+    </ol>
+  </section>
+  <section class="content">
+    <div class="body">
+      <div class="box box-default box-solid">
+        <form class="stockAdd" autocomplete="off" id="stockAdd">
+          <div id="detailUsername" class="table-responsive">
+            <div class="row ">
+              <table style="width:100%;" class="table table-responsive">
+                <tr>
+                  <td>
+                    <div class="form-group has-feedback">
+                      <div class="col-sm-4" style="padding: 10px 10px 10px 10px;">
+                        <label for="customer">Select Vertical<span class="asteric_red">*</span></label>
+                        <select class="selectVertical" required style="width:100%;" name="selectVertical"
+                          id="selectVertical">
+                          <option selected='selected' value="">Select Vertical </option>
+                          {{# each getVertical}}
+                          <option value="{{_id}}">{{verticalName}}</option>
+                          {{/each}}
+                        </select>
+                        <span id="selectVerticalSpan"></span>
+                      </div>
+                      <div class="col-sm-4" style="padding: 10px 10px 10px 10px;">
+                        <label for="lastName">Invoice No <span class="asteric_red">*</span></label>
+                        <input type="text" class="form-control validation invoiceNos" placeholder="Invoice No"
+                          id="invoiceNos" name="invoiceNos" required>
+                      </div>
+                      <div class="col-sm-4" style="padding: 10px 10px 10px 10px;">
+                        <label for="customer">Select Date<span class="asteric_red">*</span></label>
+                        <input type="text" autocomplete="off" class="form-control datepicker date validation"
+                          data-date-autoclose="true" onkeydown="event.preventDefault()" id="stockDate"
+                          data-provide="datepicker" value="{{dateVal}}" data-date-format="dd-mm-yyyy"
+                          placeholder="From Date " name="stockDate" required />
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+              <div>
+                <div style="text-align: center">
+                  <div class="loadersSpinsImgIn" style="display: none;text-align: center;">
+                    {{#with printLoaderImage}}
+                    <div class="loader-lg">
+                      <img src="{{printLoaderImg}}" class="mainLoaders"
+                        style="margin-top: -50px!important;width: 20%; text-align: center !important;">
+                    </div>
+                    {{/with}}
+                  </div>
+                </div>
+                <table class="table table-striped generic">
+                  <thead>
+                    <tr>
+                      <th class=" sorted-column" width="10%">Sl No. </th>
+                      <th class="sorted-column" width="15%">Product Code</th>
+                      <th class="sorted-column" width="25%">Product Name</th>
+                      <th class="sorted-column" width="20%">Available Stock (Unit) </th>
+                      <th class="sorted-column" width="20%">Value (GHS) </th>
+                      <th class=" sorted-column" width="10%"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {{#each getProductList}}
+                    <tr class="table-border">
+                      <td class=" sorted-column">{{incremented @index}}</td>
+                      <td class=" sorted-column" style="word-wrap: break-word">
+                        {{productCode}}</td>
+                      <td class=" sorted-column" style="word-wrap: break-word">
+                        {{productName}}</td>
+                      <td class="sorted-column">
+                        {{qtyCTN}} ({{basicUnitsName}})
+                      </td>
+                      <td class="sorted-column">
+                        {{amtShowsHelp productPrice qtyCTN}}
+                      </td>
+                      <td class=" sorted-column">
+                        <a href="javascript:void(0)" class="editProductStock" title="Click To Update Stock"
+                          id="{{_id}}">
+                          <i class="fa fa-pencil"></i>
+                        </a> &nbsp;
+                      </td>
+                    </tr>
+                    {{/each}}
+                  </tbody>
+                </table>
+              </div>
+              <table class="table generic">
+                <tbody>
+                  <tr>
+                    <td>
+                      <button type="submit" id="updateStock" class="btn btn-primary  pull-right">Submit
+                      </button>
+                      <button type="button" class="btn btn-default closestockVal" data-dismiss="modal">Close</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+  <div id="bodySpinLoadersVal" style=" width: 100%;position: 
+  fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+    {{#with bodyLoader}}
+    <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+justify-content: center;background: #f1f1f1;">
+      <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+    </div>
+    {{/with}}
+  </div>
+
+  {{> successModal id="stock1SuccessModal" section=stock}}
+  {{> errorModal id="stock1ErrorModal" section=stock}}
+  <div class="modal fade in" id="stockEditModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="userHeader"></h4>
+        </div>
+        <div class="modal-body">
+          <table style="width:100%;" class="table table-responsive">
+            <tbody>
+              <tr>
+                <td style="border: none;">
+                  <div class="form-group has-feedback">
+                    <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                      <label for="customer">Select Unit <span class="asteric_red">*</span></label>
+                      <select class="selectUnit" disabled style="width:100%;" name="selectUnit" id="selectUnit">
+                        <option selected='selected' value="">Select Unit </option>
+                        {{# each getUnitList}}
+                        <option value="{{_id}}">{{unitName}}</option>
+                        {{/each}}
+                      </select>
+                      <div style="padding:4px 14px; "> <span id="unitQuantityShows"> </span> </div>
+                      <span id="selectUnitSpan"></span>
+                    </div>
+                    <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                      <label for="lastName">Quantity <span class="asteric_red">*</span></label>
+                      <input type="text" class="form-control validation" placeholder="Quantity" id="stockData"
+                        name="stockData">
+                        <div style="padding:4px 14px; "> <span id="stockDataShows"> </span> </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <input type="hidden" id="confirmedUuid">
+        <input type="hidden" id="baseQtyVal">
+        <div class="modal-footer">
+          <button id="updateProductStock" class="btn btn-success">Update</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal" id="userClose">Close
+          </button>
+        </div>
+      </div>
+      {{#if printLoad}}
+      <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+      fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+        {{#with printLoaderImage}}
+        <div class="loader-lg" style="width: 100%;height: 100%;display: 
+        flex; align-items: center;justify-content: center;background: #fff;">
+          <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+        </div>
+        {{/with}}
+      </div>
+      {{else}}
+      <div class="loadersSpin">
+      </div>
+      {{/if}}
+    </div>
+  </div>
+</template>

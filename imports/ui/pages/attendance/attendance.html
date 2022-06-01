@@ -1,0 +1,218 @@
+<template name="attendance">
+  <section class="content-header">
+    <h1>Attendance
+      <small>Listing All Attendance</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
+      <li class="active">Attendance</li>
+    </ol>
+  </section>
+  <section class="content">
+
+    <div class="row">
+      <div style="float: right;">
+        <button class="btn btn-primary btn-flat" id="filterSearch"><i class="fa fa-search"> </i>&nbsp; Search</button>
+      </div>
+    </div>
+
+    <div class="row" id="filterDisplay" style="display:none">
+      <div class="box box-default box-solid">
+        <div class="box-header with-border bg-aqua">
+          <h3 class="box-title"  style="color: black;">{{user}} Filter</h3><button type="button" id="removeSearch"
+            style="color: white; background-color: transparent; border-color:transparent" class="pull-right"><i
+              class="fa fa-close"  style="color: black;"></i></button>
+        </div>
+        <div class="box-body no-padding">
+          <form class="order-filter">
+            <div class="row">
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EMPcode">Employee Name</label><br>
+                <select value='' name="cardName" style="width:100% !important" id="selectEmpData"
+                  class="selectEmpData" placeholder="Select Card Name">
+                  <option disabled selected value=''>Select Employee Name</option>
+                  {{# each vansaleuserList}}
+                  <option value="{{_id}}">{{profile.firstName}} {{profile.lastName}}</option>
+                  {{/each}}
+                </select>
+              </div>
+
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EmailId">From Date</label>
+                <input type="text" autocomplete="off" class="form-control datepicker date validation"
+                  data-date-autoclose="true" onkeydown="event.preventDefault()" id="fromDate" data-provide="datepicker"
+                  data-date-format="dd-mm-yyyy" placeholder="From Date " name="fromDate" />
+              </div>
+
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EmailId">To Date</label>
+                <input type="text" autocomplete="off" class="form-control datepicker date validation"
+                  data-date-autoclose="true" onkeydown="event.preventDefault()" id="toDate" data-provide="datepicker"
+                  data-date-format="dd-mm-yyyy" placeholder="To Date " name="toDate" />
+              </div>
+
+              <div class="row" style="float: right">
+                <button type="submit" name="filter" class="btn btn-primary">Filter</button>
+                <button type="button" name="reset" class="btn btn-info reset">Reset Filter</button>
+
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      {{#if isReady}}
+      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
+      onClick=clickEvent}}
+      {{/if}}
+      <div class="box box-default box-solid">
+        <!-- <div class="box-header with-border bg-aqua">
+          <h3 class="box-title">Attendance</h3>
+        </div> -->
+        {{#if isReady}}
+        <div class="box-body no-padding table-responsive">
+          <table class="table table-striped generic">
+            <tbody>
+              <tr>
+                <th class="text-center sorted-column  " id="name">Employee Name</th>
+                <th class="text-center sorted-column">Sub Distributor</th>
+                <th class="text-center sorted-column">Date</th>
+                <th class="text-center sorted-column">Time Of Punch In</th>
+                <th class="text-center sorted-column">Time Of Punch Out</th>
+                <th class="text-center sorted-column"></th>
+              </tr>
+              {{#each attendances}}
+              <tr>
+                <td class="pl-20 text-center vanUserName_{{employeeId}}" width="14%">{{vanUserName employeeId}}</td>
+                <td class="text-center vanUserName_{{subDistributor}}" width="10%">{{vanUserName subDistributor}}</td>
+                <td class="text-center" width="10%">{{attendenceDate}}</td>
+                <td class="text-center" width="10%">{{loginDate}}</td>
+                <td class="text-center" width="10%">{{logoutDate}}</td>
+                <td class="text-center" width="16%">
+                  <input type="hidden" id="userId" name="userid" value=" ">
+                  <a href="javascript:void(0)" class="view {{_id}}" title="Click to view details" id="{{_id}}">
+                    <button class="pd-20 btn btn-default"><i class="fa fa-ellipsis-v"></i></button>
+                  </a>
+                </td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+        {{sortIcon}}
+        {{else}}
+        <div class="overlay">
+          <i class="fa fa-refresh fa-spin"></i>
+        </div>
+        {{/if}}
+      </div>
+      {{#if isReady}}
+      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
+      onClick=clickEvent}}
+      {{/if}}
+
+    </div>
+    {{#if isReady}}
+    <div id="bodySpin">
+    </div>
+    {{else}}
+    <div id="bodySpin" style=" width: 100%;position: 
+          fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+      justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+    {{/if}}
+    <div id="bodySpinVal" style=" width: 100%;position: 
+          fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+      justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+  </section>
+
+
+  {{> successModal id="invoiceSuccessModal" section='Invoices'}}
+  {{> errorModal id="invoiceErrorModal" section='Invoices'}}
+
+  <div class="modal fade in" id="orderDetailPage">
+    <div class="modal-dialog">
+      <form class="statusUpdate" autocomplete="off">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span></button>
+            <h4 class="modal-title text-bold" id="orderH"></h4>
+          </div>
+          <div class="modal-body">
+            <div class="box box-default box-solid">
+              <!-- <div class="box-header with-border bg-aqua">
+                <h3 class="box-title">Attendance Details</h3>
+              </div> -->
+              <table style="width:100%;table-layout: fixed;border-collapse: collapse;" class="table table-striped">
+                <tbody>
+                  <tr class="table-border">
+                    <td width="50%">
+                      <label for="Employee ">Employee Name </label>
+                      <div id="detailEmpName" style="word-wrap:break-word;"></div>
+                    </td>
+                    <td width="50%">
+                      <label for="Employee ">Sub Distributor </label>
+                      <div id="detailSubD" style="word-wrap:break-word;"></div>
+                    </td>
+                  </tr>
+                  <tr class="table-border">
+                    <td width="50%">
+                      <label for="Employee ">Date & Time Of Login</label>
+                      <div id="detailLoginDate" style="word-wrap:break-word;"></div>
+                    </td>
+                    <td>
+                      <label for="Employee ">Date & Time Of Logout</label>
+                      <div id="detailLogoutDate" style="word-wrap:break-word;"></div>
+                    </td>
+                  </tr>
+                  <tr class="table-border">
+                    <td width="50%">
+                      <label for="Employee ">Login Location</label>
+                      <div id="detailloginLocation" style="word-wrap:break-word;"></div>
+                    </td>
+                    <td width="50%">
+                      <label for="firstName">Logout Location </label>
+                      <div id="detaillogoutLocation" style="word-wrap:break-word;"></div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            {{#if printLoad}}
+            <div class="loadersSpin">
+            </div>
+            {{else}}
+            <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+            absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+              {{#with printLoaderImage}}
+              <div class="loader-lg" style="width: 100%;height: 100%;display: 
+              flex; align-items: center;justify-content: center;background: #fff;">
+                <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+              </div>
+              {{/with}}
+            </div>
+            {{/if}}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default closen pull-right" data-dismiss="modal">Close</button>
+
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</template>

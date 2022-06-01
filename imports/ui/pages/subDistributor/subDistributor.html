@@ -1,0 +1,732 @@
+<template name="subDistributor">
+  <section class="content-header">
+    <h1>Sub Distributors
+      <small>Listing All Sub Distributors</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
+      <li class="active">Sub Distributors</li>
+    </ol>
+  </section>
+  <section class="content">
+
+    <div class="row">
+      <div style="float: right;">
+        <button class="btn btn-primary btn-flat" id="ic-create-button">Create Sub Distributor</button>
+        <button class="btn btn-primary btn-flat" id="filterSearch"><i class="fa fa-search"> </i>&nbsp; Search</button>
+      </div>
+    </div>
+
+    <div class="row" id="filterDisplay" style="display:none">
+      <div class="box box-default box-solid">
+        <div class="box-header with-border bg-aqua">
+          <h3 class="box-title" style="color: black;">{{user}} Filter</h3><button type="button" id="removeSearch"
+            style="color: white; background-color: transparent; border-color:transparent" class="pull-right"><i
+              class="fa fa-close" style="color: black;"></i></button>
+        </div>
+        <div class="box-body no-padding">
+          <form class="userFilter">
+            <div class="row">
+
+
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EMPcode">SD Code</label>
+                <input type="text" class="form-control validation" placeholder="SD Code" id="empcode" name="empcode">
+              </div>
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="Firstname">SD Name</label>
+                <input type="text" class="form-control validation" placeholder="SD Name" id="firstName" name="firstName">
+              </div>
+
+
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EmailId">Email Id</label>
+                <input type="email" class="form-control validation" placeholder="EmailId" id="emailfilter" name="emailfilter">
+              </div>
+              <div class="row" style="float: right">
+
+                <button type="submit" name="filter" class="btn btn-primary">Filter</button>
+                <button type="button" name="reset" class="btn btn-info reset">Reset Filter</button>
+
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="nav-tabs-custom taskHeader" id="taskHeader">
+        <ul class="nav nav-tabs taskHeaderList" id="taskHeaderList">
+          <li class="active paginationFilterValue activeFilter activeHeaders" id="activeFilter"><a href=""
+              data-toggle="tab">Active</a>
+          </li>
+          <li class="paginationFilterValue inactiveFilter" id="inactiveFilter"><a href="" data-toggle="tab">Inactive</a>
+          </li>
+        </ul>
+        <div class="box box-default box-solid">
+          <!-- <div class="box-header with-border bg-aqua">
+            <h3 class="box-title">{{user}}</h3>
+          </div> -->
+          {{#if isReady}}
+          <div class="box-body no-padding table-responsive">
+            <table class="table table-striped generic">
+              <tbody>
+                <tr>
+                  <th class="pl-20 sorted-column text-center" id="name">Sub Distributor Code</th>
+                  <th class=" sorted-column text-center">Sub Distributor Name</th>
+                  <th class=" sorted-column text-center">Branch</th>
+                  <th class=" sorted-column text-center">Location</th>
+                  <th class=" sorted-column text-center">Verticals</th>
+                  <th class=" sorted-column text-center">Users</th>
+                  <th class="text-center"></th>
+                </tr>
+                {{#each userList}}
+                <tr>
+                  <td class="pl-20 word-wrap text-center" width="15%;">
+                    {{profile.empCode}}
+                  </td>
+                  <td class=" word-wrap text-center" width="15%;">
+                    {{profile.firstName}}
+                  </td>
+                  <td class=" word-wrap text-center branchIdVal_{{branch}}" width="15%;">
+                    {{getBranchName branch}}
+                  </td>
+                  <td class=" word-wrap text-center locationIdVal_{{location}}" width="15%;">
+                    {{getLocationName location}}
+                  </td>
+                  <td class=" word-wrap text-center getVerticalsName_{{_id}}" width="15%;">
+                    {{getVerticalsName vertical _id}}
+                  </td>
+                  <td class=" word-wrap text-center usersCount_{{_id}}" width="5%;">
+                    {{getUsersCount _id}}
+                  </td>
+                  <td class="sorted-column text-center" width="30%;">
+                    <a href="javascript:void(0)" class="fileuploadProducts success-color"
+                      title="Click To Upload Products" id="{{_id}}">
+                      <button class="pd-20 btn btn-success"><i class="fa fa-upload"></i></button>
+                    </a> &nbsp;
+                    <a href="javascript:void(0)" class="edit primary-color" title="Click to edit {{profile.firstName}}"
+                      id="{{_id}}"><button class="pd-20 btn btn-primary"><i class="fa fa-pencil"></i></button>
+                    </a> &nbsp;
+                    <input type="hidden" id="userName_{{_id}}" value="{{profile.firstName}}">
+                    {{#if activeHelper active}}
+                    <a href="javascript:void(0)" class="deactivate" title="Click to inactivate {{profile.firstName}}"
+                      id="{{_id}}">
+                      <button class="pd-20 btn btn-danger"><i class="fa fa-close"></i></button>
+                    </a>&nbsp;
+                    {{/if}}
+                    {{#if inactiveHelper active}}
+                    <a href="javascript:void(0)" class="activate" title="Click to activate {{profile.firstName}}"
+                      id="{{_id}}">
+                      <button class="pd-20 btn btn-success"><i class="fa fa-check"></i></button>
+                    </a> &nbsp;
+                    {{/if}}
+                    <input type="hidden" id="userId" name="userid" value="{{_id}}">
+                    <a href="javascript:void(0)" class="view " title="Click to view details" id="{{_id}}">
+                      <button class="pd-20 btn btn-default"><i class="fa fa-ellipsis-v"></i></button>
+                    </a>
+                  </td>
+                </tr>
+                {{/each}}
+              </tbody>
+            </table>
+          </div>
+          {{sortIcon}}
+          {{else}}
+          <div class="overlay">
+            <i class="fa fa-refresh fa-spin"></i>
+          </div>
+          {{/if}}
+        </div>
+        {{#if isReady}}
+        {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
+        onClick=clickEvent}}
+        {{/if}}
+      </div>
+    </div>
+    {{#if isReady}}
+    <div id="bodySpin">
+    </div>
+    {{else}}
+    <div id="bodySpin" style=" width: 100%;position: 
+          fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+      justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+    {{/if}}
+    <div id="bodySpinLoaders" style=" width: 100%;position: 
+    fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+  </section>
+
+  <div class="ic-create-modal">
+    <div class="modal" id="ic-create">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Create Sub Distributor </h4>
+          </div>
+          <div class="modal-body">
+            {{> sd_create sdUser=sdUser}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {{> successModal id="sdSuccessModal" section=user}}
+  {{> errorModal id="sdErrorModal" section=user}}
+
+
+
+
+  <div class="modal fade in" id="userEditPage">
+    <div class="modal-dialog">
+      <form class="updateSd" autocomplete="off">
+
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span></button>
+            <h4 class="modal-title text-bold" id="categoryH"></h4>
+          </div>
+          <div class="modal-body">
+            <div class="box box-default box-solid">
+              <!-- <div class="box-header with-border bg-aqua">
+                <h3 class="box-title">{{user}} Details</h3>
+              </div> -->
+              <table style="width:100%;">
+                <tr>
+                  <td>
+                    <div class="form-group has-feedback">
+                      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                        <label for="branch">Branch <span class="asteric_red">*</span></label>
+                        <select class="branchSelectionEdit" disabled style="width:100%;" name="branchSelectionEdit"
+                          id="branchSelectionEdit" required>
+                          <option value="">Select Branch</option>
+                          {{# each branchLists}}
+                          <option value="{{_id}}">{{branchName}}</option>
+                          {{/each}}
+                        </select>
+                      </div>
+                      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                        <label for="branch">Location<span class="asteric_red">*</span></label>
+                        <select class="selectLocationEdit" disabled style="width:100%;" required
+                          name="selectLocationEdit" id="selectLocationEdit">
+                          <option value="">Select Location</option>
+                          {{# each locationList}}
+                          <option value="{{_id}}">{{locationName}}</option>
+                          {{/each}}
+                        </select>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <div class="form-group has-feedback">
+                    <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                      <label for="subDistributorName">Sub Distributor Name <span class="asteric_red">*</span>
+                      </label>
+                      <input type="text" id="subDistributorNameEdit" disabled class="form-control validation"
+                        placeholder="Enter Name" name="subDistributorNamEdite" required>
+                    </div>
+                    <div class="col-sm-6 priceTypeDivEdit" style="padding: 10px 10px 10px 10px; ">
+                      <label for="branch">Select Price Type <span class="asteric_red">*</span></label>
+                      <select class="selectPriceTypeEdit" required style="width:100%;" name="selectPriceTypeEdit"
+                        id="selectPriceTypeEdit">
+                        <option value="">Select Price Type </option>
+                        {{# each priceTypeList}}
+                        <option value="{{_id}}">{{priceTypeName}}</option>
+                        {{/each}}
+                      </select>
+                    </div>
+                  </div>
+                </tr>
+                <tr>
+                  <div class="form-group has-feedback">
+                    <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                      <label for="username">Contact Person </label>
+                      <input type="text" id="contactPersonEdit" class="form-control validation"
+                        placeholder="Enter Contact Person" name="contactPersonEdit">
+                    </div>
+                    <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                      <label for="username">Contact No </label>
+                      <input type="tel" pattern="[0-9]{10}" id="contactNoEdit" class="form-control validation"
+                        placeholder="Enter Contact No. . ." name="contactNoEdit">
+                    </div>
+                  </div>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="form-group has-feedback">
+                      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                        <label for="Email">Email Id <span class="asteric_red">*</span></label>
+                        <input type="email" class="form-control validation" id="emailEdit" placeholder="Enter Email Id"
+                          name="emailEdit" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$"
+                          title="Please enter a vaild email address eg: example@example.com" required>
+                        <span id="emailspan"> </span>
+                      </div>
+                      <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                        <label for="username">Address <span class="asteric_red">*</span></label>
+                        <textarea name="addresValEdit" placeholder="Enter Address" id="addresValEdit"
+                          style="height: 50px;" cols="5" rows="5"></textarea>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <div class="form-group has-feedback">
+                    <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                      <label for="username">Username<span class="asteric_red">*</span></label>
+                      <input type="text" id="usernameValueEdit" class="form-control validation"
+                        placeholder="Enter username . ." name="usernameEdit" required>
+                    </div>
+                    <div class="col-sm-6" style="padding: 10px 10px 20px 10px;">
+                      <label for="password">Password
+                      </label>
+                      <input type="password" class="form-control validation" placeholder="Enter password . ."
+                        id="passwordsEdit" name="passwordEdit" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+                        style="padding-right: 0" autocomplete="off">
+                      <span toggle="#passwordsEdit" style="position: absolute;top:36px;right: 21px;"
+                        class=" fa fa-fw fa-eye-slash field-icon toggle-passwords"></span>
+                      <span id="passwordspans"></span>
+                      <div class="hint">
+                        Password must be at least 8 characters long and should contain at least a number and an
+                        uppercase letter
+                      </div>
+                    </div>
+                  </div>
+                </tr>
+                <tr>
+                  <div class="form-group has-feedback">
+                    <div class="col-sm-6" style="padding: 10px 10px 20px 10px;">
+                      <label for="confirmPassword">Confirm Password
+                      </label>
+                      <input type="password" id="confirmPasswordsEdit" class="form-control validation"
+                        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" placeholder="Retype password . ."
+                        name="confirmPasswordEdit">
+                      <span id="confirmPasswordspans"></span>
+                    </div>
+                  </div>
+                </tr>
+                <input type="hidden" class="idEdit" name="idEdit">
+                <input type="hidden" class="hiddenemail" name="hiddenemail">
+              </table>
+              <div class="verticalAddDiv" style="display: none;">
+                <table style="width:100%;" class="table table-striped">
+                  <tr class="lightGreenBG">
+                    <td>
+                      <div class="form-group has-feedback">
+                        <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                          <label for="customer">Select Vertical <span class="asteric_red">*</span></label>
+                          <select class="selectVerticalIdEdit" style="width:100%;" name="selectVerticalIdEdit"
+                            id="selectVerticalIdEdit">
+                            <option selected='selected' value="">Select Vertical</option>
+                            {{# each verticalList}}
+                            <option value="{{_id}}">{{verticalName}}</option>
+                            {{/each}}
+                          </select>
+                          <span id="verticalSpanEdit"></span>
+                        </div>
+                        <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                          <label for="customer">Select Price Type <span class="asteric_red">*</span></label>
+                          <select class="selectPriceTypeIdEdit" style="width:100%;" name="selectPriceTypeIdEdit"
+                            id="selectPriceTypeIdEdit">
+                            <option selected='selected' value="">Select Price Type</option>
+                            {{# each verticalPriceType}}
+                            <option value="{{_id}}">{{priceTypeName}}</option>
+                            {{/each}}
+                          </select>
+                          <span id="priceTypeSpanEdit"></span>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr class="lightGreenBG">
+                    <td>
+                      <div class="form-group has-feedback">
+                        <div class="col-sm-12" style="padding: 10px">
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr class="lightGreenBG">
+                    <td>
+                      <div class="form-group has-feedback">
+                        <div class="col-sm-12" style="padding: 10px">
+                          <button type="button" class="btn btn-success addVerticalEdit"
+                            style="width:50%;padding: 10px;box-shadow: #a8a8a8 2px 3px 12px;">
+                            Add Vertical
+                          </button>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <div class="col-sm-12" style="padding:20px 10px">
+                    </div>
+                  </tr>
+                </table>
+                {{#with addedVerticals}}
+                <span style="padding-left: 10px;"><label for="Employee " style="font-weight: bold; color: black;">
+                    Price Type List</label></span>
+                <div id="detailUsername" class="table-responsive" style="border: none;">
+                  <div class="row">
+                    <table style="width:100%;table-layout: fixed; border: solid 1px #e0d8d8;"
+                      class="table table-striped with-border">
+                      <thead>
+                        <tr class="bg-light-blue-4">
+                          <th width="100px">Sl No. </th>
+                          <th width="200px">Vertical Name </th>
+                          <th width="110px">Price Type</th>
+                          <th width="110px"></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {{#each addedVerticals}}
+                        <tr class="table-border">
+                          <td>{{incremented @index}}</td>
+                          <td style="word-wrap: break-word" class="verticalId_{{vertical}}">{{getSingleVerticalName
+                            vertical}}</td>
+                          <td style="word-wrap: break-word " class="priceTypeId_{{priceType}}">{{getPriceTypeName
+                            priceType}}</td>
+                          <td>
+                            <a href="javascript:void(0)" class="deleteVerticalsEdit"
+                              style="border:none !important;font-size: 17px;" id="{{randomId}}"
+                              title="Click To Remove Verticals">
+                              <i class="fa fa-close danger-color"></i>
+                            </a>
+                          </td>
+                        </tr>
+                        {{/each}}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                {{/with}}
+                {{#with productEditGet}}
+                <span style="padding-left: 10px;"><label for="Employee " style="padding-top: 10px;">Product List
+                  </label></span>
+                <div id="detailUsername" class="table-responsive">
+                  <div class="row ">
+                    <table style="width:100%;margin-bottom:0;table-layout: fixed"
+                      class="table table-striped with-border">
+                      <thead>
+                        <tr>
+                          <th width="100px">Sl No. </th>
+                          <th width="200px">Product Name</th>
+                          <th width="110px">Minimum Quantity</th>
+                          <th width="110px"></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {{#each productEditGet}}
+                        <tr class="table-border">
+                          <td>{{incremented @index}}</td>
+                          <td style="word-wrap: break-word" class="productIdVals_{{product}}">
+                            {{ getProductNames product}}</td>
+                          <td style="word-wrap: break-word ">
+                            {{minimumQty}}</td>
+                          <td>
+                            <a href="javascript:void(0)" class="deleteProductEdit"
+                              style="border:none !important;font-size: 17px;" id="{{_id}}"
+                              title="Click To Remove Product">
+                              <i class="fa fa-close danger-color"></i>
+                            </a>
+                          </td>
+                        </tr>
+                        {{/each}}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                {{/with}}
+              </div>
+            </div>
+            {{#if printLoad}}
+            <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+            absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+              {{#with printLoaderImage}}
+              <div class="loader-lg" style="width: 100%;height: 100%;display: 
+              flex; align-items: center;justify-content: center;background: #fff;">
+                <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+              </div>
+              {{/with}}
+            </div>
+            {{else}}
+            <div class="loadersSpin">
+            </div>
+            {{/if}}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default closen pull-left" data-dismiss="modal"
+              id="categoryClose">Close</button>
+            <button type="submit" class="btn btn-primary">Update Sub Distributor </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal fade in" id="userDelConfirmation">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="userHeader"></h4>
+        </div>
+        <div class="modal-body">
+          <div id="usersBody">
+            <p class="danger-color">
+              Are you sure to inactivate Sub Distributor - '<span id="userNameDup" class="text-bold"></span>' ?
+            </p>
+          </div>
+          <input type="hidden" id="confirmedUuid">
+        </div>
+        <div class="modal-footer">
+          <button id="userRemove" class="btn btn-danger">Yes please!</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal" id="userClose">Not
+            now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade in" id="userActiveConfirmation">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="userHeaders"></h4>
+        </div>
+        <div class="modal-body">
+          <div id="usersBody">
+            <p class="success-color">
+              Are you sure to activate Sub Distributor - '<span id="userNameDups" class="text-bold"></span>' ?
+            </p>
+          </div>
+          <input type="hidden" id="confirmedUuids">
+        </div>
+        <div class="modal-footer">
+          <button id="userActivate" class="btn btn-success">Yes please!</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal" id="userClose">Not
+            now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade in" id="userDetailPage">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="userH"></h4>
+        </div>
+        <div class="modal-body">
+          <div class="box box-default box-solid">
+            <!-- <div class="box-header with-border bg-aqua">
+              <h3 class="box-title">{{user}} Details</h3>
+            </div> -->
+            <table style="width:100%;" class="table table-striped">
+              <tbody>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="Employee ">Sub Distributor Code </label>
+                    <div id="detailEMPCode"></div>
+                  </td>
+                  <td width="50%">
+                    <label for="Employee ">Sub Distributor Name </label>
+                    <div id="detailFirstName"></div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td>
+                    <label for="Employee ">Branch </label>
+                    <div id="detailBranch"></div>
+                  </td>
+                  <td>
+                    <label for="Employee ">Location </label>
+                    <div id="detailLocation"></div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td>
+                    <label for="Employee ">Verticals</label>
+                    <div id="verticalDetails"></div>
+                  </td>
+                  <td>
+                    <label for="Employee ">Email Id</label>
+                    <div id="detailEmailId"></div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td>
+                    <label for="firstName">Contact Person</label>
+                    <div id="detailContact"></div>
+                  </td>
+                  <td>
+                    <label for="firstName">Contact Number</label>
+                    <div id="contactNum"></div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td>
+                    <label for="Employee ">Username</label>
+                    <div id="detailUsername"></div>
+                  </td>
+                  <td>
+                    <label for="Employee ">Address</label>
+                    <div id="detailAddress"></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            {{#with priceTypeData}}
+            <span style="padding-left: 10px;"><label for="Employee " style="padding-top: 10px;">Price Type List
+              </label></span>
+            <div id="detailUsername" class="table-responsive">
+              <div class="row ">
+                <table style="width:100%;margin-bottom:0;table-layout: fixed" class="table table-striped with-border">
+                  <thead>
+                    <tr>
+                      <th width="50px">Sl No. </th>
+                      <th width="100px">Vertical Name</th>
+                      <th width="100px">Price Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {{#each priceTypeData}}
+                    <tr class="table-border">
+                      <td>{{incremented @index}}</td>
+                      <td style="word-wrap: break-word" class="verticalId_{{vertical}}">{{getSingleVerticalName
+                        vertical}}</td>
+                      <td style="word-wrap: break-word " class="priceTypeId_{{priceType}}">{{getPriceTypeName
+                        priceType}}</td>
+                    </tr>
+                    {{/each}}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            {{/with}}
+
+            {{#with productListData}}
+            <span style="padding-left: 10px;"><label for="Employee " style="padding-top: 10px;">Product List
+              </label></span>
+            <div id="detailUsername" class="table-responsive">
+              <div class="row ">
+                <table style="width:100%;margin-bottom:0;table-layout: fixed" class="table table-striped with-border">
+                  <thead>
+                    <tr>
+                      <th width="50px">Sl No. </th>
+                      <th width="200px">Product Name</th>
+                      <th width="100px">Minimum Quantity</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {{#each productListData}}
+                    <tr class="table-border">
+                      <td>{{incremented @index}}</td>
+                      <td style="word-wrap: break-word" class="productIdVals_{{product}}">
+                        {{ getProductNames product}}</td>
+                      <td style="word-wrap: break-word ">
+                        {{minimumQty}}</td>
+                    </tr>
+                    {{/each}}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            {{/with}}
+          </div>
+          {{#if printLoad}}
+          <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+          absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+            {{#with printLoaderImage}}
+            <div class="loader-lg" style="width: 100%;height: 100%;display: 
+            flex; align-items: center;justify-content: center;background: #fff;">
+              <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+            </div>
+            {{/with}}
+          </div>
+          {{else}}
+          <div class="loadersSpin">
+          </div>
+          {{/if}}
+          <div class="loadersSpinPromise" style=" width: 98%;opacity: 0.9;position: 
+          absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+            {{#with printLoaderImage}}
+            <div class="loader-lg" style="width: 100%;height: 100%;display: 
+            flex; align-items: center;justify-content: center;background: #fff;">
+              <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+            </div>
+            {{/with}}
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default closen" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal fade in" id="productUploadConfirmation">
+    <div class="modal-dialog">
+      <form id="uploadProducts" autocomplete="off">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span></button>
+            <h4 class="modal-title text-bold" id="branchUploadHeader"></h4>
+          </div>
+          <div class="modal-body">
+            <div id="branchsBody">
+              <div class="fileupload fileupload-new" data-provides="fileupload" style="text-align:center">
+                <span class="btn btn-file btn-default">
+                  <span class="fileupload-exists">{{#if labelName}}
+                    {{labelName}}
+                    {{else}}
+                    Upload File
+                    {{/if}}</span>
+                  <input name="uploadProductsFile" class="file-upload-input uploadProductsFile" id="uploadProductsFile"
+                    method="post" type="file" style="width: 0%;height: 0%; margin-top: 0px;" required />
+                </span>
+                <span class="text-center" id="fileArrayspan"></span>
+              </div>
+              <br>
+              <p class="">
+                Are you sure to upload products .?<span id="branchUploadNameDup" class="text-bold"></span>
+              </p>
+            </div>
+          </div>
+          <input type="hidden" id="uploadUUids">
+          <div class="modal-footer">
+            <button type="button" title="Download format" id="downloadProduct"
+              class="btn btn-primary pull-left">Format</button>
+            <button type="submit" class="btn btn-success">Yes please!</button>
+            <button type="button" class="btn btn-danger" data-dismiss="modal" id="productFileClose">Not
+              now</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</template>

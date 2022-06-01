@@ -1,0 +1,93 @@
+<template name="price_create">
+  {{#if userCan 'priceCreate'}}
+  <form class="priceAdd" autocomplete="off" id="priceAdd">
+    <div class="box box-default box-solid">
+      <div class="box-header with-border bg-aqua">
+        <!-- <h3 class="box-title">Price Details</h3> -->
+        <button type="button" class="close closeprice" id="closeUserprice" data-dismiss="modal" aria-label="Close">
+          <span style="margin-top: -65px;margin-left: -5px;position: absolute;" aria-hidden="true">×</span></button>
+      </div>
+      <table style="width:100%;" class="table table-striped">
+        <tr>
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="lastName">Select Product <span class="asteric_red">*</span></label>
+                <select class="selectProduct" required style="width:100%;" name="selectProduct" id="selectProduct">
+                  <option selected='selected' value="">Select Product</option>
+                  {{# each getProductList}}
+                  <option value="{{_id}}">{{productName}}</option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="lastName">Select Price Type <span class="asteric_red">*</span></label>
+                <select class="selectPriceType" required style="width:100%;" name="selectPriceType"
+                  id="selectPriceType">
+                  <option selected='selected' value="">Price Type</option>
+                  {{# each getPriceType}}
+                  <option value="{{_id}}">{{priceTypeName}}</option>
+                  {{/each}}
+                </select>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="lastName">Select Unit <span class="asteric_red">*</span></label>
+                <select class="selectUnit" required style="width:100%;" name="selectUnit" id="selectUnit">
+                  <option selected='selected' value="">Select Unit</option>
+                  {{# each getUnitList}}
+                  <option value="{{_id}}">{{unitName}}</option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="lastName">VSR Price <span class="asteric_red">*</span></label>
+                <input type="text" class="form-control validation" placeholder="VSR Price" id="priceGet" name="priceGet"
+                  required>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="lastName">OMR Price <span class="asteric_red">*</span></label>
+                <input type="text" class="form-control validation" placeholder="OMR Price" id="priceGetOmr"
+                  name="priceGetOmr" required>
+              </div>
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="lastName">WS Exe Price <span class="asteric_red">*</span></label>
+                <input type="text" class="form-control validation" placeholder="WS Exe Price" id="priceGetWS"
+                  name="priceGetWS" required>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <button type="submit" id="updateprice" class="btn btn-primary  pull-right">Save
+      Price</button>
+    <button type="button" class="btn btn-default closeprice" data-dismiss="modal">Close</button>
+  </form>
+  {{#if printLoad}}
+  <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+  fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+    {{#with printLoaderImage}}
+    <div class="loader-lg" style="width: 100%;height: 100%;display: 
+    flex; align-items: center;justify-content: center;background: #fff;">
+      <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+    </div>
+    {{/with}}
+  </div>
+  {{else}}
+  <div class="loadersSpin">
+  </div>
+  {{/if}}
+  {{/if}}
+</template>

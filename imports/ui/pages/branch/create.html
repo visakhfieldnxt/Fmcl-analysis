@@ -1,0 +1,34 @@
+<template name="branch_create">
+  {{#if userCan 'branchCreate'}}
+  <form class="branchAdd" autocomplete="off" id="branchAdd">
+    <div class="box box-default box-solid">
+      <div class="box-header with-border bg-aqua">
+        <!-- <h3 class="box-title">Branch Details</h3> -->
+        <button type="button" class="close closebranch" id="closeUserBranch" data-dismiss="modal" aria-label="Close">
+          <span style="margin-top: -65px;margin-left: -5px;position: absolute;" aria-hidden="true">×</span></button>
+      </div>
+      <table style="width:100%;" class="table table-striped">
+        <tr>
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="lastName">Branch Code <span class="asteric_red">*</span></label>
+                <input type="text" class="form-control validation" placeholder="Branch Code" id="branchCodes"
+                  name="branchCodes" required>
+              </div>
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="lastName">Branch Name <span class="asteric_red">*</span></label>
+                <input type="text" class="form-control validation" placeholder="Branch Name" id="branchNames"
+                  name="branchNames" required>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <button type="submit" id="updatebranch" class="btn btn-primary  pull-right">Save
+      Branch</button>
+    <button type="button" class="btn btn-default closebranch" data-dismiss="modal">Close</button>
+  </form>
+  {{/if}}
+</template>

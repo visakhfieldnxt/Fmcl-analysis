@@ -1,0 +1,841 @@
+<template name="menu">
+  <aside class="main-sidebar">
+    <!-- sidebar: style can be found in sidebar.less -->
+    <section class="sidebar">
+      <!-- search form -->
+      <form action="#" method="get" class="sidebar-form">
+        <div class="input-group">
+          <input type="text" name="q" class="form-control" placeholder="Search...">
+          <span class="input-group-btn">
+            <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
+            </button>
+          </span>
+        </div>
+      </form>
+
+      <ul class="sidebar-menu">
+        <li class="header" data-toggle="push-menu">MAIN NAVIGATION</li>
+        {{#if userCan 'administrationView'}}
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-cogs"></i> <span>Administration</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            {{#if userCan 'userView'}}
+            <li class="Menuhide">
+              <a href="/user/list" class="menuScrollTop"><i class="fa fa-users"></i>
+                User</a>
+            </li>
+            {{/if}}
+
+
+            {{#if userCan 'roleView'}}
+            <li class="Menuhide">
+              <a href="/role/list" class="menuScrollTop"><i class="fa fa-check-square-o"></i> {{#with roleName}}
+                {{role}} {{/with}}</a>
+            </li>
+            {{/if}}
+            {{#if userCan 'userView'}}
+            <li class="Menuhide">
+              <a href="/loginUsers/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                Logged In Users</a>
+            </li>
+            {{/if}}
+            {{#if userCan 'verticalsView'}}
+            <li class="Menuhide">
+              <a href="/verticals/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                Verticals</a>
+            </li>
+            {{/if}}
+
+            {{#if userCan 'branchView'}}
+            <li class="Menuhide">
+              <a href="/branch/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                Branch</a>
+            </li>
+            {{/if}}
+            {{#if userCan 'locationView'}}
+            <li class="Menuhide">
+              <a href="/location/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                Location</a>
+            </li>
+            {{/if}}
+            {{#if userCan 'brandView'}}
+            <li class="Menuhide">
+              <a href="/principal/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                Principal</a>
+            </li>
+            {{/if}}
+            {{#if userCan 'brandView'}}
+            <li class="Menuhide">
+              <a href="/brand/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                Brand</a>
+            </li>
+            {{/if}}
+            {{#if userCan 'categoryView'}}
+            <li class="Menuhide">
+              <a href="/category/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                Category</a>
+            </li>
+            {{/if}}
+            {{#if userCan 'productView'}}
+            <li class="Menuhide">
+              <a href="/product/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                Product</a>
+            </li>
+            {{/if}}
+            {{#if userCan 'unitView'}}
+            <li class="Menuhide">
+              <a href="/unit/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                Unit</a>
+            </li>
+            {{/if}}
+            {{#if userCan 'priceTypeView'}}
+            <li class="Menuhide">
+              <a href="/priceType/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                Price Type</a>
+            </li>
+            {{/if}}
+            {{#if userCan 'priceView'}}
+            <li class="Menuhide">
+              <a href="/price/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                Price</a>
+            </li>
+            {{/if}}
+            {{#if userCan 'taxView'}}
+            <li class="Menuhide">
+              <a href="/tax/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                Tax</a>
+            </li>
+            {{/if}}
+
+
+            {{#if userCan 'outletsView'}}
+            <li class="Menuhide">
+              <a href="/outletMaster/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                Outlet</a>
+            </li>
+            {{/if}}
+            {{#if userCan 'sdMasterView'}}
+            <li class="Menuhide">
+              <a href="/subDistributor/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                Sub Distributor</a>
+            </li>
+            {{/if}}
+          </ul>
+        </li>
+        {{/if}}
+
+        <!-- <li class="treeview">
+          <a href="#">
+            <i class="fa fa-pie-chart"></i> <span>Dashboard</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            {{#if userCan 'adminDashboard'}}
+            <li class="Menuhide">
+              <a href="/admin/dashboard" class="menuScrollTop"><i class="fa fa-angle-right"></i><span>
+                  Dashboard</span> </a>
+            </li>
+            {{/if}}
+            {{#if userCan 'superAdminDashboard'}}
+            <li class="Menuhide">
+              <a href="/superAdmin/dashboard" class="menuScrollTop"><i class="fa fa-angle-right"></i><span>
+                  Dashboard</span> </a>
+            </li>
+            {{/if}}
+          </ul>
+        </li> -->
+        {{#if userCan 'adminDashboard'}}
+        <li class="treeview">
+          <a href="/admin/dashboard" class="menuScrollTop"><i class="fa fa-pie-chart"></i><span>Dashboard</span>
+          </a>
+        </li>
+        {{/if}}
+        {{#if userCan 'superAdminDashboard'}}
+        <li class="treeview">
+          <a href="/superAdmin/dashboard" class="menuScrollTop"><i class="fa fa-pie-chart"></i><span>Dashboard</span>
+          </a>
+        </li>
+        {{/if}}
+        {{#if userCan 'salesDashboard'}}
+        <li class="treeview">
+          <a href="/sales/dashboard" class="menuScrollTop"><i class="fa fa-pie-chart"></i><span>Dashboard</span>
+          </a>
+        </li>
+        {{/if}}
+
+        {{#if userCan 'vanSaleUserView'}}
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-user-circle-o"></i> <span>Users</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li class="Menuhide">
+              <a href="/sdUser/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                List</a>
+            </li>
+          </ul>
+        </li>
+        {{/if}}
+        <!-- {{#if userCan 'sdUserApproveView'}}
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-th-list"></i> <span>Sub Distributor Approval</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li class="Menuhide">
+              <a href="/sdUserApproval/list" class="menuScrollTop"><i class="fa fa-angle-right"></i><span>
+                  Approval</span> </a>
+            </li>
+
+            <li class="Menuhide">
+              <a href="/approvedSdUsers/list" class="menuScrollTop"><i class="fa fa-angle-right"></i><span>
+                  Approved</span> </a>
+            </li>
+            <li class="Menuhide">
+              <a href="/rejectedSdUsers/list" class="menuScrollTop"><i class="fa fa-angle-right"></i><span>
+                  Rejected</span> </a>
+            </li>
+          </ul>
+        </li>
+        {{/if}} -->
+        {{#if userCan 'sdPriceListView'}}
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-tags"></i> <span>Product Price</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li class="Menuhide">
+              <a href="/sdPrice/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                List</a>
+            </li>
+          </ul>
+        </li>
+        {{/if}}
+
+        {{#if userCan 'outletsApproveView'}}
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-file-text-o"></i> <span>Outlet Approval</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li class="Menuhide">
+              <a href="/outletApproval/list" class="menuScrollTop"><i class="fa fa-angle-right"></i><span>
+                  New</span> </a>
+            </li>
+
+            <li class="Menuhide">
+              <a href="/outletApproved/list" class="menuScrollTop"><i class="fa fa-angle-right"></i><span>
+                  Approved</span> </a>
+            </li>
+            <li class="Menuhide">
+              <a href="/outletOnHold/list" class="menuScrollTop"><i class="fa fa-angle-right"></i><span>
+                  On Hold</span> </a>
+            </li>
+            <li class="Menuhide">
+              <a href="/outletReject/list" class="menuScrollTop"><i class="fa fa-angle-right"></i><span>
+                  Rejected</span> </a>
+            </li>
+          </ul>
+        </li>
+        {{/if}}
+
+
+        <!-- {{#if userCan 'stockTransferView'}}
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-exchange"></i> <span>Stock Transfer</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li class="Menuhide">
+              <a href="/admin/dashboard" class="menuScrollTop"><i class="fa fa-angle-right"></i><span>
+                  Stock Transfer</span> </a>
+            </li>
+          </ul>
+        </li>
+        {{/if}} -->
+
+        {{#if userCan 'outletTrackerView'}}
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-indent"></i> <span>Outlet Tracker</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li class="Menuhide">
+              <a href="/sdMap/view" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span> Map </span></a>
+            </li>
+            {{#if userCan 'sdView'}}
+            <li class="Menuhide">
+              <a href="/outletMaster/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                List</a>
+            </li>
+            {{/if}}
+          </ul>
+        </li>
+        {{/if}}
+
+        {{#if userCan 'routeView'}}
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-truck"></i> <span>Route</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li class="Menuhide">
+              <a href="/routeGroup/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>List </span></a>
+            </li>
+            {{#if userCan 'routeAssignView'}}
+            <li class="Menuhide">
+              <a href="/routeAssign/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span> Assign </span></a>
+            </li>
+            {{/if}}
+          </ul>
+        </li>
+        {{/if}}
+
+        {{#if userCan 'stockListView'}}
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-briefcase"></i> <span>Stock</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li class="Menuhide">
+              <a href="/stockList/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span> List </span></a>
+            </li>
+
+            {{#if userCan 'stockTransferView'}}
+            <li class="Menuhide">
+              <a href="/stockTransfer/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span> Transfer </span></a>
+            </li>
+            {{/if}}
+            <li class="Menuhide">
+              <a href="/stockReturnAccept/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span> Return </span></a>
+            </li>
+            {{#if userCan 'stockSummaryView'}}
+            <li class="Menuhide">
+              <a href="/stockSummary/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span> Summary List</span></a>
+            </li>
+            {{/if}}
+          </ul>
+        </li>
+        {{/if}}
+
+        {{#if userCan 'sdOutletsView'}}
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-file-text-o"></i> <span>Outlet</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li class="Menuhide">
+              <a href="/sdOutletList/list" class="menuScrollTop"><i class="fa fa-angle-right"></i><span>
+                  List</span> </a>
+            </li>
+          </ul>
+        </li>
+        {{/if}}
+
+
+
+        {{#if userCan 'stockAcceptView'}}
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-briefcase"></i> <span>Stock</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <!-- <li class="Menuhide">
+              <a href="/stockAcceptance/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span> Acceptance </span></a>
+            </li> -->
+            <li class="Menuhide">
+              <a href="/sdUserStockList/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span> List </span></a>
+            </li>
+            <!-- <li class="Menuhide">
+              <a href="/stockReturn/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span> Return </span></a>
+            </li> -->
+          </ul>
+        </li>
+        {{/if}}
+
+        <!-- {{#if userCan 'cashSalesView'}}
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-newspaper-o"></i> <span>Cash Sales</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li class="Menuhide">
+              <a href="/cashSales/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span> List </span></a>
+            </li>
+          </ul>
+        </li>
+        {{/if}} -->
+
+        {{#if userCan 'creditSaleView'}}
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-indent"></i> <span>Sales</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li class="Menuhide">
+              <a href="/creditSale/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span> List </span></a>
+            </li>
+          </ul>
+        </li>
+        {{/if}}
+
+        {{#if userCan 'orderView'}}
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-sticky-note"></i> <span>Order</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li class="Menuhide">
+              <a href="/order/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span> List </span></a>
+            </li>
+          </ul>
+        </li>
+        {{/if}}
+
+        <!-- {{#if userCan 'stockReturnView'}}
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-reply-all"></i> <span>Stock Return</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li class="Menuhide">
+              <a href="/order/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span> List </span></a>
+            </li>
+          </ul>
+        </li>
+        {{/if}} -->
+
+
+        {{#if userCan 'attendanceView'}}
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-id-card"></i> <span>Attendance</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li class="Menuhide">
+              <a href="/attendance/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>List </span></a>
+            </li>
+          </ul>
+        </li>
+        {{/if}}
+
+        {{#if userCan 'deliveryListView'}}
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-bus"></i> <span>Delivery</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li class="Menuhide">
+              <a href="/delivery/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>List </span></a>
+            </li>
+          </ul>
+        </li>
+        {{/if}}
+        {{#if userCan 'collectionListView'}}
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-address-card-o"></i> <span>Collection</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li class="Menuhide">
+              <a href="/collection/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>List </span></a>
+            </li>
+          </ul>
+        </li>
+        {{/if}}
+        {{#if userCan 'orderApprove'}}
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-tasks"></i> <span>Order Approve</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li class="Menuhide">
+              <a href="/orderApprove/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>New </span></a>
+            </li>
+            <li class="Menuhide">
+              <a href="/approveOrder/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>Approved </span></a>
+            </li>
+            <li class="Menuhide">
+              <a href="/deliveredOrders/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>Delivered </span></a>
+            </li>
+            <li class="Menuhide">
+              <a href="/orderOnHold/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>On Hold </span></a>
+            </li>
+            <li class="Menuhide">
+              <a href="/orderRejected/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>Rejected</span></a>
+            </li>
+          </ul>
+        </li>
+        {{/if}}
+
+        {{#if userCan 'stockReportView'}}
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-briefcase"></i> <span>Stock Updates</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li class="Menuhide">
+              <a href="/stockUpdatesReport/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span> List </span></a>
+            </li>
+          </ul>
+        </li>
+        {{/if}}
+
+
+        {{#if userCan 'sdUserStockHistoryView'}}
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-bars"></i> <span> History</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li class="Menuhide">
+              <a href="/sdUserStockHistory/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>Stock </span></a>
+            </li>
+
+
+            <!-- {{/if}} -->
+          </ul>
+        </li>
+        {{/if}}
+
+        <!-- {{#if userCan 'sdUserStockSummaryView'}}
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-signal"></i> <span> Stock Summary</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li class="Menuhide">
+              <a href="/sdUserStockSummary/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>List </span></a>
+            </li>
+          </ul>
+        </li>
+        {{/if}} -->
+        {{#if userCan 'reportView'}}
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-th-list"></i> <span>Report</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            {{#if userCan 'cashSalesReportView'}}
+            <li class="Menuhide">
+              <a href="/cashSaleReport/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>Cash Sale </span></a>
+            </li>
+            {{/if}}
+            {{#if userCan 'orderReport'}}
+            <li class="Menuhide">
+              <a href="/orderReport/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>Order </span></a>
+            </li>
+            {{/if}}
+            {{#if userCan 'creditSaleReport'}}
+            <li class="Menuhide">
+              <a href="/creditSaleReport/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>Credit Sale </span></a>
+            </li>
+            {{/if}}
+            {{#if userCan 'sdUserStockSummaryView'}}
+            <li class="Menuhide">
+              <a href="/sdUserStockSummary/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>Stock Summary </span></a>
+            </li>
+            <li class="Menuhide">
+              <a href="/market_Outstanding_SDUser/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>Market Outstanding </span></a>
+            </li>
+            <!-- green s-->
+            <li class="Menuhide">
+              <a href="/saleVsLastMonthSdUser/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>Sale Vs Last Month </span></a>
+              <!--User -->
+            </li>
+            {{/if}}
+            {{#if userCan 'verticalSaleReportview'}}
+            <li class="Menuhide">
+              <a href="/verticalWiseSalesReport/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>Vertical wise Sale </span></a>
+            </li>
+
+            <li class="Menuhide">
+              <a href="/regionWiseSalesReport/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>Region wise Sale </span></a>
+            </li>
+            <li class="Menuhide">
+              <a href="/subDWiseSalesRep/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>SD Wise Sales </span></a>
+            </li>
+            <li class="Menuhide">
+              <a href="/principalWiseSalesReport/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>Principal wise Sale </span></a>
+            </li>
+            <!-- green e-->
+            <li class="Menuhide">
+              <a href="/ouletWiseReport/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>Outlets </span></a>
+            </li>
+            {{/if}}
+
+            {{#if userCan 'sdReportsView'}}
+            <!-- green s-->
+            <!-- <li class="Menuhide">
+              <a href="/verticalWiseSalesSdReport/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>Vertical wise Sale  </span></a>
+            </li> -->
+            <!-- <li class="Menuhide">
+              <a href="/regionWiseSalesSdReport/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>Region wise Sale   </span></a>
+            </li> -->
+            <li class="Menuhide">
+              <a href="/principalWiseSalesSdReport/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>Principal wise Sale </span></a>
+            </li>
+            <li class="Menuhide">
+              <a href="/market_Outstanding_SD/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>Market Outstanding </span></a>
+            </li>
+            <li class="Menuhide">
+              <a href="/saleVsLastMonthSd/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>Sale Vs Last Month </span></a>
+            </li>
+
+            <li class="Menuhide">
+              <a href="/stockTransferReport/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>Stock Transfer </span></a>
+            </li>
+            <li class="Menuhide">
+              <a href="/stockReturnReport/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>Stock Return </span></a>
+            </li>
+            <li class="Menuhide">
+              <a href="/subDStockUpdatesReport/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>Stock Updates </span></a>
+            </li>
+            <li class="Menuhide">
+              <a href="/categoryWiseReport/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>Category
+                  Wise Sale </span></a>
+            </li>
+            {{/if}}
+
+            {{#if userCan 'bdmReportsView'}}
+            <li class="Menuhide">
+              <a href="/verticalWiseSalesBdmReport/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>Sales till Date </span></a>
+            </li>
+            <li class="Menuhide">
+              <a href="/regionWiseSalesBdmReport/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>Region wise Sale </span></a>
+            </li>
+            <li class="Menuhide">
+              <a href="/subDWiseSalesBdmReport/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>SD Wise Sales </span></a>
+            </li>
+            <li class="Menuhide">
+              <a href="/principalWiseSalesBdmReport/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>Principal wise Sale </span></a>
+            </li>
+            <!-- green e-->
+            <li class="Menuhide">
+              <a href="/outletApprovedReport/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span> Outlet Status </span></a>
+            </li>
+            <li class="Menuhide">
+              <a href="/approvedOutletsReportBDM/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span> Approved Outlets </span></a>
+            </li>
+
+            <li class="Menuhide">
+              <a href="/market_Outstanding/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span> Market Outstanding </span></a>
+            </li>
+            <!-- green s-->
+            <li class="Menuhide">
+              <a href="/saleVsLastMonthBdm/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>Sale Vs Last Month </span></a>
+            </li>
+            <li class="Menuhide">
+              <a href="/routeReport/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>Route Details</span></a>
+            </li>
+            <li class="Menuhide">
+              <a href="/productsReport/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>Product Details</span></a>
+            </li>
+            <li class="Menuhide">
+              <a href="/priceReport/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>Price Details</span></a>
+            </li>
+            <li class="Menuhide">
+              <a href="/salesDumpReport/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>Sales Dump</span></a>
+            </li>
+            <li class="Menuhide">
+              <a href="/stockUpdateReportBDM/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>Stock Updates </span></a>
+            </li>
+            <li class="Menuhide">
+              <a href="/outletDetailsReport/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>Outlet Details </span></a>
+            </li>
+            <li class="Menuhide">
+              <a href="/subDDetailsRep/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>Sub D Details </span></a>
+            </li>
+            <li class="Menuhide">
+              <a href="/userDetailsReport/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>User Details </span></a>
+            </li>
+            <li class="Menuhide">
+              <a href="/categoryWiseReportBDM/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>Category
+                  Wise Sale </span></a>
+            </li>
+            <li class="Menuhide">
+              <a href="/sdStockRep/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>SD Stock Report </span></a>
+            </li>
+            {{/if}}
+
+            <!-- {{#if userCan 'bhReportsView'}} --> 
+
+            <!-- {{/if}} -->
+          </ul>
+        </li>
+        {{/if}}
+
+        <!-- {{#if userCan 'sdUserStockHistoryView'}}
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-bars"></i> <span> History</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li class="Menuhide">
+              <a href="/sdUserStockHistory/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>Stock </span></a>
+            </li>
+          </ul>
+        </li>
+        {{/if}} -->
+
+        <!-- {{#if userCan 'sdUserStockSummaryView'}}
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-signal"></i> <span> Stock Summary</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li class="Menuhide">
+              <a href="/sdUserStockSummary/list" class="menuScrollTop"><i class="fa fa-angle-right"></i>
+                <span>List </span></a>
+            </li>
+          </ul>
+        </li>
+        {{/if}} -->
+
+      </ul>
+    </section>
+  </aside>
+</template>

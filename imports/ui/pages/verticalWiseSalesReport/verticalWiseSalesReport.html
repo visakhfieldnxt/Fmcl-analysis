@@ -1,0 +1,281 @@
+<template name="verticalWiseSalesReport">
+  <section class="content-header">
+    <h1>Vertical wise Sale Report
+      <small>Listing All Vertical wise Sale</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
+      <li class="active">Vertical wise Sale</li>
+    </ol>
+  </section>
+  <section class="content">
+    <div class="row">
+      <div style="float: right;">
+        <form>
+          <!-- class="exportToday" -->
+          <button type="button" title="Export Today's Order" id="exportButtons"
+            class="btn btn-primary btn-flat export">Export</button>
+          <button type="button" title="Search" class="btn btn-primary btn-flat" id="filterSearch"><i
+              class="fa fa-search"> </i>&nbsp; Search</button>
+        </form>
+      </div>
+    </div>
+    <div class="row" id="filterDisplay" style="display:none">
+      <div class="box box-default box-solid">
+        <div class="box-header with-border bg-aqua">
+          <h3 class="box-title">{{user}} Filter</h3>
+          <button type="button" id="removeSearch"
+            style="color: white; background-color: transparent; border-color:transparent" class="pull-right"><i
+              class="fa fa-close" style="color: black;"></i></button>
+        </div>
+        <div class="box-body no-padding">
+          <form class="verticalwise-filter">
+            <div class="row">
+             <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="product">Product Name</label>
+                <select class="productNameSelection" style="width:100%;" name="productNameSelection"
+                  id="productNameSelection">
+                  <option selected value=''>Select Product Name</option>
+                  {{# each productLists}}
+                  <option value="{{_id}}">{{productName}}</option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EMPcode">Vertical Name</label><br>
+                <select class="verticalfilter" style="width:100%;" name="verticalfilter" id="verticalfilter">
+                  <option selected value=''>Select Vertical Code</option>
+                  {{# each verticalList}}
+                  <option value="{{_id}}">{{verticalName}}</option>
+                  {{/each}}
+                </select>
+                <span id="itemArrayspan1"></span>
+              </div>
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EmailId">From Date</label>
+                <input type="text" autocomplete="off" class="form-control datepicker date validation"
+                  data-date-autoclose="true" onkeydown="event.preventDefault()" id="fromDate" data-provide="datepicker"
+                  data-date-format="dd-mm-yyyy" placeholder="From Date " name="fromDate" />
+                <span id="itemArrayspan"></span>
+              </div>
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EmailId">To Date</label>
+                <input type="text" autocomplete="off" class="form-control datepicker date validation"
+                  data-date-autoclose="true" onkeydown="event.preventDefault()" id="toDate" data-provide="datepicker"
+                  data-date-format="dd-mm-yyyy" placeholder="To Date " name="toDate" />
+                <span id="itemArrayspan_1"></span>
+              </div>
+              <div class="row" style="float: right">
+                <button type="submit" name="filter" class="btn btn-primary">Filter</button>
+                <button type="button" name="reset" class="btn btn-info reset">Reset Filter</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="box box-default box-solid">
+        <div class="box-header with-border bg-aqua">
+          <h3 class="box-title">Order Report List</h3>
+        </div>
+        {{#if isReady}}
+        <div class="box-body no-padding table-responsive">
+          <table class="table table-striped generic" style="width:100%;margin-bottom:0;table-layout: fixed">
+            <tbody>
+              <tr>
+                <th class="text-center sorted-column" style="width:40px">Sl.No</th>
+                <th class="text-center sorted-column" style="width:200px">Product</th>
+                <th class="text-center sorted-column" style="width:200px">From date</th>
+                <th class="text-center sorted-column" style="width:200px">To date</th>
+                <th class="text-center sorted-column" style="width:200px">Sales by Volume</th>
+                <th class="text-center sorted-column" style="width:200px">Sales by Value</th>
+              </tr>
+              {{#each verticalWiseList}}
+              <tr class="view" id="{{_id}}" style="cursor:pointer;">
+                <td class="text-center sorted-column" style="width:40px">{{incremented @index}}</td>
+                <td class="text-center sorted-column" style="width:200px">{{productName}} </td>
+                <td class="text-center sorted-column" style="width:200px">{{dateFrom}}</td>
+                <td class="text-center sorted-column" style="width:200px">{{dateTo}}</td>
+                <td class="text-center sorted-column salesByVolumeId{{_id}}" style="width:200px">{{salesByVolumeId _id}}
+                </td>
+                <td class="text-center sorted-column salesByValueId{{_id}}" style="width:200px">{{salesByValueId _id}}
+                </td>
+              </tr>
+              {{/each}}
+              <tr>
+                <td class="text-left sorted-column" style="width:200px;font-weight: bold;" colspan="4">Total</td>
+                <td class="text-center sorted-column saleByvolumeTotal" style="width:200px">{{salesByVolumeIdTotal}}
+                </td>
+                <td class="text-center sorted-column salesByValueTotal" style="width:200px">{{salesByValueIdTotal}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        {{sortIcon}}
+        {{else}}
+        <div class="overlay">
+          <i class="fa fa-refresh fa-spin"></i>
+        </div>
+        {{/if}}
+      </div>
+      {{#if isReady}}
+      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
+      onClick=clickEvent}}
+      {{/if}}
+    </div>
+    {{#if isReady}}
+    <div id="bodySpin">
+    </div>
+    {{else}}
+    <div id="bodySpin" style=" width: 100%;position: 
+          fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+      justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+    {{/if}}
+    {{#if printLoadBody}}
+    <div id="bodySpin" style=" width: 100%;position: 
+    fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+    {{else}}
+    <div id="bodySpin">
+    </div>
+    {{/if}}
+    <div id="bodySpinLoaders" style=" width: 100%;position: 
+    fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+  </section>
+  <!-- export modal -->
+  <div class="modal fade in" id="routeReportExportPage">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close exportClose" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="deliveryExportH"></h4>
+        </div>
+        <form class="exportByDate">
+          <div class="modal-body">
+            <div class="box box-default box-solid">
+              <div class="box-header with-border bg-aqua">
+                <h3 class="box-title">Details</h3>
+              </div>
+              <table style="width:100%;" class="table table-striped">
+                <tbody>
+                  <tr>
+                    <td>
+                      <label for="EMPcode">Vertical Name</label><br>
+                      <select class="verticalfilters" style="width:100%;" name="verticalfilters" id="verticalfilters"
+                        required="required">
+                        <option selected value=''>Select Vertical Code</option>
+                        {{# each verticalList}}
+                        <option value="{{_id}}">{{verticalName}}</option>
+                        {{/each}}
+                      </select>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label for="Employee ">From Date </label>
+                      <input type="text" autocomplete="off" class="form-control datepicker date validation startDate1"
+                        data-date-autoclose="true" onkeydown="event.preventDefault()" id="my-datepicker"
+                        data-provide="datepicker" data-date-format="dd-mm-yyyy" placeholder="From Date "
+                        name="startDate" required />
+                      <span id="startDateSpan"></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label for="firstName">To Date </label>
+                      <input type="text" autocomplete="off" class="form-control datepicker date validation endDate1"
+                        data-date-autoclose="true" onkeydown="event.preventDefault()" id="my-datepicker"
+                        data-provide="datepicker" data-date-format="dd-mm-yyyy" placeholder="To Date " name="endDate"
+                        required />
+                      <span id="endDateSpan"></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-center">
+                      <span id="emptyDataSpan"></span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            {{#if printLoad}}
+            <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+            absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+              {{#with printLoaderImage}}
+              <div class="loader-lg" style="width: 100%;height: 100%;display: 
+              flex; align-items: center;justify-content: center;background: #fff;">
+                <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+              </div>
+              {{/with}}
+            </div>
+            {{else}}
+            <div id="loaderSpin">
+            </div>
+            {{/if}}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default exportClose pull-left" data-dismiss="modal">Close</button>
+            {{#if verticalWiseListExport}}
+            <button type="button" id="exportButton" class="btn btn-primary exportToday">Export</button>
+            {{else}}
+            <button type="submit" class="btn btn-primary" disabled>Export</button>
+            {{/if}}
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <table class="table table-striped generic" style="display:none;" id="exportTodayOrder">
+    <tbody>
+      <tr>
+        <th class="text-center sorted-column" style="width:40px">Sl.No</th>
+        <th class="text-center sorted-column" style="width:200px">Product</th>
+        <th class="text-center sorted-column" style="width:200px">From date</th>
+        <th class="text-center sorted-column" style="width:200px">To date</th>
+        <th class="text-center sorted-column" style="width:200px">Sales by Volume</th>
+        <th class="text-center sorted-column" style="width:200px">Sales by Value</th>
+      </tr>
+      {{#each verticalWiseListExport}}
+      <tr class="view" id="{{_id}}" style="cursor:pointer;">
+        <td class="text-center sorted-column" style="width:40px"></td>
+        <td class="text-center sorted-column" style="width:200px">{{productName}} </td>
+        <td class="text-center sorted-column" style="width:200px">{{dateFromExport}}</td>
+        <td class="text-center sorted-column" style="width:200px">{{dateToExport}}</td>
+        <td class="text-center sorted-column salesByVolumeIdExport{{_id}}" style="width:200px">{{salesByVolumeIdExport
+          _id}}</td>
+        <td class="text-center sorted-column salesByValueIdExport{{_id}}" style="width:200px">{{salesByValueIdExport
+          _id}}</td>
+      </tr>
+      {{/each}}
+      <tr>
+        <td class="text-left sorted-column" style="width:200px;font-weight: bold;" colspan="4">Total</td>
+        <td class="text-center sorted-column salesByVolumeIdTotalExport" style="width:200px">
+          {{salesByVolumeIdTotalExport}}</td>
+        <td class="text-center sorted-column salesByValueIdTotalExport" style="width:200px">
+          {{salesByValueIdTotalExport}}</td>
+      </tr>
+    </tbody>
+  </table>
+  <!-- export modal -->
+</template>

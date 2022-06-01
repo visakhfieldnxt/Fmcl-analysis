@@ -1,0 +1,283 @@
+<template name="sdStockRep">
+  <section class="content-header">
+    <h1>SD Stock Report
+      <small>Listing All SD Stock Report</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
+      <li class="active">SD Stock Report</li>
+    </ol>
+  </section>
+  <section class="content">
+    <div class="row">
+      <div style="float: right;">
+        <form>
+          <button type="button" title="Export Today's Order" class="btn btn-primary btn-flat export">Export</button>
+          <button type="button" title="Search" class="btn btn-primary btn-flat" id="filterSearch"><i
+              class="fa fa-search"> </i>&nbsp; Search</button>
+        </form>
+      </div>
+    </div>
+    <div class="row" id="filterDisplay" style="display:none">
+      <div class="box box-default box-solid">
+        <div class="box-header with-border bg-aqua">
+          <h3 class="box-title">{{user}} Filter</h3><button type="button" id="removeSearch"
+          style="color: white; background-color: transparent; border-color:transparent" class="pull-right"><i
+            class="fa fa-close" style="color: black;"></i></button>
+        </div>
+        <div class="box-body no-padding">
+          <form class="order-filter">
+            <div class="row">
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EMPcode">Sub Distributor Name</label><br>
+                <select value='' name="selectSDName" style="width:100% !important" id="selectSDName"
+                  class="selectSDName" placeholder="Select SD Name">
+                  <option disabled selected value=''>Select Sub Distributor Name</option>
+                  {{# each sdList}}
+                  <option value="{{_id}}">{{profile.firstName}} {{profile.lastName}}</option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="row" style="float: right">
+                <button type="submit" name="filter" class="btn btn-primary">Filter</button>
+                <button type="button" name="reset" class="btn btn-info reset">Reset Filter</button>
+              </div>
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="box box-default box-solid">
+        {{#if isReady}}
+        <div class="box-body no-padding table-responsive">
+          <table class="table table-striped generic" style="width:100%;margin-bottom:0;table-layout: fixed">
+            <tbody>
+              <tr>
+                <th class="text-center sorted-column" style="width:40px">Sl.No</th>
+                <th class="text-center sorted-column" style="width:200px">Sub Distributor</th>
+                <th class="text-center sorted-column" style="width:100px">Warehouse Qty <br> (PCS)</th>
+                <th class="text-center sorted-column" style="width:100px">Warehouse Stock Value <br> (GHS)</th>
+                <th class="text-center sorted-column" style="width:100px">Van Qty <br> (PCS)</th>
+                <th class="text-center sorted-column" style="width:100px">Van Stock Value <br> (GHS)</th>
+                <th class="text-center sorted-column" style="width:100px">Total Qty <br> (PCS)</th>
+                <th class="text-center sorted-column" style="width:100px">Total Stock Value <br> (GHS)</th>
+              </tr>
+              {{#each listData}}
+              <tr class="view" id="{{_id}}" style="cursor:pointer;">
+                <td class="text-center sorted-column" style="width:40px">{{incremented @index}}</td>
+                <td class="text-center sorted-column" style="width:200px">{{profile.firstName}} {{profile.lastName}}
+                </td>
+                <td class="text-center sorted-column sdStockqty_{{_id}}" style="width:100px">{{sdStockqty _id}}</td>
+                <td class="text-center sorted-column sdStockvalue_{{_id}}" style="width:100px">{{sdStockValueCal _id}}
+                </td>
+                <td class="text-center sorted-column vanqty_{{_id}}" style="width:100px">{{vanQuantity _id}}</td>
+                <td class="text-center sorted-column vanstockvalue_{{_id}}" style="width:100px">{{vanstockvalue _id}}
+                </td>
+                <td class="text-center sorted-column totalqty_{{_id}}" style="width:100px">{{totalqty _id}}</td>
+                <td class="text-center sorted-column totalvalue_{{_id}}" style="width:100px">{{totalvalue _id}}</td>
+              </tr>
+              {{/each}}
+              {{#if totalAmtShows}}
+              <tr class="totalViewClass">
+                <td class="text-left sorted-column" style="width:30px; font-weight: bold;" colspan="2">Total</td>
+                <td class="text-center sorted-column sdStockqtyTotal" style="width:50px">{{sdStockqtyTotal _id}}</td>
+                <td class="text-center sorted-column sdStockValueCalTotal" style="width:50px">{{sdStockValueCalTotal
+                  _id}}
+                </td>
+                <td class="text-center sorted-column vanQuantityTotal" style="width:50px">{{vanQuantityTotal _id}}</td>
+                <td class="text-center sorted-column vanstockvalueTotal" style="width:50px">{{vanstockvalueTotal _id}}
+                </td>
+                <td class="text-center sorted-column totalqtyTotal" style="width:50px">{{totalqtyTotal _id}}</td>
+                <td class="text-center sorted-column totalvalueTotal" style="width:50px">{{totalvalueTotal _id}}</td>
+              </tr>
+              {{/if}}
+            </tbody>
+          </table>
+        </div>
+        {{sortIcon}}
+        {{else}}
+        <div class="overlay">
+          <i class="fa fa-refresh fa-spin"></i>
+        </div>
+        {{/if}}
+      </div>
+      {{#if isReady}}
+      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
+      onClick=clickEvent}}
+      {{/if}}
+
+    </div>
+    {{#if isReady}}
+    <div id="bodySpin">
+    </div>
+    {{else}}
+    <div id="bodySpin" style=" width: 100%;position: 
+          fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+      justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+    {{/if}}
+    <div id="bodySpinLoaders" style=" width: 100%;position: 
+    fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+  </section>
+  <!-- <table class="table table-striped generic" id="exportTodayOrder" style="display:none">
+   <tbody>
+        <tr >
+           <th class="text-center sorted-column" style="width:40px">Sl.No</th>           
+           <th class="text-center sorted-column" style="width:200px">Product</th>
+           <th class="text-center sorted-column" style="width:200px">From date</th>
+           <th class="text-center sorted-column" style="width:200px">To date</th>
+           <th class="text-center sorted-column" style="width:200px">Sales by Volume</th>
+           <th class="text-center sorted-column" style="width:200px">Sales by Value</th>
+        </tr>
+       {{#each listOfData}} 
+       <tr class="view" id="{{_id}}" style="cursor:pointer;">
+         <td class="text-center sorted-column" style="width:40px">{{incremented @index}}</td>
+         <td class="text-center sorted-column productIdVal_{{productId}}" style="width:200px">{{getProductName productId}}</td>
+         <td class="text-center sorted-column" style="width:200px">{{dates fromDate}}</td>
+         <td class="text-center sorted-column" style="width:200px">{{dates toDate}}</td>
+         <td class="text-center sorted-column" style="width:200px">{{ctnTotal}} CTN & {{pcsBalance}} PCS</td>
+         <td class="text-center sorted-column" style="width:200px">{{sale_by_val}}</td>
+       </tr>
+      {{/each}} 
+      <tr>
+        <td class="text-left sorted-column" style="width:200px;font-weight: bold;" colspan="4">Total</td>
+        <td class="text-center sorted-column" style="width:200px" id="total"></td>
+        <td class="text-center sorted-column" style="width:200px" id="gtotal"></td>
+      </tr>
+  </tbody>
+</table> -->
+
+
+  <!-- modal -->
+
+  <div class="modal fade in" id="routeReportExportPage">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close exportClose" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="deliveryExportH"></h4>
+        </div>
+        <form class="exportByModal">
+          <div class="modal-body">
+            <div class="box box-default box-solid"> 
+              <table style="width:100%;" class="table table-striped">
+                <tbody>
+                  <tr>
+                    <td>
+                      <label for="EMPcode">SD Name</label><br>
+                      <select value='' name="selectSDName1" style="width:100% !important" id="selectSDName1"
+                        class="selectSDName1" placeholder="Select SD Name">
+                        <option disabled selected value=''>Select SD Name</option>
+                        {{# each sdList}}
+                        <option value="{{_id}}">{{profile.firstName}}</option>
+                        {{/each}}
+                      </select>
+                    </td>
+                  </tr>
+                  <!-- <tr>
+                    <td>
+                      <label for="Employee ">From Date </label>
+                      <input type="text" autocomplete="off" class="form-control datepicker date validation startDate1"
+                        data-date-autoclose="true" onkeydown="event.preventDefault()" id="my-datepicker"
+                        data-provide="datepicker" data-date-format="dd-mm-yyyy" placeholder="From Date "
+                        name="startDate" required />
+                      <span id="startDateSpan"></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label for="firstName">To Date </label>
+                      <input type="text" autocomplete="off" class="form-control datepicker date validation endDate1"
+                        data-date-autoclose="true" onkeydown="event.preventDefault()" id="my-datepicker"
+                        data-provide="datepicker" data-date-format="dd-mm-yyyy" placeholder="To Date " name="endDate"
+                        required />
+                      <span id="endDateSpan"></span>
+                    </td>
+                  </tr> -->
+                </tbody>
+              </table>
+            </div>
+            {{#if printLoad}}
+            <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+            absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+              {{#with printLoaderImage}}
+              <div class="loader-lg" style="width: 100%;height: 100%;display: 
+              flex; align-items: center;justify-content: center;background: #fff;">
+                <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+              </div>
+              {{/with}}
+            </div>
+            {{else}}
+            <div id="loaderSpin">
+            </div>
+            {{/if}}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default exportClose pull-left" data-dismiss="modal">Close</button>
+            {{#if sdListExpo}}
+            <button type="button" class="btn btn-primary exportToday">Export</button>
+            {{else}}
+            <button type="submit" class="btn btn-primary" disabled>Export</button>
+            {{/if}}
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <table class="table table-striped generic" id="exportTodayOrder" style="display:none">
+    <tbody>
+      <tr>
+        <th class="text-center sorted-column" style="width:100px">Sl.No</th>
+        <th class="text-center sorted-column" style="width:200px">Sub Distributor</th>
+        <th class="text-center sorted-column" style="width:150px">Warehouse qty</th>
+        <th class="text-center sorted-column" style="width:150px">Warehouse stock value</th>
+        <th class="text-center sorted-column" style="width:150px">Van qty</th>
+        <th class="text-center sorted-column" style="width:150px">Van stock value</th>
+        <th class="text-center sorted-column" style="width:150px">Total qty</th>
+        <th class="text-center sorted-column" style="width:150px">Total stock value</th>
+      </tr>
+      {{#each sdListExpo}}
+      <tr class="view" id="{{_id}}" style="cursor:pointer;">
+        <td class="text-center sorted-column" style="width:100px">{{incremented @index}}</td>
+        <td class="text-center sorted-column" style="width:200px">{{profile.firstName}} {{profile.lastName}}</td>
+        <td class="text-center sorted-column sdStockqty_{{_id}}" style="width:150px">{{sdStockqty _id}}</td>
+        <td class="text-center sorted-column sdStockvalue_{{_id}}" style="width:150px">{{sdStockValueCal _id}}</td>
+        <td class="text-center sorted-column vanqty_{{_id}}" style="width:150px">{{vanQuantity _id}}</td>
+        <td class="text-center sorted-column vanstockvalue_{{_id}}" style="width:150px">{{vanstockvalue _id}}</td>
+        <td class="text-center sorted-column totalqty_{{_id}}" style="width:150px">{{totalqty _id}}</td>
+        <td class="text-center sorted-column totalvalue_{{_id}}" style="width:150px">{{totalvalue _id}}</td>
+      </tr>
+      {{/each}}
+      <!-- {{#if totalAmtShows}}
+      <tr class="totalViewClass">
+        <td class="text-left sorted-column" style="width:30px; font-weight: bold;" colspan="2">Total</td>
+        <td class="text-center sorted-column sdStockqtyTotal" style="width:50px">{{sdStockqtyTotal _id}}</td>
+        <td class="text-center sorted-column sdStockValueCalTotal" style="width:50px">{{sdStockValueCalTotal
+          _id}}
+        </td>
+        <td class="text-center sorted-column vanQuantityTotal" style="width:50px">{{vanQuantityTotal _id}}</td>
+        <td class="text-center sorted-column vanstockvalueTotal" style="width:50px">{{vanstockvalueTotal _id}}
+        </td>
+        <td class="text-center sorted-column totalqtyTotal" style="width:50px">{{totalqtyTotal _id}}</td>
+        <td class="text-center sorted-column totalvalueTotal" style="width:50px">{{totalvalueTotal _id}}</td>
+      </tr>
+      {{/if}} -->
+    </tbody>
+  </table>
+</template>

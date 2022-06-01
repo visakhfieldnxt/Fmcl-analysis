@@ -1,0 +1,232 @@
+<template name="update_profile">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <h1>
+      Profile
+      <small>Update Profile</small>
+    </h1>
+
+    <ol class="breadcrumb">
+      <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
+      <li class="active">Profile</li>
+    </ol>
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+
+    <div class="row">
+      <div class="col-md-3">
+
+        <!-- Profile Image -->
+        <div class="box box-primary">
+          <div class="box-body box-profile">
+            <img class="profile-user-img img-responsive img-circle" src="{{profileImage}}" alt="User profile picture"
+              id="profileImage">
+            {{#with user.profile.image}}
+            <div class="" style="margin-top:10px;">
+              <div class="remove-btn">
+                <span class="btn btn-xs btn-default">
+                  <span class="remove_img">Remove profile picture</span>
+                </span>
+              </div>
+            </div>
+            {{/with}}
+
+            <h3 class="profile-username text-center">{{user.profile.firstName}}&nbsp;{{user.profile.lastName}}</h3>
+            {{#each role}} <p class="text-muted text-center">{{name}} </p>{{/each}}
+
+            <div class="row">
+              <div class="col-md-12">
+
+                <div id="info_upload" class="upload-info">
+                  <span class="glyphicon glyphicon-warning-sign"></span>
+                  File type not allowed.You can only upload GIF, JPG, PNG files.
+                </div>
+
+
+                <form name="edit_profile" class="edit_profile" enctype="multipart/form-data">
+                  <div class="fileupload fileupload-new" data-provides="fileupload" style="margin-top:10px;">
+                    <div class="upload-btn">
+                      <span class="btn btn-file btn-default">
+                        <span class="fileupload-new">Choose profile picture</span>
+                        <input name="profile_image" class="file-upload-input" method="post" type="file" />
+                      </span>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12 text-center">
+                <button class="btn btn-primary" id="update" disabled>Update</button>&emsp;
+                <button class="btn btn-default" id="cancel" disabled>Cancel</button>
+              </div>
+            </div>
+
+
+          </div>
+          <!-- /.box-body -->
+        </div>
+        <!-- /.box -->
+
+        <!-- /.box -->
+      </div>
+      <!-- /.col -->
+      <div class="col-md-9">
+        <div class="nav-tabs-custom">
+          <ul class="nav nav-tabs">
+            <li class="active"><a href="#settings" data-toggle="tab">Settings</a></li>
+            <li class=""><a href="#pass" data-toggle="tab">Change password</a></li>
+          </ul>
+          <div class="tab-content">
+            <!-- /.tab-pane -->
+            <div class="active tab-pane" id="settings">
+              {{#with user}}
+              <form class="form-horizontal update_profile">
+                <div class="form-group">
+                  <label for="inputName" class="col-sm-2 control-label">First Name <span
+                      class="asteric_red">*</span></label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control input" id=" inputName" name="firstName"
+                      value="{{profile.firstName}}" placeholder="First Name" required>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="inputName" class="col-sm-2 control-label">Last Name</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control input" id="inputName" name="lastName"
+                      value="{{profile.lastName}}" placeholder="Last Name">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="inputName" class="col-sm-2 control-label">Username</label>
+                  <div class="col-sm-10">
+                    <div style="padding-top:5px;padding-left: 5px;">{{username}}</div>
+                    <!-- <input type="text" class="form-control input" value="{{username}}" placeholder="Username" disabled> -->
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="inputName" class="col-sm-2 control-label">Email Id</label>
+                  <div class="col-sm-10">
+                    {{#each emails}}
+                    <div style="padding-top:5px;padding-left: 5px;">{{address}}</div>
+                    {{/each}}
+                  </div>
+                </div> 
+                <div class="form-group">
+                  <label for="inputName" class="col-sm-2 control-label">Roles</label>
+                  <div class="col-sm-10">
+                    <div style="padding-top:5px;padding-left: 5px;">{{roleNameGet roles}} </div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="inputName" class="col-sm-2 control-label">Date Of Birth</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control datepicker date input" data-provide="datepicker"
+                      onkeydown="event.preventDefault()" id="inputName my-datepickerr " data-date-format="dd/mm/yyyy"
+                      name="dateOfBirth" data-date-autoclose="true" data-date-end-date="{{date}}"
+                      value="{{profile.dateOfBirth}}" placeholder="Date Of Birth (required)" required>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-offset-2 col-sm-10">
+                    <button type="submit" disabled class="btn btn-primary buttonDisabled">Update Profile Info</button>
+                  </div>
+                </div>
+              </form>
+              {{/with}}
+            </div>
+            <!-- /.tab-pane -->
+
+            <!-- /.tab-pane -->
+            <div class=" tab-pane" id="pass">
+              {{#with user}}
+              <form class="form-horizontal change_password">
+                <div class="form-group">
+                  <label for="inputName" class="col-sm-2 control-label">Old password <span
+                      class="asteric_red">*</span></label>
+
+                  <div class="col-sm-10">
+                    <input type="password" class="form-control input" id=" inputName" name="oldPassword"
+                      placeholder="Old password" required>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="inputName" class="col-sm-2 control-label">New password <span
+                      class="asteric_red">*</span></label>
+
+                  <div class="col-sm-10">
+                    <input type="password" class="form-control validation" placeholder="Enter password" id="password"
+                      name="newPassword" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" style="padding-right: 0"
+                      required>
+                    <span toggle="#password" style="position: absolute;top: 7px;right: 35px;"
+                      class=" fa fa-fw fa-eye-slash field-icon toggle-password"></span>
+                    <span id="passwordspan"></span>
+                    <div class="hint">
+                      Password must be at least 8 characters long and should contain at least a number and an uppercase
+                      letter
+                    </div>
+                  </div>
+
+                  <!-- <span class="glyphicon glyphicon-lock form-control-feedback"></span> -->
+
+                </div>
+                <div class="form-group">
+                  <label for="inputName" class="col-sm-2 control-label">Confirm password <span
+                      class="asteric_red">*</span></label>
+
+                  <div class="col-sm-10">
+                    <input type="password" id="confirmpassword" class="form-control validation"
+                      pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" placeholder="Retype password" name="confirmPassword"
+                      required>
+                    <!-- <span class="glyphicon glyphicon-log-in form-control-feedback"></span> -->
+                    <span id="confirmpasswordspan"></span>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-offset-2 col-sm-10">
+                    <button type="submit" disabled class="btn btn-primary buttonDisabled">Reset password</button>
+                  </div>
+                </div>
+              </form>
+              {{/with}}
+            </div>
+            <!-- /.tab-pane -->
+          </div>
+          <!-- /.tab-content -->
+        </div>
+        <!-- /.nav-tabs-custom -->
+      </div>
+      <!-- /.col -->
+    </div>
+    <!-- /.row -->
+  </section>
+  <!-- /.content -->
+
+  <div class="modal fade in" id="removeImageModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold">Confirmation</h4>
+        </div>
+        <div class="modal-body">
+          <div id="removeBody">
+            <p class="danger-color">
+              Are you sure to remove <b>profile image</b> ?
+            </p>
+          </div>
+          <input type="hidden" id="confirmedUuid">
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-danger remove_image">Yes please!</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal" id="removeClose">Not now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+</template>

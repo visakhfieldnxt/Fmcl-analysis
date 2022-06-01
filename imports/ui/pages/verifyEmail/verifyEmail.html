@@ -1,0 +1,25 @@
+<template name="verifyEmail">
+  <section class="content">
+  <div class="login-box" style="margin: 6% auto !important;" >
+
+       <div class="login-box-body" id ="failure" style="text-align:center;background:#f9fafc !important;">
+      <span style="font-size:150px;"><b>403</b></span>
+      <h2>Access Denied</h2>
+      <p class="login-box-msg">Sorry Your link has been expired !</p>
+    </div>
+    <!-- /.form-box -->
+    <div class="login-logo" style="margin: 10% auto !important;" >
+      {{#with href}}
+      <a  href="{{href_url}}" target="_blank">
+      {{#with logo}}
+       <span class="logo-mini"><img src="{{logo_img}}" class="mainLogo"></span>
+       {{/with}}
+
+         <b>{{#with appName}} {{app}} {{/with}}</b></a>
+       {{/with}}
+    </div>
+  </div>
+</section>
+
+
+</template>

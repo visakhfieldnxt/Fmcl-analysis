@@ -1,0 +1,126 @@
+<template name="routeAssign_create">
+  <form autocomplete="off" class="assign-routeData" id="routeAssigns">
+    <div class="box box-default box-solid">
+      <div class="box-header with-border bg-aqua">
+        <!-- <h3 class="box-title">Route Details</h3> -->
+        <button type="button" class="close closeRouteAssign" id="closeRoute" data-dismiss="modal" aria-label="Close">
+          <span style="margin-top: -65px;margin-left: -5px;position: absolute;" aria-hidden="true">×</span></button>
+      </div>
+      <table style="width:100%;table-layout: fixed;border-collapse: collapse;" class="table table-striped">
+        <tr>
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="customer">Select Sub Distributor <span class="asteric_red">*</span></label>
+                <select class="selectSdIds" style="width:100%;" required name="selectSdIds" id="selectSdIds">
+                  <option selected='selected' value="">Select Sub Distributor </option>
+                  {{# each sdUsersGet}}
+                  <option value="{{_id}}">{{profile.firstName}} {{profile.lastName}}</option>
+                  {{/each}}
+                </select>
+                <span id="verticalSpan"> </span> <br>
+                <span id="branchSpan"></span> <br>
+                <span id="locationSpan"></span><br>
+              </div>
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="customer">Select Route <span class="asteric_red">*</span></label>
+                <select class="selectRouteName" required style="width:100%;" name="selectRouteName"
+                  id="selectRouteName">
+                  <option selected='selected' value="">Select Route</option>
+                  {{# each routeListGet}}
+                  <option value="{{_id}}">{{routeName}}</option>
+                  {{/each}}
+                </select>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="customer">Select Date <span class="asteric_red">*</span></label>
+                <select name="selectRouteDate" id="selectRouteDate" style="width:100%" class="selectRouteDate" required>
+                  <option selected="selected" value="">Select Date</option>
+                  <option value="Monday">Monday</option>
+                  <option value="Tuesday">Tuesday</option>
+                  <option value="Wednesday">Wednesday</option>
+                  <option value="Thursday">Thursday</option>
+                  <option value="Friday">Friday</option>
+                  <option value="Saturday">Saturday</option>
+                  <option value="Sunday">Sunday</option>
+                </select>
+              </div>
+              <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                <label for="customer">Select Employee <span class="asteric_red">*</span></label>
+                <select name="selectAssignEmpoyee" id="selectAssignEmpoyee" style="width:100%"
+                  class="selectAssignEmpoyee" required>
+                  <option selected="selected" value="">Select Employee</option>
+                  {{# each vansaleUserList}}
+                  <option value="{{_id}}">{{profile.firstName}} {{profile.lastName}}
+                  </option>
+                  {{/each}}
+                </select>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="form-group has-feedback">
+              <div class="col-sm-12" style="padding: 10px 10px 20px 10px;">
+                <label for="customer">Enter Remarks</label>
+                <textarea name="descriptionVal" id="descriptionVal" cols="7" rows="10" style="height:85px"
+                  placeholder="Enter Remarks"></textarea>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </table>
+      {{#with customerDataArrayList}}
+      <span style="padding-left: 10px;"><label for="Employee " style="font-weight: bold; color: black;">
+          Outlet List</label></span>
+      <div id="detailUsername" class="table-responsive" style="border: none;">
+        <div class="row ">
+          <table style="width:100%;table-layout: fixed; border: solid 1px #e0d8d8;"
+            class="table table-striped with-border">
+            <thead>
+              <tr class="bg-light-blue-4">
+                <th width="100px">Sl No. </th>
+                <th width="200px">Outlet Name </th>
+                <th width="110px">Priority</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each customerDataArrayList}}
+              <tr class="table-border">
+                <td>{{incremented @index}}</td>
+                <td style="word-wrap: break-word">{{name}}</td>
+                <td>{{priority}}</td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {{/with}}
+    </div>
+    <button type="submit" name="submit" id="submit" class="btn btn-primary pull-right assignBtn">Assign Route</button>
+    <button type="button" class="btn btn-default closeRouteAssign" data-dismiss="modal">Close</button>
+  </form>
+  {{#if printLoad}}
+  <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+  fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+    {{#with printLoaderImage}}
+    <div class="loader-lg" style="width: 100%;height: 100%;display: 
+    flex; align-items: center;justify-content: center;background: #fff;">
+      <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+    </div>
+    {{/with}}
+  </div>
+  {{else}}
+  <div class="loadersSpin">
+  </div>
+  {{/if}} 
+
+</template>

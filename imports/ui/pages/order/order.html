@@ -1,0 +1,660 @@
+<template name="order">
+  {{#if userCan 'orderView'}}
+  <section class="content-header">
+    <h1>Order List
+      <small>Listing All Order</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
+      <li class="active">Order List</li>
+    </ol>
+  </section>
+  <section class="content">
+
+    <div class="row">
+      <div style="float: right;">
+        {{#if userCan 'orderCreate'}}
+        <button class="btn btn-flat filterButtonMobile" title="Create Order" id="ic-create-order-button">
+          <i class="fa fa-plus"></i> </button> &nbsp;
+        {{/if}}
+        <button class="btn btn-flat filterButtonMobile" title="Filter Search" id="filterSearch">
+          <i class="fa fa-filter"> </i></button>
+      </div>
+    </div>
+    <div class="row" id="filterDisplay" style="display:none">
+      <div class="box box-default box-solid">
+        <div class="box-header with-border bg-aqua">
+          <h3 class="box-title" style="color: black;">Order Filter</h3><button type="button" id="removeSearch"
+            style="color: white; background-color: transparent; border-color:transparent" class="pull-right"><i
+              class="fa fa-close" style="color: black;"></i></button>
+        </div>
+        <div class="box-body no-padding">
+          <form class="stockFilter">
+            <div class="row">
+
+               <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EMPcode">Order Id</label><br>
+                <select value='' name="orderIdClass" style="width:100% !important" id="orderIdClass"
+                  class="orderIdClass" placeholder="Select Order Id">
+                  <option disabled selected value=''>Select Order Id</option>
+                  {{# each orderIdList}}
+                  <option value="{{docNum}}">{{docNum}}</option>
+                  {{/each}}
+                </select>
+              </div>
+
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EMPcode">Outlet</label><br>
+                <select value='' name="outletClass" style="width:100% !important" id="outletClass"
+                  class="outletClass" placeholder="Select Outlet">
+                  <option disabled selected value=''>Select Outlet</option>
+                {{# each outletLisAp1}}
+                  <option value="{{_id}}">{{name}}</option>
+                  {{/each}}
+                </select>
+              </div>
+
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EMPcode">Route</label><br>
+                <select value='' name="routeClass" style="width:100% !important" id="routeClass"
+                  class="routeClass" placeholder="Select Route">
+                  <option disabled selected value=''>Select Route</option>
+                {{# each routeListsAp}}
+                  <option value="{{_id}}">{{routeName}}</option>
+                  {{/each}}
+                </select>
+              </div>
+
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EmailId">From Date</label>
+                <input type="text" autocomplete="off" class="form-control datepicker date validation"
+                  data-date-autoclose="true" onkeydown="event.preventDefault()" id="fromDate" data-provide="datepicker"
+                  data-date-format="dd-mm-yyyy" placeholder="From Date " name="fromDate" />
+              </div>
+              <div class="col-md-3 col-sx-12 col-sm-12">
+                <label for="EmailId">To Date</label>
+                <input type="text" autocomplete="off" class="form-control datepicker date validation"
+                  data-date-autoclose="true" onkeydown="event.preventDefault()" id="toDate" data-provide="datepicker"
+                  data-date-format="dd-mm-yyyy" placeholder="To Date " name="toDate" />
+              </div>
+              <div class="row" style="float: right">
+                <button type="submit" name="filter" class="btn btn-primary">Filter</button>
+                <button type="button" name="reset" class="btn btn-info reset">Reset Filter</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="box box-default box-solid">
+        {{#if isReady}}
+        <div class="box-body no-padding">
+          <table style="width:100%;margin-bottom:0;table-layout: fixed" class="table table-striped">
+            <tbody>
+              {{#if lenthCheck orderLists}}
+              {{#each orderLists}}
+              <tr>
+                <!-- class="view" id="{{_id}}" -->
+                <td class="sorted-column" width="15%">
+                    <span class="text-left outletVal_{{outlet}}"
+                    style="word-wrap: break-word; text-align: left; font-weight: bold;">
+                    {{outletHelp outlet}}
+                    </span><br>
+                    <span style="text-align: center;" class="text-center">{{docDate}} </span> <br>
+                    <span style="text-align: center;" class="text-center"> {{dateFormates createdAt}} </span>
+                </td>
+                <td class="sorted-column" style="word-wrap: break-word;" width="15%">
+                    <span style="text-align: right;"> {{#if docNum}} {{docNum}} {{else}} {{{statCheck status}}}
+                    {{/if}}</span>
+                    <br>
+                    <span style="text-align: center;" class=" verticalIdVal_{{vertical}}"> {{getVerticalName vertical}}
+                    </span><br>
+                    GHS <span style="font-weight: bold;">{{docTotal}}</span>
+                </td>
+                <td width="15%" align="right">
+                    {{#if orderEditCheck status}}
+                    <a href="javascript:void(0)" class="orderEdit" title="Click to edit Order" id="{{_id}}">
+                      <!-- <button class="pd-20 btn btn-primary"><i class="fa fa-pencil"></i></button> -->
+                      <button class="btn btn-flat filterButtonMobile" title="Click to edit Order">
+                        <i class="fa fa-pencil"></i> </button> &nbsp;
+                    </a> &nbsp;
+                    {{/if}}
+                    <a href="javascript:void(0)" class="view" title="Click to view details" id="{{_id}}">
+                      <!-- <button class="pd-20 btn btn-default"><i class="fa fa-ellipsis-v"></i></button> -->
+                      <button class="btn btn-flat filterButtonMobile">
+                        <i class="fa fa-ellipsis-v"></i> </button> &nbsp;
+                    </a>
+                </td>
+              </tr>
+              {{/each}}
+              {{else}}
+              <tr>
+                <td class="sorted-column text-center" width="15%">
+                  <span style="font-weight: bold; text-align: center;">No Records Found</span>
+                </td>
+              </tr>
+              {{/if}}
+            </tbody>
+          </table>
+        </div>
+        {{sortIcon}}
+        {{else}}
+        <div class="overlay">
+          <i class="fa fa-refresh fa-spin"></i>
+        </div>
+        {{/if}}
+      </div>
+
+      {{#if isReady}}
+      {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-right"
+      onClick=clickEvent}}
+      {{/if}}
+    </div>
+    {{#if isReady}}
+    <div id="bodySpin">
+    </div>
+    {{else}}
+    <div id="bodySpin" style=" width: 100%;position: 
+          fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+      justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+    {{/if}}
+    <div id="bodySpinLoaders" style=" width: 100%;position: 
+    fixed;top: 0;bottom: 0;right: 0;left: 3px;z-index:10000000;">
+      {{#with bodyLoader}}
+      <div class="loader-lg" style="margin-left: -3px; display: flex;align-items: center;height: 100%;
+justify-content: center;background: #f1f1f1;">
+        <img src="{{bodyLoader_img}}" class="mainLoaders" style="width: 50%;">
+      </div>
+      {{/with}}
+    </div>
+  </section>
+
+  {{> successModal id="stockSuccessModal" section=stockTransfer}}
+  {{> errorModal id="stockErrorModal" section=stockTransfer}}
+
+
+  <div class="modal fade in" id="stockUploadConfirmation">
+    <div class="modal-dialog">
+      <form id="uploadstock" autocomplete="off">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span></button>
+            <h4 class="modal-title text-bold" id="stockUploadHeader"></h4>
+          </div>
+          <div class="modal-body">
+            <div id="stocksBody">
+              <div class="fileupload fileupload-new" data-provides="fileupload" style="text-align:center">
+                <span class="btn btn-file btn-default">
+                  <span class="fileupload-exists">{{#if labelName}}
+                    {{labelName}}
+                    {{else}}
+                    Upload File
+                    {{/if}}</span>
+                  <input name="uploadstockFile" class="file-upload-input uploadstockFile" id="uploadstockFile"
+                    method="post" type="file" style="width: 0%;height: 0%; margin-top: 0px;" required />
+                </span>
+                <span class="text-center" id="fileArrayspan"></span>
+              </div>
+              <br>
+              <p class="">
+                Are you sure to upload Stock .?<span id="stockUploadNameDup" class="text-bold"></span>
+              </p>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" title="Download format" id="downloadstock"
+              class="btn btn-primary pull-left">Format</button>
+            <button type="submit" class="btn btn-success">Yes please!</button>
+            <button type="button" class="btn btn-danger" data-dismiss="modal" id="stockFileClose">Not
+              now</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal fade in" id="stockDelConfirmation">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="stockHeader"></h4>
+        </div>
+        <div class="modal-body">
+          <div id="stocksBody">
+            <p class="danger-color">
+              Are you sure to inactivate Stock- '<span id="stockNameDup" class="text-bold"></span>' ?
+            </p>
+          </div>
+          <input type="hidden" id="confirmedUuid">
+        </div>
+        <div class="modal-footer">
+          <button id="stockRemove" class="btn btn-danger">Yes please!</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal" id="stockClose">Not
+            now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade in" id="stockActiveConfirmation">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="stockHeaders"></h4>
+        </div>
+        <div class="modal-body">
+          <div id="stocksBody">
+            <p class="success-color">
+              Are you sure to activate Stock- '<span id="stockNameDups" class="text-bold"></span>' ?
+            </p>
+          </div>
+          <input type="hidden" id="confirmedUuids">
+        </div>
+        <div class="modal-footer">
+          <button id="stockActivate" class="btn btn-success">Yes please!</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal" id="stockClose">Not
+            now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade in" id="directSaleDetails">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span></button>
+          <h4 class="modal-title text-bold" id="orderViewHeader"></h4>
+        </div>
+        <div class="modal-body">
+          <div class="box box-default box-solid">
+            <table style="width:100%;" class="table table-striped">
+              <tbody>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="Employee ">Outlet Name</label>
+                    <div id="detailOutletName"></div>
+                  </td>
+                  <td width="50%">
+                    <label for="firstName">Route</label>
+                    <div id="detailRoute"></div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="Employee "> Order Id</label>
+                    <div id="saleId"></div>
+                  </td>
+                  <td width="50%">
+                    <label for="firstName">Vertical</label>
+                    <div id="detailvertical"></div>
+                  </td>
+                </tr>
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="Employee "> Date</label>
+                    <div id="detailDate"></div>
+                  </td>
+                  <td width="50%">
+                    <label for="Employee ">Employee Name</label>
+                    <div id="detailEmp"></div>
+                  </td>
+                </tr>
+                {{#with deliveryDetails}}
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="Employee ">Delivered Date</label>
+                    <div style="word-wrap:break-word;">{{dateFormat deliveredDate}}</div>
+                  </td>
+
+                  <td width="50%">
+                    <label for="Employee ">Delivery Remarks</label>
+                    <div style="word-wrap:break-word;">{{deliveryRemarks}}</div>
+                  </td>
+                </tr>
+                {{/with}}
+                <tr class="table-border">
+                  <td width="50%">
+                    <label for="Employee "> Status</label>
+                    <div id="detailStatus"></div>
+                  </td>
+                  <td width="50%">
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <span style="padding-left: 10px;"><label for="Employee " style="padding-top: 10px;">Product List
+              </label></span>
+            <div id="detailUsername" class="table-responsive">
+              {{#with productListGets}}
+              <div class="row ">
+                <table style="width:100%;margin-bottom:0;table-layout: fixed" class="table table-striped with-border">
+                  <tbody>
+                    {{#each productListGets}}
+                    <tr class="table-border">
+                      <td width="100%">
+                        <b> {{incremented @index}}</b>
+                        <br>
+                        <span class="productIdVals_{{product}}" style="word-break: break-all; font-weight: bold;">
+                          {{getProductNames
+                          product}} </span><br>
+                        <span class="unitNameVals_{{unit}}" style="word-break: break-all; font-weight: bold;">
+                          {{getUnitNames unit}} </span> <br>
+                        Quantity : <b>{{quantity}}</b> &nbsp;&nbsp;
+                        Total [GHS] :<b> {{priceFormat grossTotal}}</b> <br>
+                      </td>
+                    </tr>
+                    {{/each}}
+                  </tbody>
+                </table>
+              </div>
+              {{/with}}
+              <div class="col-sm-12">
+                <table style="float: right;">
+                  <tr>
+                    <td>Tax Amount [GHS] : </td>
+                    <td style="text-align: right;font-weight: bold;" id="detailGSTs"></td>
+                  </tr>
+                  <tr>
+                    <td>Discount[GHS] : </td>
+                    <td style="text-align: right; font-weight: bold;" id="discountAmtData"></td>
+                  </tr>
+                  <tr>
+                    <td>Grand Total [GHS] :</td>
+                    <td style="text-align: right;font-weight: bold; width: 50%;" id="detailDocTotals">
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+          {{#if printLoad}}
+          <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+          absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+            {{#with printLoaderImage}}
+            <div class="loader-lg" style="width: 100%;height: 100%;display: 
+            flex; align-items: center;justify-content: center;background: #fff;">
+              <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+            </div>
+            {{/with}}
+          </div>
+          {{else}}
+          <div class="loadersSpin">
+          </div>
+          {{/if}}
+
+          <div id="loadersSpinVal" style=" width: 98%;opacity: 0.9;position: 
+          absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+            {{#with printLoaderImage}}
+            <div class="loader-lg" style="width: 100%;height: 100%;display: 
+            flex; align-items: center;justify-content: center;background: #fff;">
+              <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+            </div>
+            {{/with}}
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default closen" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  {{> successModal id="orderSuccessModal" section=order}}
+  {{> errorModal id="orderErrorModal" section=order}}
+  <!-- edit modal  -->
+  <div class="ic-update-Order-modal">
+    <div class="modal" id="ic-update-Order">
+      <form class="addCashSales1" autocomplete="off" id="addCashSales1">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span></button>
+              <h4 class="modal-title">Edit Order</h4>
+            </div>
+            <div class="modal-body">
+              <div class="box box-default box-solid">
+                <table style="width:100%;" class="table table-responsive">
+                  <tr>
+                    <td>
+                      <div class="form-group has-feedback">
+                        <div class="col-sm-6 form-unit" style="padding: 10px 10px 10px 10px;">
+                          <label for="customer">Select Outlet<span class="asteric_red">*</span></label>
+                          <select class="selectOutlet1" required style="width:100%;" name="selectOutlet1"
+                            id="selectOutlet1" disabled>
+                            {{# each getOutletorder}}
+                            <option value="{{_id}}">{{name}}</option>
+                            {{/each}}
+                          </select>
+                          <input type="hidden" id="orderIdEdit" name="orderIdEdit">
+                        </div>
+                        <div class="col-sm-6 form-unit" style="padding: 10px 10px 10px 10px;">
+                          <label for="customer">Select Vertical<span class="asteric_red">*</span></label>
+                          <select class="selectVertical1" required style="width:100%;" name="selectVertical1"
+                            id="selectVertical1" disabled>
+                            {{# each getVerticalorder}}
+                            <option value="{{_id}}">{{verticalName}}</option>
+                            {{/each}}
+                          </select>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="form-group has-feedback">
+                      </div>
+                    </td>
+                  </tr>
+                  <tr class="lightGreenBG">
+                    <td>
+                      <div class="form-group has-feedback">
+                        <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                          <label for="customer">Select Product<span class="asteric_red">*</span></label><br>
+                          <select class="selectProductEdit" name="selectProductEdit" id="selectProductEdit"
+                            style="width:100%; overflow: hidden;">
+                            <option selected='selected' value="">Select Product </option>
+                            {{# each getProductList}}
+                            <option value="{{product}}" style="overflow: hidden; word-break: break-all;">{{productName}}
+                            </option>
+                            {{/each}}
+                          </select>
+                          <span id="itemArrayspan"></span>
+                        </div>
+                        <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                          <label for="customer">Select Unit<span class="asteric_red">*</span></label>
+                          <select class="selectUnitss" style="width:100%; overflow: hidden;" name="selectUnitss"
+                            id="selectUnitss">
+                            <option selected='selected' value="">Select Unit </option>
+                            {{# each getUnitList}}
+                            <option value="{{_id}}">{{unitName}}</option>
+                            {{/each}}
+                          </select>
+                          <div style="padding:4px 14px; "> <span id="unitQuantityShows"> </span> </div>
+                          <span id="unitArrayspan"></span>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr class="lightGreenBG">
+                    <td>
+                      <div class="form-group has-feedback">
+                        <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                          <label for="lastName">Unit Price <span class="asteric_red">*</span></label>
+                          <input type="text" class="form-control validation" placeholder="Unit Price" id="priceVals1"
+                            name="priceVals1" disabled>
+                          <!--  -->
+                          <span id="priceArrayspan"></span>
+                        </div>
+                        <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                          <label for="lastName">Quantity <span class="asteric_red">*</span></label>
+                          <input type="text" class="form-control validation" placeholder="Quantity" id="quantityVal1"
+                            name="quantityVal1">
+                          <span id="quantityArrayspan"></span>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="form-group has-feedback">
+                        <div class="col-sm-6" style="padding: 10px">
+                          <button type="button" class="btn btn-success addItem"
+                            style="width:50%;padding: 10px;box-shadow: #a8a8a8 2px 3px 12px;">
+                            Add Product
+                          </button>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <div class="form-group has-feedback">
+                        <div class="col-sm-12" style="padding: 10px;">
+                          <!-- id="disableDiv" -->
+                          {{#with itemArrayList}}
+                          {{#each itemArrayList}}
+                          <div class="row"
+                            style="background:#fff;border-radius: 15px;box-shadow: 0 10px 16px rgba(0,0,0,0.25), 0 6px 10px rgba(0,0,0,0.22);">
+                            <div class="">
+                              <div class="" style="float:left;width:70%">
+                                <div class="card">
+                                  <div class="card-body" style="padding:10px">
+                                    <div class="card-title text-left productIdVal_{{product}} " style="padding-left: 12px;height:20px;color: #3d3d3d;
+                              font-weight: bold;font-size: 12px;overflow: hidden;">
+                                      {{getProductName product}}</div>
+                                    <div class="card-text text-left "
+                                      style="padding-left: 12px;color: #696969;font-weight: lighter;font-size: small;">
+                                      <span class="fontOne">Unit Price:<span style="font-weight: bold;">&nbsp;{{
+                                          unitPrice}}</span>
+                                      </span> &nbsp;&nbsp;
+                                      <span class="fontOne"> Tax:<span style="font-weight: bold;">&nbsp;{{
+                                          taxRate}}</span>
+                                      </span>
+                                    </div>
+                                    <div class="card-text text-left"
+                                      style="padding-left: 12px;color: #696969;font-weight: lighter;font-size: small;">
+                                      <span class="fontOne"> Unit: &nbsp;<span style="font-weight: bold;"
+                                          class="unitNameVal_{{unit}}">
+                                          {{getUnitName unit}}</span>
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div style="float:left;width:20%;padding: 15px;">
+                                <div class="card-title text-center "
+                                  style="color:#3d3d3d;font-size:20px;text-align:center;vertical-align: middle">
+                                  <span class="fontTwo">{{digitSeperator quantity}}</span>
+                                </div>
+                                <div style="text-align:center;color: #848484;;font-weight: lighter;font-size: smaller;">
+                                  <span class="fontThree">Quantity</span>
+                                </div>
+                              </div>
+                              <a href="javascript:void(0)" class="remove color-white itemDelete" id="{{randomId}}">
+                                <div class=" btn btn-danger mobileView"
+                                  style="width: 10%;border-radius: 0px 15px 15px 0px; float: right;padding:28px 0px 28px;">
+                                  <div>
+                                    <input type="hidden" class="itemDelete" id="itemDelete" value="{{randomId}}">
+                                    <i class="fa fa-close deletePosition"></i>
+                                  </div>
+                                </div>
+                              </a>
+                            </div>
+                          </div>
+                          {{/each}}
+                          {{/with}}
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="form-group has-feedback">
+                        <div class="col-sm-6" style="padding: 10px 10px 10px 10px;">
+                          <label for="lastName">Discount Amount <span class="asteric_red">*</span></label>
+                          <input type="text" required class="form-control validation" placeholder="Discount Amount"
+                            id="discountAmtEdit" name="discountAmtEdit">
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="form-group has-feedback amtShowDiv" style="display: none;">
+                        <div class="col-sm-12">
+                          <table style="float: right;">
+                            <tr>
+                              <td>Tax Amount[GHS] : </td>
+                              <td style="text-align: right; font-weight: bold;" id="taxAdded"></td>
+                            </tr>
+                            <tr>
+                              <td>Discount[GHS] : </td>
+                              <td style="text-align: right; font-weight: bold;" id="discountAmtValEdit"></td>
+                            </tr>
+                            <tr>
+                              <td>Grand Total[GHS] :</td>
+                              <td style="text-align: right; font-weight: bold;" id="total">
+                              </td>
+                            </tr>
+                          </table>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" id="updateStock" class="btn btn-primary  pull-right">Submit
+              </button>
+              <button type="button" class="btn btn-default closestocks  pull-left" data-dismiss="modal">Close</button>
+
+            </div>
+          </div>
+          {{#if printLoad}}
+          <div class="loadersSpin" style=" width: 98%;opacity: 0.9;position: 
+          absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+            {{#with printLoaderImage}}
+            <div class="loader-lg" style="width: 100%;height: 100%;display: 
+            flex; align-items: center;justify-content: center;background: #fff;">
+              <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+            </div>
+            {{/with}}
+          </div>
+          {{else}}
+          <div class="loadersSpin">
+          </div>
+          {{/if}}
+
+
+          <div id="loadersSpinValEdit" style=" width: 98%;opacity: 0.9;position: 
+          absolute;top: 0;bottom: 0;right: 0;left: 3px;z-index:100000;">
+            {{#with printLoaderImage}}
+            <div class="loader-lg" style="width: 100%;height: 100%;display: 
+            flex; align-items: center;justify-content: center;background: #fff;">
+              <img src="{{printLoaderImg}}" class="mainLoaders" style="width: 35%;">
+            </div>
+            {{/with}}
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <!-- edit modal  -->
+  {{/if}}
+</template>
